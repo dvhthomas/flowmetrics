@@ -146,6 +146,42 @@ def _training(samples, start, end):
     )
 
 
+class TestProseDateFormat:
+    """Prose dates in headlines/insights/actions use `Jan 12, 2026` —
+    always with year and comma. ISO stays in code/JSON/cli_invocation."""
+
+    def test_efficiency_headline_uses_prose_dates(self):
+        prs = [_pr(1, cycle_hours=24, eff=0.5)]
+        i = interpret_efficiency(
+            _eff_input(repo="acme/widget"),
+            _window_result(prs),
+        )
+        # Original ISO ("2026-05-04") should be replaced by prose ("May 4, 2026")
+        assert "May 4, 2026" in i.headline or "May 04, 2026" in i.headline
+        assert "May 10, 2026" in i.headline or "May 10, 2026" in i.headline
+        # And the old ISO form must be absent from prose
+        assert "2026-05-04" not in i.headline
+        assert "2026-05-10" not in i.headline
+
+    def test_when_done_headline_uses_prose_dates(self):
+        input_ = WhenDoneInput(
+            repo="acme/widget", items=50, start_date=date(2026, 5, 11),
+            history_start=date(2026, 4, 11), history_end=date(2026, 5, 10),
+            offline=False,
+        )
+        training = _training([5] * 30, date(2026, 4, 11), date(2026, 5, 10))
+        percentiles = {
+            50: date(2026, 5, 19),
+            70: date(2026, 5, 21),
+            85: date(2026, 5, 23),
+            95: date(2026, 5, 25),
+        }
+        hist = build_histogram([date(2026, 5, 20)])
+        i = interpret_when_done(input_, training, hist, percentiles)
+        assert "May 23, 2026" in i.headline
+        assert "2026-05-23" not in i.headline
+
+
 class TestStatusMismatchDiagnostic:
     """When a Jira-style item set shows zero active time and the observed
     statuses don't intersect the configured --active-statuses, the
@@ -220,7 +256,7 @@ class TestInterpretWhenDone:
         i = interpret_when_done(input_, training, hist, percentiles)
         assert "acme/widget" in i.headline
         assert "50" in i.headline  # number of items
-        assert "2026-05-23" in i.headline  # 85th percentile
+        assert "May 23, 2026" in i.headline  # 85th percentile (prose format)
 
     def test_next_actions_warn_when_items_exceeds_training_throughput(self):
         input_ = WhenDoneInput(

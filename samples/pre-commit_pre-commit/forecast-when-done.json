@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-12T12:10:55.267232-06:00",
-  "headline": "Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by 2027-01-01, starting 2026-05-12.",
+  "generated_at": "2026-05-12T12:16:16.677743-06:00",
+  "headline": "Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by Jan 1, 2027, starting May 12, 2026.",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
@@ -19,9 +19,9 @@
       "reading": "Forecast horizon is much further out than the training data covers. High risk of regime change invalidating the result. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is 2026-11-12. 95% confidence is 2027-02-03. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is Nov 12, 2026. 95% confidence is Feb 3, 2027. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
-    "Commit externally on the 85% date (2027-01-01), not the 50% date (2026-11-12).",
+    "Commit externally on the 85% date (Jan 1, 2027), not the 50% date (Nov 12, 2026).",
     "Re-run weekly to track drift in the forecast.",
     "Items to complete (25) exceeds total recent throughput (4 merges in 30d). Forecast is extrapolating past the training horizon \u2014 treat the tail with skepticism.",
     "This forecast reaches 234 days out \u2014 7.8\u00d7 the training window. Shorter forecasts are more reliable; consider fewer items in a near-term commitment and re-forecasting after delivering them."

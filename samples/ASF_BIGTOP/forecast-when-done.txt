@@ -1,1 +1,1 @@
-Forecast for jira:BIGTOP: 85% confidence 25 items are done by 2026-09-09, starting 2026-05-12.
+Forecast for jira:BIGTOP: 85% confidence 25 items are done by Sep 9, 2026, starting May 12, 2026.
