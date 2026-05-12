@@ -442,7 +442,10 @@ def main() -> None:
     # Landing-page preview image. README embeds this inline so the
     # homepage shows a real chart above the fold without anyone needing
     # to click "browse samples" first.
-    preview_path = SAMPLES_DIR / "_preview.png"
+    # Filename intentionally does NOT lead with underscore — Jekyll
+    # treats underscore-prefixed files/dirs as private and won't ship
+    # them, so the README's image reference would 404 on Pages.
+    preview_path = SAMPLES_DIR / "preview.png"
     preview_source = SAMPLES_DIR / "ASF_CASSANDRA" / "cfd.html"
     if preview_source.exists():
         extract_preview_png(preview_source, preview_path)

@@ -16,7 +16,7 @@ plain English.
 A Cumulative Flow Diagram against Apache CASSANDRA's Jira changelog —
 113 issues, seven workflow states stacked by Vacanti's CFD properties:
 
-[![Cumulative Flow Diagram for Apache CASSANDRA](samples/_preview.png)](https://dvhthomas.github.io/flowmetrics/samples/ASF_CASSANDRA/cfd.html)
+[![Cumulative Flow Diagram for Apache CASSANDRA](samples/preview.png)](https://dvhthomas.github.io/flowmetrics/samples/ASF_CASSANDRA/cfd.html)
 
 ### **[Browse all seven sample reports →](https://dvhthomas.github.io/flowmetrics/samples/)**
 
