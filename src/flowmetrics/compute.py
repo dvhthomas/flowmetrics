@@ -58,6 +58,11 @@ class FlowEfficiency:
     efficiency: float
     is_bot: bool = False
     author_login: str | None = None
+    # Distinct named statuses this item visited. Empty for sources
+    # without explicit workflow states (GitHub). Sourced from
+    # `WorkItem.status_intervals` so renderers can surface a workflow
+    # map without re-reading the upstream source.
+    statuses_visited: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -70,6 +75,10 @@ class WindowResult:
     total_active: timedelta
     per_pr: list[FlowEfficiency]
     bot_pr_count: int = 0
+    # Sorted union of all named statuses observed across the window's
+    # items. Empty for sources without workflow states. Lets users tune
+    # `--active-statuses` to whatever their team's workflow actually uses.
+    observed_statuses: list[str] = field(default_factory=list)
 
     @property
     def human_pr_count(self) -> int:
@@ -130,6 +139,7 @@ def compute_pr_flow(
         efficiency=efficiency,
         is_bot=pr.is_bot,
         author_login=pr.author_login,
+        statuses_visited=tuple(sorted({iv.status for iv in pr.status_intervals})),
     )
 
 
@@ -164,4 +174,5 @@ def aggregate(per_pr: Iterable[FlowEfficiency]) -> WindowResult:
         total_active=total_active,
         per_pr=results,
         bot_pr_count=sum(1 for r in results if r.is_bot),
+        observed_statuses=sorted({s for r in results for s in r.statuses_visited}),
     )

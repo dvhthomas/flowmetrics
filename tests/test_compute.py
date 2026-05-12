@@ -97,6 +97,50 @@ class TestComputePrFlow:
         assert result.efficiency == pytest.approx(2 / 49, abs=1e-4)
 
 
+class TestObservedStatuses:
+    """When items carry status_intervals, the WindowResult must expose
+    the union of all statuses seen across the window. Agents and users
+    look at this to tune --active-statuses for their workflow."""
+
+    def test_aggregate_unions_statuses_across_items(self):
+        prs = [
+            PullRequestEvents(
+                item_id="X-1", title="t1",
+                created_at=ts(2026, 5, 4, 9, 0),
+                merged_at=ts(2026, 5, 5, 9, 0),
+                status_intervals=[
+                    StatusInterval(ts(2026, 5, 4, 9, 0), ts(2026, 5, 4, 12, 0), "Open"),
+                    StatusInterval(ts(2026, 5, 4, 12, 0), ts(2026, 5, 5, 9, 0), "In Progress"),
+                ],
+            ),
+            PullRequestEvents(
+                item_id="X-2", title="t2",
+                created_at=ts(2026, 5, 4, 9, 0),
+                merged_at=ts(2026, 5, 5, 9, 0),
+                status_intervals=[
+                    StatusInterval(ts(2026, 5, 4, 9, 0), ts(2026, 5, 4, 12, 0), "Open"),
+                    StatusInterval(ts(2026, 5, 4, 12, 0), ts(2026, 5, 5, 9, 0), "Patch Available"),
+                ],
+            ),
+        ]
+        per_pr = [
+            compute_pr_flow(
+                p, gap=GAP, min_cluster=MIN_CLUSTER,
+                active_statuses=frozenset({"In Progress"}),
+            )
+            for p in prs
+        ]
+        result = aggregate(per_pr)
+        assert result.observed_statuses == ["In Progress", "Open", "Patch Available"]
+
+    def test_empty_when_no_status_data(self):
+        # GitHub-style items (no status_intervals) → empty observed_statuses
+        prs = [make_pr(number=1)]
+        per_pr = [compute_pr_flow(p, gap=GAP, min_cluster=MIN_CLUSTER) for p in prs]
+        result = aggregate(per_pr)
+        assert result.observed_statuses == []
+
+
 class TestStatusDurationActiveTime:
     """When a WorkItem carries `status_intervals`, active time becomes the
     sum of durations spent in user-mapped active statuses. This is Vacanti's

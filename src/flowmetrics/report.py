@@ -34,6 +34,11 @@ class EfficiencyInput:
     gap_hours: float
     min_cluster_minutes: float
     offline: bool
+    # Status names mapped to "active" when items carry named workflow
+    # statuses (Jira). Ignored for GitHub. Captured here so the
+    # interpretation layer can suggest a remap when observed statuses
+    # don't overlap the configured set.
+    active_statuses: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

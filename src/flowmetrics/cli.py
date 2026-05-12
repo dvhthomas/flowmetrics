@@ -313,6 +313,7 @@ def week(
             repo=src.label,
             start=start_d,
             stop=stop_d,
+            active_statuses=tuple(sorted(active_set)),
             gap_hours=gap_hours,
             min_cluster_minutes=min_cluster_minutes,
             offline=offline,

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:02:45.042441-06:00",
+  "generated_at": "2026-05-12T12:10:42.495842-06:00",
   "headline": "Portfolio flow efficiency for pytest-dev/pytest 2026-05-05\u21922026-05-11: 2.0% across 9 completed items (5 human, 4 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
@@ -20,7 +20,8 @@
       "seconds": 99046.0,
       "hours": 27.512777777777778,
       "days": 1.1463657407407408
-    }
+    },
+    "observed_statuses": []
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14375)  ran 28.4d and dominates the ratio.",
   "next_actions": [
@@ -86,7 +87,11 @@
     "stop": "2026-05-11",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": false
+    "offline": false,
+    "active_statuses": [
+      "In Development",
+      "In Progress"
+    ]
   },
   "result": {
     "per_pr": [

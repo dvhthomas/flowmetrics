@@ -91,6 +91,27 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
         "rather than setting a target on the number itself."
     )
 
+    # Diagnostic: zero active time AND configured --active-statuses don't
+    # appear in this workflow → name the mismatch and suggest a remap.
+    # (Vacanti-flavored Jira projects often use non-standard status names.)
+    from datetime import timedelta as _td
+
+    if (
+        result.observed_statuses
+        and result.total_active == _td(0)
+        and not (set(input.active_statuses) & set(result.observed_statuses))
+    ):
+        observed = ", ".join(repr(s) for s in result.observed_statuses)
+        configured = ", ".join(repr(s) for s in input.active_statuses) or "(none)"
+        next_actions.insert(
+            0,
+            f"Configured --active-statuses ({configured}) don't appear in this "
+            f"workflow. Statuses actually observed: {observed}. Pick whichever "
+            "represent active development and pass them as "
+            "`--active-statuses 'X,Y'` — or accept that work happens outside "
+            "the issue tracker.",
+        )
+
     return Interpretation(
         headline=headline,
         key_insight=key_insight,

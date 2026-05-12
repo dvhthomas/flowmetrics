@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:03:07.470199-06:00",
+  "generated_at": "2026-05-12T12:11:04.391790-06:00",
   "headline": "Portfolio flow efficiency for jira:CASSANDRA 2026-05-05\u21922026-05-11: 0.0% across 7 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
@@ -20,7 +20,16 @@
       "seconds": 513.167,
       "hours": 0.1425463888888889,
       "days": 0.005939432870370371
-    }
+    },
+    "observed_statuses": [
+      "In Progress",
+      "Needs Committer",
+      "Open",
+      "Patch Available",
+      "Ready to Commit",
+      "Review In Progress",
+      "Triage Needed"
+    ]
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-20672)  ran 348.4d and dominates the ratio.",
   "next_actions": [
@@ -78,7 +87,11 @@
     "stop": "2026-05-11",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": false
+    "offline": false,
+    "active_statuses": [
+      "In Development",
+      "In Progress"
+    ]
   },
   "result": {
     "per_pr": [

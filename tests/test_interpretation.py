@@ -146,6 +146,59 @@ def _training(samples, start, end):
     )
 
 
+class TestStatusMismatchDiagnostic:
+    """When a Jira-style item set shows zero active time and the observed
+    statuses don't intersect the configured --active-statuses, the
+    interpretation calls out the mismatch and suggests a fix."""
+
+    def _input_with_active(self, active: tuple[str, ...]) -> EfficiencyInput:
+        return EfficiencyInput(
+            repo="jira:BIGTOP",
+            start=date(2026, 5, 4),
+            stop=date(2026, 5, 10),
+            gap_hours=4.0,
+            min_cluster_minutes=30.0,
+            offline=False,
+            active_statuses=active,
+        )
+
+    def test_zero_efficiency_with_unmatched_statuses_suggests_remap(self):
+        prs = [_pr(1, cycle_hours=24, eff=0.0)]
+        result = WindowResult(
+            pr_count=1, portfolio_efficiency=0.0,
+            mean_efficiency=0.0, median_efficiency=0.0,
+            total_cycle=timedelta(hours=24),
+            total_active=timedelta(0),
+            per_pr=prs,
+            observed_statuses=["Open", "Patch Available"],
+        )
+        i = interpret_efficiency(
+            self._input_with_active(("In Progress", "In Development")),
+            result,
+        )
+        text = " ".join(i.next_actions).lower()
+        assert "active-statuses" in text
+        # Concrete suggestion names an observed status
+        assert "patch available" in text or "open" in text
+
+    def test_zero_efficiency_with_overlap_does_not_suggest_remap(self):
+        prs = [_pr(1, cycle_hours=24, eff=0.0)]
+        result = WindowResult(
+            pr_count=1, portfolio_efficiency=0.0,
+            mean_efficiency=0.0, median_efficiency=0.0,
+            total_cycle=timedelta(hours=24),
+            total_active=timedelta(0),
+            per_pr=prs,
+            observed_statuses=["In Progress", "Open"],
+        )
+        i = interpret_efficiency(
+            self._input_with_active(("In Progress",)),
+            result,
+        )
+        text = " ".join(i.next_actions).lower()
+        assert "active-statuses" not in text
+
+
 class TestInterpretWhenDone:
     def test_headline_names_repo_85th_percentile_and_item_count(self):
         input_ = WhenDoneInput(

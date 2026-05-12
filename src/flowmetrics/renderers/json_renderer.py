@@ -106,6 +106,7 @@ def _render_efficiency(report: EfficiencyReport) -> dict[str, Any]:
             "mean_efficiency": r.mean_efficiency,
             "total_cycle": _encode(r.total_cycle),
             "total_active": _encode(r.total_active),
+            "observed_statuses": list(r.observed_statuses),
         },
         "key_insight": report.interpretation.key_insight,
         "next_actions": list(report.interpretation.next_actions),

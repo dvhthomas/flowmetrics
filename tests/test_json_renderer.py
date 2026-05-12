@@ -221,6 +221,51 @@ class TestEfficiencyJson:
         assert "per_pr_efficiency" in payload["chart_data"]
         assert payload["chart_data"]["per_pr_efficiency"][0]["item_id"] == "#42"
 
+    def test_summary_includes_observed_statuses(self):
+        """Agents/users tune --active-statuses by inspecting what the
+        source actually emits. Surfaced under summary.observed_statuses."""
+        from datetime import timedelta as _td
+
+        from flowmetrics.compute import (
+            FlowEfficiency as _FE,
+        )
+        from flowmetrics.compute import (
+            WindowResult as _WR,
+        )
+
+        per_pr = [
+            _FE(
+                item_id="BIGTOP-1",
+                title="t",
+                created_at=datetime(2026, 5, 4, 9, 0, tzinfo=UTC),
+                merged_at=datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
+                cycle_time=_td(hours=24),
+                active_time=_td(0),
+                efficiency=0.0,
+                statuses_visited=("Open", "Patch Available"),
+            ),
+        ]
+        result = _WR(
+            pr_count=1, portfolio_efficiency=0.0,
+            mean_efficiency=0.0, median_efficiency=0.0,
+            total_cycle=_td(hours=24), total_active=_td(0),
+            per_pr=per_pr,
+            observed_statuses=["Open", "Patch Available"],
+        )
+        report = EfficiencyReport(
+            input=EfficiencyInput(
+                "jira:BIGTOP", date(2026, 5, 4), date(2026, 5, 10),
+                4.0, 30.0, False,
+                active_statuses=("In Progress",),
+            ),
+            result=result,
+            interpretation=_interp(),
+        )
+        payload = json.loads(json_renderer.render(report))
+        assert payload["summary"]["observed_statuses"] == [
+            "Open", "Patch Available",
+        ]
+
     def test_interpretation_promoted_to_top_level(self):
         """Headline + insight + actions are now top-level for agent access."""
         payload = json.loads(json_renderer.render(_efficiency_report()))

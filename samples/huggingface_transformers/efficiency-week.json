@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:02:49.621650-06:00",
+  "generated_at": "2026-05-12T12:10:47.178790-06:00",
   "headline": "Portfolio flow efficiency for huggingface/transformers 2026-05-05\u21922026-05-11: 1.2% across 47 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
@@ -20,7 +20,8 @@
       "seconds": 964386.0,
       "hours": 267.885,
       "days": 11.161875
-    }
+    },
+    "observed_statuses": []
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#36895)  ran 411.4d and dominates the ratio.",
   "next_actions": [
@@ -238,7 +239,11 @@
     "stop": "2026-05-11",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": false
+    "offline": false,
+    "active_statuses": [
+      "In Development",
+      "In Progress"
+    ]
   },
   "result": {
     "per_pr": [

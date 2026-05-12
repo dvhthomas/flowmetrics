@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:03:14.174657-06:00",
+  "generated_at": "2026-05-12T12:11:09.040461-06:00",
   "headline": "Portfolio flow efficiency for jira:BIGTOP 2026-05-05\u21922026-05-11: 0.0% across 4 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
@@ -20,10 +20,15 @@
       "seconds": 0.0,
       "hours": 0.0,
       "days": 0.0
-    }
+    },
+    "observed_statuses": [
+      "Open",
+      "Patch Available"
+    ]
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (BIGTOP-4517)  ran 84.5d and dominates the ratio.",
   "next_actions": [
+    "Configured --active-statuses ('In Development', 'In Progress') don't appear in this workflow. Statuses actually observed: 'Open', 'Patch Available'. Pick whichever represent active development and pass them as `--active-statuses 'X,Y'` \u2014 or accept that work happens outside the issue tracker.",
     "Inspect the three slowest PRs (BIGTOP-4517, BIGTOP-4522, BIGTOP-4523) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
@@ -66,7 +71,11 @@
     "stop": "2026-05-11",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": false
+    "offline": false,
+    "active_statuses": [
+      "In Development",
+      "In Progress"
+    ]
   },
   "result": {
     "per_pr": [
