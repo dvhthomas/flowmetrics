@@ -13,7 +13,22 @@ plain English.
 
 ## What it looks like
 
-A one-line answer for terminals and pipelines:
+A Cumulative Flow Diagram against Apache CASSANDRA's Jira changelog —
+113 issues, seven workflow states stacked by Vacanti's CFD properties:
+
+[![Cumulative Flow Diagram for Apache CASSANDRA](samples/_preview.png)](https://dvhthomas.github.io/flowmetrics/samples/ASF_CASSANDRA/cfd.html)
+
+### **[Browse all seven sample reports →](https://dvhthomas.github.io/flowmetrics/samples/)**
+
+Seven public sources — five GitHub repos (`astral-sh/uv`,
+`pytest-dev/pytest`, `huggingface/transformers`, `pre-commit/pre-commit`,
+`CalcMark/go-calcmark`) and two Apache Jira projects (`CASSANDRA`,
+`BIGTOP`) — each rendered as HTML, plain text, and agent-readable JSON.
+
+---
+
+A one-line headline for terminals and pipelines (`--format text`,
+default):
 
 ```
 $ uv run flow efficiency week --repo astral-sh/uv
@@ -24,26 +39,10 @@ $ uv run flow aging --repo astral-sh/uv \
     --workflow "Draft,Awaiting Review,Changes Requested,Approved"
 WIP Aging for astral-sh/uv as of May 12, 2026: 390 in-flight items,
 378 already past P85 (3.2d), 368 past P95 (9.0d).
-
-$ uv run flow cfd --jira-url https://issues.apache.org/jira \
-    --jira-project BIGTOP --start 2026-04-12 --stop 2026-05-11 \
-    --workflow "Open,In Progress,Patch Available,Resolved"
-CFD for jira:BIGTOP Apr 12, 2026 → May 11, 2026: 9 items arrived,
-9 completed, 0 still in flight at end.
 ```
 
-A self-contained HTML report (embedded charts + interpretation +
-the exact command to reproduce it) for archiving and sharing:
-
-> **[See a rendered report →](https://dvhthomas.github.io/flowmetrics/samples/astral-sh_uv/aging.html)**
->
-> The samples directory has [seven public sources](https://dvhthomas.github.io/flowmetrics/samples/)
-> covering a spread of team archetypes — GitHub PR data (astral-sh/uv,
-> pytest, transformers, pre-commit, go-calcmark) and Apache Jira issue
-> data (CASSANDRA, BIGTOP).
-
-And a schema-versioned JSON envelope (with chart data, captured logs,
-and a reproducer command) for agents and dashboards:
+A schema-versioned JSON envelope (with chart data, captured logs, and
+a reproducer command) for agents and dashboards (`--format json`):
 
 ```
 $ uv run flow forecast when-done --repo astral-sh/uv --items 50 --format json \

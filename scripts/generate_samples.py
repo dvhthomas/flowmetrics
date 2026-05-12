@@ -15,7 +15,9 @@ orchestration is integration-tested by running the script.
 
 from __future__ import annotations
 
+import base64
 import html
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -436,6 +438,28 @@ def main() -> None:
     index_path = SAMPLES_DIR / "index.html"
     index_path.write_text(build_index_html(sets, generated_at), encoding="utf-8")
     print(f"\nWrote {index_path}")
+
+    # Landing-page preview image. README embeds this inline so the
+    # homepage shows a real chart above the fold without anyone needing
+    # to click "browse samples" first.
+    preview_path = SAMPLES_DIR / "_preview.png"
+    preview_source = SAMPLES_DIR / "ASF_CASSANDRA" / "cfd.html"
+    if preview_source.exists():
+        extract_preview_png(preview_source, preview_path)
+        print(f"Wrote {preview_path}")
+
+
+def extract_preview_png(source_html: Path, dest_png: Path) -> Path:
+    """Extract the first base64-embedded PNG from `source_html` and
+    write it to `dest_png`. Used to lift a representative chart into a
+    standalone file the README can reference inline."""
+    text = source_html.read_text(encoding="utf-8")
+    match = re.search(r'data:image/png;base64,([A-Za-z0-9+/=]+)', text)
+    if not match:
+        raise ValueError(f"no base64 PNG found in {source_html}")
+    dest_png.parent.mkdir(parents=True, exist_ok=True)
+    dest_png.write_bytes(base64.b64decode(match.group(1)))
+    return dest_png
 
 
 if __name__ == "__main__":
