@@ -1,0 +1,54 @@
+# GitHub Pages / Jekyll configuration.
+#
+# Source: this repo, main branch, root directory.
+# Result: README.md is the site home; docs/*.md render as pages;
+# samples/* (static HTML/JSON/text) is served as-is at /samples/.
+#
+# Internal markdown links to other .md files (e.g.
+# `[METRICS](METRICS.md)` inside `docs/GLOSSARY.md`) are rewritten by
+# `jekyll-relative-links` to their generated HTML URLs at build time —
+# so the same link works both on github.com and on the published site.
+
+title: flowmetrics
+description: >-
+  Vacanti-style flow metrics (cycle/active/wait time, flow efficiency)
+  and Monte Carlo forecasting from GitHub PR data and Apache Jira
+  issue data. Demo-quality learning tool.
+
+# Project sites at user.github.io/<repo>/ need baseurl set so internal
+# absolute paths and theme assets resolve correctly.
+baseurl: "/flowmetrics"
+
+theme: jekyll-theme-cayman
+
+plugins:
+  - jekyll-readme-index        # README.md → site home (`/`)
+  - jekyll-relative-links      # rewrites `.md` cross-doc links
+  - jekyll-titles-from-headings # H1 becomes the page <title>
+  - jekyll-default-layout      # apply theme layout to plain .md pages
+  - jekyll-optional-front-matter # no `---` block needed in docs
+  - jekyll-seo-tag             # basic <head> meta tags
+  - jekyll-sitemap             # generates /sitemap.xml
+
+relative_links:
+  enabled: true
+  collections: true
+
+# Don't try to render the cache / source / tooling directories.
+exclude:
+  - .cache/
+  - .pytest_cache/
+  - .ruff_cache/
+  - .ty_cache/
+  - .venv/
+  - src/
+  - tests/
+  - scripts/
+  - pyproject.toml
+  - uv.lock
+  - .python-version
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - node_modules/
+  - reports/

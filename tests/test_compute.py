@@ -3,8 +3,8 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from flowmetrics.compute import (
-    PullRequestEvents,
     StatusInterval,
+    WorkItem,
     aggregate,
     compute_pr_flow,
 )
@@ -22,8 +22,8 @@ def make_pr(
     created: datetime = ts(2026, 5, 5, 9, 0),
     merged: datetime = ts(2026, 5, 5, 17, 0),
     activity: list[datetime] | None = None,
-) -> PullRequestEvents:
-    return PullRequestEvents(
+) -> WorkItem:
+    return WorkItem(
         item_id=f"#{number}",
         title=f"PR #{number}",
         created_at=created,
@@ -34,7 +34,7 @@ def make_pr(
 
 class TestComputePrFlow:
     def test_unmerged_pr_is_rejected(self):
-        pr = PullRequestEvents(
+        pr = WorkItem(
             item_id="#1",
             title="open",
             created_at=ts(2026, 5, 5, 9, 0),
@@ -104,7 +104,7 @@ class TestObservedStatuses:
 
     def test_aggregate_unions_statuses_across_items(self):
         prs = [
-            PullRequestEvents(
+            WorkItem(
                 item_id="X-1", title="t1",
                 created_at=ts(2026, 5, 4, 9, 0),
                 merged_at=ts(2026, 5, 5, 9, 0),
@@ -113,7 +113,7 @@ class TestObservedStatuses:
                     StatusInterval(ts(2026, 5, 4, 12, 0), ts(2026, 5, 5, 9, 0), "In Progress"),
                 ],
             ),
-            PullRequestEvents(
+            WorkItem(
                 item_id="X-2", title="t2",
                 created_at=ts(2026, 5, 4, 9, 0),
                 merged_at=ts(2026, 5, 5, 9, 0),
@@ -150,7 +150,7 @@ class TestStatusDurationActiveTime:
     def test_active_time_is_sum_of_in_progress_intervals(self):
         # Issue created Mon 9am, In Progress Tue 9am, Resolved Fri 9am.
         # 1 day Open, 3 days In Progress. Active=3d, cycle=4d, FE=75%.
-        item = PullRequestEvents(
+        item = WorkItem(
             item_id="BIGTOP-1",
             title="example",
             created_at=ts(2026, 5, 4, 9, 0),
@@ -170,7 +170,7 @@ class TestStatusDurationActiveTime:
 
     def test_zero_active_time_when_no_active_status_visited(self):
         # All time in "Open" then "In Review" — neither marked active.
-        item = PullRequestEvents(
+        item = WorkItem(
             item_id="BIGTOP-2",
             title="never active",
             created_at=ts(2026, 5, 4, 9, 0),
@@ -189,7 +189,7 @@ class TestStatusDurationActiveTime:
 
     def test_multiple_active_statuses_summed(self):
         # Both "In Progress" and "In Development" treated as active.
-        item = PullRequestEvents(
+        item = WorkItem(
             item_id="X-3", title="multi active",
             created_at=ts(2026, 5, 4, 9, 0),
             merged_at=ts(2026, 5, 8, 9, 0),
@@ -279,7 +279,7 @@ class TestAggregate:
 
     def test_aggregate_counts_bot_prs(self):
         prs = [
-            PullRequestEvents(
+            WorkItem(
                 item_id="#1",
                 title="human",
                 created_at=ts(2026, 5, 5, 9, 0),
@@ -287,7 +287,7 @@ class TestAggregate:
                 activity=[],
                 is_bot=False,
             ),
-            PullRequestEvents(
+            WorkItem(
                 item_id="#2",
                 title="bump",
                 created_at=ts(2026, 5, 5, 9, 0),
@@ -295,7 +295,7 @@ class TestAggregate:
                 activity=[],
                 is_bot=True,
             ),
-            PullRequestEvents(
+            WorkItem(
                 item_id="#3",
                 title="bump 2",
                 created_at=ts(2026, 5, 5, 9, 0),

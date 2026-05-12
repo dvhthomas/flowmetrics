@@ -1,6 +1,5 @@
 from .compute import (
     FlowEfficiency,
-    PullRequestEvents,
     WindowResult,
     WorkItem,
     aggregate,
@@ -34,7 +33,6 @@ __all__ = [
     "DEFAULT_MIN_CLUSTER",
     "DEFAULT_TRAINING_DAYS",
     "FlowEfficiency",
-    "PullRequestEvents",
     "ResultsHistogram",
     "Source",
     "WindowResult",

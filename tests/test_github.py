@@ -279,3 +279,123 @@ class TestFetchPrsMergedInWindow:
 
         client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
         assert fetch_prs_merged_in_window(client, repo, start, stop) == []
+
+
+# ---------------------------------------------------------------------------
+# Open-PR fetch for Aging (review-decision lifecycle)
+# ---------------------------------------------------------------------------
+
+
+from flowmetrics.github import (  # noqa: E402
+    OPEN_PR_QUERY,
+    _pr_open_phase,
+    fetch_open_prs,
+)
+
+
+def _open_pr_variables(repo: str) -> dict:
+    return {
+        "q": f"repo:{repo} is:pr is:open archived:false",
+        "first": 100,
+        "after": None,
+    }
+
+
+def _stub_open_pr(*, number: int, is_draft: bool, review_decision: str | None,
+                  created_at: str = "2026-04-20T10:00:00Z",
+                  title: str = "Open PR",
+                  author: dict | None = None) -> dict:
+    return {
+        "number": number,
+        "title": title,
+        "createdAt": created_at,
+        "isDraft": is_draft,
+        "reviewDecision": review_decision,
+        "author": author or {"__typename": "User", "login": "alice"},
+    }
+
+
+def _seed_open_search(cache: FileCache, repo: str, prs: list[dict]) -> None:
+    variables = _open_pr_variables(repo)
+    response = {
+        "data": {
+            "search": {
+                "pageInfo": {"hasNextPage": False, "endCursor": None},
+                "issueCount": len(prs),
+                "nodes": prs,
+            }
+        }
+    }
+    cache.put(FileCache.make_key(OPEN_PR_QUERY, variables), response)
+
+
+class TestPrOpenPhase:
+    """A PR's open-phase is derived from isDraft + reviewDecision.
+
+    Simple, deliberate four-state lifecycle: Draft, Awaiting Review,
+    Changes Requested, Approved. Merged/closed are terminal and don't
+    appear on the Aging chart.
+    """
+
+    def test_draft_overrides_review_decision(self):
+        # If the PR is a draft, that's the column it sits in regardless
+        # of whether reviewers have already left feedback.
+        assert _pr_open_phase(is_draft=True, review_decision=None) == "Draft"
+        assert _pr_open_phase(is_draft=True, review_decision="APPROVED") == "Draft"
+
+    def test_changes_requested_when_not_draft(self):
+        assert _pr_open_phase(is_draft=False, review_decision="CHANGES_REQUESTED") == "Changes Requested"
+
+    def test_approved_when_not_draft(self):
+        assert _pr_open_phase(is_draft=False, review_decision="APPROVED") == "Approved"
+
+    def test_review_required_means_awaiting_review(self):
+        assert _pr_open_phase(is_draft=False, review_decision="REVIEW_REQUIRED") == "Awaiting Review"
+
+    def test_null_decision_means_awaiting_review(self):
+        # GitHub returns reviewDecision=null when no reviewers are assigned
+        # yet — the PR is implicitly waiting.
+        assert _pr_open_phase(is_draft=False, review_decision=None) == "Awaiting Review"
+
+
+class TestFetchOpenPrs:
+    def test_returns_workitems_with_synthetic_interval_ending_at_asof(self, tmp_path):
+        cache = FileCache(tmp_path)
+        _seed_open_search(
+            cache,
+            "x/y",
+            [
+                _stub_open_pr(number=1, is_draft=True, review_decision=None),
+                _stub_open_pr(number=2, is_draft=False, review_decision="REVIEW_REQUIRED"),
+                _stub_open_pr(number=3, is_draft=False, review_decision="CHANGES_REQUESTED"),
+                _stub_open_pr(number=4, is_draft=False, review_decision="APPROVED"),
+            ],
+        )
+        client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
+        asof = date(2026, 5, 12)
+        items = fetch_open_prs(client, "x/y", asof=asof)
+
+        assert [i.item_id for i in items] == ["#1", "#2", "#3", "#4"]
+        # All in-flight (merged_at None)
+        assert all(i.merged_at is None for i in items)
+        # Each carries a single synthetic interval naming the current phase
+        phases = [i.status_intervals[-1].status for i in items]
+        assert phases == ["Draft", "Awaiting Review", "Changes Requested", "Approved"]
+        # The synthetic interval ends at asof so compute_aging can read it
+        for it in items:
+            assert it.status_intervals[-1].end.date() == asof
+            assert it.status_intervals[-1].start == it.created_at
+
+    def test_skips_nodes_without_a_number(self, tmp_path):
+        # GitHub's search can return null nodes when an item changes type
+        # between request and response. Don't crash.
+        cache = FileCache(tmp_path)
+        variables = _open_pr_variables("x/y")
+        cache.put(
+            FileCache.make_key(OPEN_PR_QUERY, variables),
+            {"data": {"search": {"pageInfo": {"hasNextPage": False, "endCursor": None},
+                                  "issueCount": 0, "nodes": [None]}}},
+        )
+        client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
+        items = fetch_open_prs(client, "x/y", asof=date(2026, 5, 12))
+        assert items == []

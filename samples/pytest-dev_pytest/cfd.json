@@ -1,0 +1,266 @@
+{
+  "schema": "flowmetrics.cfd.v1",
+  "command": "cfd",
+  "generated_at": "2026-05-12T13:15:17.607597-06:00",
+  "headline": "CFD for pytest-dev/pytest Apr 12, 2026 \u2192 May 11, 2026: 39 items arrived, 39 completed, 0 still in flight at end.",
+  "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
+  "summary": {
+    "workflow": [
+      "Open",
+      "Merged"
+    ],
+    "samples": 30,
+    "arrivals_at_end": 39,
+    "departures_at_end": 39,
+    "wip_at_end": 0
+  },
+  "key_insight": "Workflow has a single state \u2014 CFD collapses to one line of cumulative arrivals.",
+  "next_actions": [
+    "Look for places where one line flattens \u2014 that's a stall in that band.",
+    "Compare band widths to the previous window to spot accumulation trends."
+  ],
+  "caveats": [
+    "Past data only \u2014 Vacanti's CFD property #5. The chart does not project forward.",
+    "Items still in flight may be under-represented when the source only fetches completed work. Wider bands today may grow tomorrow.",
+    "Workflow used: Open \u2192 Merged. Items that visit statuses outside this list are silently skipped at those points."
+  ],
+  "vocabulary": {
+    "Cumulative Flow Diagram": "Stacked area chart of cumulative counts per workflow state over time. Each state's line counts items that have entered that state or any later one \u2014 so the lines never cross and never decrease.",
+    "Arrivals": "Top line of a CFD. Cumulative count of items that have entered the workflow (first state) by each sample date. Slope = arrival rate.",
+    "Departures": "Bottom line of a CFD. Cumulative count of items that have exited the workflow (last state) by each sample date. Slope = throughput.",
+    "WIP": "Work In Progress. Vertical distance between two adjacent CFD lines at a sample date = items currently in that workflow band. Per Vacanti's CFD property #3.",
+    "Workflow state": "A named stage in your delivery process (e.g., Open, In Progress, Done). CFDs require an ordered list \u2014 earliest stage to latest."
+  },
+  "chart_data": {
+    "points": [
+      {
+        "sampled_on": "2026-04-12",
+        "counts_by_state": {
+          "Open": 11,
+          "Merged": 2
+        }
+      },
+      {
+        "sampled_on": "2026-04-13",
+        "counts_by_state": {
+          "Open": 12,
+          "Merged": 4
+        }
+      },
+      {
+        "sampled_on": "2026-04-14",
+        "counts_by_state": {
+          "Open": 12,
+          "Merged": 4
+        }
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "counts_by_state": {
+          "Open": 12,
+          "Merged": 4
+        }
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "counts_by_state": {
+          "Open": 12,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "counts_by_state": {
+          "Open": 13,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "counts_by_state": {
+          "Open": 14,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "counts_by_state": {
+          "Open": 15,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "counts_by_state": {
+          "Open": 20,
+          "Merged": 9
+        }
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "counts_by_state": {
+          "Open": 21,
+          "Merged": 13
+        }
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "counts_by_state": {
+          "Open": 21,
+          "Merged": 13
+        }
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "counts_by_state": {
+          "Open": 22,
+          "Merged": 13
+        }
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "counts_by_state": {
+          "Open": 22,
+          "Merged": 13
+        }
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "counts_by_state": {
+          "Open": 23,
+          "Merged": 14
+        }
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "counts_by_state": {
+          "Open": 27,
+          "Merged": 19
+        }
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "counts_by_state": {
+          "Open": 28,
+          "Merged": 19
+        }
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "counts_by_state": {
+          "Open": 28,
+          "Merged": 20
+        }
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "counts_by_state": {
+          "Open": 30,
+          "Merged": 21
+        }
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "counts_by_state": {
+          "Open": 30,
+          "Merged": 21
+        }
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "counts_by_state": {
+          "Open": 31,
+          "Merged": 26
+        }
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "counts_by_state": {
+          "Open": 31,
+          "Merged": 26
+        }
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "counts_by_state": {
+          "Open": 33,
+          "Merged": 30
+        }
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "counts_by_state": {
+          "Open": 33,
+          "Merged": 30
+        }
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "counts_by_state": {
+          "Open": 33,
+          "Merged": 30
+        }
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "counts_by_state": {
+          "Open": 34,
+          "Merged": 30
+        }
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "counts_by_state": {
+          "Open": 34,
+          "Merged": 31
+        }
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "counts_by_state": {
+          "Open": 36,
+          "Merged": 34
+        }
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "counts_by_state": {
+          "Open": 36,
+          "Merged": 36
+        }
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "counts_by_state": {
+          "Open": 38,
+          "Merged": 37
+        }
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "counts_by_state": {
+          "Open": 39,
+          "Merged": 39
+        }
+      }
+    ]
+  },
+  "input": {
+    "repo": "pytest-dev/pytest",
+    "start": "2026-04-12",
+    "stop": "2026-05-11",
+    "workflow": [
+      "Open",
+      "Merged"
+    ],
+    "interval_days": 1,
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow cfd --repo pytest-dev/pytest --start 2026-04-12 --stop 2026-05-11 --workflow 'Open,Merged' --interval-days 1",
+  "logs": []
+}

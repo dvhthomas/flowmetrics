@@ -1,0 +1,2403 @@
+{
+  "schema": "flowmetrics.aging.v1",
+  "command": "aging",
+  "generated_at": "2026-05-12T13:15:11.703575-06:00",
+  "headline": "WIP Aging for astral-sh/uv as of May 12, 2026: 390 in-flight items, 378 already past P85 (3.2d), 368 past P95 (9.0d).",
+  "definition": "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
+  "summary": {
+    "in_flight_count": 390,
+    "wip_by_state": {
+      "Draft": 135,
+      "Changes Requested": 5,
+      "Awaiting Review": 250
+    },
+    "cycle_time_percentiles_days": {
+      "50": 0.5005324074074075,
+      "70": 0.8309027777777778,
+      "85": 3.2072453703703703,
+      "95": 8.993518518518519
+    },
+    "completed_count_for_percentiles": 197
+  },
+  "key_insight": "378 item(s) have aged past the P85 cycle time (3.2d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #3889, #6374, #6791. Concentrate decision-making here.",
+  "next_actions": [
+    "368 item(s) past P95 (9.0d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "Biggest WIP column is 'Awaiting Review' with 250 item(s). If that band is upstream (queue), pull policy. If downstream (review/test), capacity.",
+    "Re-check daily; Aging is a leading indicator of forecast slip."
+  ],
+  "caveats": [
+    "Aging is a snapshot as of May 12, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 12, 2026 \u2192 May 11, 2026 (197 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second."
+  ],
+  "vocabulary": {
+    "Work Item Age": "Elapsed time since an item entered the workflow. Applies only to in-flight items \u2014 once an item exits, that elapsed time becomes the item's Cycle Time. Vacanti, WWIBD pp. 50.",
+    "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y). Vacanti, WWIBD Figure 3.2."
+  },
+  "chart_data": {
+    "items": [
+      {
+        "item_id": "#19379",
+        "title": "Make GitLab job verbose",
+        "current_state": "Draft",
+        "age_days": 0
+      },
+      {
+        "item_id": "#19373",
+        "title": "Add support for setting `no-editable` in `pyproject.toml`",
+        "current_state": "Changes Requested",
+        "age_days": 0
+      },
+      {
+        "item_id": "#19371",
+        "title": "fix: show lock mismatch error with --quiet/--check",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#19365",
+        "title": "Remove usages of `zip` crate",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#19364",
+        "title": "Apply stricter validation to all wheel filename segments",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#19359",
+        "title": "Add some generated internals documentation",
+        "current_state": "Draft",
+        "age_days": 1
+      },
+      {
+        "item_id": "#19357",
+        "title": "Fixes for #16455",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#19347",
+        "title": "Update MSRV to v1.93.1",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#19338",
+        "title": "Normalize second-less TOML datetimes for TOML 1.0",
+        "current_state": "Awaiting Review",
+        "age_days": 2
+      },
+      {
+        "item_id": "#19336",
+        "title": "Support `--require-hashes` in `requirements.txt files`",
+        "current_state": "Awaiting Review",
+        "age_days": 2
+      },
+      {
+        "item_id": "#19335",
+        "title": "Clarify rollback after tool install executable conflicts",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#19333",
+        "title": "Preserve `--locked` error message when `--quiet` is set",
+        "current_state": "Changes Requested",
+        "age_days": 3
+      },
+      {
+        "item_id": "#19323",
+        "title": "Recognize `UV_NO_INSTALL_PROJECT`, `UV_NO_INSTALL_WORKSPACE`, `UV_NO_INSTALL_LOCAL`",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#19319",
+        "title": "fix: continue loop after dangling tool in uv tool uninstall",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#19316",
+        "title": "added more detailed alternative description of the bar chart in the readme",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#19305",
+        "title": "uv audit: JSON output",
+        "current_state": "Awaiting Review",
+        "age_days": 6
+      },
+      {
+        "item_id": "#19304",
+        "title": "Bump rand/digest/hashing crates",
+        "current_state": "Draft",
+        "age_days": 6
+      },
+      {
+        "item_id": "#19299",
+        "title": "docs: clarify that `uv run python` starts a REPL (fixes #6548)",
+        "current_state": "Changes Requested",
+        "age_days": 6
+      },
+      {
+        "item_id": "#19295",
+        "title": "Minimal edit of documentation in settings.rs for `index`",
+        "current_state": "Awaiting Review",
+        "age_days": 6
+      },
+      {
+        "item_id": "#19289",
+        "title": "docs(init): show .git/ and .gitignore in concepts/projects/init.md (#19281)",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#19251",
+        "title": "Update Rust crate rustls-pki-types to v1.14.1",
+        "current_state": "Awaiting Review",
+        "age_days": 8
+      },
+      {
+        "item_id": "#19250",
+        "title": "Update Rust crate rustls to v0.23.40",
+        "current_state": "Awaiting Review",
+        "age_days": 8
+      },
+      {
+        "item_id": "#19244",
+        "title": "Resolve project environment in `uv python find --project` (#11990)",
+        "current_state": "Awaiting Review",
+        "age_days": 9
+      },
+      {
+        "item_id": "#19240",
+        "title": "Move parsing of `UV_RUN_MAX_RECURSION_DEPTH` to EnvironmentOptions; update `str_to_bool` comment about nonstandard values",
+        "current_state": "Awaiting Review",
+        "age_days": 10
+      },
+      {
+        "item_id": "#19235",
+        "title": "Fix pythonw launcher mode for managed Windows venv links",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#19233",
+        "title": "Update conda-incubator/setup-miniconda action to v4",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#19231",
+        "title": "Update fedora:45 Docker digest to 8b838b3",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#19230",
+        "title": "Update cgr.dev/chainguard/python:latest-dev Docker digest to 11ea36a",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#19225",
+        "title": "Readjust the trampoline CI check",
+        "current_state": "Draft",
+        "age_days": 12
+      },
+      {
+        "item_id": "#19220",
+        "title": "Handle broken managed Python installation directory",
+        "current_state": "Awaiting Review",
+        "age_days": 13
+      },
+      {
+        "item_id": "#19217",
+        "title": "feat: Add `uv lock --rewrite` (#15220)",
+        "current_state": "Awaiting Review",
+        "age_days": 13
+      },
+      {
+        "item_id": "#19198",
+        "title": "filter `[exclude-newer-package]` lockfile entries to resolved packages",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#19197",
+        "title": "Package by default: Stabilize preview feature",
+        "current_state": "Draft",
+        "age_days": 15
+      },
+      {
+        "item_id": "#19182",
+        "title": "warn csh users when creating a relocatable virtual environment",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#19170",
+        "title": "Update Rust crate uuid to v1.23.1",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#19159",
+        "title": "Fix PowerShell activator UNC path handling",
+        "current_state": "Awaiting Review",
+        "age_days": 16
+      },
+      {
+        "item_id": "#19151",
+        "title": "Preserve relative structure of transitive editables in `uv pip compile`",
+        "current_state": "Awaiting Review",
+        "age_days": 17
+      },
+      {
+        "item_id": "#19148",
+        "title": "fetch available CPython releases from the network",
+        "current_state": "Draft",
+        "age_days": 18
+      },
+      {
+        "item_id": "#19147",
+        "title": "Redact sensitive parts of URLs in reqwest errors",
+        "current_state": "Draft",
+        "age_days": 18
+      },
+      {
+        "item_id": "#19143",
+        "title": "Remove xz support entirely",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#19127",
+        "title": "Support `pylock.toml` in `--with-requirements` in `uv run` and `uvx`",
+        "current_state": "Awaiting Review",
+        "age_days": 19
+      },
+      {
+        "item_id": "#19122",
+        "title": "Add module owners to workspace metadata",
+        "current_state": "Awaiting Review",
+        "age_days": 19
+      },
+      {
+        "item_id": "#19111",
+        "title": "Stop stacking progress bars when a wheel download is retried",
+        "current_state": "Awaiting Review",
+        "age_days": 20
+      },
+      {
+        "item_id": "#19109",
+        "title": "Fix inclusion of extra specified in dependency group when listed in a conflict",
+        "current_state": "Draft",
+        "age_days": 20
+      },
+      {
+        "item_id": "#19085",
+        "title": "Workspace caching 2 bench",
+        "current_state": "Draft",
+        "age_days": 22
+      },
+      {
+        "item_id": "#19084",
+        "title": "Workspace caching 1 bench",
+        "current_state": "Draft",
+        "age_days": 22
+      },
+      {
+        "item_id": "#19075",
+        "title": "Retry failed partial downloads with HTTP Range header when supported.",
+        "current_state": "Awaiting Review",
+        "age_days": 22
+      },
+      {
+        "item_id": "#19046",
+        "title": "docs: disambiguate duplicate top-level setting anchors",
+        "current_state": "Awaiting Review",
+        "age_days": 23
+      },
+      {
+        "item_id": "#19045",
+        "title": "docs: deduplicate editable install instructions",
+        "current_state": "Awaiting Review",
+        "age_days": 23
+      },
+      {
+        "item_id": "#19041",
+        "title": "Adds --interactive` flag to pass `-i` to python",
+        "current_state": "Awaiting Review",
+        "age_days": 24
+      },
+      {
+        "item_id": "#19033",
+        "title": "Use relative path when creating symlinks in cache.",
+        "current_state": "Awaiting Review",
+        "age_days": 25
+      },
+      {
+        "item_id": "#19026",
+        "title": "Package by default: Update documentation",
+        "current_state": "Draft",
+        "age_days": 26
+      },
+      {
+        "item_id": "#19011",
+        "title": "Allow snapshotting a toml subsection",
+        "current_state": "Draft",
+        "age_days": 27
+      },
+      {
+        "item_id": "#19007",
+        "title": "Cache `pyproject.toml` parsing in workspace discovery",
+        "current_state": "Draft",
+        "age_days": 27
+      },
+      {
+        "item_id": "#18980",
+        "title": "Update dependencies",
+        "current_state": "Awaiting Review",
+        "age_days": 29
+      },
+      {
+        "item_id": "#18975",
+        "title": "Log out without `--username` if username is unambiguous",
+        "current_state": "Awaiting Review",
+        "age_days": 30
+      },
+      {
+        "item_id": "#18974",
+        "title": "Add support for `'3.7.*' == python_full_version`-style markers",
+        "current_state": "Awaiting Review",
+        "age_days": 30
+      },
+      {
+        "item_id": "#18957",
+        "title": "Validate `--upgrade-group` targets",
+        "current_state": "Awaiting Review",
+        "age_days": 33
+      },
+      {
+        "item_id": "#18954",
+        "title": "Allow workspace root to override member non-workspace sources",
+        "current_state": "Draft",
+        "age_days": 33
+      },
+      {
+        "item_id": "#18953",
+        "title": "Only use reproducible exclude newer errors in the test suite",
+        "current_state": "Draft",
+        "age_days": 33
+      },
+      {
+        "item_id": "#18937",
+        "title": "Add a full \"lockfile\" to tool receipts",
+        "current_state": "Awaiting Review",
+        "age_days": 33
+      },
+      {
+        "item_id": "#18936",
+        "title": "Reject locked malware installations",
+        "current_state": "Awaiting Review",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18929",
+        "title": "Add additional retries on WinGet dowloads in CI",
+        "current_state": "Awaiting Review",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18927",
+        "title": "Remove bz/lzma/xz support from ZIP handling",
+        "current_state": "Awaiting Review",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18923",
+        "title": "Fail on `exclude-newer` parse errors",
+        "current_state": "Draft",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18921",
+        "title": "Add `allow-bypass` option to `exclude-newer` for allowing direct pinned dependencies",
+        "current_state": "Draft",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18918",
+        "title": "Show larger files first in progress reporters",
+        "current_state": "Awaiting Review",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18910",
+        "title": "Added instructions for using JupyterLab in a separate environment",
+        "current_state": "Awaiting Review",
+        "age_days": 34
+      },
+      {
+        "item_id": "#18907",
+        "title": "Rewrite the native authentication storage scheme",
+        "current_state": "Draft",
+        "age_days": 35
+      },
+      {
+        "item_id": "#18884",
+        "title": "docs: link the run page to locking and syncing",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#18881",
+        "title": "feat(python): add --all-variants flag to python list",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#18870",
+        "title": "Update Rust crate sha2 to 0.11.0",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#18869",
+        "title": "Update Rust crate md-5 to 0.11.0",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#18859",
+        "title": "Omit workspace members for `--no-sources` commands",
+        "current_state": "Awaiting Review",
+        "age_days": 37
+      },
+      {
+        "item_id": "#18846",
+        "title": "Move `UV_CUDA_DRIVER_VERSION` and `UV_AMD_GPU_ARCHITECTURE` parsing to `EnvironmentOptions`",
+        "current_state": "Awaiting Review",
+        "age_days": 38
+      },
+      {
+        "item_id": "#18835",
+        "title": "Skip macOS AppleDouble sidecar files during .data directory installation",
+        "current_state": "Awaiting Review",
+        "age_days": 39
+      },
+      {
+        "item_id": "#18810",
+        "title": "Fix Docker layer caching during trampoline reproducibility check",
+        "current_state": "Draft",
+        "age_days": 41
+      },
+      {
+        "item_id": "#18776",
+        "title": "fix: support native macOS keyring credential lookup",
+        "current_state": "Awaiting Review",
+        "age_days": 42
+      },
+      {
+        "item_id": "#18772",
+        "title": "Don't silently ignore directories in source-include",
+        "current_state": "Draft",
+        "age_days": 43
+      },
+      {
+        "item_id": "#18770",
+        "title": "Add `--outdated` to `uv python uninstall` and `--uninstall` to `uv python upgrade`",
+        "current_state": "Awaiting Review",
+        "age_days": 43
+      },
+      {
+        "item_id": "#18761",
+        "title": "Update Rust crate cyclonedx-bom to v0.8.1",
+        "current_state": "Draft",
+        "age_days": 43
+      },
+      {
+        "item_id": "#18741",
+        "title": "Add TOML v1.1 -> v1.0 backwards compatibility for source distributions",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#18718",
+        "title": "Store flat indexes as relative paths when originally specified as relative",
+        "current_state": "Draft",
+        "age_days": 48
+      },
+      {
+        "item_id": "#18713",
+        "title": "Use `editpe` for trampoline resource edits",
+        "current_state": "Draft",
+        "age_days": 48
+      },
+      {
+        "item_id": "#18712",
+        "title": "Add docker integration test for Windows NanoServer entrypoint installation",
+        "current_state": "Awaiting Review",
+        "age_days": 48
+      },
+      {
+        "item_id": "#18711",
+        "title": "Use a GitHub App for authentication during release creation",
+        "current_state": "Awaiting Review",
+        "age_days": 48
+      },
+      {
+        "item_id": "#18702",
+        "title": "Add a `system-certs-default` preview feature",
+        "current_state": "Draft",
+        "age_days": 49
+      },
+      {
+        "item_id": "#18693",
+        "title": "Infer Python version requests from source trees in `uv tool` invocations",
+        "current_state": "Draft",
+        "age_days": 49
+      },
+      {
+        "item_id": "#18684",
+        "title": "Add parallel discovery of Python versions for `uv python list`",
+        "current_state": "Draft",
+        "age_days": 50
+      },
+      {
+        "item_id": "#18638",
+        "title": "fix: route warnings through MultiProgress::suspend() to prevent truncation",
+        "current_state": "Awaiting Review",
+        "age_days": 51
+      },
+      {
+        "item_id": "#18627",
+        "title": "Add minimal clarifying install-python.md note",
+        "current_state": "Awaiting Review",
+        "age_days": 52
+      },
+      {
+        "item_id": "#18596",
+        "title": "Prefer hardlinks over reflinks for Mach-O executables to reduce security scanning overhead",
+        "current_state": "Draft",
+        "age_days": 53
+      },
+      {
+        "item_id": "#18593",
+        "title": "Move UV_RUN_MAX_RECURSION_DEPTH parsing to EnvironmentOptions",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#18587",
+        "title": "Fork version selection based on wheel Python version tags",
+        "current_state": "Draft",
+        "age_days": 53
+      },
+      {
+        "item_id": "#18584",
+        "title": "fix: handle BrokenPipe in shell completion generation",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#18580",
+        "title": "Fall back to keyring.exe when WSL interop is available",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#18568",
+        "title": "Expand publish network retries to include transient error status codes",
+        "current_state": "Draft",
+        "age_days": 54
+      },
+      {
+        "item_id": "#18566",
+        "title": "Validate locked versions satisfy requirement specifiers",
+        "current_state": "Draft",
+        "age_days": 54
+      },
+      {
+        "item_id": "#18537",
+        "title": "Invalidate interpreter cache when pyvenv.cfg changes",
+        "current_state": "Draft",
+        "age_days": 56
+      },
+      {
+        "item_id": "#18531",
+        "title": "Move parsing UV_RUN_RECURSION_DEPTH to EnvironmentOptions",
+        "current_state": "Awaiting Review",
+        "age_days": 56
+      },
+      {
+        "item_id": "#18519",
+        "title": "Add JSON output format support to `uv python install`",
+        "current_state": "Awaiting Review",
+        "age_days": 57
+      },
+      {
+        "item_id": "#18518",
+        "title": "Detect architecture at runtime using uname on Unix",
+        "current_state": "Draft",
+        "age_days": 57
+      },
+      {
+        "item_id": "#18517",
+        "title": "Add an integration test for aarch64 Linux",
+        "current_state": "Draft",
+        "age_days": 57
+      },
+      {
+        "item_id": "#18505",
+        "title": "feat: `uv add --constraints <file_or_url>` to save constraints to pyproject.toml",
+        "current_state": "Awaiting Review",
+        "age_days": 57
+      },
+      {
+        "item_id": "#18476",
+        "title": "docs: add workspace guidance for `--all-packages`",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18475",
+        "title": "docs: mention `uv run python` for an interactive REPL",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18474",
+        "title": "docs: clarify uv export default dependency selection",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18472",
+        "title": "docs: clarify what `uv venv --seed` installs",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18471",
+        "title": "docs: mention uvw in the GUI script guide",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18469",
+        "title": "docs: clarify repeated --exclude usage",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#18437",
+        "title": "Allow configuring preview features in `uv.toml` and `pyproject.toml`",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#18434",
+        "title": "Add an extension trait to provide a `Display` implementation which prints an error chain",
+        "current_state": "Awaiting Review",
+        "age_days": 61
+      },
+      {
+        "item_id": "#18418",
+        "title": "fix: update .gitignore to include additional patterns",
+        "current_state": "Awaiting Review",
+        "age_days": 61
+      },
+      {
+        "item_id": "#18409",
+        "title": "Airflow workspace benchmark",
+        "current_state": "Draft",
+        "age_days": 62
+      },
+      {
+        "item_id": "#18402",
+        "title": "Preserve absolute/relative paths passed to `uv add`",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#18401",
+        "title": "Allow `workspace` to take a path in `tool.uv.sources`",
+        "current_state": "Awaiting Review",
+        "age_days": 63
+      },
+      {
+        "item_id": "#18370",
+        "title": "Add --emit-index-url and --emit-find-links to uv export",
+        "current_state": "Draft",
+        "age_days": 65
+      },
+      {
+        "item_id": "#18363",
+        "title": "docs: clarify that uv lock uses universal resolution (fixes #18029)",
+        "current_state": "Awaiting Review",
+        "age_days": 66
+      },
+      {
+        "item_id": "#18359",
+        "title": "Switch to free runners when on a fork",
+        "current_state": "Awaiting Review",
+        "age_days": 67
+      },
+      {
+        "item_id": "#18347",
+        "title": "Move the registry tests out of the integration test job",
+        "current_state": "Draft",
+        "age_days": 67
+      },
+      {
+        "item_id": "#18311",
+        "title": "Speedup discovery of large workspaces",
+        "current_state": "Awaiting Review",
+        "age_days": 68
+      },
+      {
+        "item_id": "#18302",
+        "title": "Add an integration test for Android",
+        "current_state": "Draft",
+        "age_days": 68
+      },
+      {
+        "item_id": "#18280",
+        "title": "Add code signing of release binaries via `cargo-code-sign`",
+        "current_state": "Draft",
+        "age_days": 70
+      },
+      {
+        "item_id": "#18275",
+        "title": "Add `uv clean --background` for async cache deletion",
+        "current_state": "Draft",
+        "age_days": 70
+      },
+      {
+        "item_id": "#18272",
+        "title": "Create complementary dependencies for extra-only sources",
+        "current_state": "Draft",
+        "age_days": 70
+      },
+      {
+        "item_id": "#18214",
+        "title": "Centralised environment storage",
+        "current_state": "Awaiting Review",
+        "age_days": 74
+      },
+      {
+        "item_id": "#18195",
+        "title": "Fix managed interpreter platform filtering when explicit requests are made",
+        "current_state": "Draft",
+        "age_days": 76
+      },
+      {
+        "item_id": "#18171",
+        "title": "Fix supervisor race condition when spawning child processes on Windows",
+        "current_state": "Draft",
+        "age_days": 78
+      },
+      {
+        "item_id": "#18166",
+        "title": "Add uname -m to the interpreter cache key",
+        "current_state": "Awaiting Review",
+        "age_days": 78
+      },
+      {
+        "item_id": "#18162",
+        "title": "Drop the `ctrlc` dependency",
+        "current_state": "Draft",
+        "age_days": 78
+      },
+      {
+        "item_id": "#18150",
+        "title": "Update Rust crate toml_edit to 0.25.0",
+        "current_state": "Awaiting Review",
+        "age_days": 78
+      },
+      {
+        "item_id": "#18121",
+        "title": "Add test for tool upgrade after Python version removal",
+        "current_state": "Draft",
+        "age_days": 81
+      },
+      {
+        "item_id": "#18118",
+        "title": "Attempt to use reflink on Windows",
+        "current_state": "Draft",
+        "age_days": 81
+      },
+      {
+        "item_id": "#18095",
+        "title": "Add test coverage for pip build environments in `find_uv_bin`",
+        "current_state": "Draft",
+        "age_days": 83
+      },
+      {
+        "item_id": "#18090",
+        "title": "Refactor hint handling",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#18085",
+        "title": "Respect `[tool.uv.sources]` for extra build dependencies in `uv build` and `uv run --with`",
+        "current_state": "Draft",
+        "age_days": 83
+      },
+      {
+        "item_id": "#18084",
+        "title": "Vendor packse scenarios and serve them from an in-memory index",
+        "current_state": "Draft",
+        "age_days": 83
+      },
+      {
+        "item_id": "#18069",
+        "title": "docs: add integration guide for building a minimal AWS Lambda docker image",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#18044",
+        "title": "Update pre-commit dependencies",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#18028",
+        "title": "Clarify `uv python upgrade` message when no installations found",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#18023",
+        "title": "Make access to system site packages directory configureable for tools",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#18009",
+        "title": "fix: improve clarity of uv python upgrade output message",
+        "current_state": "Awaiting Review",
+        "age_days": 88
+      },
+      {
+        "item_id": "#17993",
+        "title": "Improve unsat diagnostics by attributing transitive pins to constraints files",
+        "current_state": "Awaiting Review",
+        "age_days": 89
+      },
+      {
+        "item_id": "#17992",
+        "title": "Create non-virtual relocatable environments with managed interpreters",
+        "current_state": "Draft",
+        "age_days": 89
+      },
+      {
+        "item_id": "#17961",
+        "title": "Add preview option to respect umask when creating lock files",
+        "current_state": "Draft",
+        "age_days": 90
+      },
+      {
+        "item_id": "#17913",
+        "title": "Fix tool upgrade error after Python version upgrade",
+        "current_state": "Awaiting Review",
+        "age_days": 92
+      },
+      {
+        "item_id": "#17911",
+        "title": "Fix benchmark image reflow on documentation index page",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#17894",
+        "title": "fix(tool run): use --from context for requirement resolution failures",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17893",
+        "title": "fix(requirements): detect uv lockfiles passed to -r",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17892",
+        "title": "fix(lock): retry file lock acquisition on EINTR",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17891",
+        "title": "fix(frozen): clarify missing workspace member rename case",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17889",
+        "title": "fix(settings): handle `pyproject.toml` directories during discovery",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17888",
+        "title": "fix(python find): respect --project when selecting .venv",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#17874",
+        "title": "feat(env): add UV_ACTIVE to default to --active",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#17868",
+        "title": "Accept optional 's' suffix for UV_HTTP_TIMEOUT",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#17863",
+        "title": "Move the extract test files into the repository",
+        "current_state": "Awaiting Review",
+        "age_days": 97
+      },
+      {
+        "item_id": "#17854",
+        "title": "Add support for locking build dependencies",
+        "current_state": "Draft",
+        "age_days": 97
+      },
+      {
+        "item_id": "#17841",
+        "title": "Package by default: Add in preview",
+        "current_state": "Awaiting Review",
+        "age_days": 98
+      },
+      {
+        "item_id": "#17818",
+        "title": "Add a script to cross-build macOS binaries on Linux",
+        "current_state": "Draft",
+        "age_days": 99
+      },
+      {
+        "item_id": "#17800",
+        "title": "Implement `uv pip index versions` command",
+        "current_state": "Draft",
+        "age_days": 100
+      },
+      {
+        "item_id": "#17798",
+        "title": "docs: Add MLflow integration guide",
+        "current_state": "Awaiting Review",
+        "age_days": 100
+      },
+      {
+        "item_id": "#17797",
+        "title": "Add support for `--find-links-strategy` to enable non-merge semantics for find-links",
+        "current_state": "Draft",
+        "age_days": 100
+      },
+      {
+        "item_id": "#17790",
+        "title": "Show errors in `uv publish` with `-q` and require `-qq` to suppress them",
+        "current_state": "Draft",
+        "age_days": 100
+      },
+      {
+        "item_id": "#17789",
+        "title": "Allow concurrent uploads and wheel validations in `uv publish`",
+        "current_state": "Draft",
+        "age_days": 101
+      },
+      {
+        "item_id": "#17786",
+        "title": "Add `--on-failure` to `uv publish` and continue on errors by default",
+        "current_state": "Draft",
+        "age_days": 101
+      },
+      {
+        "item_id": "#17779",
+        "title": "Auto-run single executable in uvx/uv tool run when package name differs",
+        "current_state": "Awaiting Review",
+        "age_days": 102
+      },
+      {
+        "item_id": "#17775",
+        "title": "Add riscv64 Docker images",
+        "current_state": "Draft",
+        "age_days": 102
+      },
+      {
+        "item_id": "#17752",
+        "title": "Fix canonicalization of incompatible marker pairs compound disjunctions",
+        "current_state": "Draft",
+        "age_days": 102
+      },
+      {
+        "item_id": "#17748",
+        "title": "Allow installing when the base project and an extra are declared as conflicting",
+        "current_state": "Draft",
+        "age_days": 102
+      },
+      {
+        "item_id": "#17736",
+        "title": "Document interaction between index definitions and workspaces",
+        "current_state": "Awaiting Review",
+        "age_days": 103
+      },
+      {
+        "item_id": "#17709",
+        "title": "Fetch issues from prism on Claude Code for Web start",
+        "current_state": "Awaiting Review",
+        "age_days": 106
+      },
+      {
+        "item_id": "#17703",
+        "title": "Add `--no-upgrade-package` to opt-out of upgrading a specific package (#7177)",
+        "current_state": "Awaiting Review",
+        "age_days": 106
+      },
+      {
+        "item_id": "#17668",
+        "title": "docs(timeout): clarify timeout format in error messages",
+        "current_state": "Awaiting Review",
+        "age_days": 109
+      },
+      {
+        "item_id": "#17646",
+        "title": "Create lock files 644, only check read bit for locks, respect umask",
+        "current_state": "Awaiting Review",
+        "age_days": 111
+      },
+      {
+        "item_id": "#17633",
+        "title": "fix(install): limit preparer concurrency to prevent file handle exhaustion",
+        "current_state": "Awaiting Review",
+        "age_days": 112
+      },
+      {
+        "item_id": "#17628",
+        "title": "Fix local wheel cache invalidation",
+        "current_state": "Awaiting Review",
+        "age_days": 112
+      },
+      {
+        "item_id": "#17611",
+        "title": "Add Nix installation instructions to documentation",
+        "current_state": "Awaiting Review",
+        "age_days": 113
+      },
+      {
+        "item_id": "#17600",
+        "title": "Update Rust crate windows to 0.62.0",
+        "current_state": "Awaiting Review",
+        "age_days": 113
+      },
+      {
+        "item_id": "#17553",
+        "title": "Add an mdtest framework",
+        "current_state": "Draft",
+        "age_days": 114
+      },
+      {
+        "item_id": "#17535",
+        "title": "Add first-party line wrapping",
+        "current_state": "Draft",
+        "age_days": 116
+      },
+      {
+        "item_id": "#17460",
+        "title": "Improve create-python-mirror script",
+        "current_state": "Awaiting Review",
+        "age_days": 118
+      },
+      {
+        "item_id": "#17455",
+        "title": "Support using `--index` to refer to index names",
+        "current_state": "Awaiting Review",
+        "age_days": 119
+      },
+      {
+        "item_id": "#17439",
+        "title": "Fix Python downloads with explicit `+gil` requests",
+        "current_state": "Draft",
+        "age_days": 119
+      },
+      {
+        "item_id": "#17431",
+        "title": "Log if the `gh` CLI is available on session start",
+        "current_state": "Draft",
+        "age_days": 119
+      },
+      {
+        "item_id": "#17426",
+        "title": "Assume tar.gz for packages without extension",
+        "current_state": "Draft",
+        "age_days": 120
+      },
+      {
+        "item_id": "#17398",
+        "title": "Use a reactive benchmark image for the GitHub README",
+        "current_state": "Draft",
+        "age_days": 123
+      },
+      {
+        "item_id": "#17394",
+        "title": "Restore OpenSUSE system test in CI",
+        "current_state": "Draft",
+        "age_days": 123
+      },
+      {
+        "item_id": "#17361",
+        "title": "Allow `--bump post` with `--bump dev`",
+        "current_state": "Awaiting Review",
+        "age_days": 124
+      },
+      {
+        "item_id": "#17336",
+        "title": "Add support for delocating macOS wheels",
+        "current_state": "Awaiting Review",
+        "age_days": 126
+      },
+      {
+        "item_id": "#17326",
+        "title": "Move remaining Boolean environment variables out of Clap",
+        "current_state": "Draft",
+        "age_days": 127
+      },
+      {
+        "item_id": "#17316",
+        "title": "Preserve absolute paths in `uv add` for local dependencies",
+        "current_state": "Awaiting Review",
+        "age_days": 128
+      },
+      {
+        "item_id": "#17278",
+        "title": "Update docs on integrating to AWS CodeArtifact with currently working version",
+        "current_state": "Draft",
+        "age_days": 132
+      },
+      {
+        "item_id": "#17233",
+        "title": "WIP: Add hint for missing Python interpreter on spawn failure",
+        "current_state": "Draft",
+        "age_days": 139
+      },
+      {
+        "item_id": "#17211",
+        "title": "Add background autoprune to remove stale cache entries",
+        "current_state": "Awaiting Review",
+        "age_days": 142
+      },
+      {
+        "item_id": "#17207",
+        "title": "feat: add cache df sub command",
+        "current_state": "Awaiting Review",
+        "age_days": 142
+      },
+      {
+        "item_id": "#17202",
+        "title": "Added config file settings validation for preview features",
+        "current_state": "Awaiting Review",
+        "age_days": 142
+      },
+      {
+        "item_id": "#17179",
+        "title": "Shell-escape Python request in manual install hint",
+        "current_state": "Awaiting Review",
+        "age_days": 145
+      },
+      {
+        "item_id": "#17175",
+        "title": "DEBUG: Improve Python install test performance",
+        "current_state": "Draft",
+        "age_days": 145
+      },
+      {
+        "item_id": "#17172",
+        "title": "Fix --color flag not working with --help",
+        "current_state": "Awaiting Review",
+        "age_days": 145
+      },
+      {
+        "item_id": "#17118",
+        "title": "Avoid allowing package-versions with no wheels in supported environments",
+        "current_state": "Draft",
+        "age_days": 150
+      },
+      {
+        "item_id": "#17110",
+        "title": "Remove miette",
+        "current_state": "Draft",
+        "age_days": 151
+      },
+      {
+        "item_id": "#17091",
+        "title": "16782 python update shell force",
+        "current_state": "Awaiting Review",
+        "age_days": 152
+      },
+      {
+        "item_id": "#17075",
+        "title": "Cache Python downloads by default",
+        "current_state": "Draft",
+        "age_days": 153
+      },
+      {
+        "item_id": "#17074",
+        "title": "Store unpacked Python installations in the cache",
+        "current_state": "Draft",
+        "age_days": 153
+      },
+      {
+        "item_id": "#17072",
+        "title": "Allow missing executables in tool install target when `--with-executables-from` is used",
+        "current_state": "Awaiting Review",
+        "age_days": 153
+      },
+      {
+        "item_id": "#17021",
+        "title": "Add free-threaded selector hint for requires-python",
+        "current_state": "Awaiting Review",
+        "age_days": 155
+      },
+      {
+        "item_id": "#17006",
+        "title": "Add `--isolated-lock` flag to `uv sync`",
+        "current_state": "Awaiting Review",
+        "age_days": 158
+      },
+      {
+        "item_id": "#17001",
+        "title": "Add helpful error message for 'uv activate'",
+        "current_state": "Awaiting Review",
+        "age_days": 158
+      },
+      {
+        "item_id": "#16991",
+        "title": "Honor `--refresh` when reusing cached tool environments for `uvx`/`uv` tool run",
+        "current_state": "Awaiting Review",
+        "age_days": 159
+      },
+      {
+        "item_id": "#16967",
+        "title": "Always treat paths after `-e` as directories",
+        "current_state": "Awaiting Review",
+        "age_days": 160
+      },
+      {
+        "item_id": "#16952",
+        "title": "[Draft] Clarify duration environment variable format at parse time",
+        "current_state": "Draft",
+        "age_days": 160
+      },
+      {
+        "item_id": "#16853",
+        "title": "Issue 11632 - Add sources override",
+        "current_state": "Draft",
+        "age_days": 168
+      },
+      {
+        "item_id": "#16816",
+        "title": "Content-address distributions in the archive",
+        "current_state": "Awaiting Review",
+        "age_days": 171
+      },
+      {
+        "item_id": "#16815",
+        "title": "Clarify 'uv python upgrade' message when no versions exist",
+        "current_state": "Awaiting Review",
+        "age_days": 172
+      },
+      {
+        "item_id": "#16808",
+        "title": "Add `--exclude-packages` to pip compile/install/tool install",
+        "current_state": "Awaiting Review",
+        "age_days": 172
+      },
+      {
+        "item_id": "#16749",
+        "title": "Follow-up from #16542",
+        "current_state": "Awaiting Review",
+        "age_days": 178
+      },
+      {
+        "item_id": "#16748",
+        "title": "fix: prefer env var credentials over index URL username; guard cache & git-store; add tests",
+        "current_state": "Awaiting Review",
+        "age_days": 178
+      },
+      {
+        "item_id": "#16746",
+        "title": "Migrate sys_info to sysinfo",
+        "current_state": "Awaiting Review",
+        "age_days": 178
+      },
+      {
+        "item_id": "#16743",
+        "title": "`uvx`/`uv tool run` install confirmation prompt",
+        "current_state": "Draft",
+        "age_days": 179
+      },
+      {
+        "item_id": "#16723",
+        "title": "tests: cache managed Python installs",
+        "current_state": "Awaiting Review",
+        "age_days": 180
+      },
+      {
+        "item_id": "#16670",
+        "title": "Switch from Mkdocs to Zensical",
+        "current_state": "Draft",
+        "age_days": 183
+      },
+      {
+        "item_id": "#16648",
+        "title": "Use `git ls-remote` to resolve Git SHAs",
+        "current_state": "Awaiting Review",
+        "age_days": 184
+      },
+      {
+        "item_id": "#16635",
+        "title": "Implement `pip install --report <file>`",
+        "current_state": "Awaiting Review",
+        "age_days": 186
+      },
+      {
+        "item_id": "#16606",
+        "title": "Add debug logging for exclude-newer filtering",
+        "current_state": "Awaiting Review",
+        "age_days": 188
+      },
+      {
+        "item_id": "#16598",
+        "title": "Add PEP 794 import name metadata support to uv build backend",
+        "current_state": "Awaiting Review",
+        "age_days": 188
+      },
+      {
+        "item_id": "#16553",
+        "title": "Add `MACOSX_DEPLOYMENT_TARGET` hint for macos platform wheels",
+        "current_state": "Awaiting Review",
+        "age_days": 191
+      },
+      {
+        "item_id": "#16544",
+        "title": "Allow non-root packages in `uv sync`",
+        "current_state": "Awaiting Review",
+        "age_days": 192
+      },
+      {
+        "item_id": "#16515",
+        "title": "add Renovate CustomManager to manage maturin version",
+        "current_state": "Awaiting Review",
+        "age_days": 194
+      },
+      {
+        "item_id": "#16489",
+        "title": "Ignore markers on requirements.txt options",
+        "current_state": "Awaiting Review",
+        "age_days": 195
+      },
+      {
+        "item_id": "#16480",
+        "title": "Don't allow local versions when a non-local version is pinned",
+        "current_state": "Draft",
+        "age_days": 196
+      },
+      {
+        "item_id": "#16475",
+        "title": "Improve create-python-mirror - Save metadata & Update URLs",
+        "current_state": "Awaiting Review",
+        "age_days": 196
+      },
+      {
+        "item_id": "#16462",
+        "title": "allow toml pass preview features in list",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#16452",
+        "title": "Added support for [tool.uv.preview-features] in TOML configs (#15767)",
+        "current_state": "Awaiting Review",
+        "age_days": 198
+      },
+      {
+        "item_id": "#16445",
+        "title": "tweak build dependency hint wording",
+        "current_state": "Awaiting Review",
+        "age_days": 199
+      },
+      {
+        "item_id": "#16432",
+        "title": "Add example to docs for a release job within GitLab CI",
+        "current_state": "Awaiting Review",
+        "age_days": 200
+      },
+      {
+        "item_id": "#16403",
+        "title": "Ignore PermissionDenied during config discovery",
+        "current_state": "Awaiting Review",
+        "age_days": 202
+      },
+      {
+        "item_id": "#16398",
+        "title": "Add JSON output for the `tree` command",
+        "current_state": "Awaiting Review",
+        "age_days": 203
+      },
+      {
+        "item_id": "#16388",
+        "title": "Move parsing `UV_COMPILE_BYTECODE_TIMEOUT` to EnvironmentOptions",
+        "current_state": "Awaiting Review",
+        "age_days": 203
+      },
+      {
+        "item_id": "#16335",
+        "title": "Fix: uv tool install installs workspace members non\u2011editable by default; --editable to opt\u2011in",
+        "current_state": "Awaiting Review",
+        "age_days": 207
+      },
+      {
+        "item_id": "#16323",
+        "title": "Error when there is an authentication failure in check URL",
+        "current_state": "Draft",
+        "age_days": 209
+      },
+      {
+        "item_id": "#16287",
+        "title": "Fix: uv fails if requirements.txt files contain remote constraints",
+        "current_state": "Awaiting Review",
+        "age_days": 211
+      },
+      {
+        "item_id": "#16277",
+        "title": "Add `@generated` marker to `uv.lock` files",
+        "current_state": "Awaiting Review",
+        "age_days": 211
+      },
+      {
+        "item_id": "#16255",
+        "title": "document how to specify where to install tools",
+        "current_state": "Awaiting Review",
+        "age_days": 212
+      },
+      {
+        "item_id": "#16249",
+        "title": "Add `--no-wait` argument for the `run` command to not wait for spawned process to finish",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#16245",
+        "title": "Dont retry connection on SSL certificate error",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#16230",
+        "title": "Add technique for offline generation of autocompletion files to docs",
+        "current_state": "Awaiting Review",
+        "age_days": 214
+      },
+      {
+        "item_id": "#16222",
+        "title": "Add `UV_PYTHON_EXTRA_INSTALL_DIRS`",
+        "current_state": "Draft",
+        "age_days": 214
+      },
+      {
+        "item_id": "#16103",
+        "title": "Add `--find-links` support for `uv pip list`",
+        "current_state": "Awaiting Review",
+        "age_days": 222
+      },
+      {
+        "item_id": "#16089",
+        "title": "Error on dependency groups with incompatible requires-python in `pip compile`",
+        "current_state": "Awaiting Review",
+        "age_days": 223
+      },
+      {
+        "item_id": "#16069",
+        "title": "Short overview of project creation options",
+        "current_state": "Awaiting Review",
+        "age_days": 224
+      },
+      {
+        "item_id": "#16036",
+        "title": "Remove docs for custom GitHub caching",
+        "current_state": "Awaiting Review",
+        "age_days": 228
+      },
+      {
+        "item_id": "#16018",
+        "title": "Add `--outdated` to `uv python uninstall`",
+        "current_state": "Awaiting Review",
+        "age_days": 230
+      },
+      {
+        "item_id": "#16006",
+        "title": "Switch default indentation to 2 spaces in `pyproject.toml`",
+        "current_state": "Awaiting Review",
+        "age_days": 231
+      },
+      {
+        "item_id": "#16002",
+        "title": "Add support for explicit variants and `--all-variants` flag with `uv python list`",
+        "current_state": "Awaiting Review",
+        "age_days": 231
+      },
+      {
+        "item_id": "#15949",
+        "title": "Add instructions for publishing to Cloudsmith",
+        "current_state": "Changes Requested",
+        "age_days": 235
+      },
+      {
+        "item_id": "#15939",
+        "title": "Support `uv version --all-packages`",
+        "current_state": "Awaiting Review",
+        "age_days": 236
+      },
+      {
+        "item_id": "#15932",
+        "title": "Always ensure wheels are compatible with the required Python versions",
+        "current_state": "Draft",
+        "age_days": 236
+      },
+      {
+        "item_id": "#15924",
+        "title": "support isolated PEP 723 scripts",
+        "current_state": "Awaiting Review",
+        "age_days": 236
+      },
+      {
+        "item_id": "#15893",
+        "title": "Allow uv to install from Pyodide's index",
+        "current_state": "Draft",
+        "age_days": 238
+      },
+      {
+        "item_id": "#15884",
+        "title": "Ignore inferred conflict marker when determining if lockfile is up-to-date",
+        "current_state": "Draft",
+        "age_days": 238
+      },
+      {
+        "item_id": "#15841",
+        "title": "Add GHE support for gist resolution with GH_HOST",
+        "current_state": "Awaiting Review",
+        "age_days": 240
+      },
+      {
+        "item_id": "#15711",
+        "title": "Implement UV_PYTHON_PLATFORM env var",
+        "current_state": "Draft",
+        "age_days": 247
+      },
+      {
+        "item_id": "#15658",
+        "title": "Restrict the URLs considered compatible with pyx requests",
+        "current_state": "Draft",
+        "age_days": 251
+      },
+      {
+        "item_id": "#15621",
+        "title": "merged match arms where possible",
+        "current_state": "Awaiting Review",
+        "age_days": 253
+      },
+      {
+        "item_id": "#15568",
+        "title": "Allow declaring match-runtime for project's own build dependencies",
+        "current_state": "Draft",
+        "age_days": 257
+      },
+      {
+        "item_id": "#15479",
+        "title": "Filter Python executables on Windows by Python version metadata",
+        "current_state": "Awaiting Review",
+        "age_days": 261
+      },
+      {
+        "item_id": "#15467",
+        "title": "Warn when uv venv is used and VIRTUAL_ENV is set",
+        "current_state": "Awaiting Review",
+        "age_days": 262
+      },
+      {
+        "item_id": "#15456",
+        "title": "Add keyring integration for git credentials",
+        "current_state": "Draft",
+        "age_days": 263
+      },
+      {
+        "item_id": "#15343",
+        "title": "Add comma-separated support for --extra and --group flags",
+        "current_state": "Awaiting Review",
+        "age_days": 267
+      },
+      {
+        "item_id": "#15321",
+        "title": "Update build-backend.md",
+        "current_state": "Awaiting Review",
+        "age_days": 270
+      },
+      {
+        "item_id": "#15308",
+        "title": "Support UV_PYTHON_PLATFORM when executing `uv sync`",
+        "current_state": "Awaiting Review",
+        "age_days": 270
+      },
+      {
+        "item_id": "#15295",
+        "title": "Improved `match` statements",
+        "current_state": "Awaiting Review",
+        "age_days": 270
+      },
+      {
+        "item_id": "#15284",
+        "title": "Set `VIRTUAL_ENV` in `uv tool run`",
+        "current_state": "Draft",
+        "age_days": 271
+      },
+      {
+        "item_id": "#15279",
+        "title": "Add a CI job to test memory",
+        "current_state": "Draft",
+        "age_days": 271
+      },
+      {
+        "item_id": "#15250",
+        "title": "Implement -C as short hand for --project",
+        "current_state": "Awaiting Review",
+        "age_days": 272
+      },
+      {
+        "item_id": "#15244",
+        "title": "Merge the top-level members of the Jupyter share and etc directories",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#15236",
+        "title": "change in build-backend.md file and settings.md",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#15235",
+        "title": "chore: replaced the license link",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#15175",
+        "title": "workflows: Add annotating permission to 'annotate uv' action",
+        "current_state": "Awaiting Review",
+        "age_days": 277
+      },
+      {
+        "item_id": "#15167",
+        "title": "chore(ci): address lint findings in release workflow",
+        "current_state": "Awaiting Review",
+        "age_days": 277
+      },
+      {
+        "item_id": "#15094",
+        "title": "Code style improvements",
+        "current_state": "Awaiting Review",
+        "age_days": 280
+      },
+      {
+        "item_id": "#15075",
+        "title": "Update badge logo SVG",
+        "current_state": "Awaiting Review",
+        "age_days": 280
+      },
+      {
+        "item_id": "#15004",
+        "title": "docs/guides/integration/jupyter: section about ephemeral environments",
+        "current_state": "Awaiting Review",
+        "age_days": 285
+      },
+      {
+        "item_id": "#15001",
+        "title": "Move environment variable parsing to EnvironmentOptions",
+        "current_state": "Draft",
+        "age_days": 285
+      },
+      {
+        "item_id": "#14937",
+        "title": "Allow templating the `UV_PROJECT_ENVIRONMENT` path",
+        "current_state": "Awaiting Review",
+        "age_days": 288
+      },
+      {
+        "item_id": "#14911",
+        "title": "[WIP] feat: add CUDA management support to uv",
+        "current_state": "Draft",
+        "age_days": 290
+      },
+      {
+        "item_id": "#14909",
+        "title": "Automatically include extra variant index in variant prototype",
+        "current_state": "Draft",
+        "age_days": 291
+      },
+      {
+        "item_id": "#14877",
+        "title": "Symlink (or copy) binary entry points into ephemeral environments",
+        "current_state": "Draft",
+        "age_days": 292
+      },
+      {
+        "item_id": "#14869",
+        "title": "Do not replace the Python dylib on macOS if `install_name_tool` fails",
+        "current_state": "Awaiting Review",
+        "age_days": 292
+      },
+      {
+        "item_id": "#14789",
+        "title": "Add `--all-groups` to `uv pip install` and `uv pip sync`",
+        "current_state": "Awaiting Review",
+        "age_days": 295
+      },
+      {
+        "item_id": "#14783",
+        "title": "In pylock.toml export, include dependencies (name, marker and version)",
+        "current_state": "Awaiting Review",
+        "age_days": 295
+      },
+      {
+        "item_id": "#14743",
+        "title": "Directly ask the NVIDIA kernel driver what version it is",
+        "current_state": "Draft",
+        "age_days": 297
+      },
+      {
+        "item_id": "#14728",
+        "title": "Complete PEP 751 multi-use lock file for pylock.toml export",
+        "current_state": "Draft",
+        "age_days": 298
+      },
+      {
+        "item_id": "#14687",
+        "title": "Support http/https URLs in `uv python --python-downloads-json-url`",
+        "current_state": "Awaiting Review",
+        "age_days": 299
+      },
+      {
+        "item_id": "#14669",
+        "title": "Add a GitHub Actions warning to the `uv venv` behavior change",
+        "current_state": "Draft",
+        "age_days": 300
+      },
+      {
+        "item_id": "#14628",
+        "title": "Initial design doc for centralized venvs",
+        "current_state": "Awaiting Review",
+        "age_days": 301
+      },
+      {
+        "item_id": "#14579",
+        "title": "Implement an auto-import proof-of-concept",
+        "current_state": "Draft",
+        "age_days": 304
+      },
+      {
+        "item_id": "#14499",
+        "title": "Added an automatic sourcing utility called \"Envy\" to CLI ",
+        "current_state": "Awaiting Review",
+        "age_days": 309
+      },
+      {
+        "item_id": "#14492",
+        "title": "docs(guides): Add Python and PyPy mirror configuration",
+        "current_state": "Awaiting Review",
+        "age_days": 309
+      },
+      {
+        "item_id": "#14459",
+        "title": "Support `self update --output-format=json`",
+        "current_state": "Awaiting Review",
+        "age_days": 312
+      },
+      {
+        "item_id": "#14428",
+        "title": "Always write filesystem locks to a shared state directory",
+        "current_state": "Changes Requested",
+        "age_days": 314
+      },
+      {
+        "item_id": "#14327",
+        "title": "Enable the Python download cache in CI",
+        "current_state": "Draft",
+        "age_days": 319
+      },
+      {
+        "item_id": "#14287",
+        "title": "Use `flit_editable` instead of `poetry_editable` throughout",
+        "current_state": "Draft",
+        "age_days": 320
+      },
+      {
+        "item_id": "#14266",
+        "title": "docs: add instructions for installing dependencies for entire workspace or specific packages",
+        "current_state": "Awaiting Review",
+        "age_days": 320
+      },
+      {
+        "item_id": "#14188",
+        "title": "Use isolated Poetry editables for `pip_uninstall` tests",
+        "current_state": "Draft",
+        "age_days": 325
+      },
+      {
+        "item_id": "#14125",
+        "title": "Fix the current directory change issue upon activation of a relocatable venv within fish",
+        "current_state": "Awaiting Review",
+        "age_days": 328
+      },
+      {
+        "item_id": "#14077",
+        "title": "WIP unused sources warning",
+        "current_state": "Draft",
+        "age_days": 330
+      },
+      {
+        "item_id": "#14074",
+        "title": "Fix test isolation from managed Python installations",
+        "current_state": "Draft",
+        "age_days": 330
+      },
+      {
+        "item_id": "#14027",
+        "title": "Refactor version handling in self_update to report upgradable version",
+        "current_state": "Awaiting Review",
+        "age_days": 333
+      },
+      {
+        "item_id": "#14001",
+        "title": "Add `UV_PACKAGE` environment variable",
+        "current_state": "Awaiting Review",
+        "age_days": 334
+      },
+      {
+        "item_id": "#13976",
+        "title": "Add a \"storage\" reference document",
+        "current_state": "Awaiting Review",
+        "age_days": 335
+      },
+      {
+        "item_id": "#13962",
+        "title": "Support `tool list --output-format=json`",
+        "current_state": "Awaiting Review",
+        "age_days": 335
+      },
+      {
+        "item_id": "#13934",
+        "title": "feat: upgrade dependencies in pyproject.toml",
+        "current_state": "Draft",
+        "age_days": 337
+      },
+      {
+        "item_id": "#13879",
+        "title": "Expand environment variables in user-provided index URLs",
+        "current_state": "Awaiting Review",
+        "age_days": 340
+      },
+      {
+        "item_id": "#13873",
+        "title": "Support python@latest for newest, stable, discoverable Python",
+        "current_state": "Awaiting Review",
+        "age_days": 341
+      },
+      {
+        "item_id": "#13684",
+        "title": "Add note on uv venv replacing the existing virtual environment",
+        "current_state": "Awaiting Review",
+        "age_days": 350
+      },
+      {
+        "item_id": "#13542",
+        "title": "[DOC] Explain `uv sync` in the projects guide for working on existing projects",
+        "current_state": "Awaiting Review",
+        "age_days": 358
+      },
+      {
+        "item_id": "#13510",
+        "title": "Make `uv python install` consider `pyproject.toml`'s `requires-python` field",
+        "current_state": "Awaiting Review",
+        "age_days": 360
+      },
+      {
+        "item_id": "#13306",
+        "title": "Use uv to test cross-build wheels instead of pip",
+        "current_state": "Draft",
+        "age_days": 372
+      },
+      {
+        "item_id": "#13272",
+        "title": "Handle packages with mismatched names in Simple API",
+        "current_state": "Awaiting Review",
+        "age_days": 375
+      },
+      {
+        "item_id": "#13021",
+        "title": "uv-workspace: provide hint when pyproject.toml is missing",
+        "current_state": "Awaiting Review",
+        "age_days": 386
+      },
+      {
+        "item_id": "#12965",
+        "title": "Support `default-extras` config in the project interface.",
+        "current_state": "Draft",
+        "age_days": 389
+      },
+      {
+        "item_id": "#12952",
+        "title": "Add support for `<maj>.<min>-dev` Python version requests",
+        "current_state": "Draft",
+        "age_days": 390
+      },
+      {
+        "item_id": "#12937",
+        "title": "Prevent uninstalling a Python installation if it is used by a tool",
+        "current_state": "Awaiting Review",
+        "age_days": 390
+      },
+      {
+        "item_id": "#12888",
+        "title": "Bugfix relative path glob walking for cache-keys",
+        "current_state": "Awaiting Review",
+        "age_days": 392
+      },
+      {
+        "item_id": "#12815",
+        "title": "add another note that sources in deps don't work",
+        "current_state": "Awaiting Review",
+        "age_days": 397
+      },
+      {
+        "item_id": "#12556",
+        "title": "Make python-install-mirror configurable in single-file scripts",
+        "current_state": "Awaiting Review",
+        "age_days": 408
+      },
+      {
+        "item_id": "#12475",
+        "title": "POC: Implement `uv pip wheel`",
+        "current_state": "Draft",
+        "age_days": 412
+      },
+      {
+        "item_id": "#12390",
+        "title": "Documentation for --package and --all-packages options for the sync command",
+        "current_state": "Awaiting Review",
+        "age_days": 416
+      },
+      {
+        "item_id": "#12320",
+        "title": "Use Depot Windows runner in `cargo-test`",
+        "current_state": "Draft",
+        "age_days": 419
+      },
+      {
+        "item_id": "#12292",
+        "title": "uv build: add --keep-on-error",
+        "current_state": "Awaiting Review",
+        "age_days": 420
+      },
+      {
+        "item_id": "#12255",
+        "title": "Continue on client errors when fetching wheel metadata",
+        "current_state": "Awaiting Review",
+        "age_days": 420
+      },
+      {
+        "item_id": "#12210",
+        "title": "Test for interrupts during git process",
+        "current_state": "Awaiting Review",
+        "age_days": 421
+      },
+      {
+        "item_id": "#12203",
+        "title": "Add prototype implementation of wheel variant specification",
+        "current_state": "Draft",
+        "age_days": 422
+      },
+      {
+        "item_id": "#12201",
+        "title": "More descriptive error message for `uv run pythonx.xx`",
+        "current_state": "Awaiting Review",
+        "age_days": 422
+      },
+      {
+        "item_id": "#12156",
+        "title": "fixed git submodule bug when using relative paths",
+        "current_state": "Awaiting Review",
+        "age_days": 425
+      },
+      {
+        "item_id": "#12025",
+        "title": "Add dependabot config for uv to docs",
+        "current_state": "Awaiting Review",
+        "age_days": 432
+      },
+      {
+        "item_id": "#11964",
+        "title": "Include the Python request source in not found error messages",
+        "current_state": "Draft",
+        "age_days": 433
+      },
+      {
+        "item_id": "#11785",
+        "title": "Handle nested .git directories in `uv init`",
+        "current_state": "Awaiting Review",
+        "age_days": 440
+      },
+      {
+        "item_id": "#11783",
+        "title": "Add MACOSX_DEPLOYMENT_TARGET hint for macos platform wheels",
+        "current_state": "Awaiting Review",
+        "age_days": 441
+      },
+      {
+        "item_id": "#11774",
+        "title": "Adds Persistent fils logs to testing",
+        "current_state": "Awaiting Review",
+        "age_days": 441
+      },
+      {
+        "item_id": "#11762",
+        "title": "Add logging output to file functionality ",
+        "current_state": "Awaiting Review",
+        "age_days": 441
+      },
+      {
+        "item_id": "#11750",
+        "title": "Increase spacing between nav sections and headers",
+        "current_state": "Awaiting Review",
+        "age_days": 442
+      },
+      {
+        "item_id": "#11670",
+        "title": "Consider system site packages if activated",
+        "current_state": "Draft",
+        "age_days": 446
+      },
+      {
+        "item_id": "#11642",
+        "title": "Add an \"edit this page\" button to the docs",
+        "current_state": "Awaiting Review",
+        "age_days": 447
+      },
+      {
+        "item_id": "#11617",
+        "title": "Add documentation for running as unprivileged user",
+        "current_state": "Awaiting Review",
+        "age_days": 447
+      },
+      {
+        "item_id": "#11613",
+        "title": "Close #9871: add uv self uninstall command",
+        "current_state": "Draft",
+        "age_days": 447
+      },
+      {
+        "item_id": "#11526",
+        "title": "Use \"Source\" instead of \"Repository\" in PyPI links",
+        "current_state": "Awaiting Review",
+        "age_days": 452
+      },
+      {
+        "item_id": "#11477",
+        "title": "Make the cache dir  wherever uv is called from when --no-cache specified",
+        "current_state": "Awaiting Review",
+        "age_days": 453
+      },
+      {
+        "item_id": "#11325",
+        "title": "Add experimental direct src layout",
+        "current_state": "Draft",
+        "age_days": 459
+      },
+      {
+        "item_id": "#11287",
+        "title": "Add `--virtual` flag to `uv python find`",
+        "current_state": "Draft",
+        "age_days": 460
+      },
+      {
+        "item_id": "#11257",
+        "title": "Reduce the number of badges in the README",
+        "current_state": "Draft",
+        "age_days": 461
+      },
+      {
+        "item_id": "#11256",
+        "title": "Left-align benchmark on landing instead of center",
+        "current_state": "Awaiting Review",
+        "age_days": 461
+      },
+      {
+        "item_id": "#11248",
+        "title": "Recommend deactivation in the project `VIRTUAL_ENV` warning",
+        "current_state": "Awaiting Review",
+        "age_days": 461
+      },
+      {
+        "item_id": "#11204",
+        "title": "Add docs for `uv pip compile` and renovate",
+        "current_state": "Draft",
+        "age_days": 463
+      },
+      {
+        "item_id": "#11106",
+        "title": "Use docker cache mounts for apt, pip and cargo",
+        "current_state": "Awaiting Review",
+        "age_days": 467
+      },
+      {
+        "item_id": "#10944",
+        "title": "Use GitHub ARM runners to build aarch64 Linux binaries",
+        "current_state": "Draft",
+        "age_days": 473
+      },
+      {
+        "item_id": "#10923",
+        "title": "Add `urllib3` to ecosystem tests",
+        "current_state": "Awaiting Review",
+        "age_days": 474
+      },
+      {
+        "item_id": "#10921",
+        "title": "Skip clean-up of test temporary directories in CI",
+        "current_state": "Draft",
+        "age_days": 474
+      },
+      {
+        "item_id": "#10897",
+        "title": "Add `--subdirectory` for Git dependencies",
+        "current_state": "Draft",
+        "age_days": 474
+      },
+      {
+        "item_id": "#10886",
+        "title": "Print dependencies in uv pip list.",
+        "current_state": "Awaiting Review",
+        "age_days": 474
+      },
+      {
+        "item_id": "#10670",
+        "title": "Add elvish activation script",
+        "current_state": "Awaiting Review",
+        "age_days": 481
+      },
+      {
+        "item_id": "#10521",
+        "title": "Fix `OSTYPE` unset error in virtualenv activate script",
+        "current_state": "Draft",
+        "age_days": 486
+      },
+      {
+        "item_id": "#10492",
+        "title": "Fix `cygpath` missing error in virtualenv activate script",
+        "current_state": "Draft",
+        "age_days": 486
+      },
+      {
+        "item_id": "#10292",
+        "title": "Draft: Add `uv license` command",
+        "current_state": "Draft",
+        "age_days": 494
+      },
+      {
+        "item_id": "#10083",
+        "title": "Allow the creation of non-activatable envrionments",
+        "current_state": "Draft",
+        "age_days": 507
+      },
+      {
+        "item_id": "#10075",
+        "title": "Add additional explanation of --mount=type=cache",
+        "current_state": "Awaiting Review",
+        "age_days": 507
+      },
+      {
+        "item_id": "#10072",
+        "title": "Add support for direct archive dependencies in Git",
+        "current_state": "Awaiting Review",
+        "age_days": 507
+      },
+      {
+        "item_id": "#9920",
+        "title": "Enable user-level management of index credentials via uv (& keyring)",
+        "current_state": "Awaiting Review",
+        "age_days": 513
+      },
+      {
+        "item_id": "#9882",
+        "title": "Improve fish shell completion instructions",
+        "current_state": "Awaiting Review",
+        "age_days": 515
+      },
+      {
+        "item_id": "#9849",
+        "title": "Use `sys.path` for package discovery",
+        "current_state": "Draft",
+        "age_days": 516
+      },
+      {
+        "item_id": "#9841",
+        "title": "Dim uninstalled Python keys in `uv python list`",
+        "current_state": "Draft",
+        "age_days": 516
+      },
+      {
+        "item_id": "#9839",
+        "title": "Implement pip list --verbose",
+        "current_state": "Draft",
+        "age_days": 516
+      },
+      {
+        "item_id": "#9788",
+        "title": "Detect x86_64 microarchitecture variant automatically",
+        "current_state": "Draft",
+        "age_days": 518
+      },
+      {
+        "item_id": "#9689",
+        "title": "Docs: Add details of `--seed` to pip environments docs",
+        "current_state": "Awaiting Review",
+        "age_days": 522
+      },
+      {
+        "item_id": "#9360",
+        "title": "Move the dependency specifiers specification into the reference section",
+        "current_state": "Draft",
+        "age_days": 536
+      },
+      {
+        "item_id": "#9315",
+        "title": "Allow building multiple packages in one `uv build` run",
+        "current_state": "Draft",
+        "age_days": 537
+      },
+      {
+        "item_id": "#9034",
+        "title": "Include new package name mistake suggestions",
+        "current_state": "Awaiting Review",
+        "age_days": 547
+      },
+      {
+        "item_id": "#9033",
+        "title": "Fix reflow of index on image load: benchmark image - #6264",
+        "current_state": "Awaiting Review",
+        "age_days": 547
+      },
+      {
+        "item_id": "#9019",
+        "title": "Add the differences between ``pip install`` and ``uv pip install`` installation directories in the pip compatibility document.",
+        "current_state": "Awaiting Review",
+        "age_days": 547
+      },
+      {
+        "item_id": "#8649",
+        "title": "Update Windows trampolines for compatibility with Python 3.7 and earlier",
+        "current_state": "Awaiting Review",
+        "age_days": 561
+      },
+      {
+        "item_id": "#8541",
+        "title": ":sparkles: use UV_SYNC_ALL_EXTRAS env var in uv sync command",
+        "current_state": "Awaiting Review",
+        "age_days": 565
+      },
+      {
+        "item_id": "#8190",
+        "title": "Load Git trees lazily on checkout",
+        "current_state": "Awaiting Review",
+        "age_days": 575
+      },
+      {
+        "item_id": "#7935",
+        "title": "Add `pyenv-virtualenv` compatybility",
+        "current_state": "Awaiting Review",
+        "age_days": 585
+      },
+      {
+        "item_id": "#7677",
+        "title": "Add a `uv-python` shim executable",
+        "current_state": "Draft",
+        "age_days": 595
+      },
+      {
+        "item_id": "#7223",
+        "title": "Respect `NO_COLOR` env var in `uv help` output",
+        "current_state": "Awaiting Review",
+        "age_days": 610
+      },
+      {
+        "item_id": "#7171",
+        "title": "Support man pages for `uv tool`",
+        "current_state": "Draft",
+        "age_days": 612
+      },
+      {
+        "item_id": "#6791",
+        "title": "Update the Git fetch API to be async",
+        "current_state": "Draft",
+        "age_days": 621
+      },
+      {
+        "item_id": "#6374",
+        "title": "Add `uv init --from-project <path>`",
+        "current_state": "Awaiting Review",
+        "age_days": 629
+      },
+      {
+        "item_id": "#3889",
+        "title": "Make `--python` a global argument",
+        "current_state": "Draft",
+        "age_days": 714
+      }
+    ]
+  },
+  "input": {
+    "repo": "astral-sh/uv",
+    "asof": "2026-05-12",
+    "workflow": [
+      "Draft",
+      "Awaiting Review",
+      "Changes Requested",
+      "Approved"
+    ],
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow aging --repo astral-sh/uv --asof 2026-05-12 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-12 --history-end 2026-05-11",
+  "logs": []
+}

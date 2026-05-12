@@ -1,0 +1,59 @@
+{% extends "base.html.jinja" %}
+
+{% block content %}
+{% if not report.points %}
+<p>No CFD samples for this window.</p>
+{% else %}
+
+<h2>Headline numbers</h2>
+<table>
+  <tr><th>Workflow</th><td>{{ report.input.workflow | join(" → ") }}</td></tr>
+  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }} ({{ report.points|length }} samples)</td></tr>
+  <tr><th>Arrivals at end</th><td class="num">{{ end_counts[report.input.workflow[0]] }}</td></tr>
+  <tr><th>Departures at end</th><td class="num">{{ end_counts[report.input.workflow[-1]] }}</td></tr>
+  <tr><th>Total WIP at end</th><td class="num">
+    <strong>{{ end_counts[report.input.workflow[0]] - end_counts[report.input.workflow[-1]] }}</strong>
+  </td></tr>
+</table>
+
+<img alt="Cumulative Flow Diagram" src="data:image/png;base64,{{ chart_cfd_b64 }}" />
+
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<strong>Reading the chart.</strong> Each band's vertical thickness at a
+sample date is the WIP in that workflow state (property #3). The slope
+of any line measures the rate at which items entered that state-or-later
+over time (property #6). The horizontal distance between two adjacent
+lines at a given y-level is the approximate average cycle time through
+the bands between them (property #4).
+</p>
+{% endif %}
+{% endblock %}
+
+{% block detail %}
+<h2>Input parameters</h2>
+<table>
+  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
+  <tr><th>Workflow</th><td>{{ report.input.workflow | join(", ") }}</td></tr>
+  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }}</td></tr>
+  <tr><th>Sample interval</th><td>{{ report.input.interval_days }} day(s)</td></tr>
+</table>
+
+<details>
+<summary>Show all {{ report.points|length }} sample points</summary>
+<table>
+<thead>
+<tr><th>Date</th>{% for s in report.input.workflow %}<th>{{ s }}</th>{% endfor %}</tr>
+</thead>
+<tbody>
+{% for p in report.points %}
+  <tr>
+    <td>{{ p.sampled_on }}</td>
+    {% for s in report.input.workflow %}
+      <td class="num">{{ p.counts_by_state.get(s, 0) }}</td>
+    {% endfor %}
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</details>
+{% endblock %}

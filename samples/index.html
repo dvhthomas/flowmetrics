@@ -3,167 +3,106 @@
 <head>
 <meta charset="utf-8">
 <title>flowmetrics — samples</title>
-<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#1a1a1a;line-height:1.55;}h1{font-size:1.6rem;}.stamp{color:#777;font-size:0.85rem;}table{border-collapse:collapse;margin:1rem 0;width:100%;}th,td{padding:0.5rem 0.7rem;border-bottom:1px solid #eee;text-align:left;vertical-align:top;}th{background:#fafafa;}.archetype{color:#777;font-size:0.85rem;}a{color:#2b7cff;text-decoration:none;}a:hover{text-decoration:underline;}</style>
+<style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:1200px;margin:2rem auto;padding:0 1rem;color:#1a1a1a;line-height:1.55;}h1{font-size:1.6rem;}h2{font-size:1.15rem;margin-top:2.5rem;border-bottom:1px solid #eee;padding-bottom:0.3rem;}.stamp{color:#777;font-size:0.85rem;}table{border-collapse:collapse;margin:1rem 0;width:100%;}th,td{padding:0.5rem 0.7rem;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:0.9rem;}th{background:#fafafa;}.archetype{color:#777;font-size:0.85rem;}.na{color:#bbb;font-style:italic;}a{color:#2b7cff;text-decoration:none;}a:hover{text-decoration:underline;}.note{color:#666;font-size:0.85rem;background:#fafafa;padding:0.6rem 0.8rem;border-left:3px solid #ddd;margin:0.8rem 0;}dl dt{margin-top:0.6rem;font-weight:600;}dl dd{margin:0.1rem 0 0.5rem 1.2rem;color:#555;font-size:0.9rem;}</style>
 </head>
 <body>
 <h1>flowmetrics — sample output</h1>
-<p class="stamp">Generated 2026-05-12 18:15:58 UTC</p>
-<p>Live data from public GitHub repositories. Each row gives three
-output formats (HTML report, plain text for humans, JSON for agents).</p>
+<p class="stamp">Generated 2026-05-12 19:15:05 UTC</p>
+<p>Live data from public GitHub and Apache Jira sources. Each row gives
+three output formats per report (HTML, text, JSON).</p>
+<p class="note"><strong>About the GitHub samples:</strong> GitHub PRs
+don't expose a multi-state workflow, so CFD shows a degenerate
+two-band view (open → merged) — useful as a learning reference for
+what CFD looks like with no intermediate states. GitHub Aging uses a
+deliberately simple review-decision lifecycle (Draft → Awaiting Review
+→ Changes Requested → Approved). See <code>docs/DECISIONS.md</code>
+#9 and #10 for the full reasoning.</p>
 <table>
 <thead>
-<tr><th>Repository</th><th>Efficiency (week)</th>
-<th>Forecast: when-done</th><th>Forecast: how-many</th></tr>
+<tr><th>Repository</th>
+<th>Efficiency (week)</th>
+<th>Forecast: when-done</th>
+<th>Forecast: how-many</th>
+<th>CFD</th>
+<th>Aging WIP</th></tr>
 </thead>
 <tbody>
         <tr>
-          <td>
-            <strong>astral-sh/uv</strong><br>
-            <span class="archetype">Fast-moving Rust/Python tooling (GitHub)</span>
-          </td>
-          <td>
-            <a href="astral-sh_uv/efficiency-week.html">html</a> ·
-            <a href="astral-sh_uv/efficiency-week.txt">text</a> ·
-            <a href="astral-sh_uv/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="astral-sh_uv/forecast-when-done.html">html</a> ·
-            <a href="astral-sh_uv/forecast-when-done.txt">text</a> ·
-            <a href="astral-sh_uv/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="astral-sh_uv/forecast-how-many.html">html</a> ·
-            <a href="astral-sh_uv/forecast-how-many.txt">text</a> ·
-            <a href="astral-sh_uv/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>astral-sh/uv</strong><br><span class="archetype">Fast-moving Rust/Python tooling (GitHub)</span></td>
+          <td><a href="astral-sh_uv/efficiency-week.html">html</a> · <a href="astral-sh_uv/efficiency-week.txt">text</a> · <a href="astral-sh_uv/efficiency-week.json">json</a></td>
+          <td><a href="astral-sh_uv/forecast-when-done.html">html</a> · <a href="astral-sh_uv/forecast-when-done.txt">text</a> · <a href="astral-sh_uv/forecast-when-done.json">json</a></td>
+          <td><a href="astral-sh_uv/forecast-how-many.html">html</a> · <a href="astral-sh_uv/forecast-how-many.txt">text</a> · <a href="astral-sh_uv/forecast-how-many.json">json</a></td>
+          <td><a href="astral-sh_uv/cfd.html">html</a> · <a href="astral-sh_uv/cfd.txt">text</a> · <a href="astral-sh_uv/cfd.json">json</a></td>
+          <td><a href="astral-sh_uv/aging.html">html</a> · <a href="astral-sh_uv/aging.txt">text</a> · <a href="astral-sh_uv/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>pytest-dev/pytest</strong><br>
-            <span class="archetype">Mature Python framework with active maintenance (GitHub)</span>
-          </td>
-          <td>
-            <a href="pytest-dev_pytest/efficiency-week.html">html</a> ·
-            <a href="pytest-dev_pytest/efficiency-week.txt">text</a> ·
-            <a href="pytest-dev_pytest/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="pytest-dev_pytest/forecast-when-done.html">html</a> ·
-            <a href="pytest-dev_pytest/forecast-when-done.txt">text</a> ·
-            <a href="pytest-dev_pytest/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="pytest-dev_pytest/forecast-how-many.html">html</a> ·
-            <a href="pytest-dev_pytest/forecast-how-many.txt">text</a> ·
-            <a href="pytest-dev_pytest/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>pytest-dev/pytest</strong><br><span class="archetype">Mature Python framework with active maintenance (GitHub)</span></td>
+          <td><a href="pytest-dev_pytest/efficiency-week.html">html</a> · <a href="pytest-dev_pytest/efficiency-week.txt">text</a> · <a href="pytest-dev_pytest/efficiency-week.json">json</a></td>
+          <td><a href="pytest-dev_pytest/forecast-when-done.html">html</a> · <a href="pytest-dev_pytest/forecast-when-done.txt">text</a> · <a href="pytest-dev_pytest/forecast-when-done.json">json</a></td>
+          <td><a href="pytest-dev_pytest/forecast-how-many.html">html</a> · <a href="pytest-dev_pytest/forecast-how-many.txt">text</a> · <a href="pytest-dev_pytest/forecast-how-many.json">json</a></td>
+          <td><a href="pytest-dev_pytest/cfd.html">html</a> · <a href="pytest-dev_pytest/cfd.txt">text</a> · <a href="pytest-dev_pytest/cfd.json">json</a></td>
+          <td><a href="pytest-dev_pytest/aging.html">html</a> · <a href="pytest-dev_pytest/aging.txt">text</a> · <a href="pytest-dev_pytest/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>huggingface/transformers</strong><br>
-            <span class="archetype">ML library, mixed community + maintainer flow (GitHub)</span>
-          </td>
-          <td>
-            <a href="huggingface_transformers/efficiency-week.html">html</a> ·
-            <a href="huggingface_transformers/efficiency-week.txt">text</a> ·
-            <a href="huggingface_transformers/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="huggingface_transformers/forecast-when-done.html">html</a> ·
-            <a href="huggingface_transformers/forecast-when-done.txt">text</a> ·
-            <a href="huggingface_transformers/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="huggingface_transformers/forecast-how-many.html">html</a> ·
-            <a href="huggingface_transformers/forecast-how-many.txt">text</a> ·
-            <a href="huggingface_transformers/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>huggingface/transformers</strong><br><span class="archetype">ML library, mixed community + maintainer flow (GitHub)</span></td>
+          <td><a href="huggingface_transformers/efficiency-week.html">html</a> · <a href="huggingface_transformers/efficiency-week.txt">text</a> · <a href="huggingface_transformers/efficiency-week.json">json</a></td>
+          <td><a href="huggingface_transformers/forecast-when-done.html">html</a> · <a href="huggingface_transformers/forecast-when-done.txt">text</a> · <a href="huggingface_transformers/forecast-when-done.json">json</a></td>
+          <td><a href="huggingface_transformers/forecast-how-many.html">html</a> · <a href="huggingface_transformers/forecast-how-many.txt">text</a> · <a href="huggingface_transformers/forecast-how-many.json">json</a></td>
+          <td><a href="huggingface_transformers/cfd.html">html</a> · <a href="huggingface_transformers/cfd.txt">text</a> · <a href="huggingface_transformers/cfd.json">json</a></td>
+          <td><a href="huggingface_transformers/aging.html">html</a> · <a href="huggingface_transformers/aging.txt">text</a> · <a href="huggingface_transformers/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>pre-commit/pre-commit</strong><br>
-            <span class="archetype">Developer-tooling Python project (GitHub)</span>
-          </td>
-          <td>
-            <a href="pre-commit_pre-commit/efficiency-week.html">html</a> ·
-            <a href="pre-commit_pre-commit/efficiency-week.txt">text</a> ·
-            <a href="pre-commit_pre-commit/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="pre-commit_pre-commit/forecast-when-done.html">html</a> ·
-            <a href="pre-commit_pre-commit/forecast-when-done.txt">text</a> ·
-            <a href="pre-commit_pre-commit/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="pre-commit_pre-commit/forecast-how-many.html">html</a> ·
-            <a href="pre-commit_pre-commit/forecast-how-many.txt">text</a> ·
-            <a href="pre-commit_pre-commit/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>pre-commit/pre-commit</strong><br><span class="archetype">Developer-tooling Python project (GitHub)</span></td>
+          <td><a href="pre-commit_pre-commit/efficiency-week.html">html</a> · <a href="pre-commit_pre-commit/efficiency-week.txt">text</a> · <a href="pre-commit_pre-commit/efficiency-week.json">json</a></td>
+          <td><a href="pre-commit_pre-commit/forecast-when-done.html">html</a> · <a href="pre-commit_pre-commit/forecast-when-done.txt">text</a> · <a href="pre-commit_pre-commit/forecast-when-done.json">json</a></td>
+          <td><a href="pre-commit_pre-commit/forecast-how-many.html">html</a> · <a href="pre-commit_pre-commit/forecast-how-many.txt">text</a> · <a href="pre-commit_pre-commit/forecast-how-many.json">json</a></td>
+          <td><a href="pre-commit_pre-commit/cfd.html">html</a> · <a href="pre-commit_pre-commit/cfd.txt">text</a> · <a href="pre-commit_pre-commit/cfd.json">json</a></td>
+          <td><a href="pre-commit_pre-commit/aging.html">html</a> · <a href="pre-commit_pre-commit/aging.txt">text</a> · <a href="pre-commit_pre-commit/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>CalcMark/go-calcmark</strong><br>
-            <span class="archetype">Custom request: Go computational-document tool (GitHub)</span>
-          </td>
-          <td>
-            <a href="CalcMark_go-calcmark/efficiency-week.html">html</a> ·
-            <a href="CalcMark_go-calcmark/efficiency-week.txt">text</a> ·
-            <a href="CalcMark_go-calcmark/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="CalcMark_go-calcmark/forecast-when-done.html">html</a> ·
-            <a href="CalcMark_go-calcmark/forecast-when-done.txt">text</a> ·
-            <a href="CalcMark_go-calcmark/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="CalcMark_go-calcmark/forecast-how-many.html">html</a> ·
-            <a href="CalcMark_go-calcmark/forecast-how-many.txt">text</a> ·
-            <a href="CalcMark_go-calcmark/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>CalcMark/go-calcmark</strong><br><span class="archetype">Custom request: Go computational-document tool (GitHub)</span></td>
+          <td><a href="CalcMark_go-calcmark/efficiency-week.html">html</a> · <a href="CalcMark_go-calcmark/efficiency-week.txt">text</a> · <a href="CalcMark_go-calcmark/efficiency-week.json">json</a></td>
+          <td><a href="CalcMark_go-calcmark/forecast-when-done.html">html</a> · <a href="CalcMark_go-calcmark/forecast-when-done.txt">text</a> · <a href="CalcMark_go-calcmark/forecast-when-done.json">json</a></td>
+          <td><a href="CalcMark_go-calcmark/forecast-how-many.html">html</a> · <a href="CalcMark_go-calcmark/forecast-how-many.txt">text</a> · <a href="CalcMark_go-calcmark/forecast-how-many.json">json</a></td>
+          <td><a href="CalcMark_go-calcmark/cfd.html">html</a> · <a href="CalcMark_go-calcmark/cfd.txt">text</a> · <a href="CalcMark_go-calcmark/cfd.json">json</a></td>
+          <td><a href="CalcMark_go-calcmark/aging.html">html</a> · <a href="CalcMark_go-calcmark/aging.txt">text</a> · <a href="CalcMark_go-calcmark/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>ASF/CASSANDRA</strong><br>
-            <span class="archetype">Apache Cassandra — active distributed-database project (Jira)</span>
-          </td>
-          <td>
-            <a href="ASF_CASSANDRA/efficiency-week.html">html</a> ·
-            <a href="ASF_CASSANDRA/efficiency-week.txt">text</a> ·
-            <a href="ASF_CASSANDRA/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="ASF_CASSANDRA/forecast-when-done.html">html</a> ·
-            <a href="ASF_CASSANDRA/forecast-when-done.txt">text</a> ·
-            <a href="ASF_CASSANDRA/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="ASF_CASSANDRA/forecast-how-many.html">html</a> ·
-            <a href="ASF_CASSANDRA/forecast-how-many.txt">text</a> ·
-            <a href="ASF_CASSANDRA/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>ASF/CASSANDRA</strong><br><span class="archetype">Apache Cassandra — active distributed-database project (Jira)</span></td>
+          <td><a href="ASF_CASSANDRA/efficiency-week.html">html</a> · <a href="ASF_CASSANDRA/efficiency-week.txt">text</a> · <a href="ASF_CASSANDRA/efficiency-week.json">json</a></td>
+          <td><a href="ASF_CASSANDRA/forecast-when-done.html">html</a> · <a href="ASF_CASSANDRA/forecast-when-done.txt">text</a> · <a href="ASF_CASSANDRA/forecast-when-done.json">json</a></td>
+          <td><a href="ASF_CASSANDRA/forecast-how-many.html">html</a> · <a href="ASF_CASSANDRA/forecast-how-many.txt">text</a> · <a href="ASF_CASSANDRA/forecast-how-many.json">json</a></td>
+          <td><a href="ASF_CASSANDRA/cfd.html">html</a> · <a href="ASF_CASSANDRA/cfd.txt">text</a> · <a href="ASF_CASSANDRA/cfd.json">json</a></td>
+          <td><a href="ASF_CASSANDRA/aging.html">html</a> · <a href="ASF_CASSANDRA/aging.txt">text</a> · <a href="ASF_CASSANDRA/aging.json">json</a></td>
         </tr>
         <tr>
-          <td>
-            <strong>ASF/BIGTOP</strong><br>
-            <span class="archetype">Apache Bigtop — smaller-team build/packaging project (Jira)</span>
-          </td>
-          <td>
-            <a href="ASF_BIGTOP/efficiency-week.html">html</a> ·
-            <a href="ASF_BIGTOP/efficiency-week.txt">text</a> ·
-            <a href="ASF_BIGTOP/efficiency-week.json">json</a>
-          </td>
-          <td>
-            <a href="ASF_BIGTOP/forecast-when-done.html">html</a> ·
-            <a href="ASF_BIGTOP/forecast-when-done.txt">text</a> ·
-            <a href="ASF_BIGTOP/forecast-when-done.json">json</a>
-          </td>
-          <td>
-            <a href="ASF_BIGTOP/forecast-how-many.html">html</a> ·
-            <a href="ASF_BIGTOP/forecast-how-many.txt">text</a> ·
-            <a href="ASF_BIGTOP/forecast-how-many.json">json</a>
-          </td>
+          <td><strong>ASF/BIGTOP</strong><br><span class="archetype">Apache Bigtop — smaller-team build/packaging project (Jira)</span></td>
+          <td><a href="ASF_BIGTOP/efficiency-week.html">html</a> · <a href="ASF_BIGTOP/efficiency-week.txt">text</a> · <a href="ASF_BIGTOP/efficiency-week.json">json</a></td>
+          <td><a href="ASF_BIGTOP/forecast-when-done.html">html</a> · <a href="ASF_BIGTOP/forecast-when-done.txt">text</a> · <a href="ASF_BIGTOP/forecast-when-done.json">json</a></td>
+          <td><a href="ASF_BIGTOP/forecast-how-many.html">html</a> · <a href="ASF_BIGTOP/forecast-how-many.txt">text</a> · <a href="ASF_BIGTOP/forecast-how-many.json">json</a></td>
+          <td><a href="ASF_BIGTOP/cfd.html">html</a> · <a href="ASF_BIGTOP/cfd.txt">text</a> · <a href="ASF_BIGTOP/cfd.json">json</a></td>
+          <td><a href="ASF_BIGTOP/aging.html">html</a> · <a href="ASF_BIGTOP/aging.txt">text</a> · <a href="ASF_BIGTOP/aging.json">json</a></td>
         </tr>
 </tbody>
 </table>
+
+<h2>Reference</h2>
+<p>The samples on this site are produced by the
+<a href="https://github.com/dvhthomas/flowmetrics">flowmetrics</a> CLI. For how the math works, why
+each decision was made, and the Vacanti vocabulary used throughout, see
+the source documents in the GitHub repo (markdown renders natively
+there):</p>
+<dl>
+  <dt><a href="https://github.com/dvhthomas/flowmetrics/blob/main/README.md">README</a> <span style="color:#888;font-size:0.85rem;">— README.md</span></dt>
+  <dd>What flowmetrics is and how to run it.</dd>
+  <dt><a href="https://github.com/dvhthomas/flowmetrics/blob/main/docs/METRICS.md">Metrics</a> <span style="color:#888;font-size:0.85rem;">— docs/METRICS.md</span></dt>
+  <dd>How cycle / active / wait / flow efficiency are computed.</dd>
+  <dt><a href="https://github.com/dvhthomas/flowmetrics/blob/main/docs/FORECAST.md">Forecasting</a> <span style="color:#888;font-size:0.85rem;">— docs/FORECAST.md</span></dt>
+  <dd>Monte Carlo when-done and how-many.</dd>
+  <dt><a href="https://github.com/dvhthomas/flowmetrics/blob/main/docs/DECISIONS.md">Decisions</a> <span style="color:#888;font-size:0.85rem;">— docs/DECISIONS.md</span></dt>
+  <dd>Architectural trade-offs and known constraints.</dd>
+  <dt><a href="https://github.com/dvhthomas/flowmetrics/blob/main/docs/GLOSSARY.md">Glossary</a> <span style="color:#888;font-size:0.85rem;">— docs/GLOSSARY.md</span></dt>
+  <dd>Vacanti terms and our usage.</dd>
+</dl>
 </body>
 </html>

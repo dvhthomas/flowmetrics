@@ -25,6 +25,8 @@ from rich.rule import Rule
 from rich.table import Table
 
 from ..report import (
+    AgingReport,
+    CfdReport,
     EfficiencyReport,
     HowManyReport,
     Report,
@@ -68,6 +70,10 @@ def render(
         _render_when_done(report, console)
     elif isinstance(report, HowManyReport):
         _render_how_many(report, console)
+    elif isinstance(report, CfdReport):
+        _render_cfd(report, console)
+    elif isinstance(report, AgingReport):
+        _render_aging(report, console)
     else:  # pragma: no cover
         raise TypeError(f"unknown report type: {type(report).__name__}")
     return buf.getvalue()
@@ -235,6 +241,104 @@ def _render_when_done(report: WhenDoneReport, console: Console) -> None:
 # ---------------------------------------------------------------------------
 # Forecast: how-many
 # ---------------------------------------------------------------------------
+
+
+def _render_cfd(report: CfdReport, console: Console) -> None:
+    _top(console, report)
+
+    if not report.points:
+        _insight_and_actions(console, report)
+        _detail_divider(console)
+        _reproduce(console, report)
+        return
+
+    end = report.points[-1]
+    summary = Table(title="Headline numbers")
+    summary.add_column("Metric")
+    summary.add_column("Value", justify="right")
+    for state in report.input.workflow:
+        summary.add_row(f"At end — {state}", str(end.counts_by_state.get(state, 0)))
+    arrivals = end.counts_by_state.get(report.input.workflow[0], 0)
+    departures = end.counts_by_state.get(report.input.workflow[-1], 0)
+    summary.add_row("WIP at end", str(arrivals - departures))
+    console.print(summary)
+    console.print("(For the stacked-area chart, use --format html.)", style="dim")
+
+    _insight_and_actions(console, report)
+    _detail_divider(console)
+
+    rows = [
+        ("Repo", report.input.repo),
+        ("Workflow", " → ".join(report.input.workflow)),
+        ("Window", f"{report.input.start} → {report.input.stop}"),
+        ("Sample interval (days)", str(report.input.interval_days)),
+        ("Samples", str(len(report.points))),
+    ]
+    console.print(_input_table(report, rows))
+    _reproduce(console, report)
+    _vocabulary(console, report)
+
+
+def _render_aging(report: AgingReport, console: Console) -> None:
+    _top(console, report)
+
+    if not report.items:
+        _insight_and_actions(console, report)
+        _detail_divider(console)
+        _reproduce(console, report)
+        return
+
+    wip_by_state: dict[str, int] = {}
+    for it in report.items:
+        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
+
+    summary = Table(title="WIP per workflow state")
+    summary.add_column("State")
+    summary.add_column("Items", justify="right")
+    for state in report.input.workflow:
+        summary.add_row(state, str(wip_by_state.get(state, 0)))
+    console.print(summary)
+
+    pct = Table(title="Cycle-time percentile checkpoints (from completed items)")
+    pct.add_column("Percentile")
+    pct.add_column("Days", justify="right")
+    for p, v in report.cycle_time_percentiles.items():
+        pct.add_row(f"P{p}", f"{v:.1f}")
+    console.print(pct)
+    console.print(
+        f"(Percentiles built from {report.completed_count} items completed "
+        f"between {report.input.history_start} and {report.input.history_end}.)",
+        style="dim",
+    )
+    console.print("(For the scatter chart, use --format html.)", style="dim")
+
+    _insight_and_actions(console, report)
+    _detail_divider(console)
+
+    rows = [
+        ("Repo", report.input.repo),
+        ("As of", report.input.asof.isoformat()),
+        ("Workflow", " → ".join(report.input.workflow)),
+        ("In-flight items", str(len(report.items))),
+    ]
+    console.print(_input_table(report, rows))
+
+    items_sorted = sorted(report.items, key=lambda i: i.age_days, reverse=True)
+    age_table = Table(title="In-flight items (oldest first)")
+    age_table.add_column("#")
+    age_table.add_column("Age (d)", justify="right")
+    age_table.add_column("State")
+    age_table.add_column("Title")
+    for it in items_sorted[:20]:
+        age_table.add_row(it.item_id, str(it.age_days), it.current_state, it.title[:50])
+    console.print(age_table)
+    if len(items_sorted) > 20:
+        console.print(
+            f"[dim]…and {len(items_sorted) - 20} more (see --format html for the full list).[/dim]"
+        )
+
+    _reproduce(console, report)
+    _vocabulary(console, report)
 
 
 def _render_how_many(report: HowManyReport, console: Console) -> None:

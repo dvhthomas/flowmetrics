@@ -313,7 +313,35 @@ they are accurate. Force-pushes that rewrite commit dates can in principle
 distort `committedDate`; we use it anyway because it is the best signal
 available.
 
-### 6.7 Timeline pagination is bounded
+### 6.7 GitHub issues are not consulted — work without a PR is invisible
+
+For GitHub sources, the unit of work is the **pull request**, full stop.
+GitHub issues are never fetched, never read, never counted. If a team
+tracks work on issues without raising a corresponding PR (planning,
+docs, discussions, design reviews, ops tasks), this tool will not see
+any of it.
+
+Concrete consequences:
+
+- **No PR = no work, for our purposes.** A bug fixed by direct push, a
+  policy change applied via repo settings, or an issue closed by hand
+  is invisible here.
+- **Issues used purely as a backlog (no `Closes #N` PR)** never appear
+  in cycle time, throughput, CFD, Aging, or forecasts.
+- **The Aging chart shows PR review phases**, not "is this task being
+  worked on?". A PR sitting at Approved means a reviewer approved it;
+  it does not say anything about whether the underlying issue is also
+  in motion.
+
+If your team's WIP lives in issue labels (a "in-progress" /
+"in-review" / "done" label workflow on issues), use a tool that
+understands that convention — see [gh-velocity] — or open the door for
+a future `GitHubIssuesSource` here. See `docs/DECISIONS.md` #9 and #10
+for the full reasoning.
+
+[gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
+
+### 6.8 Timeline pagination is bounded
 
 We fetch up to 100 timeline events per PR. PRs with more than 100 events
 will have their tail truncated, slightly under-counting activity (and thus

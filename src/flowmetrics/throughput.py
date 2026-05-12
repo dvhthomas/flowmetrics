@@ -3,11 +3,11 @@ from __future__ import annotations
 from collections.abc import Iterable
 from datetime import date
 
-from .compute import PullRequestEvents
+from .compute import WorkItem
 
 
 def daily_throughput(
-    prs: Iterable[PullRequestEvents],
+    prs: Iterable[WorkItem],
     start: date,
     stop: date,
 ) -> list[int]:

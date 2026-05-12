@@ -1,0 +1,81 @@
+{% extends "base.html.jinja" %}
+
+{% block content %}
+{% if not report.items %}
+<p>No in-flight items as of {{ report.input.asof }}.</p>
+{% else %}
+
+<h2>Headline numbers</h2>
+<table>
+  <tr><th>In-flight items</th><td class="num">{{ report.items|length }}</td></tr>
+  <tr><th>As of</th><td>{{ report.input.asof }}</td></tr>
+  <tr><th>Workflow</th><td>{{ report.input.workflow | join(" → ") }}</td></tr>
+</table>
+
+<h2>WIP per workflow state</h2>
+<table>
+{% for state in report.input.workflow %}
+  <tr><th>{{ state }}</th><td class="num">{{ wip_by_state.get(state, 0) }}</td></tr>
+{% endfor %}
+</table>
+
+<h2>Cycle-time percentiles (from completed items)</h2>
+<table>
+  <tr>
+  {% for p, v in report.cycle_time_percentiles.items() %}
+    <th>P{{ p }}</th>
+  {% endfor %}
+  </tr>
+  <tr>
+  {% for p, v in report.cycle_time_percentiles.items() %}
+    <td class="num">{{ "%.1f"|format(v) }}d</td>
+  {% endfor %}
+  </tr>
+</table>
+<p style="font-size:0.9rem; color:#666">
+Computed from {{ report.completed_count }} items completed between
+{{ report.input.history_start }} and {{ report.input.history_end }}.
+</p>
+
+<img alt="Aging Work In Progress" src="data:image/png;base64,{{ chart_aging_b64 }}" />
+
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<strong>Reading the chart.</strong> Each dot is one in-flight item.
+X-axis columns are workflow states (earliest left, latest right). Y-axis
+is Age in days. The dashed horizontal lines are 50/70/85/95 percentiles
+of cycle time from recently completed items — Vacanti's checkpoints. An
+item that has aged past P85 is likely to miss the next forecast.
+</p>
+{% endif %}
+{% endblock %}
+
+{% block detail %}
+<h2>Input parameters</h2>
+<table>
+  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
+  <tr><th>As of</th><td>{{ report.input.asof }}</td></tr>
+  <tr><th>Workflow</th><td>{{ report.input.workflow | join(", ") }}</td></tr>
+  <tr><th>Percentile training window</th>
+      <td>{{ report.input.history_start }} → {{ report.input.history_end }}
+          ({{ report.completed_count }} completed items)</td></tr>
+</table>
+
+{% if report.items %}
+<details>
+<summary>All {{ report.items|length }} in-flight items (oldest first)</summary>
+<table>
+<thead><tr><th>#</th><th>Age (days)</th><th>Current state</th><th>Title</th></tr></thead>
+<tbody>
+{% for it in items_sorted %}
+  <tr>
+    <td>{{ it.item_id }}</td>
+    <td class="num">{{ it.age_days }}</td>
+    <td>{{ it.current_state }}</td>
+    <td>{{ it.title[:80] }}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</details>
+{% endif %}
+{% endblock %}

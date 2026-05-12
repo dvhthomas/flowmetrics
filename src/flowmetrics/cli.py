@@ -23,7 +23,9 @@ from typing import Any
 
 import click
 
-from .compute import WindowResult
+from .aging import compute_aging, cycle_time_percentiles
+from .cfd import build_cfd
+from .compute import WindowResult, compute_pr_flow  # compute_pr_flow used in aging path
 from .forecast import (
     ResultsHistogram,
     backward_percentile,
@@ -32,10 +34,20 @@ from .forecast import (
     monte_carlo_how_many,
     monte_carlo_when_done,
 )
-from .interpretation import interpret_efficiency, interpret_how_many, interpret_when_done
+from .interpretation import (
+    interpret_aging,
+    interpret_cfd,
+    interpret_efficiency,
+    interpret_how_many,
+    interpret_when_done,
+)
 from .logcapture import LogCapture
 from .renderers import html_renderer, json_renderer, text_renderer
 from .report import (
+    AgingInput,
+    AgingReport,
+    CfdInput,
+    CfdReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -322,6 +334,210 @@ def week(
             input=input_,
             result=result,
             interpretation=interpret_efficiency(input_, result),
+        )
+
+    _dispatch(fmt, output, build, verbose=verbose)
+
+
+@cli.command(short_help="Cumulative Flow Diagram per Vacanti")
+@_apply_source_options
+@click.option("--start", type=str, required=True, help="Window start (YYYY-MM-DD).")
+@click.option("--stop", type=str, required=True, help="Window stop (YYYY-MM-DD).")
+@click.option(
+    "--workflow",
+    type=str,
+    required=True,
+    help=(
+        "Comma-separated workflow states, earliest → latest. "
+        "Example: 'Open,In Progress,Done'."
+    ),
+)
+@click.option(
+    "--interval-days",
+    type=int,
+    default=1,
+    show_default=True,
+    help="Sample interval in days.",
+)
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path), default=DEFAULT_CACHE_DIR, show_default=True
+)
+@click.option("--offline/--online", default=False)
+@_FORMAT_OPTION
+@_OUTPUT_OPTION
+@_VERBOSE_OPTION
+def cfd(
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
+    start: str,
+    stop: str,
+    workflow: str,
+    interval_days: int,
+    cache_dir: Path,
+    offline: bool,
+    fmt: str,
+    output: Path | None,
+    verbose: bool,
+) -> None:
+    """Cumulative Flow Diagram per Vacanti — stacked workflow states over time.
+
+    The CFD uses items completed inside the window and the timestamped
+    status_intervals each item carries. Sources that don't expose
+    workflow history (GitHub PRs) produce a degenerate two-line CFD
+    (arrivals / departures only). Jira issues with full changelog yield
+    the full multi-band view.
+    """
+    start_d = _parse_date(start)
+    stop_d = _parse_date(stop)
+    workflow_tuple = tuple(s.strip() for s in workflow.split(",") if s.strip())
+    if not workflow_tuple:
+        raise click.UsageError("--workflow needs at least one state")
+
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url,
+        jira_project=jira_project,
+        cache_dir=cache_dir,
+        offline=offline,
+    )
+
+    def build() -> CfdReport:
+        items = src.fetch_completed_in_window(start_d, stop_d)
+        points = build_cfd(
+            items,
+            workflow=workflow_tuple,
+            start=start_d,
+            stop=stop_d,
+            interval=timedelta(days=interval_days),
+        )
+        input_ = CfdInput(
+            repo=src.label,
+            start=start_d,
+            stop=stop_d,
+            workflow=workflow_tuple,
+            interval_days=interval_days,
+            offline=offline,
+        )
+        return CfdReport(
+            input=input_,
+            points=points,
+            interpretation=interpret_cfd(input_, points),
+        )
+
+    _dispatch(fmt, output, build, verbose=verbose)
+
+
+@cli.command(short_help="Aging Work In Progress (Vacanti WWIBD)")
+@_apply_source_options
+@click.option(
+    "--asof",
+    type=str,
+    default=None,
+    help="As-of date (YYYY-MM-DD). Defaults to today (UTC).",
+)
+@click.option(
+    "--workflow",
+    type=str,
+    required=True,
+    help=(
+        "Comma-separated workflow states, earliest → latest. "
+        "Example: 'Open,In Progress,Patch Available,Resolved'."
+    ),
+)
+@click.option(
+    "--history-start",
+    type=str,
+    default=None,
+    help=(
+        "First day of the completed-items window used for cycle-time "
+        f"percentile lines. Defaults to {DEFAULT_TRAINING_DAYS - 1} days "
+        "before --history-end."
+    ),
+)
+@click.option(
+    "--history-end",
+    type=str,
+    default=None,
+    help="Last day of the completed-items percentile window. Defaults to yesterday-UTC.",
+)
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path), default=DEFAULT_CACHE_DIR, show_default=True
+)
+@click.option("--offline/--online", default=False)
+@_FORMAT_OPTION
+@_OUTPUT_OPTION
+@_VERBOSE_OPTION
+def aging(
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
+    asof: str | None,
+    workflow: str,
+    history_start: str | None,
+    history_end: str | None,
+    cache_dir: Path,
+    offline: bool,
+    fmt: str,
+    output: Path | None,
+    verbose: bool,
+) -> None:
+    """Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51).
+
+    Each in-flight item is plotted in the column of its current workflow
+    state at a height equal to its age in days. Percentile lines come
+    from the cycle times of recently completed items (the "Scatterplot"
+    distribution) and serve as risk checkpoints.
+
+    GitHub is not yet supported (PRs only have one "Open" state). Use
+    --jira-url + --jira-project.
+    """
+    asof_d = _parse_date(asof) if asof else date.today()
+    workflow_tuple = tuple(s.strip() for s in workflow.split(",") if s.strip())
+    if not workflow_tuple:
+        raise click.UsageError("--workflow needs at least one state")
+
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url,
+        jira_project=jira_project,
+        cache_dir=cache_dir,
+        offline=offline,
+    )
+
+    def build() -> AgingReport:
+        in_flight = src.fetch_in_flight(asof_d)
+
+        # Percentile window: completed items, defaulting to Vacanti's 30 days.
+        hist_end = _parse_date(history_end) if history_end else (asof_d - timedelta(days=1))
+        hist_start = (
+            _parse_date(history_start) if history_start
+            else hist_end - timedelta(days=DEFAULT_TRAINING_DAYS - 1)
+        )
+        completed_items = src.fetch_completed_in_window(hist_start, hist_end)
+        # Convert WorkItem → FlowEfficiency (only cycle_time matters for percentiles)
+        completed_flows = [
+            compute_pr_flow(item, gap=DEFAULT_GAP, min_cluster=DEFAULT_MIN_CLUSTER)
+            for item in completed_items
+            if item.merged_at is not None
+        ]
+        pct = cycle_time_percentiles(completed_flows)
+
+        aging_items = compute_aging(in_flight, asof=asof_d)
+        input_ = AgingInput(
+            repo=src.label,
+            asof=asof_d,
+            workflow=workflow_tuple,
+            history_start=hist_start,
+            history_end=hist_end,
+            offline=offline,
+        )
+        return AgingReport(
+            input=input_,
+            items=aging_items,
+            cycle_time_percentiles=pct,
+            completed_count=len(completed_flows),
+            interpretation=interpret_aging(input_, aging_items, pct, len(completed_flows)),
         )
 
     _dispatch(fmt, output, build, verbose=verbose)

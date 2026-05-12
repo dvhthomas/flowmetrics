@@ -43,10 +43,6 @@ class WorkItem:
     status_intervals: list[StatusInterval] = field(default_factory=list)
 
 
-# Backwards-compat alias — was named for the GitHub-only era.
-PullRequestEvents = WorkItem
-
-
 @dataclass(frozen=True)
 class FlowEfficiency:
     item_id: str
@@ -86,7 +82,7 @@ class WindowResult:
 
 
 def compute_pr_flow(
-    pr: PullRequestEvents,
+    pr: WorkItem,
     *,
     gap: timedelta,
     min_cluster: timedelta,

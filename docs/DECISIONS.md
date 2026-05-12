@@ -195,6 +195,118 @@ transient failures more than once or twice per week, add an
 
 ---
 
+## 9. WIP-tracking source is per-system, not generalized
+
+**The question.** Vacanti's CFD and Aging charts assume named workflow
+states. Where do those come from? In Jira, status transitions live in
+each issue's changelog. In GitHub, there is no native multi-state
+workflow on PRs — tools like [gh-velocity] reconstruct WIP from issue
+*labels* (with per-project configuration). The two models are not
+interchangeable; either covers some teams' reality and not others'.
+
+**What we do.**
+
+- **Jira issues**: native workflow. Each issue's `changelog.histories`
+  provides status transitions; CFD and Aging consume `status_intervals`
+  directly. This is the canonical Vacanti use case and our reference
+  surface for those charts.
+
+- **GitHub PRs (Aging)**: a deliberately simple four-state review
+  lifecycle derived from GitHub's own native fields — `isDraft` and
+  `reviewDecision`:
+
+  | Phase             | Condition                                   |
+  | ----------------- | ------------------------------------------- |
+  | Draft             | `isDraft == true`                           |
+  | Awaiting Review   | `reviewDecision in (null, REVIEW_REQUIRED)` |
+  | Changes Requested | `reviewDecision == "CHANGES_REQUESTED"`     |
+  | Approved          | `reviewDecision == "APPROVED"`              |
+
+  Age = today − `createdAt`. This is not a substitute for full WIP
+  tracking — it's a review-cycle lens. Useful for spotting stalled PRs
+  in the review queue; not useful for tracking development phases that
+  happen *before* a PR is opened.
+
+- **GitHub PRs (CFD)**: also two-state degenerate (arrivals/departures
+  only) when we lack synthetic per-phase transitions. We don't backfill
+  the four-state lifecycle into CFD because we'd be inventing
+  transition timestamps we don't have — `reviewDecision` is a snapshot,
+  not a history. Aging only needs the *current* snapshot, which is why
+  it works here.
+
+- **GitHub issues + labels**: not supported. That's [gh-velocity]'s
+  domain — they handle the per-repo label-to-state configuration
+  honestly (it must be configured, because conventions vary). We point
+  users there from the in-line `flow aging` help.
+
+**What we accept.**
+
+1. GitHub Aging surfaces review-cycle phase only. Teams that track
+   real development phases via labels need a tool that knows their
+   label conventions (gh-velocity, or a future `GitHubIssuesSource`
+   here).
+2. GitHub CFD remains degenerate for now. The fix is to materialize
+   `isDraft` / `reviewDecision` transitions from PR timeline events
+   (`ReadyForReviewEvent`, `ConvertToDraftEvent`, `PullRequestReview`)
+   — doable but not done.
+
+**When to revisit.**
+
+- If a user wants CFD/Aging on GitHub issues, the path is a new
+  `GitHubIssuesSource` adapter that takes an explicit label-to-state
+  mapping per repo (config file or repeated `--label-state` flags).
+  It should sit alongside the Jira source as a peer, not replace
+  anything.
+- If GitHub PR CFD becomes important, materialize review-phase
+  transitions from timeline events.
+
+[gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
+
+---
+
+## 10. For GitHub, only pull requests count as work — issues are invisible
+
+**The assumption.** Every GitHub source in flowmetrics treats the
+*pull request* as the unit of work. Issues are never queried. If a team
+tracks WIP on issues (with or without labels), opens issues that don't
+result in a PR, or closes issues by hand, none of that flows into any
+report — efficiency, forecast, CFD, or Aging.
+
+**What it means in practice.**
+
+- Cycle time, throughput, and percentiles are PR-only series.
+- A team that fixes bugs via direct pushes or settings changes has its
+  output silently dropped.
+- The Aging chart, on GitHub, surfaces PR review state (Draft →
+  Awaiting Review → Changes Requested → Approved). It is *not* a view
+  of issue progress. A PR sitting at Approved is one stalled review;
+  the underlying issue may or may not be moving.
+- "Items" in the forecast vocabulary means "PRs" for GitHub sources
+  and "issues" for Jira sources. The unit is consistent within a
+  report but the noun changes by backend.
+
+**Why we accept it.**
+
+PRs have unambiguous start (`createdAt`) and end (`mergedAt`)
+timestamps via the GraphQL API, plus a rich timeline of events for
+active/wait clustering. Issues, by contrast, have no native concept of
+"started" — that signal lives in per-team conventions (labels, project
+boards, milestones, custom fields). Trying to be right across teams
+means making per-team decisions configurable, which is exactly what
+[gh-velocity] is for. We deliberately do not duplicate that.
+
+**When to revisit.**
+
+If a user with a labelled-issue workflow opens an issue here, the
+remediation is a new `GitHubIssuesSource` with explicit per-repo
+label-to-state mapping passed in config. It would sit alongside the
+existing PR source as a separate source, not replace it. The two
+answer different questions; both should be available.
+
+[gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
+
+---
+
 ## Summary: the cache is doing the heavy lifting
 
 Every decision above leans on one assumption: **the disk cache

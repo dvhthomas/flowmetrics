@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from ..report import (
+    AgingReport,
+    CfdReport,
     EfficiencyReport,
     HowManyReport,
     Report,
@@ -61,6 +63,10 @@ def render(report: Report) -> str:
         return _render_when_done(report)
     if isinstance(report, HowManyReport):
         return _render_how_many(report)
+    if isinstance(report, CfdReport):
+        return _render_cfd(report)
+    if isinstance(report, AgingReport):
+        return _render_aging(report)
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
@@ -292,6 +298,169 @@ def _render_when_done(report: WhenDoneReport) -> str:
         training=report.training,
         chart_training_b64=_chart_training(report),
         chart_histogram_b64=_chart_when_done_histogram(report),
+    )
+
+
+def _chart_cfd(report: CfdReport) -> str:
+    """Stacked area CFD chart per Vacanti: arrivals on top, departures on
+    bottom, intermediate states in between. The lines are drawn directly
+    (the area between consecutive lines = WIP in that band)."""
+    workflow = list(report.input.workflow)
+    sample_dates = [p.sampled_on for p in report.points]
+    include_year = _needs_year_in_labels(sample_dates)
+    iso_dates = [d.isoformat() for d in sample_dates]
+    pretty = [_human_date_label(d, include_year) for d in sample_dates]
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    # One series per workflow state, drawn from top (arrivals) to bottom
+    # (departures). fill_between consecutive lines yields the stacked
+    # bands that visualize WIP.
+    series: list[list[int]] = [
+        [p.counts_by_state.get(state, 0) for p in report.points] for state in workflow
+    ]
+    palette = [
+        "#2b7cff",  # top = arrivals (blue)
+        "#5ab2ff",
+        "#a0d7ff",
+        "#d4a72c",
+        "#cc3333",
+    ]
+    for i, state in enumerate(workflow):
+        color = palette[i % len(palette)]
+        if i + 1 < len(workflow):
+            ax.fill_between(
+                iso_dates, series[i], series[i + 1], color=color, alpha=0.55, label=state
+            )
+        else:
+            # Bottom band = the "departed" floor — fill from 0 to the last line.
+            ax.fill_between(iso_dates, series[i], 0, color=color, alpha=0.55, label=state)
+        ax.plot(iso_dates, series[i], color=color, linewidth=1.2)
+
+    ax.set_ylabel("Items (cumulative)")
+    ax.set_title(
+        f"Cumulative Flow Diagram — {report.input.repo} "
+        f"({sample_dates[0].isoformat()} → {sample_dates[-1].isoformat()})"
+    )
+    ax.legend(loc="upper left", fontsize=8)
+    _thin_xticks(ax, pretty)
+    fig.autofmt_xdate(rotation=45)
+    fig.tight_layout()
+    return _png_b64(fig)
+
+
+def _render_cfd(report: CfdReport) -> str:
+    template = _env.get_template("cfd.html.jinja")
+    end_counts: dict[str, int] = (
+        dict(report.points[-1].counts_by_state) if report.points else {}
+    )
+    return template.render(
+        title=f"flowmetrics — cfd {report.input.repo}",
+        generated_at=report.generated_at,
+        interpretation=report.interpretation,
+        definition=report_definition(report),
+        invocation=cli_invocation(report),
+        vocabulary=report_vocabulary(report),
+        report=report,
+        end_counts=end_counts,
+        chart_cfd_b64=_chart_cfd(report) if report.points else "",
+    )
+
+
+def _chart_aging(report: AgingReport) -> str:
+    """Aging WIP scatter per Vacanti (WWIBD Figure 3.2): columns =
+    workflow states, y = Age in days, percentile lines from completed
+    cycle time as horizontal references."""
+    import random as _r
+
+    workflow = list(report.input.workflow)
+    state_to_x = {state: i for i, state in enumerate(workflow)}
+
+    # Place each in-flight item in its current-state column. Jitter x
+    # slightly so overlapping ages stay readable (Vacanti uses faint
+    # horizontal jitter on his charts too).
+    jitter = _r.Random(42)
+    xs: list[float] = []
+    ys: list[float] = []
+    labels: list[str] = []
+    for it in report.items:
+        x = state_to_x.get(it.current_state)
+        if x is None:
+            # Item is in a state outside the configured workflow — drop it
+            # but the count will still show up in the diagnostic table.
+            continue
+        xs.append(x + (jitter.random() - 0.5) * 0.35)
+        ys.append(it.age_days)
+        labels.append(it.item_id)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.scatter(xs, ys, color="#2b7cff", s=60, alpha=0.7, edgecolors="white")
+
+    # Percentile reference lines
+    pct = report.cycle_time_percentiles
+    for p, color, style in [
+        (50, "#999", ":"),
+        (70, "#888", "-."),
+        (85, "#d4a72c", "--"),
+        (95, "#cc3333", "-"),
+    ]:
+        value = pct.get(p, 0.0)
+        if value > 0:
+            ax.axhline(
+                value,
+                color=color,
+                linestyle=style,
+                linewidth=1.0,
+                label=f"P{p}: {value:.1f}d",
+            )
+
+    # WIP count callouts above each column
+    wip_by_state: dict[str, int] = {}
+    for it in report.items:
+        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
+    y_top = (max(ys) if ys else max(pct.values(), default=10)) * 1.1 + 1
+    for state, x in state_to_x.items():
+        count = wip_by_state.get(state, 0)
+        ax.text(
+            x, y_top, f"WIP: {count}",
+            ha="center", va="bottom", fontsize=9, color="#444",
+        )
+
+    # Column separators
+    for i in range(1, len(workflow)):
+        ax.axvline(i - 0.5, color="#ddd", linewidth=0.8)
+
+    ax.set_xticks(range(len(workflow)))
+    ax.set_xticklabels(workflow, rotation=20, ha="right")
+    ax.set_ylabel("Age (days)")
+    ax.set_xlim(-0.6, len(workflow) - 0.4)
+    ax.set_ylim(0, y_top + 2)
+    ax.set_title(
+        f"Aging Work In Progress — {report.input.repo} as of "
+        f"{report.input.asof.isoformat()}"
+    )
+    ax.legend(loc="upper left", fontsize=8)
+    fig.tight_layout()
+    return _png_b64(fig)
+
+
+def _render_aging(report: AgingReport) -> str:
+    template = _env.get_template("aging.html.jinja")
+    wip_by_state: dict[str, int] = {}
+    for it in report.items:
+        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
+    items_sorted = sorted(report.items, key=lambda i: i.age_days, reverse=True)
+    return template.render(
+        title=f"flowmetrics — aging {report.input.repo}",
+        generated_at=report.generated_at,
+        interpretation=report.interpretation,
+        definition=report_definition(report),
+        invocation=cli_invocation(report),
+        vocabulary=report_vocabulary(report),
+        report=report,
+        wip_by_state=wip_by_state,
+        items_sorted=items_sorted,
+        chart_aging_b64=_chart_aging(report) if report.items else "",
     )
 
 

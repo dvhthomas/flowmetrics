@@ -56,18 +56,27 @@ class TestRepoConfig:
 # ---------------------------------------------------------------------------
 
 
-def _sample_set(slug: str) -> SampleSet:
+def _sample_set(
+    slug: str, *, with_cfd: bool = False, with_aging: bool = False
+) -> SampleSet:
+    d = slug.replace("/", "_")
     return SampleSet(
         repo=Repo(slug=slug, archetype="test", cli_args=["--repo", slug]),
-        efficiency_html=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.html"),
-        efficiency_json=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.json"),
-        efficiency_text=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.txt"),
-        when_done_html=Path(f"samples/{slug.replace('/', '_')}/forecast-when-done.html"),
-        when_done_json=Path(f"samples/{slug.replace('/', '_')}/forecast-when-done.json"),
-        when_done_text=Path(f"samples/{slug.replace('/', '_')}/forecast-when-done.txt"),
-        how_many_html=Path(f"samples/{slug.replace('/', '_')}/forecast-how-many.html"),
-        how_many_json=Path(f"samples/{slug.replace('/', '_')}/forecast-how-many.json"),
-        how_many_text=Path(f"samples/{slug.replace('/', '_')}/forecast-how-many.txt"),
+        efficiency_html=Path(f"samples/{d}/efficiency-week.html"),
+        efficiency_json=Path(f"samples/{d}/efficiency-week.json"),
+        efficiency_text=Path(f"samples/{d}/efficiency-week.txt"),
+        when_done_html=Path(f"samples/{d}/forecast-when-done.html"),
+        when_done_json=Path(f"samples/{d}/forecast-when-done.json"),
+        when_done_text=Path(f"samples/{d}/forecast-when-done.txt"),
+        how_many_html=Path(f"samples/{d}/forecast-how-many.html"),
+        how_many_json=Path(f"samples/{d}/forecast-how-many.json"),
+        how_many_text=Path(f"samples/{d}/forecast-how-many.txt"),
+        cfd_html=Path(f"samples/{d}/cfd.html") if with_cfd else None,
+        cfd_json=Path(f"samples/{d}/cfd.json") if with_cfd else None,
+        cfd_text=Path(f"samples/{d}/cfd.txt") if with_cfd else None,
+        aging_html=Path(f"samples/{d}/aging.html") if with_aging else None,
+        aging_json=Path(f"samples/{d}/aging.json") if with_aging else None,
+        aging_text=Path(f"samples/{d}/aging.txt") if with_aging else None,
     )
 
 
@@ -98,6 +107,65 @@ class TestBuildIndexHtml:
             [_sample_set("astral-sh/uv")], datetime(2026, 5, 12, 14, 30, 15, tzinfo=UTC)
         )
         assert "2026-05-12" in out
+
+    def test_cfd_aging_columns_show_links_when_present(self):
+        sets = [_sample_set("acme/jira", with_cfd=True, with_aging=True)]
+        out = build_index_html(sets, datetime(2026, 5, 12, 14, 30, tzinfo=UTC))
+        assert "cfd.html" in out
+        assert "aging.html" in out
+
+    def test_cfd_renders_na_when_absent(self):
+        """GitHub repos skip CFD per DECISIONS.md #9 — should read 'n/a'."""
+        sets = [_sample_set("github/repo", with_cfd=False, with_aging=True)]
+        out = build_index_html(sets, datetime(2026, 5, 12, 14, 30, tzinfo=UTC))
+        assert "n/a" in out
+        # The Aging column should still link, the CFD column shouldn't
+        assert "cfd.html" not in out
+        assert "aging.html" in out
+
+    def test_aging_renders_na_when_absent(self):
+        sets = [_sample_set("repo/no-aging", with_cfd=False, with_aging=False)]
+        out = build_index_html(sets, datetime(2026, 5, 12, 14, 30, tzinfo=UTC))
+        assert out.count("n/a") >= 2  # both CFD and Aging cells
+
+    def test_includes_decisions_pointer_for_na_explanation(self):
+        """The reader needs to know why some cells are blank."""
+        sets = [_sample_set("github/repo", with_cfd=False, with_aging=True)]
+        out = build_index_html(sets, datetime(2026, 5, 12, 14, 30, tzinfo=UTC))
+        assert "DECISIONS.md" in out
+
+
+class TestReferenceSection:
+    """Pages-published samples include a 'Reference' section linking back
+    to the source markdown in the GitHub repo (README + docs/*.md).
+
+    The site serves only `samples/`, so cross-doc reading happens on
+    GitHub.com where markdown renders natively.
+    """
+
+    def test_links_to_readme_and_every_docs_markdown(self):
+        out = build_index_html(
+            [_sample_set("astral-sh/uv")],
+            datetime(2026, 5, 12, 14, 30, tzinfo=UTC),
+        )
+        # Every reference doc must appear as a github.com blob URL
+        for doc in [
+            "README.md",
+            "docs/DECISIONS.md",
+            "docs/METRICS.md",
+            "docs/FORECAST.md",
+            "docs/GLOSSARY.md",
+        ]:
+            assert f"github.com/dvhthomas/flowmetrics/blob/main/{doc}" in out, (
+                f"missing reference link to {doc}"
+            )
+
+    def test_reference_section_has_heading(self):
+        out = build_index_html(
+            [_sample_set("astral-sh/uv")],
+            datetime(2026, 5, 12, 14, 30, tzinfo=UTC),
+        )
+        assert "Reference" in out
 
 
 # ---------------------------------------------------------------------------

@@ -52,6 +52,13 @@ We also report mean and median per-item ratios; both are inferior to
 portfolio efficiency and we say so in the output. Mean of ratios is
 particularly misleading when a long tail of fast PRs distorts it.
 
+**Concrete example.** Fifty trivial 5-minute version-bump PRs at 100%
+FE, plus one big 30-day refactor PR at 5% FE. Mean per-PR FE ≈ 98%.
+Portfolio FE ≈ 5%. The portfolio number reflects the system you're
+trying to improve — the one big PR is where the wait time actually
+lives. Optimizing for the 98% number rewards the people churning out
+small PRs and punishes the engineer working through the queue.
+
 ### Throughput
 
 Count of items completed per unit time (we use days). The empirical
@@ -131,12 +138,18 @@ the unit `forecast` counts.
 
 ### Issue
 
-Jira-specific. Will be the equivalent unit when the Jira source
-lands; same role in the math.
+Jira-specific. The unit our Jira source measures (same role in the
+math as a PR for GitHub).
 
-When a renderer string says "items" it means "PRs OR issues OR
-whatever this source's unit of completed work is" — the math is
-identical.
+**Important: GitHub issues are *not* consulted by any flowmetrics
+report.** For GitHub sources, the unit of work is the pull request,
+period. A team that tracks WIP on GitHub issues without opening
+corresponding PRs will have that work silently dropped. See
+`docs/DECISIONS.md` #10 for the full reasoning, and `gh-velocity.org`
+for a tool that does read GitHub issues with label-based workflows.
+
+When a renderer string says "items" it means "PRs OR Jira issues" —
+the math is identical, but the noun differs by source.
 
 ## Configurable defaults
 

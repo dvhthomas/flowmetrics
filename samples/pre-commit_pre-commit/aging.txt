@@ -1,0 +1,2 @@
+WIP Aging for pre-commit/pre-commit as of May 12, 2026: 6 in-flight items, 6 already past P85 
+(1.1d), 6 past P95 (1.1d).

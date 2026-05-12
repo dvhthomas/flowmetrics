@@ -1,0 +1,4431 @@
+{
+  "schema": "flowmetrics.aging.v1",
+  "command": "aging",
+  "generated_at": "2026-05-12T13:16:00.941484-06:00",
+  "headline": "WIP Aging for jira:BIGTOP as of May 12, 2026: 728 in-flight items, 723 already past P85 (84.5d), 700 past P95 (581.9d).",
+  "definition": "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
+  "summary": {
+    "in_flight_count": 728,
+    "wip_by_state": {
+      "Open": 665,
+      "Reopened": 5,
+      "In Progress": 23,
+      "Patch Available": 35
+    },
+    "cycle_time_percentiles_days": {
+      "50": 50.782986111111114,
+      "70": 82.70313657407408,
+      "85": 84.48579861111111,
+      "95": 581.9253472222222
+    },
+    "completed_count_for_percentiles": 9
+  },
+  "key_insight": "723 item(s) have aged past the P85 cycle time (84.5d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: BIGTOP-22, BIGTOP-39, BIGTOP-41. Concentrate decision-making here.",
+  "next_actions": [
+    "700 item(s) past P95 (581.9d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "Biggest WIP column is 'Open' with 665 item(s). If that band is upstream (queue), pull policy. If downstream (review/test), capacity.",
+    "Re-check daily; Aging is a leading indicator of forecast slip."
+  ],
+  "caveats": [
+    "Aging is a snapshot as of May 12, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 12, 2026 \u2192 May 11, 2026 (9 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second."
+  ],
+  "vocabulary": {
+    "Work Item Age": "Elapsed time since an item entered the workflow. Applies only to in-flight items \u2014 once an item exits, that elapsed time becomes the item's Cycle Time. Vacanti, WWIBD pp. 50.",
+    "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y). Vacanti, WWIBD Figure 3.2."
+  },
+  "chart_data": {
+    "items": [
+      {
+        "item_id": "BIGTOP-22",
+        "title": "Unify init scripts",
+        "current_state": "Open",
+        "age_days": 5385
+      },
+      {
+        "item_id": "BIGTOP-39",
+        "title": "Include Apache Avro in Bigtop",
+        "current_state": "Open",
+        "age_days": 5375
+      },
+      {
+        "item_id": "BIGTOP-41",
+        "title": "Add Apache Thrift to Bigtop",
+        "current_state": "Open",
+        "age_days": 5375
+      },
+      {
+        "item_id": "BIGTOP-51",
+        "title": "Layout of Bigtop repository can be optimized",
+        "current_state": "Open",
+        "age_days": 5370
+      },
+      {
+        "item_id": "BIGTOP-58",
+        "title": "Add man page for Mahout",
+        "current_state": "Open",
+        "age_days": 5369
+      },
+      {
+        "item_id": "BIGTOP-60",
+        "title": "Add normal rpmbuild options for make rpm",
+        "current_state": "Open",
+        "age_days": 5367
+      },
+      {
+        "item_id": "BIGTOP-64",
+        "title": "Package Apache tools used in Bigtop builds",
+        "current_state": "Open",
+        "age_days": 5367
+      },
+      {
+        "item_id": "BIGTOP-65",
+        "title": "Package Apache Forrest",
+        "current_state": "Open",
+        "age_days": 5367
+      },
+      {
+        "item_id": "BIGTOP-78",
+        "title": "Misc improvments ",
+        "current_state": "Open",
+        "age_days": 5362
+      },
+      {
+        "item_id": "BIGTOP-79",
+        "title": "Audit RPM package dependencies for programs invoked from install/uninstall scripts",
+        "current_state": "Open",
+        "age_days": 5362
+      },
+      {
+        "item_id": "BIGTOP-98",
+        "title": "Ability to force ivy/maven version inter-dependency needs to be implemented",
+        "current_state": "Open",
+        "age_days": 5353
+      },
+      {
+        "item_id": "BIGTOP-101",
+        "title": "Need to come up with a strategy for dealing with soft dependencies between packages",
+        "current_state": "Open",
+        "age_days": 5348
+      },
+      {
+        "item_id": "BIGTOP-105",
+        "title": "hadoop services can not be started with the default configs in place",
+        "current_state": "Open",
+        "age_days": 5346
+      },
+      {
+        "item_id": "BIGTOP-107",
+        "title": "make Bigtop packaging work in kick-start environment",
+        "current_state": "Open",
+        "age_days": 5342
+      },
+      {
+        "item_id": "BIGTOP-117",
+        "title": "Document incompatible API changes between releases",
+        "current_state": "Open",
+        "age_days": 5326
+      },
+      {
+        "item_id": "BIGTOP-135",
+        "title": "make jsvc use detection more robust on SLES",
+        "current_state": "Open",
+        "age_days": 5318
+      },
+      {
+        "item_id": "BIGTOP-153",
+        "title": "Build should detect invalid archives in the dl directory",
+        "current_state": "Open",
+        "age_days": 5314
+      },
+      {
+        "item_id": "BIGTOP-168",
+        "title": "all of the packages that link to hadoop-core need to also link commons-configuration-1.6.jar",
+        "current_state": "Open",
+        "age_days": 5313
+      },
+      {
+        "item_id": "BIGTOP-177",
+        "title": "Remove or fix versioned dependencies between packages of Bigtop",
+        "current_state": "Open",
+        "age_days": 5312
+      },
+      {
+        "item_id": "BIGTOP-187",
+        "title": "some packages ship log files",
+        "current_state": "Open",
+        "age_days": 5312
+      },
+      {
+        "item_id": "BIGTOP-204",
+        "title": "Add information about supported projects and criteria for support to Apache Bigtop website",
+        "current_state": "Open",
+        "age_days": 5310
+      },
+      {
+        "item_id": "BIGTOP-213",
+        "title": "We should use another group than hadoop for system groups",
+        "current_state": "Open",
+        "age_days": 5307
+      },
+      {
+        "item_id": "BIGTOP-218",
+        "title": "we need to figure out which compressors/codecs need to be pulled into Bigtop",
+        "current_state": "Open",
+        "age_days": 5307
+      },
+      {
+        "item_id": "BIGTOP-219",
+        "title": "Pig/HBase integration is not working",
+        "current_state": "Open",
+        "age_days": 5307
+      },
+      {
+        "item_id": "BIGTOP-220",
+        "title": "Add mrunit to Bigtop",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-223",
+        "title": " install/ initscripts fixes ",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-224",
+        "title": "Some configuration files have their permissions set to 755",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-225",
+        "title": "Exit consistently in init scripts for stop on stopped service",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-227",
+        "title": "whirr has all its files (except its man page) set as 755",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-230",
+        "title": "removing packages displays the following extraneous messages",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-231",
+        "title": "Flume's init script output is confusing when restarting",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-232",
+        "title": "create an example .ks file for Bigtop",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-233",
+        "title": "Ubuntu integration: ufw application profiles",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-234",
+        "title": "SRPM does not include forrest install",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-237",
+        "title": "Oozie init scripts are way too verbose",
+        "current_state": "Open",
+        "age_days": 5306
+      },
+      {
+        "item_id": "BIGTOP-240",
+        "title": "hbase initscripts should be more explicit",
+        "current_state": "Open",
+        "age_days": 5305
+      },
+      {
+        "item_id": "BIGTOP-243",
+        "title": "hadoop jobtracker and tasktracker status command do not detect running jobtracker/tasktracker",
+        "current_state": "Open",
+        "age_days": 5304
+      },
+      {
+        "item_id": "BIGTOP-245",
+        "title": "Improve Bigtop layout",
+        "current_state": "Open",
+        "age_days": 5303
+      },
+      {
+        "item_id": "BIGTOP-246",
+        "title": "Provide more verbose output at artifact build time",
+        "current_state": "Open",
+        "age_days": 5300
+      },
+      {
+        "item_id": "BIGTOP-256",
+        "title": "Lintian Errors/Warnings - Hadoop Package",
+        "current_state": "Open",
+        "age_days": 5293
+      },
+      {
+        "item_id": "BIGTOP-276",
+        "title": "Standardize how clients create classpaths and java.library.paths",
+        "current_state": "Open",
+        "age_days": 5284
+      },
+      {
+        "item_id": "BIGTOP-279",
+        "title": "we shouldn't be using properties that have been deprecated in config/puppet",
+        "current_state": "Open",
+        "age_days": 5278
+      },
+      {
+        "item_id": "BIGTOP-284",
+        "title": "It would be nice to integrate Nutch crawling as one of the MR (and perhaps HBase) tests for Bigtop",
+        "current_state": "Open",
+        "age_days": 5276
+      },
+      {
+        "item_id": "BIGTOP-292",
+        "title": "Bigtop SRPMs and SDEBs can not be rebuilt",
+        "current_state": "Open",
+        "age_days": 5272
+      },
+      {
+        "item_id": "BIGTOP-302",
+        "title": "1. Start a separate Wiki page on Installing Bigtop in VMs (VirtualBox) (make sure to record the fact that one needs >> 2GB of RAM)    2. Record the experience with 32bit OSes ",
+        "current_state": "Open",
+        "age_days": 5267
+      },
+      {
+        "item_id": "BIGTOP-304",
+        "title": "document test creation and test execution steps in Bigtop",
+        "current_state": "Open",
+        "age_days": 5266
+      },
+      {
+        "item_id": "BIGTOP-305",
+        "title": "hadtoop's \"task-controller.c\" builds both 32 AND 64 bit versions in a 32bit environment",
+        "current_state": "Open",
+        "age_days": 5266
+      },
+      {
+        "item_id": "BIGTOP-311",
+        "title": "hadoop does not build in off-line mode",
+        "current_state": "Open",
+        "age_days": 5264
+      },
+      {
+        "item_id": "BIGTOP-314",
+        "title": "add ZooKeeper systest to Bigtop testing regime ",
+        "current_state": "Open",
+        "age_days": 5256
+      },
+      {
+        "item_id": "BIGTOP-326",
+        "title": "puppet modules need to be renamed to align with renaming that happens on the package front",
+        "current_state": "Open",
+        "age_days": 5247
+      },
+      {
+        "item_id": "BIGTOP-330",
+        "title": "hadoop 0.23 pseudo conf needs to set more properties to avoid using /tmp as its datadir",
+        "current_state": "Open",
+        "age_days": 5243
+      },
+      {
+        "item_id": "BIGTOP-340",
+        "title": "wrapper scripts would benefit from being explicit",
+        "current_state": "Open",
+        "age_days": 5235
+      },
+      {
+        "item_id": "BIGTOP-350",
+        "title": "Some sort of system expert would be useful for manifests reviews",
+        "current_state": "Open",
+        "age_days": 5229
+      },
+      {
+        "item_id": "BIGTOP-358",
+        "title": "now that hadoop packages have been split we have to update the dependencies on the downstream packages",
+        "current_state": "Open",
+        "age_days": 5227
+      },
+      {
+        "item_id": "BIGTOP-368",
+        "title": "/usr/bin/hadoop sources /etc/default/yarn unconditionally",
+        "current_state": "Open",
+        "age_days": 5220
+      },
+      {
+        "item_id": "BIGTOP-375",
+        "title": "Publish a table of component dependency versions",
+        "current_state": "Open",
+        "age_days": 5219
+      },
+      {
+        "item_id": "BIGTOP-377",
+        "title": "Clean up packages",
+        "current_state": "Open",
+        "age_days": 5218
+      },
+      {
+        "item_id": "BIGTOP-380",
+        "title": "Initscripts have misleading messages",
+        "current_state": "Open",
+        "age_days": 5215
+      },
+      {
+        "item_id": "BIGTOP-399",
+        "title": "Provide a one-click install package for seamless deployment of Bigtop from the release/nightly repos",
+        "current_state": "Open",
+        "age_days": 5205
+      },
+      {
+        "item_id": "BIGTOP-400",
+        "title": "make hadoop-deb fails from trunk, when using java 7",
+        "current_state": "Open",
+        "age_days": 5203
+      },
+      {
+        "item_id": "BIGTOP-410",
+        "title": "Build secure version of HBase",
+        "current_state": "Open",
+        "age_days": 5198
+      },
+      {
+        "item_id": "BIGTOP-425",
+        "title": "HMaster dies from RemoteException: Server IPC version 5 cannot communicate with client version 4",
+        "current_state": "Open",
+        "age_days": 5184
+      },
+      {
+        "item_id": "BIGTOP-433",
+        "title": "Make variables used in build/install scripts consistent",
+        "current_state": "Open",
+        "age_days": 5180
+      },
+      {
+        "item_id": "BIGTOP-436",
+        "title": "flume-node stop seems to mistarget some other java process on lucid",
+        "current_state": "Open",
+        "age_days": 5178
+      },
+      {
+        "item_id": "BIGTOP-441",
+        "title": "Remove LDFLAGS definition in Hadoop build",
+        "current_state": "Open",
+        "age_days": 5177
+      },
+      {
+        "item_id": "BIGTOP-451",
+        "title": "ooziedb.sh script should run as the unix user that runs oozie server",
+        "current_state": "Open",
+        "age_days": 5172
+      },
+      {
+        "item_id": "BIGTOP-452",
+        "title": "oozie installation should offer to run ooziedb.sh",
+        "current_state": "Open",
+        "age_days": 5172
+      },
+      {
+        "item_id": "BIGTOP-456",
+        "title": "Consider splitting homedir between mapred and hdfs users?",
+        "current_state": "Open",
+        "age_days": 5171
+      },
+      {
+        "item_id": "BIGTOP-458",
+        "title": "Create some builds/tests jobs for openJDK 7 on bigtop01 jenkins",
+        "current_state": "Open",
+        "age_days": 5167
+      },
+      {
+        "item_id": "BIGTOP-460",
+        "title": "Add support for daemontools-encore",
+        "current_state": "Open",
+        "age_days": 5167
+      },
+      {
+        "item_id": "BIGTOP-486",
+        "title": "separate principals from keytabs in our kerberos module",
+        "current_state": "Open",
+        "age_days": 5163
+      },
+      {
+        "item_id": "BIGTOP-490",
+        "title": "SmokeTest-Mahout test failures",
+        "current_state": "Open",
+        "age_days": 5162
+      },
+      {
+        "item_id": "BIGTOP-492",
+        "title": "make our launcher scripts recognize cascading defaults",
+        "current_state": "Open",
+        "age_days": 5160
+      },
+      {
+        "item_id": "BIGTOP-497",
+        "title": "add bash tab completion to our hadoop packages",
+        "current_state": "Open",
+        "age_days": 5157
+      },
+      {
+        "item_id": "BIGTOP-499",
+        "title": "Mahout script cluster-reuters.sh does not work",
+        "current_state": "Open",
+        "age_days": 5157
+      },
+      {
+        "item_id": "BIGTOP-524",
+        "title": "Add tests to verify that our init scripts conform to the LSB specification",
+        "current_state": "Open",
+        "age_days": 5144
+      },
+      {
+        "item_id": "BIGTOP-531",
+        "title": "package metadata check error: when description is empty, the summary will append text \"description\" at the end of summary",
+        "current_state": "Open",
+        "age_days": 5142
+      },
+      {
+        "item_id": "BIGTOP-533",
+        "title": "BigTop Hama Integration Tests",
+        "current_state": "Open",
+        "age_days": 5139
+      },
+      {
+        "item_id": "BIGTOP-549",
+        "title": "update puppet code for the latest state of HA in Hadoop",
+        "current_state": "Open",
+        "age_days": 5136
+      },
+      {
+        "item_id": "BIGTOP-550",
+        "title": "Add ability to have multiple zookeeper servers to puppet",
+        "current_state": "Open",
+        "age_days": 5136
+      },
+      {
+        "item_id": "BIGTOP-551",
+        "title": "Updates for packaging manifest",
+        "current_state": "Open",
+        "age_days": 5136
+      },
+      {
+        "item_id": "BIGTOP-566",
+        "title": "Flume NG pkg init script should allow user to customize the location of the conf dir",
+        "current_state": "Open",
+        "age_days": 5128
+      },
+      {
+        "item_id": "BIGTOP-571",
+        "title": "we might need to guard against direct use of the upstream launcher scripts",
+        "current_state": "Open",
+        "age_days": 5123
+      },
+      {
+        "item_id": "BIGTOP-575",
+        "title": "[Pseudo-dist config] Should yarn.nodemanager.remote-app-log-dir really be set?",
+        "current_state": "Open",
+        "age_days": 5121
+      },
+      {
+        "item_id": "BIGTOP-594",
+        "title": "Introduce git-style bigtop command line and BIGTOP_HOME environment variable",
+        "current_state": "Open",
+        "age_days": 5107
+      },
+      {
+        "item_id": "BIGTOP-601",
+        "title": "introduce bigtop-build packages for packaging build-time dependencies",
+        "current_state": "Open",
+        "age_days": 5102
+      },
+      {
+        "item_id": "BIGTOP-614",
+        "title": "Add HDFS HA tests",
+        "current_state": "Open",
+        "age_days": 5088
+      },
+      {
+        "item_id": "BIGTOP-615",
+        "title": "Add support for Ambrose Pig job visualization",
+        "current_state": "Open",
+        "age_days": 5088
+      },
+      {
+        "item_id": "BIGTOP-629",
+        "title": "Adding Automated HA Tests ",
+        "current_state": "Open",
+        "age_days": 5079
+      },
+      {
+        "item_id": "BIGTOP-635",
+        "title": "Implement a cluster-abstraction, discovery and manipulation framework for iTest",
+        "current_state": "Open",
+        "age_days": 5076
+      },
+      {
+        "item_id": "BIGTOP-640",
+        "title": "Sync up dependency library versions automatically",
+        "current_state": "Open",
+        "age_days": 5073
+      },
+      {
+        "item_id": "BIGTOP-644",
+        "title": "fix the runlevels for a few packages in yum/apt/zypper",
+        "current_state": "Open",
+        "age_days": 5073
+      },
+      {
+        "item_id": "BIGTOP-665",
+        "title": "update apt package manifest",
+        "current_state": "Open",
+        "age_days": 5062
+      },
+      {
+        "item_id": "BIGTOP-666",
+        "title": "improve pkg test to handle hue-server started status in Ubuntu",
+        "current_state": "Open",
+        "age_days": 5061
+      },
+      {
+        "item_id": "BIGTOP-683",
+        "title": "remove hacks for datanode init.d now that bin/hadoop has HDFS-1943 in it",
+        "current_state": "Open",
+        "age_days": 5039
+      },
+      {
+        "item_id": "BIGTOP-698",
+        "title": "Add itest developer guide",
+        "current_state": "Open",
+        "age_days": 4996
+      },
+      {
+        "item_id": "BIGTOP-705",
+        "title": "Make variables used in giraph build/install scripts consistent",
+        "current_state": "Open",
+        "age_days": 4986
+      },
+      {
+        "item_id": "BIGTOP-709",
+        "title": "Add Apache Ambari to Apache Bigtop",
+        "current_state": "Reopened",
+        "age_days": 4985
+      },
+      {
+        "item_id": "BIGTOP-710",
+        "title": "Create a higher level orchestration deployment framework",
+        "current_state": "Open",
+        "age_days": 4981
+      },
+      {
+        "item_id": "BIGTOP-722",
+        "title": "fix hive puppet module to install and start hive-metastore",
+        "current_state": "Open",
+        "age_days": 4971
+      },
+      {
+        "item_id": "BIGTOP-724",
+        "title": "add support to install and configure postgresql through bigtop puppet moduels",
+        "current_state": "Open",
+        "age_days": 4970
+      },
+      {
+        "item_id": "BIGTOP-729",
+        "title": "zookeeper initd script status doesn't work",
+        "current_state": "Open",
+        "age_days": 4967
+      },
+      {
+        "item_id": "BIGTOP-730",
+        "title": "add tarball driver into Bigtop",
+        "current_state": "Open",
+        "age_days": 4967
+      },
+      {
+        "item_id": "BIGTOP-737",
+        "title": "Add tests accessing Solr via SolrJ",
+        "current_state": "Open",
+        "age_days": 4962
+      },
+      {
+        "item_id": "BIGTOP-738",
+        "title": "Add tests using Lucene directly",
+        "current_state": "Open",
+        "age_days": 4962
+      },
+      {
+        "item_id": "BIGTOP-739",
+        "title": "Add tests for EmbeddedSolr",
+        "current_state": "Open",
+        "age_days": 4962
+      },
+      {
+        "item_id": "BIGTOP-740",
+        "title": "improve the package file content tests to ignore platform specific file names",
+        "current_state": "Open",
+        "age_days": 4961
+      },
+      {
+        "item_id": "BIGTOP-769",
+        "title": "Create a generic shell executor iTest driver",
+        "current_state": "Open",
+        "age_days": 4942
+      },
+      {
+        "item_id": "BIGTOP-770",
+        "title": "Upgrade of the .deb Packege removes Hadoop Users (hdfs and mapred) and the hadoop-group",
+        "current_state": "Open",
+        "age_days": 4941
+      },
+      {
+        "item_id": "BIGTOP-779",
+        "title": "create a config management utility for SolrCloud",
+        "current_state": "Open",
+        "age_days": 4928
+      },
+      {
+        "item_id": "BIGTOP-792",
+        "title": "org.apache.bigtop.itest.posix.Service needs to be updated to accomodate upstart/systemd",
+        "current_state": "Open",
+        "age_days": 4920
+      },
+      {
+        "item_id": "BIGTOP-794",
+        "title": "puppet code around hadoop_head_node breaks on newer puppets",
+        "current_state": "Open",
+        "age_days": 4919
+      },
+      {
+        "item_id": "BIGTOP-795",
+        "title": "need to abstract away the notion of Bigtop puppet repo",
+        "current_state": "Open",
+        "age_days": 4915
+      },
+      {
+        "item_id": "BIGTOP-803",
+        "title": "somehow puppet gets confused by the hadoop fs output",
+        "current_state": "Open",
+        "age_days": 4906
+      },
+      {
+        "item_id": "BIGTOP-807",
+        "title": "Create standalone Helix agent ",
+        "current_state": "Open",
+        "age_days": 4898
+      },
+      {
+        "item_id": "BIGTOP-820",
+        "title": "Write puppet deployment wiki",
+        "current_state": "Open",
+        "age_days": 4877
+      },
+      {
+        "item_id": "BIGTOP-825",
+        "title": "make package manager be able to handle two conflicted packages",
+        "current_state": "Open",
+        "age_days": 4868
+      },
+      {
+        "item_id": "BIGTOP-847",
+        "title": "form VM baking come up with a way to init services that require being up and running",
+        "current_state": "Open",
+        "age_days": 4830
+      },
+      {
+        "item_id": "BIGTOP-865",
+        "title": "Fix up zookeeper's install script",
+        "current_state": "Open",
+        "age_days": 4814
+      },
+      {
+        "item_id": "BIGTOP-866",
+        "title": "add OpenStack swift filesystem support for Hadoop as new RPM/deb",
+        "current_state": "Open",
+        "age_days": 4810
+      },
+      {
+        "item_id": "BIGTOP-867",
+        "title": "Add integration tests that verify filesystem support for pig, hive, etc",
+        "current_state": "Open",
+        "age_days": 4810
+      },
+      {
+        "item_id": "BIGTOP-868",
+        "title": "Oozie map-reduce example fails with ClassNotFoundException",
+        "current_state": "Open",
+        "age_days": 4809
+      },
+      {
+        "item_id": "BIGTOP-872",
+        "title": "Separate docs into doc packages",
+        "current_state": "Open",
+        "age_days": 4805
+      },
+      {
+        "item_id": "BIGTOP-897",
+        "title": "Revise the Hadoop installation on Ubuntu wiki page",
+        "current_state": "Open",
+        "age_days": 4790
+      },
+      {
+        "item_id": "BIGTOP-898",
+        "title": "Include an avro-mapred dependency as part of the base Hadoop package itself",
+        "current_state": "Open",
+        "age_days": 4788
+      },
+      {
+        "item_id": "BIGTOP-921",
+        "title": "Add Ganglia to BigTop stack",
+        "current_state": "Open",
+        "age_days": 4779
+      },
+      {
+        "item_id": "BIGTOP-924",
+        "title": "Change the aggregation log directory default in shipped configs to be more intuitive (about local vs. DFS)",
+        "current_state": "Open",
+        "age_days": 4778
+      },
+      {
+        "item_id": "BIGTOP-925",
+        "title": "add integration test to verify hadoop-client dependencies completeness",
+        "current_state": "Open",
+        "age_days": 4778
+      },
+      {
+        "item_id": "BIGTOP-941",
+        "title": "Integrate Apache Knox",
+        "current_state": "Open",
+        "age_days": 4765
+      },
+      {
+        "item_id": "BIGTOP-942",
+        "title": "Provide packaging support Apache Knox in BigTop",
+        "current_state": "Open",
+        "age_days": 4765
+      },
+      {
+        "item_id": "BIGTOP-943",
+        "title": "Provide deployment support for Apache Knox in BigTop (i.e Puppet code)",
+        "current_state": "Open",
+        "age_days": 4765
+      },
+      {
+        "item_id": "BIGTOP-944",
+        "title": "Provide testing support for Apache Knox in BigTop",
+        "current_state": "Open",
+        "age_days": 4765
+      },
+      {
+        "item_id": "BIGTOP-966",
+        "title": "Consider changing Hive tests to use Thrift Java client, JDBC client or Oozie workflows",
+        "current_state": "Open",
+        "age_days": 4757
+      },
+      {
+        "item_id": "BIGTOP-978",
+        "title": "Create a parameterized Jenkins job on Bigtop jenkins to build any component from any given branch from github",
+        "current_state": "Open",
+        "age_days": 4753
+      },
+      {
+        "item_id": "BIGTOP-979",
+        "title": "Add hprof dump settings on OOM to all JVMs started by bigtop scripts",
+        "current_state": "Open",
+        "age_days": 4752
+      },
+      {
+        "item_id": "BIGTOP-999",
+        "title": "Consolidate metastores in Bigtop distribution",
+        "current_state": "Open",
+        "age_days": 4723
+      },
+      {
+        "item_id": "BIGTOP-1003",
+        "title": "enable more sophisticated package testsuites on our jenkins",
+        "current_state": "Open",
+        "age_days": 4721
+      },
+      {
+        "item_id": "BIGTOP-1007",
+        "title": "Introduce a modules system for HBase coprocessor applications",
+        "current_state": "Open",
+        "age_days": 4717
+      },
+      {
+        "item_id": "BIGTOP-1012",
+        "title": "bigtop-detect-javahome should check PATH if JAVA_HOME is unset",
+        "current_state": "Open",
+        "age_days": 4717
+      },
+      {
+        "item_id": "BIGTOP-1014",
+        "title": "Consider creating devel packages to include header files for development use",
+        "current_state": "Open",
+        "age_days": 4709
+      },
+      {
+        "item_id": "BIGTOP-1015",
+        "title": "TestJDBC Driver failing in Hive 0.11.0",
+        "current_state": "Open",
+        "age_days": 4709
+      },
+      {
+        "item_id": "BIGTOP-1018",
+        "title": "Gora for Bigtop",
+        "current_state": "Open",
+        "age_days": 4708
+      },
+      {
+        "item_id": "BIGTOP-1020",
+        "title": "Update Build Requirements on our web pages",
+        "current_state": "Open",
+        "age_days": 4694
+      },
+      {
+        "item_id": "BIGTOP-1024",
+        "title": "Define scala environments for dev and runtime",
+        "current_state": "Open",
+        "age_days": 4688
+      },
+      {
+        "item_id": "BIGTOP-1025",
+        "title": "Starting hadoop-mapreduce-historyserver fails on Ubuntu Lucid",
+        "current_state": "Open",
+        "age_days": 4685
+      },
+      {
+        "item_id": "BIGTOP-1028",
+        "title": "Add BenchPress module",
+        "current_state": "Open",
+        "age_days": 4682
+      },
+      {
+        "item_id": "BIGTOP-1035",
+        "title": "Add Apache Falcon to BigTop",
+        "current_state": "Open",
+        "age_days": 4670
+      },
+      {
+        "item_id": "BIGTOP-1049",
+        "title": "Add Storm to Bigtop",
+        "current_state": "Open",
+        "age_days": 4657
+      },
+      {
+        "item_id": "BIGTOP-1058",
+        "title": "Set up hive-site.xml for shark server during the deployment",
+        "current_state": "Open",
+        "age_days": 4639
+      },
+      {
+        "item_id": "BIGTOP-1061",
+        "title": "Provide a jstack capturing script",
+        "current_state": "Open",
+        "age_days": 4633
+      },
+      {
+        "item_id": "BIGTOP-1064",
+        "title": "First class integration of HCatalog in Pig",
+        "current_state": "Open",
+        "age_days": 4631
+      },
+      {
+        "item_id": "BIGTOP-1065",
+        "title": "Stress Tests ",
+        "current_state": "Reopened",
+        "age_days": 4629
+      },
+      {
+        "item_id": "BIGTOP-1066",
+        "title": "multifilewc and possibly other mapreduce smoke tests rely on mapred: should they be separated or replaced?",
+        "current_state": "Open",
+        "age_days": 4626
+      },
+      {
+        "item_id": "BIGTOP-1067",
+        "title": "Testing input splits in jobs",
+        "current_state": "Open",
+        "age_days": 4625
+      },
+      {
+        "item_id": "BIGTOP-1068",
+        "title": "Add packaging for Apache Curator",
+        "current_state": "Open",
+        "age_days": 4624
+      },
+      {
+        "item_id": "BIGTOP-1091",
+        "title": "Apply BIGTOP_CLASSPATH to all remaining components",
+        "current_state": "Open",
+        "age_days": 4613
+      },
+      {
+        "item_id": "BIGTOP-1093",
+        "title": "decide on package naming scheme",
+        "current_state": "Open",
+        "age_days": 4613
+      },
+      {
+        "item_id": "BIGTOP-1102",
+        "title": "Change default of HBase TestLoadAndVerify test so it can be run as smoke",
+        "current_state": "Open",
+        "age_days": 4607
+      },
+      {
+        "item_id": "BIGTOP-1109",
+        "title": "Remove protobuf jar from a few packages that depend on Hadoop",
+        "current_state": "Open",
+        "age_days": 4598
+      },
+      {
+        "item_id": "BIGTOP-1113",
+        "title": "Failing smokes should copy Std Error / Std Out to a file or else print them to the existing test logs.",
+        "current_state": "Open",
+        "age_days": 4597
+      },
+      {
+        "item_id": "BIGTOP-1116",
+        "title": "phoenix package dependencies can be optimized",
+        "current_state": "Open",
+        "age_days": 4595
+      },
+      {
+        "item_id": "BIGTOP-1120",
+        "title": "implement tests for NFS/HDFS",
+        "current_state": "Open",
+        "age_days": 4589
+      },
+      {
+        "item_id": "BIGTOP-1133",
+        "title": "Phoenix should provide some integration with Apache HBase",
+        "current_state": "Open",
+        "age_days": 4579
+      },
+      {
+        "item_id": "BIGTOP-1134",
+        "title": "Faile to \"mvn verify\"  in flume",
+        "current_state": "Open",
+        "age_days": 4579
+      },
+      {
+        "item_id": "BIGTOP-1136",
+        "title": "Testing Multitenancy and Multiuser applications",
+        "current_state": "Open",
+        "age_days": 4575
+      },
+      {
+        "item_id": "BIGTOP-1140",
+        "title": "Solr server watchdog heartbeat requests shouldn't be proxied",
+        "current_state": "Open",
+        "age_days": 4572
+      },
+      {
+        "item_id": "BIGTOP-1142",
+        "title": "Create wiki page comparing FHS guidelines with the bigtop packaging results",
+        "current_state": "Open",
+        "age_days": 4569
+      },
+      {
+        "item_id": "BIGTOP-1148",
+        "title": "Move Hadoop native bits into arch-specific packaging",
+        "current_state": "Open",
+        "age_days": 4558
+      },
+      {
+        "item_id": "BIGTOP-1151",
+        "title": "Default VM disk sizes, might be a little too small?  Or maybe just need recipes for making them bigger?",
+        "current_state": "Open",
+        "age_days": 4551
+      },
+      {
+        "item_id": "BIGTOP-1172",
+        "title": "Verify new Spark /bin and /sbin scripts layout and correct permissions",
+        "current_state": "Open",
+        "age_days": 4512
+      },
+      {
+        "item_id": "BIGTOP-1176",
+        "title": "Add Yarn Test cases",
+        "current_state": "Open",
+        "age_days": 4507
+      },
+      {
+        "item_id": "BIGTOP-1177",
+        "title": "Puppet Recipes: Can we modularize them to foster HCFS initiatives?",
+        "current_state": "Open",
+        "age_days": 4507
+      },
+      {
+        "item_id": "BIGTOP-1186",
+        "title": "Consolidate shell/puppet vagrant provisioners.",
+        "current_state": "Open",
+        "age_days": 4495
+      },
+      {
+        "item_id": "BIGTOP-1211",
+        "title": "Puppet recipes:  Should they start a NodeManager if yarn is enabled?",
+        "current_state": "Open",
+        "age_days": 4468
+      },
+      {
+        "item_id": "BIGTOP-1214",
+        "title": "Remove component version dependency  for apache cross component",
+        "current_state": "Open",
+        "age_days": 4464
+      },
+      {
+        "item_id": "BIGTOP-1219",
+        "title": "create a custom application master to talk with YARN",
+        "current_state": "Open",
+        "age_days": 4460
+      },
+      {
+        "item_id": "BIGTOP-1228",
+        "title": "Monitor resource or metrics of hadoop cluster",
+        "current_state": "Open",
+        "age_days": 4457
+      },
+      {
+        "item_id": "BIGTOP-1229",
+        "title": "Keep binary tarball after building packages or support build tarball command ",
+        "current_state": "Open",
+        "age_days": 4457
+      },
+      {
+        "item_id": "BIGTOP-1230",
+        "title": "Create version-less symlinks for all components",
+        "current_state": "Open",
+        "age_days": 4457
+      },
+      {
+        "item_id": "BIGTOP-1233",
+        "title": "Iterate on BIGTOP-1221 to make HCFS FUSE tests more configurable for different filesystem implementations,",
+        "current_state": "Open",
+        "age_days": 4456
+      },
+      {
+        "item_id": "BIGTOP-1237",
+        "title": "TestFuse needs to also be compatible with HA configurations ",
+        "current_state": "Open",
+        "age_days": 4452
+      },
+      {
+        "item_id": "BIGTOP-1243",
+        "title": "Add Vendor and Signature in RPM information",
+        "current_state": "Open",
+        "age_days": 4451
+      },
+      {
+        "item_id": "BIGTOP-1248",
+        "title": "artifact version can be replaced during build",
+        "current_state": "Open",
+        "age_days": 4446
+      },
+      {
+        "item_id": "BIGTOP-1249",
+        "title": "Umbrella JIRA: Pre-commit hooks and automated Patch validation",
+        "current_state": "Open",
+        "age_days": 4446
+      },
+      {
+        "item_id": "BIGTOP-1251",
+        "title": "Add Vendor in RPM information",
+        "current_state": "Open",
+        "age_days": 4445
+      },
+      {
+        "item_id": "BIGTOP-1261",
+        "title": "Smoke tests for the NameNode High Avaibility",
+        "current_state": "Open",
+        "age_days": 4429
+      },
+      {
+        "item_id": "BIGTOP-1262",
+        "title": "Smoke tests for Luigi",
+        "current_state": "Open",
+        "age_days": 4429
+      },
+      {
+        "item_id": "BIGTOP-1263",
+        "title": "Next vagrant iteration: Make easy to customize,maintain and a HA recipe.",
+        "current_state": "Open",
+        "age_days": 4429
+      },
+      {
+        "item_id": "BIGTOP-1264",
+        "title": "make the DEBIAN file flexible Maintainer with variable substitutions",
+        "current_state": "In Progress",
+        "age_days": 4423
+      },
+      {
+        "item_id": "BIGTOP-1276",
+        "title": "[BigPetStore] Port the BigPetStore web app to bigtop",
+        "current_state": "Open",
+        "age_days": 4409
+      },
+      {
+        "item_id": "BIGTOP-1286",
+        "title": "Build an immutable BigTop CI.",
+        "current_state": "Open",
+        "age_days": 4404
+      },
+      {
+        "item_id": "BIGTOP-1297",
+        "title": "Update puppet deployment recipes to reflect combination of HMaster and HRegionServer",
+        "current_state": "Open",
+        "age_days": 4388
+      },
+      {
+        "item_id": "BIGTOP-1298",
+        "title": "Remove hbase-regionserver",
+        "current_state": "Open",
+        "age_days": 4388
+      },
+      {
+        "item_id": "BIGTOP-1299",
+        "title": "Better verification of status of commands in HttpFs",
+        "current_state": "Open",
+        "age_days": 4387
+      },
+      {
+        "item_id": "BIGTOP-1305",
+        "title": "Use tests from the HBase test jar to potentially replace hbase-smokes",
+        "current_state": "Open",
+        "age_days": 4383
+      },
+      {
+        "item_id": "BIGTOP-1317",
+        "title": "Make variable names in Flume Test reflect the HCFS Compliance.",
+        "current_state": "Open",
+        "age_days": 4375
+      },
+      {
+        "item_id": "BIGTOP-1326",
+        "title": "iTest Shell does fully work under root user only",
+        "current_state": "Open",
+        "age_days": 4366
+      },
+      {
+        "item_id": "BIGTOP-1328",
+        "title": "Puppet should provision sudoers to allow NOPASSWD test user ",
+        "current_state": "Open",
+        "age_days": 4365
+      },
+      {
+        "item_id": "BIGTOP-1329",
+        "title": "Leverage bigtop to build a patch deployment tester for hadoop.",
+        "current_state": "Open",
+        "age_days": 4358
+      },
+      {
+        "item_id": "BIGTOP-1333",
+        "title": "Update build.gradle in smoketests to read from paramterized file input",
+        "current_state": "Open",
+        "age_days": 4354
+      },
+      {
+        "item_id": "BIGTOP-1335",
+        "title": "JAVA_HOME auto detect improvement",
+        "current_state": "Open",
+        "age_days": 4348
+      },
+      {
+        "item_id": "BIGTOP-1339",
+        "title": "hadoop pseudo configuration can be default configuration",
+        "current_state": "Open",
+        "age_days": 4346
+      },
+      {
+        "item_id": "BIGTOP-1349",
+        "title": "oozie fail to execute Hive action in secure cluster",
+        "current_state": "Open",
+        "age_days": 4341
+      },
+      {
+        "item_id": "BIGTOP-1360",
+        "title": "Our First Pull Request !",
+        "current_state": "Open",
+        "age_days": 4332
+      },
+      {
+        "item_id": "BIGTOP-1362",
+        "title": "Package NFS service for HDFS",
+        "current_state": "Open",
+        "age_days": 4332
+      },
+      {
+        "item_id": "BIGTOP-1364",
+        "title": "Add lookup/reval case for HCFS Fuse tests.",
+        "current_state": "Open",
+        "age_days": 4331
+      },
+      {
+        "item_id": "BIGTOP-1367",
+        "title": "Include LICENSES(.txt) and NOTICES(.txt) for every component",
+        "current_state": "Open",
+        "age_days": 4327
+      },
+      {
+        "item_id": "BIGTOP-1368",
+        "title": "Have Jenkins use Mesos-Jenkins plugin to create containerized build slaves",
+        "current_state": "Open",
+        "age_days": 4326
+      },
+      {
+        "item_id": "BIGTOP-1369",
+        "title": "Hive Debian rules file does not set maven.repo.local",
+        "current_state": "Open",
+        "age_days": 4326
+      },
+      {
+        "item_id": "BIGTOP-1370",
+        "title": "Update yarn.nodemanager.remote-app-log-dir in hadoop-conf-pseudo to be a URI",
+        "current_state": "Open",
+        "age_days": 4325
+      },
+      {
+        "item_id": "BIGTOP-1376",
+        "title": "Split Oozie package into several small packages",
+        "current_state": "Open",
+        "age_days": 4320
+      },
+      {
+        "item_id": "BIGTOP-1379",
+        "title": "Remove eclipse build dependency and deploy CI for bigtpetstore",
+        "current_state": "Open",
+        "age_days": 4316
+      },
+      {
+        "item_id": "BIGTOP-1383",
+        "title": "Next iteration of bigtop site",
+        "current_state": "Open",
+        "age_days": 4306
+      },
+      {
+        "item_id": "BIGTOP-1385",
+        "title": "HCatalog uses /var/lib for PID files",
+        "current_state": "Open",
+        "age_days": 4304
+      },
+      {
+        "item_id": "BIGTOP-1386",
+        "title": "Use parameters to specify node behavior when testing ClusterFailuresTest.groovy",
+        "current_state": "Open",
+        "age_days": 4302
+      },
+      {
+        "item_id": "BIGTOP-1387",
+        "title": "Command line parametrization for host/remote_host in ClusterFailuresTest.groovy",
+        "current_state": "Open",
+        "age_days": 4302
+      },
+      {
+        "item_id": "BIGTOP-1389",
+        "title": "Create a plugins directory for unpackaged plugins for Apache Flume",
+        "current_state": "Open",
+        "age_days": 4302
+      },
+      {
+        "item_id": "BIGTOP-1403",
+        "title": "Add YARN-2410 to Longevity tests.",
+        "current_state": "Open",
+        "age_days": 4290
+      },
+      {
+        "item_id": "BIGTOP-1407",
+        "title": "create Bigtop stack definition for Ambari",
+        "current_state": "Open",
+        "age_days": 4284
+      },
+      {
+        "item_id": "BIGTOP-1410",
+        "title": "improve and further migrate to new testing framework",
+        "current_state": "Open",
+        "age_days": 4283
+      },
+      {
+        "item_id": "BIGTOP-1411",
+        "title": "Create packaging for Smoke Tests",
+        "current_state": "Open",
+        "age_days": 4283
+      },
+      {
+        "item_id": "BIGTOP-1412",
+        "title": "Read permission should be added for some jars.",
+        "current_state": "Open",
+        "age_days": 4283
+      },
+      {
+        "item_id": "BIGTOP-1413",
+        "title": "Revise the log file name of spark",
+        "current_state": "Open",
+        "age_days": 4282
+      },
+      {
+        "item_id": "BIGTOP-1424",
+        "title": "hive do-component-build should use skipTest instead of maven.test.skip",
+        "current_state": "Open",
+        "age_days": 4269
+      },
+      {
+        "item_id": "BIGTOP-1431",
+        "title": "Determine future of Kerberos and ID Support in Bigtop",
+        "current_state": "Open",
+        "age_days": 4266
+      },
+      {
+        "item_id": "BIGTOP-1454",
+        "title": "Clean up mahout tests .",
+        "current_state": "Open",
+        "age_days": 4252
+      },
+      {
+        "item_id": "BIGTOP-1455",
+        "title": "lets enforce C.UTF-8 locale in all of Bigtop builds",
+        "current_state": "Open",
+        "age_days": 4251
+      },
+      {
+        "item_id": "BIGTOP-1463",
+        "title": "We need a better automation of the release process.",
+        "current_state": "Open",
+        "age_days": 4244
+      },
+      {
+        "item_id": "BIGTOP-1464",
+        "title": "'install' of test-execution/pom.xml shouldn't trigger the enforcer",
+        "current_state": "Open",
+        "age_days": 4244
+      },
+      {
+        "item_id": "BIGTOP-1466",
+        "title": "automate to include known issues in release notes",
+        "current_state": "Open",
+        "age_days": 4244
+      },
+      {
+        "item_id": "BIGTOP-1469",
+        "title": "Add build option for do-component-build ",
+        "current_state": "Open",
+        "age_days": 4244
+      },
+      {
+        "item_id": "BIGTOP-1471",
+        "title": "BigPetStore:  Cleanup sources",
+        "current_state": "Open",
+        "age_days": 4243
+      },
+      {
+        "item_id": "BIGTOP-1473",
+        "title": "Enable publishing of BigPetStore jars",
+        "current_state": "Open",
+        "age_days": 4242
+      },
+      {
+        "item_id": "BIGTOP-1474",
+        "title": "Incorrect paths in /usr/lib/solr/tomcat-deployment.sh",
+        "current_state": "Open",
+        "age_days": 4242
+      },
+      {
+        "item_id": "BIGTOP-1477",
+        "title": "Gradle build should print errors",
+        "current_state": "Open",
+        "age_days": 4241
+      },
+      {
+        "item_id": "BIGTOP-1479",
+        "title": "top level Maven/Gradle build needs to be able to deploy everything",
+        "current_state": "Open",
+        "age_days": 4238
+      },
+      {
+        "item_id": "BIGTOP-1482",
+        "title": "Include snappy in toolchain",
+        "current_state": "Open",
+        "age_days": 4234
+      },
+      {
+        "item_id": "BIGTOP-1483",
+        "title": "Include m4 in toolchain",
+        "current_state": "Open",
+        "age_days": 4234
+      },
+      {
+        "item_id": "BIGTOP-1485",
+        "title": "Include findbugs in toolchain",
+        "current_state": "Open",
+        "age_days": 4234
+      },
+      {
+        "item_id": "BIGTOP-1496",
+        "title": "Can't uninstall hue completely if any app is installed",
+        "current_state": "Open",
+        "age_days": 4218
+      },
+      {
+        "item_id": "BIGTOP-1500",
+        "title": "Stop already stopped hue service returns ok instead of failed",
+        "current_state": "Open",
+        "age_days": 4214
+      },
+      {
+        "item_id": "BIGTOP-1505",
+        "title": "Need a better way to express jdk package dependency in Puppet recipes",
+        "current_state": "Open",
+        "age_days": 4212
+      },
+      {
+        "item_id": "BIGTOP-1507",
+        "title": "Maintain explicit CI and Bigtop Architecture info in Bigtop",
+        "current_state": "Open",
+        "age_days": 4212
+      },
+      {
+        "item_id": "BIGTOP-1512",
+        "title": "Add  FS SHell tests to RC candidate testing script, and gradle (follow up to BIGTOP-1511)",
+        "current_state": "Open",
+        "age_days": 4208
+      },
+      {
+        "item_id": "BIGTOP-1515",
+        "title": "Invalid hbase.jar in hive rpm build",
+        "current_state": "Open",
+        "age_days": 4206
+      },
+      {
+        "item_id": "BIGTOP-1518",
+        "title": "add vv to rpbbuild",
+        "current_state": "Open",
+        "age_days": 4205
+      },
+      {
+        "item_id": "BIGTOP-1519",
+        "title": "toolchain get manifest from http instead of https or ftp",
+        "current_state": "Open",
+        "age_days": 4204
+      },
+      {
+        "item_id": "BIGTOP-1520",
+        "title": "Files permissions prevent running hbase shell for non root users.",
+        "current_state": "Open",
+        "age_days": 4204
+      },
+      {
+        "item_id": "BIGTOP-1528",
+        "title": "Add cluster failure testing to Vagrant / docker recipes",
+        "current_state": "Open",
+        "age_days": 4198
+      },
+      {
+        "item_id": "BIGTOP-1530",
+        "title": "pig -useHCatalog does not work",
+        "current_state": "Open",
+        "age_days": 4193
+      },
+      {
+        "item_id": "BIGTOP-1538",
+        "title": "Add customer clustering example to BPS Spark",
+        "current_state": "Open",
+        "age_days": 4192
+      },
+      {
+        "item_id": "BIGTOP-1539",
+        "title": "Add Spark analytics example for distribution of time between customer purchases",
+        "current_state": "Open",
+        "age_days": 4192
+      },
+      {
+        "item_id": "BIGTOP-1540",
+        "title": "Add Spark analytics example for distribution of customer-store and transaction customer-store distances",
+        "current_state": "Open",
+        "age_days": 4192
+      },
+      {
+        "item_id": "BIGTOP-1546",
+        "title": "The pyspark command, by default, points to a script that contains a bug",
+        "current_state": "Open",
+        "age_days": 4187
+      },
+      {
+        "item_id": "BIGTOP-1561",
+        "title": "Add Presto as a component",
+        "current_state": "Open",
+        "age_days": 4175
+      },
+      {
+        "item_id": "BIGTOP-1572",
+        "title": "Improve the automated install, smoke tests, and integration of tachyon-HDFS ",
+        "current_state": "Open",
+        "age_days": 4166
+      },
+      {
+        "item_id": "BIGTOP-1573",
+        "title": "rpm init scripts do not wait for network",
+        "current_state": "Open",
+        "age_days": 4166
+      },
+      {
+        "item_id": "BIGTOP-1575",
+        "title": "auto-testing and puppetization of Phoenix",
+        "current_state": "Open",
+        "age_days": 4166
+      },
+      {
+        "item_id": "BIGTOP-1577",
+        "title": "refactor our Gradle packaging build to get rid of direct exec's",
+        "current_state": "Patch Available",
+        "age_days": 4165
+      },
+      {
+        "item_id": "BIGTOP-1584",
+        "title": "Ansible roles and playbooks for Bigtop",
+        "current_state": "Open",
+        "age_days": 4150
+      },
+      {
+        "item_id": "BIGTOP-1623",
+        "title": "Add Smoke tests for Kafka",
+        "current_state": "Open",
+        "age_days": 4124
+      },
+      {
+        "item_id": "BIGTOP-1625",
+        "title": "Fix the way we currently pick Kafka scripts that land under /usr/bin.",
+        "current_state": "Open",
+        "age_days": 4124
+      },
+      {
+        "item_id": "BIGTOP-1644",
+        "title": "Configuring ports for Apache Spark",
+        "current_state": "Open",
+        "age_days": 4116
+      },
+      {
+        "item_id": "BIGTOP-1646",
+        "title": "Update network ports reference",
+        "current_state": "Open",
+        "age_days": 4116
+      },
+      {
+        "item_id": "BIGTOP-1647",
+        "title": "zookeeper jar contains java sources",
+        "current_state": "Open",
+        "age_days": 4116
+      },
+      {
+        "item_id": "BIGTOP-1666",
+        "title": "Test and confirm vagrant puppet recipes work on Windows VMs.",
+        "current_state": "Open",
+        "age_days": 4108
+      },
+      {
+        "item_id": "BIGTOP-1672",
+        "title": "a referenced link is not working on http://bigtop.apache.org/",
+        "current_state": "Open",
+        "age_days": 4106
+      },
+      {
+        "item_id": "BIGTOP-1680",
+        "title": "[BigPetStore] BPS-Spark Unit tests for transaction generation",
+        "current_state": "Open",
+        "age_days": 4101
+      },
+      {
+        "item_id": "BIGTOP-1682",
+        "title": "Build BPS Spark against BigTop Artifacts",
+        "current_state": "Open",
+        "age_days": 4101
+      },
+      {
+        "item_id": "BIGTOP-1689",
+        "title": "puppet: Allow merging arbitrary site configuration",
+        "current_state": "Patch Available",
+        "age_days": 4100
+      },
+      {
+        "item_id": "BIGTOP-1695",
+        "title": "Deprecate maven build after full gradelization of the project",
+        "current_state": "Open",
+        "age_days": 4099
+      },
+      {
+        "item_id": "BIGTOP-1702",
+        "title": "Enable SSH Provisioning for existing Cloud instance (One click BigTop  provisioning).",
+        "current_state": "Open",
+        "age_days": 4096
+      },
+      {
+        "item_id": "BIGTOP-1704",
+        "title": "Rewrite bigtop-detect-javahome",
+        "current_state": "Open",
+        "age_days": 4095
+      },
+      {
+        "item_id": "BIGTOP-1713",
+        "title": "Enforce Puppet 3.x check",
+        "current_state": "Open",
+        "age_days": 4091
+      },
+      {
+        "item_id": "BIGTOP-1714",
+        "title": "Add a smoke test for YARN ATS",
+        "current_state": "Open",
+        "age_days": 4089
+      },
+      {
+        "item_id": "BIGTOP-1715",
+        "title": "Puppet recipe for YARN Timelineserver",
+        "current_state": "Open",
+        "age_days": 4089
+      },
+      {
+        "item_id": "BIGTOP-1717",
+        "title": "Add smoke tests for modules built on Spark",
+        "current_state": "Open",
+        "age_days": 4089
+      },
+      {
+        "item_id": "BIGTOP-1719",
+        "title": "Remove Hive integration from Spark SQL",
+        "current_state": "Open",
+        "age_days": 4088
+      },
+      {
+        "item_id": "BIGTOP-1720",
+        "title": "Add RC tests for HBase on Spark",
+        "current_state": "Open",
+        "age_days": 4087
+      },
+      {
+        "item_id": "BIGTOP-1736",
+        "title": "Determine why SOLRCTL fails and add error messages to puppet.",
+        "current_state": "Open",
+        "age_days": 4083
+      },
+      {
+        "item_id": "BIGTOP-1740",
+        "title": "Add smoke test for Sqoop2",
+        "current_state": "Open",
+        "age_days": 4082
+      },
+      {
+        "item_id": "BIGTOP-1747",
+        "title": "gradlew script needs a better error message if unzip isn't available",
+        "current_state": "Open",
+        "age_days": 4081
+      },
+      {
+        "item_id": "BIGTOP-1749",
+        "title": "Consume solr 5.0.0 in Bigtop ",
+        "current_state": "Open",
+        "age_days": 4081
+      },
+      {
+        "item_id": "BIGTOP-1750",
+        "title": "Restructure TestCLI",
+        "current_state": "Open",
+        "age_days": 4081
+      },
+      {
+        "item_id": "BIGTOP-1752",
+        "title": "Add Zinc to bigtop_toolchain so that it may be used by Spark builds",
+        "current_state": "Patch Available",
+        "age_days": 4080
+      },
+      {
+        "item_id": "BIGTOP-1759",
+        "title": "Add SSL configuration for Solr",
+        "current_state": "Open",
+        "age_days": 4075
+      },
+      {
+        "item_id": "BIGTOP-1760",
+        "title": "Add flume-doc as a sub package for Apache Flume",
+        "current_state": "Open",
+        "age_days": 4074
+      },
+      {
+        "item_id": "BIGTOP-1762",
+        "title": "PASSWORDS pgp file.",
+        "current_state": "Open",
+        "age_days": 4073
+      },
+      {
+        "item_id": "BIGTOP-1772",
+        "title": "Split init-hdfs.sh script and let the individual modules take care of folder creation",
+        "current_state": "Open",
+        "age_days": 4068
+      },
+      {
+        "item_id": "BIGTOP-1773",
+        "title": "Add option for starting services and monitoring their lifecycle via Upstart to puppet deploy",
+        "current_state": "Open",
+        "age_days": 4067
+      },
+      {
+        "item_id": "BIGTOP-1782",
+        "title": "BigTop Bazaar : Simulating IoT data at scale (Apache HBase blueprint)",
+        "current_state": "Open",
+        "age_days": 4064
+      },
+      {
+        "item_id": "BIGTOP-1784",
+        "title": "Create web page with release artifacts for BigPetStore",
+        "current_state": "Open",
+        "age_days": 4064
+      },
+      {
+        "item_id": "BIGTOP-1785",
+        "title": "Integrate Gradle builds for BigPetStore",
+        "current_state": "Open",
+        "age_days": 4064
+      },
+      {
+        "item_id": "BIGTOP-1786",
+        "title": "Create Hive warehouse on FileSystem (i.e. HDFS) initialization",
+        "current_state": "Open",
+        "age_days": 4064
+      },
+      {
+        "item_id": "BIGTOP-1788",
+        "title": "Fix BigPetStore Spark packages",
+        "current_state": "Patch Available",
+        "age_days": 4064
+      },
+      {
+        "item_id": "BIGTOP-1792",
+        "title": "Improve bigtop-deploy hive module",
+        "current_state": "Open",
+        "age_days": 4061
+      },
+      {
+        "item_id": "BIGTOP-1796",
+        "title": "Replace puppet toolchain installation with a SANE solution, not involving unzippping of unsiged data to the root folder",
+        "current_state": "Open",
+        "age_days": 4059
+      },
+      {
+        "item_id": "BIGTOP-1799",
+        "title": "puppet: Allow blacklisting Hue apps",
+        "current_state": "Open",
+        "age_days": 4057
+      },
+      {
+        "item_id": "BIGTOP-1800",
+        "title": "puppet: Configure Hue Zookeeper app",
+        "current_state": "Open",
+        "age_days": 4057
+      },
+      {
+        "item_id": "BIGTOP-1802",
+        "title": "Define BigTop reference implementations. ",
+        "current_state": "Open",
+        "age_days": 4055
+      },
+      {
+        "item_id": "BIGTOP-1807",
+        "title": "Spark master and worker classes should reference common::master_host",
+        "current_state": "Open",
+        "age_days": 4053
+      },
+      {
+        "item_id": "BIGTOP-1811",
+        "title": "Add puppet option for spark thriftserver port",
+        "current_state": "Open",
+        "age_days": 4051
+      },
+      {
+        "item_id": "BIGTOP-1844",
+        "title": "Upgrade Sqoop to 1.99.7",
+        "current_state": "Open",
+        "age_days": 4038
+      },
+      {
+        "item_id": "BIGTOP-1847",
+        "title": "Hue fails to load the 3rd party modules in /usr/lib64/python2.6/site-packages",
+        "current_state": "Open",
+        "age_days": 4037
+      },
+      {
+        "item_id": "BIGTOP-1856",
+        "title": "apache mirror selection should be dynamic/configurable",
+        "current_state": "Open",
+        "age_days": 4030
+      },
+      {
+        "item_id": "BIGTOP-1858",
+        "title": "only check remote URL if task is going to be executed",
+        "current_state": "Open",
+        "age_days": 4030
+      },
+      {
+        "item_id": "BIGTOP-1871",
+        "title": "Simplify depedencies needed for init-hcfs",
+        "current_state": "Open",
+        "age_days": 4019
+      },
+      {
+        "item_id": "BIGTOP-1878",
+        "title": "Add Apache Sentry to Bigtop",
+        "current_state": "Open",
+        "age_days": 4010
+      },
+      {
+        "item_id": "BIGTOP-1880",
+        "title": "HBase build fails on AmazonLinux due to MaxPermGen size",
+        "current_state": "Open",
+        "age_days": 4009
+      },
+      {
+        "item_id": "BIGTOP-1881",
+        "title": "Add \"mvn-install\" to the list of pig targets",
+        "current_state": "Open",
+        "age_days": 4009
+      },
+      {
+        "item_id": "BIGTOP-1883",
+        "title": "AmazonLinux toolchain updates",
+        "current_state": "Open",
+        "age_days": 4009
+      },
+      {
+        "item_id": "BIGTOP-1884",
+        "title": "Ensure HDFS has left safemode before initialization",
+        "current_state": "Open",
+        "age_days": 4009
+      },
+      {
+        "item_id": "BIGTOP-1885",
+        "title": "Add smoke tests for Apache Kafka",
+        "current_state": "Open",
+        "age_days": 4003
+      },
+      {
+        "item_id": "BIGTOP-1889",
+        "title": "PuppetForge module for 'bigtop-deploy'",
+        "current_state": "Open",
+        "age_days": 3996
+      },
+      {
+        "item_id": "BIGTOP-1906",
+        "title": "Optimize and enahnce build/CI process to reuse artifacts",
+        "current_state": "Open",
+        "age_days": 3980
+      },
+      {
+        "item_id": "BIGTOP-1912",
+        "title": "possible bug for spark-slave?",
+        "current_state": "Open",
+        "age_days": 3972
+      },
+      {
+        "item_id": "BIGTOP-1922",
+        "title": "Smoke tests for HBase using YCSB",
+        "current_state": "Open",
+        "age_days": 3960
+      },
+      {
+        "item_id": "BIGTOP-1926",
+        "title": "Simplify log level property name",
+        "current_state": "Open",
+        "age_days": 3959
+      },
+      {
+        "item_id": "BIGTOP-1927",
+        "title": "Add Apache Flink to Bigtop",
+        "current_state": "In Progress",
+        "age_days": 3959
+      },
+      {
+        "item_id": "BIGTOP-1928",
+        "title": "Implement BPS-Flink",
+        "current_state": "Open",
+        "age_days": 3958
+      },
+      {
+        "item_id": "BIGTOP-1935",
+        "title": "Add Apache Blur to Bigtop",
+        "current_state": "Open",
+        "age_days": 3952
+      },
+      {
+        "item_id": "BIGTOP-1945",
+        "title": "Wrong machine name of smoke test script under parallel provision",
+        "current_state": "Open",
+        "age_days": 3939
+      },
+      {
+        "item_id": "BIGTOP-1952",
+        "title": "Add puppet recipe for Apache Phoenix",
+        "current_state": "Open",
+        "age_days": 3935
+      },
+      {
+        "item_id": "BIGTOP-1961",
+        "title": "update bps spark to use only datagenerators from bigtop.",
+        "current_state": "Patch Available",
+        "age_days": 3929
+      },
+      {
+        "item_id": "BIGTOP-1972",
+        "title": "Umbrella: Additional tests to hdfs, mr, flume, sqoop, tez, oozie, hive modules",
+        "current_state": "Open",
+        "age_days": 3918
+      },
+      {
+        "item_id": "BIGTOP-1978",
+        "title": "Add new tests for -setfacl option ",
+        "current_state": "Patch Available",
+        "age_days": 3914
+      },
+      {
+        "item_id": "BIGTOP-1982",
+        "title": "BigTop Data Generators",
+        "current_state": "Open",
+        "age_days": 3913
+      },
+      {
+        "item_id": "BIGTOP-1988",
+        "title": "Consolidate wrapped examples for Spark smokes into smoke-tests",
+        "current_state": "Open",
+        "age_days": 3913
+      },
+      {
+        "item_id": "BIGTOP-1989",
+        "title": "Extract product generator from BigPetStore data generator",
+        "current_state": "Open",
+        "age_days": 3913
+      },
+      {
+        "item_id": "BIGTOP-1994",
+        "title": "Remove references to site.csv from README.md files",
+        "current_state": "Patch Available",
+        "age_days": 3909
+      },
+      {
+        "item_id": "BIGTOP-2001",
+        "title": "Add Apache Drill to Bigtop",
+        "current_state": "Open",
+        "age_days": 3906
+      },
+      {
+        "item_id": "BIGTOP-2002",
+        "title": "Template code generator for new components",
+        "current_state": "Open",
+        "age_days": 3906
+      },
+      {
+        "item_id": "BIGTOP-2006",
+        "title": "Migrate the dang web resources from SVN 100% to git.",
+        "current_state": "Open",
+        "age_days": 3904
+      },
+      {
+        "item_id": "BIGTOP-2011",
+        "title": "Add new tests for distcp",
+        "current_state": "Patch Available",
+        "age_days": 3903
+      },
+      {
+        "item_id": "BIGTOP-2021",
+        "title": "Remove references to specific versions in data generator READMEs",
+        "current_state": "Open",
+        "age_days": 3898
+      },
+      {
+        "item_id": "BIGTOP-2022",
+        "title": "Add checkstyles plugin to data generators gradle build",
+        "current_state": "Open",
+        "age_days": 3898
+      },
+      {
+        "item_id": "BIGTOP-2023",
+        "title": "Add javadocs to all public data generator APIs",
+        "current_state": "Open",
+        "age_days": 3898
+      },
+      {
+        "item_id": "BIGTOP-2024",
+        "title": "Add CLI driver for the name generator",
+        "current_state": "Open",
+        "age_days": 3898
+      },
+      {
+        "item_id": "BIGTOP-2030",
+        "title": "User, directories, and samples not set up for Hue",
+        "current_state": "Open",
+        "age_days": 3897
+      },
+      {
+        "item_id": "BIGTOP-2031",
+        "title": "Vagrant docker script does not seem to honor :enable_local_repo",
+        "current_state": "Open",
+        "age_days": 3897
+      },
+      {
+        "item_id": "BIGTOP-2034",
+        "title": "Explicitly select what kite modules to build",
+        "current_state": "Open",
+        "age_days": 3896
+      },
+      {
+        "item_id": "BIGTOP-2048",
+        "title": "Add RAT check as pre-commit hook",
+        "current_state": "Open",
+        "age_days": 3892
+      },
+      {
+        "item_id": "BIGTOP-2058",
+        "title": "Update toolchain-puppetmodules to remove deprecation warnings",
+        "current_state": "Open",
+        "age_days": 3887
+      },
+      {
+        "item_id": "BIGTOP-2070",
+        "title": "Add new oozie tests ",
+        "current_state": "Open",
+        "age_days": 3883
+      },
+      {
+        "item_id": "BIGTOP-2072",
+        "title": "Add OpenZipkin integration to Bigtop",
+        "current_state": "Open",
+        "age_days": 3882
+      },
+      {
+        "item_id": "BIGTOP-2076",
+        "title": "Rename ignite-hadoop packages to indicate wider set of functionality provided",
+        "current_state": "Open",
+        "age_days": 3881
+      },
+      {
+        "item_id": "BIGTOP-2093",
+        "title": "Building Kafka does not need '-x signArchives' option after 0.8.2.0",
+        "current_state": "Open",
+        "age_days": 3856
+      },
+      {
+        "item_id": "BIGTOP-2095",
+        "title": "Improve Ignite packaging and deployment",
+        "current_state": "Open",
+        "age_days": 3853
+      },
+      {
+        "item_id": "BIGTOP-2100",
+        "title": "Build from source errors out at test stage",
+        "current_state": "Open",
+        "age_days": 3850
+      },
+      {
+        "item_id": "BIGTOP-2106",
+        "title": "Add R support to Spark component",
+        "current_state": "Open",
+        "age_days": 3847
+      },
+      {
+        "item_id": "BIGTOP-2109",
+        "title": "Getting rid of md5 and sha1 for release artifacts",
+        "current_state": "Open",
+        "age_days": 3846
+      },
+      {
+        "item_id": "BIGTOP-2111",
+        "title": "the ignite-hadoop-docs package is empty",
+        "current_state": "Open",
+        "age_days": 3845
+      },
+      {
+        "item_id": "BIGTOP-2112",
+        "title": "docs package comes out empty",
+        "current_state": "Open",
+        "age_days": 3845
+      },
+      {
+        "item_id": "BIGTOP-2124",
+        "title": "Add integration/smoke tests for Zeppelin",
+        "current_state": "Open",
+        "age_days": 3836
+      },
+      {
+        "item_id": "BIGTOP-2125",
+        "title": "Add package tests for Zeppelin",
+        "current_state": "Open",
+        "age_days": 3836
+      },
+      {
+        "item_id": "BIGTOP-2129",
+        "title": "Current ignite-hadoop man page is a piece of crap. Needs improvements",
+        "current_state": "Open",
+        "age_days": 3836
+      },
+      {
+        "item_id": "BIGTOP-2132",
+        "title": "Improve Oozie Puppet Manifest to use new DB init",
+        "current_state": "Open",
+        "age_days": 3834
+      },
+      {
+        "item_id": "BIGTOP-2151",
+        "title": "Some files missing in hadoop*.src.rpm",
+        "current_state": "Open",
+        "age_days": 3828
+      },
+      {
+        "item_id": "BIGTOP-2157",
+        "title": "Vagrant/Puppet VM installation doesn't disable firewall",
+        "current_state": "Open",
+        "age_days": 3822
+      },
+      {
+        "item_id": "BIGTOP-2160",
+        "title": "beeline crashes because of two versions of log4j in paths",
+        "current_state": "Open",
+        "age_days": 3821
+      },
+      {
+        "item_id": "BIGTOP-2161",
+        "title": "[bigpetstore] transaction-queue Implment/Brainstorm ideas for global data rate.",
+        "current_state": "Open",
+        "age_days": 3821
+      },
+      {
+        "item_id": "BIGTOP-2170",
+        "title": "Better organization of the gradle build structure",
+        "current_state": "Open",
+        "age_days": 3808
+      },
+      {
+        "item_id": "BIGTOP-2178",
+        "title": "Awkwardness in dealing if a component version has '-' in it",
+        "current_state": "Open",
+        "age_days": 3802
+      },
+      {
+        "item_id": "BIGTOP-2182",
+        "title": "Add Puppet support for Apache Tajo cluster deployment",
+        "current_state": "Open",
+        "age_days": 3800
+      },
+      {
+        "item_id": "BIGTOP-2186",
+        "title": "Add tests for tez module ",
+        "current_state": "Patch Available",
+        "age_days": 3794
+      },
+      {
+        "item_id": "BIGTOP-2202",
+        "title": "Add hive udf tests",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2203",
+        "title": "Add hive tests using beeline with tez execution engine",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2204",
+        "title": "Add hive DDL tests submitted using hivecli with tez ",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2205",
+        "title": "Add hive dml tests using hive cli with tez",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2206",
+        "title": "Add hive tests using jdbc with tez",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2207",
+        "title": "Add hive ddl tests with beeline using mr engine ",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2208",
+        "title": "Add hive ddl tests with jdbc using mr engine ",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2209",
+        "title": "Add hive dml tests using hive cli",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2210",
+        "title": "Add hive dml tests using jdbc with mr engine",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2211",
+        "title": "Add hive dml tests using beeline with mr engine",
+        "current_state": "Patch Available",
+        "age_days": 3785
+      },
+      {
+        "item_id": "BIGTOP-2241",
+        "title": "\"How to contribute\" page needs to be updated",
+        "current_state": "Open",
+        "age_days": 3771
+      },
+      {
+        "item_id": "BIGTOP-2248",
+        "title": "Improve handling of test inclusion/exclusion in smokes",
+        "current_state": "Open",
+        "age_days": 3770
+      },
+      {
+        "item_id": "BIGTOP-2250",
+        "title": "Move environment setting from smokes helper script to gradle",
+        "current_state": "Open",
+        "age_days": 3769
+      },
+      {
+        "item_id": "BIGTOP-2251",
+        "title": "provisioner shouldn't install components just in case",
+        "current_state": "Open",
+        "age_days": 3769
+      },
+      {
+        "item_id": "BIGTOP-2258",
+        "title": "Create symlinks for HBase jars in Pig lib, not Pig lib/h2 when Pig packages HBase 0.99.0 or above as default",
+        "current_state": "Open",
+        "age_days": 3767
+      },
+      {
+        "item_id": "BIGTOP-2268",
+        "title": "Untangle the convoluted Hive-support from Spark deployment",
+        "current_state": "Open",
+        "age_days": 3763
+      },
+      {
+        "item_id": "BIGTOP-2269",
+        "title": "Reduce the size of Zeppelin package",
+        "current_state": "Open",
+        "age_days": 3763
+      },
+      {
+        "item_id": "BIGTOP-2283",
+        "title": "QFS Integration",
+        "current_state": "Open",
+        "age_days": 3759
+      },
+      {
+        "item_id": "BIGTOP-2284",
+        "title": "Update getting started docs for adding new components",
+        "current_state": "Open",
+        "age_days": 3759
+      },
+      {
+        "item_id": "BIGTOP-2287",
+        "title": "Put docs specs in scripts rather than in SPEC",
+        "current_state": "Open",
+        "age_days": 3758
+      },
+      {
+        "item_id": "BIGTOP-2291",
+        "title": "Have ant mvn deploy task for zookeeper.",
+        "current_state": "Open",
+        "age_days": 3757
+      },
+      {
+        "item_id": "BIGTOP-2294",
+        "title": "TestFsck in HDFS smoke test fails when HBase is deployed too",
+        "current_state": "Open",
+        "age_days": 3756
+      },
+      {
+        "item_id": "BIGTOP-2298",
+        "title": "Gradle wrapper for mvn commands doesn't work as expected",
+        "current_state": "Open",
+        "age_days": 3754
+      },
+      {
+        "item_id": "BIGTOP-2300",
+        "title": "Do we have to have separate RAT configurations for sub-projects?",
+        "current_state": "Open",
+        "age_days": 3754
+      },
+      {
+        "item_id": "BIGTOP-2305",
+        "title": "Hbase shell not working in ppc64le due to missing jffi native library.",
+        "current_state": "Patch Available",
+        "age_days": 3752
+      },
+      {
+        "item_id": "BIGTOP-2307",
+        "title": "bigtop-ci/jenkins/jobsCreator.groovy Load Error!",
+        "current_state": "Open",
+        "age_days": 3749
+      },
+      {
+        "item_id": "BIGTOP-2320",
+        "title": "Add Apache HAWQ (incubating) to Bigtop",
+        "current_state": "Open",
+        "age_days": 3744
+      },
+      {
+        "item_id": "BIGTOP-2321",
+        "title": "Add packaging code for HAWQ",
+        "current_state": "Open",
+        "age_days": 3743
+      },
+      {
+        "item_id": "BIGTOP-2322",
+        "title": "Smoke tests for HAWQ",
+        "current_state": "Open",
+        "age_days": 3743
+      },
+      {
+        "item_id": "BIGTOP-2323",
+        "title": "Build slaves toolchain needs to be updated for HAWQ",
+        "current_state": "Open",
+        "age_days": 3743
+      },
+      {
+        "item_id": "BIGTOP-2324",
+        "title": "HAWQ packaging tests",
+        "current_state": "Open",
+        "age_days": 3743
+      },
+      {
+        "item_id": "BIGTOP-2325",
+        "title": "Deployment recipes for HAWQ",
+        "current_state": "Open",
+        "age_days": 3743
+      },
+      {
+        "item_id": "BIGTOP-2328",
+        "title": "Add an init script for HBase backup master ",
+        "current_state": "Open",
+        "age_days": 3742
+      },
+      {
+        "item_id": "BIGTOP-2329",
+        "title": "Add smoke tests for Phoenix in using Phoenix Pherf",
+        "current_state": "Open",
+        "age_days": 3742
+      },
+      {
+        "item_id": "BIGTOP-2331",
+        "title": "Add package tests for QFS",
+        "current_state": "Open",
+        "age_days": 3740
+      },
+      {
+        "item_id": "BIGTOP-2338",
+        "title": "Increase ulimit open file and user processes for Phoenix QueryServer",
+        "current_state": "Open",
+        "age_days": 3736
+      },
+      {
+        "item_id": "BIGTOP-2341",
+        "title": "Spark packaged as part of Zeppelin can conflict with Spark already installed",
+        "current_state": "Open",
+        "age_days": 3735
+      },
+      {
+        "item_id": "BIGTOP-2348",
+        "title": "Add Druid to Bigtop stack",
+        "current_state": "Open",
+        "age_days": 3728
+      },
+      {
+        "item_id": "BIGTOP-2349",
+        "title": "Hive-2.0 spec files need to handle jdbc standalone jars in new location",
+        "current_state": "Patch Available",
+        "age_days": 3728
+      },
+      {
+        "item_id": "BIGTOP-2356",
+        "title": "Add Flink smoke tests",
+        "current_state": "Open",
+        "age_days": 3712
+      },
+      {
+        "item_id": "BIGTOP-2361",
+        "title": "Add a package for the Phoenix query server",
+        "current_state": "Open",
+        "age_days": 3704
+      },
+      {
+        "item_id": "BIGTOP-2369",
+        "title": "Unit test errors on spark-deb gradle task (ppc64le)",
+        "current_state": "Open",
+        "age_days": 3695
+      },
+      {
+        "item_id": "BIGTOP-2383",
+        "title": "[puppet] ruby template to generate yarn config for standalone and ha is wrong.",
+        "current_state": "Patch Available",
+        "age_days": 3683
+      },
+      {
+        "item_id": "BIGTOP-2388",
+        "title": "Add longevity tests to gradle smokes",
+        "current_state": "Open",
+        "age_days": 3682
+      },
+      {
+        "item_id": "BIGTOP-2389",
+        "title": "Adding Apache Arrow to the Bigtop project",
+        "current_state": "Open",
+        "age_days": 3681
+      },
+      {
+        "item_id": "BIGTOP-2390",
+        "title": "Create Arrow Packages",
+        "current_state": "Open",
+        "age_days": 3681
+      },
+      {
+        "item_id": "BIGTOP-2391",
+        "title": "Add smoke test for Apache Arrow",
+        "current_state": "Open",
+        "age_days": 3681
+      },
+      {
+        "item_id": "BIGTOP-2392",
+        "title": "Create deployment recipes - Puppet?",
+        "current_state": "Open",
+        "age_days": 3681
+      },
+      {
+        "item_id": "BIGTOP-2394",
+        "title": "Upgrade Tajo version to 0.11.2",
+        "current_state": "Patch Available",
+        "age_days": 3680
+      },
+      {
+        "item_id": "BIGTOP-2398",
+        "title": "Maven 'dependency management' report errors out in site's build",
+        "current_state": "Open",
+        "age_days": 3677
+      },
+      {
+        "item_id": "BIGTOP-2418",
+        "title": "Add init/service script for Tephra transaction manager service",
+        "current_state": "Open",
+        "age_days": 3662
+      },
+      {
+        "item_id": "BIGTOP-2420",
+        "title": "Documentation for how to create smoke test for new open source project and what test need to add as compare to open source test code",
+        "current_state": "Open",
+        "age_days": 3661
+      },
+      {
+        "item_id": "BIGTOP-2422",
+        "title": "Flume smoke failing in master",
+        "current_state": "Open",
+        "age_days": 3657
+      },
+      {
+        "item_id": "BIGTOP-2424",
+        "title": "Create package tests",
+        "current_state": "Open",
+        "age_days": 3656
+      },
+      {
+        "item_id": "BIGTOP-2436",
+        "title": "Logo approvals for new website",
+        "current_state": "Open",
+        "age_days": 3646
+      },
+      {
+        "item_id": "BIGTOP-2437",
+        "title": "Getting Started and Tutorial section for new website",
+        "current_state": "Open",
+        "age_days": 3646
+      },
+      {
+        "item_id": "BIGTOP-2440",
+        "title": "Symlink Py4J `.zip` archive under a version-independent name",
+        "current_state": "Open",
+        "age_days": 3644
+      },
+      {
+        "item_id": "BIGTOP-2444",
+        "title": "flink: Rework packaging",
+        "current_state": "Open",
+        "age_days": 3642
+      },
+      {
+        "item_id": "BIGTOP-2457",
+        "title": "spark: fix adduser and register init.d scripts on DEB systemes",
+        "current_state": "Open",
+        "age_days": 3640
+      },
+      {
+        "item_id": "BIGTOP-2461",
+        "title": "Get spark execution mode from spark-defaults.conf in tests",
+        "current_state": "Open",
+        "age_days": 3638
+      },
+      {
+        "item_id": "BIGTOP-2470",
+        "title": "tajo does not build on opensuse 42.1",
+        "current_state": "Open",
+        "age_days": 3628
+      },
+      {
+        "item_id": "BIGTOP-2484",
+        "title": "Adding Sqoop Charm",
+        "current_state": "Open",
+        "age_days": 3616
+      },
+      {
+        "item_id": "BIGTOP-2485",
+        "title": "Adding Oozie Charm",
+        "current_state": "Open",
+        "age_days": 3616
+      },
+      {
+        "item_id": "BIGTOP-2489",
+        "title": "Add Alluxio Charm",
+        "current_state": "In Progress",
+        "age_days": 3610
+      },
+      {
+        "item_id": "BIGTOP-2493",
+        "title": "Add Flume Charm",
+        "current_state": "Open",
+        "age_days": 3588
+      },
+      {
+        "item_id": "BIGTOP-2496",
+        "title": "Add hive-hcatalog role to the puppet recipe",
+        "current_state": "Open",
+        "age_days": 3585
+      },
+      {
+        "item_id": "BIGTOP-2498",
+        "title": "Split the YCSB package into core and bindings",
+        "current_state": "Open",
+        "age_days": 3585
+      },
+      {
+        "item_id": "BIGTOP-2499",
+        "title": "Create puppet recipes for Apache Phoenix",
+        "current_state": "Open",
+        "age_days": 3585
+      },
+      {
+        "item_id": "BIGTOP-2501",
+        "title": "Split tez package into tez and tez-ui",
+        "current_state": "Open",
+        "age_days": 3585
+      },
+      {
+        "item_id": "BIGTOP-2502",
+        "title": "Add puppet recipes for deploying the Tez UI",
+        "current_state": "Open",
+        "age_days": 3585
+      },
+      {
+        "item_id": "BIGTOP-2510",
+        "title": "Add role in puppet scripts to deploy journal node of Hadoop HA ",
+        "current_state": "Patch Available",
+        "age_days": 3568
+      },
+      {
+        "item_id": "BIGTOP-2515",
+        "title": "Check for value is undef in templates",
+        "current_state": "Open",
+        "age_days": 3563
+      },
+      {
+        "item_id": "BIGTOP-2580",
+        "title": "Docker Vagrant provisioner fails with boot2docker b/c VM is stuck with old client",
+        "current_state": "Open",
+        "age_days": 3471
+      },
+      {
+        "item_id": "BIGTOP-2581",
+        "title": "Docker Vagrant provisioner fails with boot2docker b/c VM is stuck with old client",
+        "current_state": "Open",
+        "age_days": 3471
+      },
+      {
+        "item_id": "BIGTOP-2583",
+        "title": "When the NameNode HA was enabled, it can not pass the smoke test.",
+        "current_state": "Patch Available",
+        "age_days": 3466
+      },
+      {
+        "item_id": "BIGTOP-2584",
+        "title": "Failure of smoke test due to input value verification specification change of \"hadoop dfsadmin - setSpaceQuota\"",
+        "current_state": "Patch Available",
+        "age_days": 3466
+      },
+      {
+        "item_id": "BIGTOP-2598",
+        "title": "Remove the makeshift patch introduced in BIGTOP-2534",
+        "current_state": "Open",
+        "age_days": 3459
+      },
+      {
+        "item_id": "BIGTOP-2619",
+        "title": "zookeeper build fails on Fedora 25/24",
+        "current_state": "Open",
+        "age_days": 3446
+      },
+      {
+        "item_id": "BIGTOP-2659",
+        "title": "Support aarch64 leveldb for hadoop",
+        "current_state": "Patch Available",
+        "age_days": 3414
+      },
+      {
+        "item_id": "BIGTOP-2666",
+        "title": "Merge ODPi upstream contributions back to Bigtop",
+        "current_state": "Open",
+        "age_days": 3410
+      },
+      {
+        "item_id": "BIGTOP-2671",
+        "title": "[Puppet] Zookeeper can not support multiple nodes deployment",
+        "current_state": "Open",
+        "age_days": 3398
+      },
+      {
+        "item_id": "BIGTOP-2684",
+        "title": "Fix a smoke-test for HDFS fsck",
+        "current_state": "Open",
+        "age_days": 3384
+      },
+      {
+        "item_id": "BIGTOP-2685",
+        "title": "Wrong command usage to build repository in README.md",
+        "current_state": "Open",
+        "age_days": 3384
+      },
+      {
+        "item_id": "BIGTOP-2686",
+        "title": "[Sandbox] Docker repository for Bigtop sandbox",
+        "current_state": "Open",
+        "age_days": 3382
+      },
+      {
+        "item_id": "BIGTOP-2691",
+        "title": "Failed to build bigpetstore-spark with StackOverflowError",
+        "current_state": "Open",
+        "age_days": 3366
+      },
+      {
+        "item_id": "BIGTOP-2713",
+        "title": "Remove HADOOP-12366 patch from hadoop once we migrate to Hadoop 3",
+        "current_state": "Open",
+        "age_days": 3338
+      },
+      {
+        "item_id": "BIGTOP-2720",
+        "title": "Ignite packages shouldn't contain libraries for Spark and alike",
+        "current_state": "Open",
+        "age_days": 3334
+      },
+      {
+        "item_id": "BIGTOP-2731",
+        "title": "come with a way to deal with year in the NOTICE that doesn't require yearly update",
+        "current_state": "Open",
+        "age_days": 3325
+      },
+      {
+        "item_id": "BIGTOP-2732",
+        "title": "Review RAT exclusion list",
+        "current_state": "Open",
+        "age_days": 3325
+      },
+      {
+        "item_id": "BIGTOP-2734",
+        "title": "Enhancements to ODPi runtime certification test suite",
+        "current_state": "Open",
+        "age_days": 3324
+      },
+      {
+        "item_id": "BIGTOP-2735",
+        "title": "Improve the build steps for apex component",
+        "current_state": "Open",
+        "age_days": 3322
+      },
+      {
+        "item_id": "BIGTOP-2736",
+        "title": "Automate last mile of release process",
+        "current_state": "Open",
+        "age_days": 3322
+      },
+      {
+        "item_id": "BIGTOP-2741",
+        "title": "smoke tests do not honor proxies",
+        "current_state": "Open",
+        "age_days": 3316
+      },
+      {
+        "item_id": "BIGTOP-2745",
+        "title": "Publish bigtop/slaves Images for 1.2 release",
+        "current_state": "Open",
+        "age_days": 3310
+      },
+      {
+        "item_id": "BIGTOP-2757",
+        "title": "Umbrella JIRA: Docker Sandbox improvements",
+        "current_state": "In Progress",
+        "age_days": 3293
+      },
+      {
+        "item_id": "BIGTOP-2759",
+        "title": "[Sandbox] Support build from local yum/apt repo",
+        "current_state": "Open",
+        "age_days": 3293
+      },
+      {
+        "item_id": "BIGTOP-2768",
+        "title": "gradle docker-provisioner always return true despite failed",
+        "current_state": "Open",
+        "age_days": 3286
+      },
+      {
+        "item_id": "BIGTOP-2773",
+        "title": "[Sandbox] Support to use --dryrun to produce Dockerfile and resume the build after Dockerfile modified",
+        "current_state": "Open",
+        "age_days": 3276
+      },
+      {
+        "item_id": "BIGTOP-2780",
+        "title": "[Sandbox] Support to run bigtop tests during image build time",
+        "current_state": "Open",
+        "age_days": 3273
+      },
+      {
+        "item_id": "BIGTOP-2782",
+        "title": "[Provisioner] Provide a solution to expose the ports in containers for browser to access",
+        "current_state": "Open",
+        "age_days": 3273
+      },
+      {
+        "item_id": "BIGTOP-2791",
+        "title": "[Puppet] expand hive config options",
+        "current_state": "Open",
+        "age_days": 3269
+      },
+      {
+        "item_id": "BIGTOP-2792",
+        "title": "Include tez tarball in tez package ",
+        "current_state": "Open",
+        "age_days": 3268
+      },
+      {
+        "item_id": "BIGTOP-2820",
+        "title": "Polish the documentations on Bigtop Wiki for 1.2.1 release",
+        "current_state": "Open",
+        "age_days": 3246
+      },
+      {
+        "item_id": "BIGTOP-2830",
+        "title": "[iTest] testGetAllAlternatives failed when building on Ubuntu-16.04",
+        "current_state": "Open",
+        "age_days": 3236
+      },
+      {
+        "item_id": "BIGTOP-2831",
+        "title": "zeppelin start error",
+        "current_state": "Open",
+        "age_days": 3235
+      },
+      {
+        "item_id": "BIGTOP-2837",
+        "title": "Crail Integration",
+        "current_state": "Open",
+        "age_days": 3228
+      },
+      {
+        "item_id": "BIGTOP-2845",
+        "title": "ODPi runtime dependencies are misaligned with the component versions",
+        "current_state": "Open",
+        "age_days": 3223
+      },
+      {
+        "item_id": "BIGTOP-2887",
+        "title": "ZOO_DATADIR_AUTOCREATE_DISABLE is always set",
+        "current_state": "Open",
+        "age_days": 3157
+      },
+      {
+        "item_id": "BIGTOP-2896",
+        "title": "Build GPDB with GPORCA",
+        "current_state": "Open",
+        "age_days": 3148
+      },
+      {
+        "item_id": "BIGTOP-2913",
+        "title": "bigpetstore-data-generator's \"seed\" parameter is not optional",
+        "current_state": "Open",
+        "age_days": 3125
+      },
+      {
+        "item_id": "BIGTOP-2923",
+        "title": "Bump kafka to 1.0.0",
+        "current_state": "Open",
+        "age_days": 3101
+      },
+      {
+        "item_id": "BIGTOP-2933",
+        "title": "System user for Kafka and QFS in Ubuntu/Debian",
+        "current_state": "Open",
+        "age_days": 3097
+      },
+      {
+        "item_id": "BIGTOP-2937",
+        "title": "Download page must link to KEYS, hashes, sigs",
+        "current_state": "Open",
+        "age_days": 3094
+      },
+      {
+        "item_id": "BIGTOP-2941",
+        "title": "update nodejs",
+        "current_state": "Open",
+        "age_days": 3092
+      },
+      {
+        "item_id": "BIGTOP-2948",
+        "title": "Update example configs for Docker Provisioner in response to platform upgrades",
+        "current_state": "Open",
+        "age_days": 3087
+      },
+      {
+        "item_id": "BIGTOP-2954",
+        "title": "bug of do-component-build which may cause spark build failure",
+        "current_state": "Open",
+        "age_days": 3084
+      },
+      {
+        "item_id": "BIGTOP-2955",
+        "title": "spark: Disable nailgun , compile error for non-x86",
+        "current_state": "Open",
+        "age_days": 3084
+      },
+      {
+        "item_id": "BIGTOP-2960",
+        "title": "Building Hue requires python-ipaddress package",
+        "current_state": "Open",
+        "age_days": 3066
+      },
+      {
+        "item_id": "BIGTOP-2962",
+        "title": "rpm and deb packaging for Presto",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2963",
+        "title": "Smoke tests for Presto",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2964",
+        "title": "Puppet recipes for Presto",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2965",
+        "title": "rpm and deb packaging for Druid",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2966",
+        "title": "Smoke tests for Druid",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2967",
+        "title": "Puppet recipes for Druid",
+        "current_state": "Open",
+        "age_days": 3064
+      },
+      {
+        "item_id": "BIGTOP-2972",
+        "title": "rpm packaging for Storm",
+        "current_state": "Open",
+        "age_days": 3059
+      },
+      {
+        "item_id": "BIGTOP-2975",
+        "title": "Compilation Pig with Hive 2+ is broken",
+        "current_state": "Open",
+        "age_days": 3058
+      },
+      {
+        "item_id": "BIGTOP-2977",
+        "title": "make bigtop-jsvc a wrapper package for jsvc package",
+        "current_state": "Open",
+        "age_days": 3057
+      },
+      {
+        "item_id": "BIGTOP-2982",
+        "title": "POC provisioner based on docker-compose",
+        "current_state": "Open",
+        "age_days": 3049
+      },
+      {
+        "item_id": "BIGTOP-2983",
+        "title": "gradle hadoop-rpm fails in bigtop-alpha branch",
+        "current_state": "Open",
+        "age_days": 3029
+      },
+      {
+        "item_id": "BIGTOP-2999",
+        "title": "Formalize LOCAL_DOWNLOADS_DIR environment variable as the local cache",
+        "current_state": "In Progress",
+        "age_days": 3013
+      },
+      {
+        "item_id": "BIGTOP-3000",
+        "title": "Build option to not cleanup output folders",
+        "current_state": "Open",
+        "age_days": 3013
+      },
+      {
+        "item_id": "BIGTOP-3012",
+        "title": "Spark layer neglects to set 'rest_port' on client relation",
+        "current_state": "Open",
+        "age_days": 2987
+      },
+      {
+        "item_id": "BIGTOP-3016",
+        "title": "Master yarn-client is deprecated since 2.0. Please use master \"yarn\" with specified deploy mode instead.",
+        "current_state": "Open",
+        "age_days": 2966
+      },
+      {
+        "item_id": "BIGTOP-3017",
+        "title": "Need JVM heap config exposed in all bigtop charms.",
+        "current_state": "Open",
+        "age_days": 2966
+      },
+      {
+        "item_id": "BIGTOP-3020",
+        "title": "spark api not exposed via spark charm",
+        "current_state": "Open",
+        "age_days": 2962
+      },
+      {
+        "item_id": "BIGTOP-3028",
+        "title": "Add JMX capabilities to kafka Juju Charm",
+        "current_state": "Open",
+        "age_days": 2925
+      },
+      {
+        "item_id": "BIGTOP-3032",
+        "title": "wiki \"Packaging Cookbook\" outdated",
+        "current_state": "Open",
+        "age_days": 2918
+      },
+      {
+        "item_id": "BIGTOP-3049",
+        "title": "Expanded Hive Testing",
+        "current_state": "Open",
+        "age_days": 2871
+      },
+      {
+        "item_id": "BIGTOP-3056",
+        "title": "Bump Kafka to 1.1.1",
+        "current_state": "Open",
+        "age_days": 2835
+      },
+      {
+        "item_id": "BIGTOP-3057",
+        "title": "Bump flink to 1.5.2",
+        "current_state": "Open",
+        "age_days": 2835
+      },
+      {
+        "item_id": "BIGTOP-3070",
+        "title": "Support Spark Thrift Server in Charm",
+        "current_state": "Open",
+        "age_days": 2822
+      },
+      {
+        "item_id": "BIGTOP-3071",
+        "title": "Missing Oozie charm",
+        "current_state": "Open",
+        "age_days": 2822
+      },
+      {
+        "item_id": "BIGTOP-3073",
+        "title": "Change the hadoop-slave name",
+        "current_state": "Open",
+        "age_days": 2814
+      },
+      {
+        "item_id": "BIGTOP-3080",
+        "title": "New shell script zkTxnLogToolkit.sh should be added to the install script",
+        "current_state": "Patch Available",
+        "age_days": 2800
+      },
+      {
+        "item_id": "BIGTOP-3084",
+        "title": "Debian source packages available in APT repo",
+        "current_state": "Open",
+        "age_days": 2791
+      },
+      {
+        "item_id": "BIGTOP-3093",
+        "title": "Modifying the way Spark's log4j.properties file is being generated",
+        "current_state": "Patch Available",
+        "age_days": 2775
+      },
+      {
+        "item_id": "BIGTOP-3095",
+        "title": "solr module is missing dependencies for zookeeper, hdfs-namenode",
+        "current_state": "Open",
+        "age_days": 2772
+      },
+      {
+        "item_id": "BIGTOP-3096",
+        "title": "s3 bucket bigtop-repos DISAPPEARED?",
+        "current_state": "In Progress",
+        "age_days": 2757
+      },
+      {
+        "item_id": "BIGTOP-3097",
+        "title": "Flink installation needs redhat-lsb, but not written in spec file",
+        "current_state": "Open",
+        "age_days": 2748
+      },
+      {
+        "item_id": "BIGTOP-3100",
+        "title": "Bump Spark to 2.4",
+        "current_state": "Open",
+        "age_days": 2733
+      },
+      {
+        "item_id": "BIGTOP-3101",
+        "title": "bigtop repo broken",
+        "current_state": "Open",
+        "age_days": 2728
+      },
+      {
+        "item_id": "BIGTOP-3119",
+        "title": "Failed to deploy docker provisioner on Mac occasionally",
+        "current_state": "Open",
+        "age_days": 2694
+      },
+      {
+        "item_id": "BIGTOP-3127",
+        "title": "spark smoke-test fails in bigtop 1.3 ",
+        "current_state": "Open",
+        "age_days": 2682
+      },
+      {
+        "item_id": "BIGTOP-3143",
+        "title": "Better way to detect whether daemon is up and running",
+        "current_state": "Open",
+        "age_days": 2670
+      },
+      {
+        "item_id": "BIGTOP-3205",
+        "title": "zookeeper servers didn't deploy in Clustered (Multi-Server) / ensemble mode",
+        "current_state": "Open",
+        "age_days": 2589
+      },
+      {
+        "item_id": "BIGTOP-3218",
+        "title": "Implement storage bindings",
+        "current_state": "Open",
+        "age_days": 2489
+      },
+      {
+        "item_id": "BIGTOP-3224",
+        "title": "missing mvn in bigtop/slaves:1.4.0-debian-9",
+        "current_state": "Open",
+        "age_days": 2429
+      },
+      {
+        "item_id": "BIGTOP-3225",
+        "title": "Cloud Native Bigtop",
+        "current_state": "Open",
+        "age_days": 2423
+      },
+      {
+        "item_id": "BIGTOP-3226",
+        "title": "iTest for Cloud Native Bigtop",
+        "current_state": "Open",
+        "age_days": 2416
+      },
+      {
+        "item_id": "BIGTOP-3227",
+        "title": "BigPetStore for CNB",
+        "current_state": "Open",
+        "age_days": 2416
+      },
+      {
+        "item_id": "BIGTOP-3228",
+        "title": "Process automation for CNB",
+        "current_state": "Open",
+        "age_days": 2416
+      },
+      {
+        "item_id": "BIGTOP-3229",
+        "title": "BOM for first Cloud Native Bigtop",
+        "current_state": "Open",
+        "age_days": 2416
+      },
+      {
+        "item_id": "BIGTOP-3231",
+        "title": "Benchmark Suite for CNB",
+        "current_state": "Open",
+        "age_days": 2409
+      },
+      {
+        "item_id": "BIGTOP-3232",
+        "title": "Support streaming data generator for BPS",
+        "current_state": "Open",
+        "age_days": 2409
+      },
+      {
+        "item_id": "BIGTOP-3233",
+        "title": "Batch scheduler for long running ML and big data workload",
+        "current_state": "Open",
+        "age_days": 2409
+      },
+      {
+        "item_id": "BIGTOP-3247",
+        "title": "Deploy Presto cluster with Hive metastore",
+        "current_state": "Open",
+        "age_days": 2402
+      },
+      {
+        "item_id": "BIGTOP-3252",
+        "title": "Deploy MySQL on Kubernetes",
+        "current_state": "Open",
+        "age_days": 2400
+      },
+      {
+        "item_id": "BIGTOP-3253",
+        "title": "Deploy PostgreSQL on Kubernetes",
+        "current_state": "Open",
+        "age_days": 2400
+      },
+      {
+        "item_id": "BIGTOP-3257",
+        "title": "Jupyter notebook with Kubernetes",
+        "current_state": "Open",
+        "age_days": 2398
+      },
+      {
+        "item_id": "BIGTOP-3269",
+        "title": "Add ability to toggle nagios checks in charm",
+        "current_state": "Open",
+        "age_days": 2384
+      },
+      {
+        "item_id": "BIGTOP-3271",
+        "title": "juju bundle/charm refresh (nov 2019)",
+        "current_state": "Patch Available",
+        "age_days": 2383
+      },
+      {
+        "item_id": "BIGTOP-3272",
+        "title": "Hive Metastore not Initialized",
+        "current_state": "Open",
+        "age_days": 2371
+      },
+      {
+        "item_id": "BIGTOP-3275",
+        "title": "Make the provisioner work with both Puppet v3 and v4",
+        "current_state": "Open",
+        "age_days": 2349
+      },
+      {
+        "item_id": "BIGTOP-3321",
+        "title": "CVEs in the dependencies are in the execution path of your project",
+        "current_state": "Open",
+        "age_days": 2259
+      },
+      {
+        "item_id": "BIGTOP-3324",
+        "title": "Wrap CI scripts into Bigtop codebase",
+        "current_state": "Open",
+        "age_days": 2250
+      },
+      {
+        "item_id": "BIGTOP-3326",
+        "title": "Error out when docker image build failed",
+        "current_state": "Open",
+        "age_days": 2248
+      },
+      {
+        "item_id": "BIGTOP-3328",
+        "title": "Remove hard-coded version numbers from build.gradle",
+        "current_state": "Open",
+        "age_days": 2247
+      },
+      {
+        "item_id": "BIGTOP-3344",
+        "title": "Check-in Smoke Test CI script to the codebase ",
+        "current_state": "Open",
+        "age_days": 2208
+      },
+      {
+        "item_id": "BIGTOP-3345",
+        "title": "Failed to run smoke test due to jenkins do not have permission to cleanup workspace",
+        "current_state": "Open",
+        "age_days": 2208
+      },
+      {
+        "item_id": "BIGTOP-3349",
+        "title": "Add puppet manifest to deploy Hive on Spark",
+        "current_state": "In Progress",
+        "age_days": 2206
+      },
+      {
+        "item_id": "BIGTOP-3350",
+        "title": "Add smoke test for Hive on Spark",
+        "current_state": "Open",
+        "age_days": 2206
+      },
+      {
+        "item_id": "BIGTOP-3365",
+        "title": "[meta] Ambari, Ambari-Mpack added as components in Jira",
+        "current_state": "Open",
+        "age_days": 2169
+      },
+      {
+        "item_id": "BIGTOP-3366",
+        "title": "Ambari-Mpack installation tests are misleading",
+        "current_state": "Open",
+        "age_days": 2169
+      },
+      {
+        "item_id": "BIGTOP-3367",
+        "title": "Ambari-mpack - initial installation suggestion needs work",
+        "current_state": "Open",
+        "age_days": 2169
+      },
+      {
+        "item_id": "BIGTOP-3370",
+        "title": "Add support for systemd conf file in Zookeeper",
+        "current_state": "Open",
+        "age_days": 2163
+      },
+      {
+        "item_id": "BIGTOP-3373",
+        "title": "Make patch detecting and applying mechanism consistent between deb and rpm",
+        "current_state": "Open",
+        "age_days": 2139
+      },
+      {
+        "item_id": "BIGTOP-3381",
+        "title": "Livy package should depend on spark-core",
+        "current_state": "Open",
+        "age_days": 2117
+      },
+      {
+        "item_id": "BIGTOP-3385",
+        "title": "Fix bigtop-tomcat dependency in bigtop.bom",
+        "current_state": "Open",
+        "age_days": 2115
+      },
+      {
+        "item_id": "BIGTOP-3393",
+        "title": "Fix Arm64 docker-provisioner issues on Ubuntu18.04 and Debian 10",
+        "current_state": "Open",
+        "age_days": 2080
+      },
+      {
+        "item_id": "BIGTOP-3402",
+        "title": "Broken Arm64 docker images was not reported as \"build failed\" by build-routine.",
+        "current_state": "Open",
+        "age_days": 2070
+      },
+      {
+        "item_id": "BIGTOP-3404",
+        "title": "Centos-8: Incorrect file permissions on installed spark, hadoop rpms",
+        "current_state": "Open",
+        "age_days": 2066
+      },
+      {
+        "item_id": "BIGTOP-3412",
+        "title": "Introduce fallback mechanism to the download process of bigtop-tomcat",
+        "current_state": "Open",
+        "age_days": 2057
+      },
+      {
+        "item_id": "BIGTOP-3417",
+        "title": "Declare GPDB's dependency on bigtop-utils explicitly",
+        "current_state": "Open",
+        "age_days": 2055
+      },
+      {
+        "item_id": "BIGTOP-3423",
+        "title": "Add Getting started link to https://bigtop.apache.org/",
+        "current_state": "Open",
+        "age_days": 2051
+      },
+      {
+        "item_id": "BIGTOP-3428",
+        "title": "Kibana's smoke test fails on some distros",
+        "current_state": "In Progress",
+        "age_days": 2050
+      },
+      {
+        "item_id": "BIGTOP-3445",
+        "title": "Add Apache Ozone to Bigtop",
+        "current_state": "Open",
+        "age_days": 2007
+      },
+      {
+        "item_id": "BIGTOP-3461",
+        "title": "Integration test failure during release artifacts deployment",
+        "current_state": "Open",
+        "age_days": 1986
+      },
+      {
+        "item_id": "BIGTOP-3463",
+        "title": "Failed to run Hbase Smoke Tests on Arm64 Fedora 31",
+        "current_state": "Open",
+        "age_days": 1982
+      },
+      {
+        "item_id": "BIGTOP-3464",
+        "title": "Failed to run Oozie Smoke Tests on Arm64 Cetnos-8",
+        "current_state": "Open",
+        "age_days": 1982
+      },
+      {
+        "item_id": "BIGTOP-3466",
+        "title": "HDFS default command line values not overriden if started with 'hdfs' command instead of initscripts",
+        "current_state": "Open",
+        "age_days": 1974
+      },
+      {
+        "item_id": "BIGTOP-3467",
+        "title": "Fix strange behaviour of website publishing",
+        "current_state": "Open",
+        "age_days": 1974
+      },
+      {
+        "item_id": "BIGTOP-3468",
+        "title": "Update Vagrant provisioner configuration to 1.5.0",
+        "current_state": "Open",
+        "age_days": 1973
+      },
+      {
+        "item_id": "BIGTOP-3469",
+        "title": "Support multiple distros in the Vagrant provisioner",
+        "current_state": "Open",
+        "age_days": 1973
+      },
+      {
+        "item_id": "BIGTOP-3470",
+        "title": "Update default Bigtop versions in config files for Docker provisioner",
+        "current_state": "Open",
+        "age_days": 1968
+      },
+      {
+        "item_id": "BIGTOP-3487",
+        "title": "Teardown method in HBase smoke test fails on Debian 10 and Ubuntu 18.04",
+        "current_state": "Open",
+        "age_days": 1923
+      },
+      {
+        "item_id": "BIGTOP-3502",
+        "title": "Alluxio and Elasticsearch can't be deployed simultaneously via puppet due to resource name duplication",
+        "current_state": "Open",
+        "age_days": 1910
+      },
+      {
+        "item_id": "BIGTOP-3503",
+        "title": "Set the correct version info to Flink",
+        "current_state": "Open",
+        "age_days": 1909
+      },
+      {
+        "item_id": "BIGTOP-3504",
+        "title": "Split the Phoenix package into client and server",
+        "current_state": "Patch Available",
+        "age_days": 1909
+      },
+      {
+        "item_id": "BIGTOP-3518",
+        "title": "Remove codes related to dropped products from bigtop-bigpetstore",
+        "current_state": "Open",
+        "age_days": 1892
+      },
+      {
+        "item_id": "BIGTOP-3566",
+        "title": "Add support for the Namenode Observer role in puppet",
+        "current_state": "Open",
+        "age_days": 1775
+      },
+      {
+        "item_id": "BIGTOP-3572",
+        "title": "Oozie smoke test fails on the ARM platform",
+        "current_state": "Reopened",
+        "age_days": 1764
+      },
+      {
+        "item_id": "BIGTOP-3586",
+        "title": "Upgrade Bigtop-ambari-mpack to support Ambari 2.7.5 and Hadoop3.x in BIGTOP-3.0 release",
+        "current_state": "Open",
+        "age_days": 1684
+      },
+      {
+        "item_id": "BIGTOP-3594",
+        "title": "Make Bigtop-Mpack compatible with Ubuntu 20.04",
+        "current_state": "Open",
+        "age_days": 1650
+      },
+      {
+        "item_id": "BIGTOP-3603",
+        "title": "Secured HDFS datanode startup error",
+        "current_state": "Open",
+        "age_days": 1634
+      },
+      {
+        "item_id": "BIGTOP-3608",
+        "title": "HBase zookeeper build failure ",
+        "current_state": "Open",
+        "age_days": 1620
+      },
+      {
+        "item_id": "BIGTOP-3611",
+        "title": "Upgrade Jenkins to latest upstream",
+        "current_state": "Open",
+        "age_days": 1613
+      },
+      {
+        "item_id": "BIGTOP-3612",
+        "title": "Move Jenkins master's /home/jenkins to a dedicated EBS volume",
+        "current_state": "Open",
+        "age_days": 1613
+      },
+      {
+        "item_id": "BIGTOP-3617",
+        "title": "Bigtop 3.0 Ambari Mpack error",
+        "current_state": "Open",
+        "age_days": 1608
+      },
+      {
+        "item_id": "BIGTOP-3620",
+        "title": "Add missing files under /usr/share/doc to Phoenix deb package",
+        "current_state": "Open",
+        "age_days": 1604
+      },
+      {
+        "item_id": "BIGTOP-3628",
+        "title": "Hadoop YARN Job Failure",
+        "current_state": "Open",
+        "age_days": 1587
+      },
+      {
+        "item_id": "BIGTOP-3633",
+        "title": "Update build.gradle and our docs",
+        "current_state": "Open",
+        "age_days": 1571
+      },
+      {
+        "item_id": "BIGTOP-3636",
+        "title": "Remove slave terminology from the project",
+        "current_state": "Open",
+        "age_days": 1565
+      },
+      {
+        "item_id": "BIGTOP-3641",
+        "title": "Hive on Spark error",
+        "current_state": "Open",
+        "age_days": 1552
+      },
+      {
+        "item_id": "BIGTOP-3644",
+        "title": "Improve dowload artifact resilency in Gradle/Maven/etc..",
+        "current_state": "Open",
+        "age_days": 1542
+      },
+      {
+        "item_id": "BIGTOP-3651",
+        "title": "Create stack-select package in bigtop ",
+        "current_state": "Open",
+        "age_days": 1527
+      },
+      {
+        "item_id": "BIGTOP-3660",
+        "title": "Selectable HDFS data initialization.",
+        "current_state": "Open",
+        "age_days": 1501
+      },
+      {
+        "item_id": "BIGTOP-3661",
+        "title": "The Docker-Toolchain-Trunk job for Fedora 35 fails on aarch64",
+        "current_state": "Open",
+        "age_days": 1498
+      },
+      {
+        "item_id": "BIGTOP-3667",
+        "title": "remove remaining use of log4jv1",
+        "current_state": "Open",
+        "age_days": 1492
+      },
+      {
+        "item_id": "BIGTOP-3668",
+        "title": "zookeeper version in master branch has cve",
+        "current_state": "Open",
+        "age_days": 1492
+      },
+      {
+        "item_id": "BIGTOP-3673",
+        "title": "Help to install Apache Kafka/Ranger using Apache Ambari build in bigtop",
+        "current_state": "Reopened",
+        "age_days": 1481
+      },
+      {
+        "item_id": "BIGTOP-3674",
+        "title": "Ambari mpack activation err in Bigtop 3.0.1",
+        "current_state": "Open",
+        "age_days": 1481
+      },
+      {
+        "item_id": "BIGTOP-3681",
+        "title": "Deploying Flink fails on aarch64",
+        "current_state": "Open",
+        "age_days": 1464
+      },
+      {
+        "item_id": "BIGTOP-3683",
+        "title": "Fix flaky elasticsearch build",
+        "current_state": "Open",
+        "age_days": 1460
+      },
+      {
+        "item_id": "BIGTOP-3691",
+        "title": "Bump Puppet to Puppet7",
+        "current_state": "Open",
+        "age_days": 1440
+      },
+      {
+        "item_id": "BIGTOP-3713",
+        "title": "Hive/Hive-hcatalog problem with install on Debian 11",
+        "current_state": "Open",
+        "age_days": 1412
+      },
+      {
+        "item_id": "BIGTOP-3723",
+        "title": "Support Puppet Deploy Ambari with Bigtop-ambari-mpack",
+        "current_state": "Open",
+        "age_days": 1405
+      },
+      {
+        "item_id": "BIGTOP-3773",
+        "title": "Improve Bigtop's webpage and documentation with user-friendly contents",
+        "current_state": "Open",
+        "age_days": 1372
+      },
+      {
+        "item_id": "BIGTOP-3779",
+        "title": "Compile Hadoop in Bigtop 3.1.1 on OpenEuler failed",
+        "current_state": "Open",
+        "age_days": 1365
+      },
+      {
+        "item_id": "BIGTOP-3781",
+        "title": "cwiki 'Hello world example for adding a new package' page outdated",
+        "current_state": "Open",
+        "age_days": 1361
+      },
+      {
+        "item_id": "BIGTOP-3783",
+        "title": "Compile the leveldb repeatedly in Hadoop",
+        "current_state": "Open",
+        "age_days": 1358
+      },
+      {
+        "item_id": "BIGTOP-3784",
+        "title": "Improve the build scripts to make binary distribution more configurable",
+        "current_state": "Open",
+        "age_days": 1357
+      },
+      {
+        "item_id": "BIGTOP-3785",
+        "title": "Improve the build scripts to configure package installation path",
+        "current_state": "Open",
+        "age_days": 1357
+      },
+      {
+        "item_id": "BIGTOP-3793",
+        "title": "Improve the build scripts to configure package installation path for RPM packages",
+        "current_state": "Open",
+        "age_days": 1350
+      },
+      {
+        "item_id": "BIGTOP-3794",
+        "title": "Improve the build scripts to configure package installation path for DEB packages",
+        "current_state": "Open",
+        "age_days": 1350
+      },
+      {
+        "item_id": "BIGTOP-3807",
+        "title": "node-gyp needs to support python3 version in OpenEuler",
+        "current_state": "Open",
+        "age_days": 1342
+      },
+      {
+        "item_id": "BIGTOP-3811",
+        "title": "Use Ambari to Manage Service Accounts and Groups",
+        "current_state": "Open",
+        "age_days": 1337
+      },
+      {
+        "item_id": "BIGTOP-3817",
+        "title": "HdfsResource didn't chown again when reupload local file in resource_management for Ambari-2.7.5",
+        "current_state": "In Progress",
+        "age_days": 1334
+      },
+      {
+        "item_id": "BIGTOP-3822",
+        "title": "add apache atlas into bigtop",
+        "current_state": "Open",
+        "age_days": 1329
+      },
+      {
+        "item_id": "BIGTOP-3824",
+        "title": "Ranger-admin installation failed in openEuler",
+        "current_state": "Open",
+        "age_days": 1329
+      },
+      {
+        "item_id": "BIGTOP-3829",
+        "title": "The Phoenix component should have python3 as its dependency",
+        "current_state": "Open",
+        "age_days": 1323
+      },
+      {
+        "item_id": "BIGTOP-3834",
+        "title": "Split the Hadoop Puppet Code into Manageable Components",
+        "current_state": "Open",
+        "age_days": 1320
+      },
+      {
+        "item_id": "BIGTOP-3836",
+        "title": "Consider about the table of documents",
+        "current_state": "Open",
+        "age_days": 1317
+      },
+      {
+        "item_id": "BIGTOP-3837",
+        "title": "Mpack having issue",
+        "current_state": "Open",
+        "age_days": 1317
+      },
+      {
+        "item_id": "BIGTOP-3838",
+        "title": "Yarn not working with BGTP Ambari MPack 1",
+        "current_state": "Open",
+        "age_days": 1317
+      },
+      {
+        "item_id": "BIGTOP-3843",
+        "title": "docker-hadoop.sh should not ignore --smoke-tests option",
+        "current_state": "Open",
+        "age_days": 1308
+      },
+      {
+        "item_id": "BIGTOP-3844",
+        "title": "Enable automatic reference from JIRA to GitHub PR",
+        "current_state": "Open",
+        "age_days": 1307
+      },
+      {
+        "item_id": "BIGTOP-3850",
+        "title": "Conflict occurs when installing both ranger-hdfs-plugin and ranger-yarn-plugin",
+        "current_state": "Open",
+        "age_days": 1303
+      },
+      {
+        "item_id": "BIGTOP-3854",
+        "title": "Hadoop Smoke test failed in openEuler",
+        "current_state": "Open",
+        "age_days": 1300
+      },
+      {
+        "item_id": "BIGTOP-3855",
+        "title": "Upgrade Commons Text to 1.10.0",
+        "current_state": "Open",
+        "age_days": 1296
+      },
+      {
+        "item_id": "BIGTOP-3860",
+        "title": "gpdb5.28.5 needs to support python3 version in OpenEuler",
+        "current_state": "Open",
+        "age_days": 1292
+      },
+      {
+        "item_id": "BIGTOP-3862",
+        "title": "Failed to install spark in OpenEuler",
+        "current_state": "Open",
+        "age_days": 1289
+      },
+      {
+        "item_id": "BIGTOP-3863",
+        "title": "Atlas tasks in Bigtop",
+        "current_state": "Open",
+        "age_days": 1287
+      },
+      {
+        "item_id": "BIGTOP-3864",
+        "title": "Ranger RPM Build Failed",
+        "current_state": "Open",
+        "age_days": 1287
+      },
+      {
+        "item_id": "BIGTOP-3865",
+        "title": "Apache Sentry in BigTop",
+        "current_state": "Open",
+        "age_days": 1287
+      },
+      {
+        "item_id": "BIGTOP-3867",
+        "title": "Add an option to use Java 11 to bigtop-deploy",
+        "current_state": "Open",
+        "age_days": 1281
+      },
+      {
+        "item_id": "BIGTOP-3899",
+        "title": "Exclude docker/bigtop-slaves/Dockerfile from git",
+        "current_state": "Open",
+        "age_days": 1218
+      },
+      {
+        "item_id": "BIGTOP-3902",
+        "title": "Error building Ranger rpm using bigtop",
+        "current_state": "Open",
+        "age_days": 1211
+      },
+      {
+        "item_id": "BIGTOP-3904",
+        "title": "Introduce bigtop-select deb package to Bigtop",
+        "current_state": "Open",
+        "age_days": 1195
+      },
+      {
+        "item_id": "BIGTOP-3906",
+        "title": "Wrapper script for hive sources wrong default file (hbase)",
+        "current_state": "Open",
+        "age_days": 1193
+      },
+      {
+        "item_id": "BIGTOP-3907",
+        "title": "Spark History Server fails to start on CentOS7 aarch64",
+        "current_state": "Open",
+        "age_days": 1190
+      },
+      {
+        "item_id": "BIGTOP-3908",
+        "title": "Upgrade Spark Packages for PySpark Requres Python3",
+        "current_state": "Open",
+        "age_days": 1185
+      },
+      {
+        "item_id": "BIGTOP-3911",
+        "title": "Ubuntu 20.04 ambari install way",
+        "current_state": "Open",
+        "age_days": 1161
+      },
+      {
+        "item_id": "BIGTOP-3921",
+        "title": "Add ZSTD Codec Support for hadoop",
+        "current_state": "Open",
+        "age_days": 1141
+      },
+      {
+        "item_id": "BIGTOP-3932",
+        "title": "ranger2.4 support both in bigtop and bigtop stack",
+        "current_state": "In Progress",
+        "age_days": 1115
+      },
+      {
+        "item_id": "BIGTOP-3935",
+        "title": "Hbase master can't start due to ranger-hbase-plugin jersey jar class loading order\t",
+        "current_state": "Patch Available",
+        "age_days": 1115
+      },
+      {
+        "item_id": "BIGTOP-3938",
+        "title": "Hive CLI creates 2 Tez sessions",
+        "current_state": "Open",
+        "age_days": 1104
+      },
+      {
+        "item_id": "BIGTOP-3939",
+        "title": "Ambari in bigtop does not have a Yarn query manager or file views",
+        "current_state": "Open",
+        "age_days": 1099
+      },
+      {
+        "item_id": "BIGTOP-3940",
+        "title": "bigtop hadoop and hbase build is failing because MAVEN_OPTS overridden in build scripts ",
+        "current_state": "Open",
+        "age_days": 1096
+      },
+      {
+        "item_id": "BIGTOP-3941",
+        "title": "DataNode start is failing with Permission denied error",
+        "current_state": "Open",
+        "age_days": 1096
+      },
+      {
+        "item_id": "BIGTOP-3943",
+        "title": "Solr incompatible names on deployment and test module",
+        "current_state": "Open",
+        "age_days": 1092
+      },
+      {
+        "item_id": "BIGTOP-3957",
+        "title": "hbase-regionserver must be started after zookeer-server is ready",
+        "current_state": "Open",
+        "age_days": 1034
+      },
+      {
+        "item_id": "BIGTOP-3958",
+        "title": "Add trino as a component",
+        "current_state": "Open",
+        "age_days": 1030
+      },
+      {
+        "item_id": "BIGTOP-3959",
+        "title": "Add trino as a component in Bigtop and Start Stop Status of trino",
+        "current_state": "Reopened",
+        "age_days": 1030
+      },
+      {
+        "item_id": "BIGTOP-3965",
+        "title": "Fix hive server and hadoop 3.3.5 NameNode and ResourceManager can't start after enable ranger",
+        "current_state": "Open",
+        "age_days": 1020
+      },
+      {
+        "item_id": "BIGTOP-3971",
+        "title": "Start Stop Status of Trino from Installed package in Bigtop",
+        "current_state": "Open",
+        "age_days": 1016
+      },
+      {
+        "item_id": "BIGTOP-3973",
+        "title": "Fix the name of docker volume for Maven cache and make it configurable",
+        "current_state": "Open",
+        "age_days": 1014
+      },
+      {
+        "item_id": "BIGTOP-3976",
+        "title": "Fix invalid conditional of exec resources in bigtop_toolchain",
+        "current_state": "Open",
+        "age_days": 1013
+      },
+      {
+        "item_id": "BIGTOP-3977",
+        "title": "Support appending suffix to phoenix rpm package name",
+        "current_state": "In Progress",
+        "age_days": 1013
+      },
+      {
+        "item_id": "BIGTOP-3984",
+        "title": "Make use of phoenix-client jar of phoenix instead of phoenix-core in ambari metrics collector",
+        "current_state": "Open",
+        "age_days": 1008
+      },
+      {
+        "item_id": "BIGTOP-3986",
+        "title": "Phoenix rpm package lost queryserver",
+        "current_state": "Open",
+        "age_days": 1005
+      },
+      {
+        "item_id": "BIGTOP-3989",
+        "title": "Bump HBase to 2.5.3",
+        "current_state": "In Progress",
+        "age_days": 1001
+      },
+      {
+        "item_id": "BIGTOP-3992",
+        "title": "Missing distcp package for hdfs in hive",
+        "current_state": "Open",
+        "age_days": 995
+      },
+      {
+        "item_id": "BIGTOP-3995",
+        "title": "Bug fixes for Bigtop v3.3.0 release ",
+        "current_state": "In Progress",
+        "age_days": 992
+      },
+      {
+        "item_id": "BIGTOP-3996",
+        "title": "Force a clean build of toolchain images",
+        "current_state": "In Progress",
+        "age_days": 992
+      },
+      {
+        "item_id": "BIGTOP-3997",
+        "title": "Add phoenix queryserver as a component",
+        "current_state": "In Progress",
+        "age_days": 988
+      },
+      {
+        "item_id": "BIGTOP-4004",
+        "title": "Revert Monkey Patch for Ambari Certificate Expiry Issue(#BIGTOP-3946)",
+        "current_state": "Open",
+        "age_days": 977
+      },
+      {
+        "item_id": "BIGTOP-4006",
+        "title": "Add phoenix omid as a component",
+        "current_state": "Open",
+        "age_days": 973
+      },
+      {
+        "item_id": "BIGTOP-4011",
+        "title": "CVE-2022-23307: Apache Log4j security vulnerabilities",
+        "current_state": "Open",
+        "age_days": 942
+      },
+      {
+        "item_id": "BIGTOP-4028",
+        "title": "HIVE service excludes HBASE related log dependencies",
+        "current_state": "Open",
+        "age_days": 935
+      },
+      {
+        "item_id": "BIGTOP-4036",
+        "title": "Fix Ranger's smoke test failure on Debian 11",
+        "current_state": "Open",
+        "age_days": 923
+      },
+      {
+        "item_id": "BIGTOP-4038",
+        "title": "Replace certbot with apache httpd's mod_md",
+        "current_state": "Open",
+        "age_days": 920
+      },
+      {
+        "item_id": "BIGTOP-4046",
+        "title": "Enable Parallel Compilation for Multiple Modules in SPARK",
+        "current_state": "In Progress",
+        "age_days": 879
+      },
+      {
+        "item_id": "BIGTOP-4048",
+        "title": "Enable Parallel Compilation for Multiple Modules in Alluxio",
+        "current_state": "In Progress",
+        "age_days": 876
+      },
+      {
+        "item_id": "BIGTOP-4052",
+        "title": "Remove python dependency in bigtop package",
+        "current_state": "Open",
+        "age_days": 876
+      },
+      {
+        "item_id": "BIGTOP-4054",
+        "title": "Enable Parallel Compilation for Multiple Modules in Hadoop",
+        "current_state": "In Progress",
+        "age_days": 873
+      },
+      {
+        "item_id": "BIGTOP-4055",
+        "title": "Add Spark History Server Smoke Test",
+        "current_state": "Open",
+        "age_days": 870
+      },
+      {
+        "item_id": "BIGTOP-4056",
+        "title": "Support Detect Python Path",
+        "current_state": "Open",
+        "age_days": 868
+      },
+      {
+        "item_id": "BIGTOP-4058",
+        "title": "Replace Jenkins' Matrix reloaded plugin",
+        "current_state": "Open",
+        "age_days": 849
+      },
+      {
+        "item_id": "BIGTOP-4060",
+        "title": "Issue when Bigtop trunk building, import bigtop source code to IDEA",
+        "current_state": "Open",
+        "age_days": 838
+      },
+      {
+        "item_id": "BIGTOP-4066",
+        "title": "Fixing Python Dependency Logic in Spark Packaging",
+        "current_state": "Open",
+        "age_days": 806
+      },
+      {
+        "item_id": "BIGTOP-4080",
+        "title": "Enable devel repo on Rocky Linux 9",
+        "current_state": "Open",
+        "age_days": 784
+      },
+      {
+        "item_id": "BIGTOP-4081",
+        "title": "Add knox support",
+        "current_state": "In Progress",
+        "age_days": 778
+      },
+      {
+        "item_id": "BIGTOP-4085",
+        "title": "Upgrade Zepplin to 0.11.1",
+        "current_state": "Open",
+        "age_days": 765
+      },
+      {
+        "item_id": "BIGTOP-4087",
+        "title": " Add  pkgSuffix and parentDir build arguments to Hadoop deb",
+        "current_state": "In Progress",
+        "age_days": 763
+      },
+      {
+        "item_id": "BIGTOP-4094",
+        "title": "Migrate /var/run to /run /var/run on Rocky Linux 9",
+        "current_state": "Open",
+        "age_days": 754
+      },
+      {
+        "item_id": "BIGTOP-4096",
+        "title": "Fix CVE Vulnerabilities in Hadoop Dependencies: common-compress and common-configuration2",
+        "current_state": "In Progress",
+        "age_days": 749
+      },
+      {
+        "item_id": "BIGTOP-4103",
+        "title": "Replace legacy facts in manifests",
+        "current_state": "Open",
+        "age_days": 741
+      },
+      {
+        "item_id": "BIGTOP-4104",
+        "title": "Introduce Apache Doris into Bigtop",
+        "current_state": "Open",
+        "age_days": 735
+      },
+      {
+        "item_id": "BIGTOP-4110",
+        "title": "Gpdb 7.1.0 compile failed in rockylinux 9",
+        "current_state": "Open",
+        "age_days": 719
+      },
+      {
+        "item_id": "BIGTOP-4118",
+        "title": "Add nodejs package to bigtop_toolchain",
+        "current_state": "Open",
+        "age_days": 708
+      },
+      {
+        "item_id": "BIGTOP-4147",
+        "title": "Fix test failure of Ranger due to timing issue",
+        "current_state": "Open",
+        "age_days": 691
+      },
+      {
+        "item_id": "BIGTOP-4151",
+        "title": "Add pkgSuffix and parentDir build arguments to Zookeeper deb",
+        "current_state": "In Progress",
+        "age_days": 678
+      },
+      {
+        "item_id": "BIGTOP-4156",
+        "title": "Fix init script of Zeppelin to properly get status",
+        "current_state": "Open",
+        "age_days": 670
+      },
+      {
+        "item_id": "BIGTOP-4182",
+        "title": "Provide systemd service unit files ",
+        "current_state": "Open",
+        "age_days": 644
+      },
+      {
+        "item_id": "BIGTOP-4196",
+        "title": "Provide systemd service unit files(RPM): Spark",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4198",
+        "title": "Provide systemd service unit files(RPM): Flink",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4199",
+        "title": "Provide systemd service unit files(RPM): Hive",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4200",
+        "title": "Provide systemd service unit files(RPM): HBase",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4201",
+        "title": "Provide systemd service unit files(RPM): Phoenix",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4202",
+        "title": "Provide systemd service unit files(RPM): Kafka",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4203",
+        "title": "Provide systemd service unit files(RPM): Tez",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4204",
+        "title": "Provide systemd service unit files(RPM): Solr",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4205",
+        "title": "Provide systemd service unit file(RPM): Zeppelin",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4206",
+        "title": "Provide systemd service unit files(RPM): Livy",
+        "current_state": "Open",
+        "age_days": 626
+      },
+      {
+        "item_id": "BIGTOP-4229",
+        "title": "Add Ubuntu 24.04 Support",
+        "current_state": "Open",
+        "age_days": 603
+      },
+      {
+        "item_id": "BIGTOP-4259",
+        "title": "Provide systemd service unit files(RPM): ZooKeeper-rest",
+        "current_state": "Open",
+        "age_days": 558
+      },
+      {
+        "item_id": "BIGTOP-4276",
+        "title": "Upgrade Ranger to 2.5.0",
+        "current_state": "In Progress",
+        "age_days": 536
+      },
+      {
+        "item_id": "BIGTOP-4280",
+        "title": "Provide systemd service unit files: Hadoop(KMS,HttpFS)",
+        "current_state": "Open",
+        "age_days": 536
+      },
+      {
+        "item_id": "BIGTOP-4285",
+        "title": "Fix deployment failure of zookeeper due to conflict with zookeeper provided by Ubuntu 24.04",
+        "current_state": "Open",
+        "age_days": 533
+      },
+      {
+        "item_id": "BIGTOP-4298",
+        "title": "Upgrade Ranger to 2.5.0",
+        "current_state": "Open",
+        "age_days": 519
+      },
+      {
+        "item_id": "BIGTOP-4310",
+        "title": "Executing `{hadoop_mapreduce_home}/bin/mapred` would occur ERROR that the mapred-config.sh doesn't exist",
+        "current_state": "Open",
+        "age_days": 504
+      },
+      {
+        "item_id": "BIGTOP-4328",
+        "title": "Enable GuessMainPID with ZooKeeper",
+        "current_state": "Open",
+        "age_days": 483
+      },
+      {
+        "item_id": "BIGTOP-4366",
+        "title": "Modernize BigPetStore",
+        "current_state": "Open",
+        "age_days": 447
+      },
+      {
+        "item_id": "BIGTOP-4383",
+        "title": "Remove old hadoop configuration files",
+        "current_state": "Open",
+        "age_days": 434
+      },
+      {
+        "item_id": "BIGTOP-4384",
+        "title": "Using EnvironmentFile configuration in Hadoop systemd unit file",
+        "current_state": "Open",
+        "age_days": 434
+      },
+      {
+        "item_id": "BIGTOP-4422",
+        "title": "Fix build failure of Phoenix on aarch64 due to missing protoc artifact",
+        "current_state": "Open",
+        "age_days": 361
+      },
+      {
+        "item_id": "BIGTOP-4423",
+        "title": "Packaging Hadoop failes due to compilation error of leveldbjni on ppc64le",
+        "current_state": "Open",
+        "age_days": 359
+      },
+      {
+        "item_id": "BIGTOP-4436",
+        "title": "protobuf version mismatch between hadoop and tez",
+        "current_state": "Open",
+        "age_days": 341
+      },
+      {
+        "item_id": "BIGTOP-4438",
+        "title": "Problem compatibility of Hadoop components (HDFS, Mapreduce, Hive, Spark)",
+        "current_state": "Open",
+        "age_days": 337
+      },
+      {
+        "item_id": "BIGTOP-4455",
+        "title": "RPM packaging of Airflow fails due to ambiguous python shebangs error",
+        "current_state": "Open",
+        "age_days": 312
+      },
+      {
+        "item_id": "BIGTOP-4457",
+        "title": "Integrating Apache Kyuubi with Ambari",
+        "current_state": "Open",
+        "age_days": 309
+      },
+      {
+        "item_id": "BIGTOP-4459",
+        "title": "Define Bigtop 3.5 release BOM",
+        "current_state": "Open",
+        "age_days": 307
+      },
+      {
+        "item_id": "BIGTOP-4486",
+        "title": "Binary Repository Broken with TLS Certificate Error",
+        "current_state": "Open",
+        "age_days": 265
+      },
+      {
+        "item_id": "BIGTOP-4499",
+        "title": "Phoenix rpm packaging doesn't use the parentDir variable",
+        "current_state": "Open",
+        "age_days": 238
+      },
+      {
+        "item_id": "BIGTOP-4512",
+        "title": "feat: Add Atlas to extra stack",
+        "current_state": "Open",
+        "age_days": 152
+      },
+      {
+        "item_id": "BIGTOP-4513",
+        "title": "Optimize service order execution logic",
+        "current_state": "Open",
+        "age_days": 150
+      },
+      {
+        "item_id": "BIGTOP-4514",
+        "title": "Add interface guidance for enabling HDFS HA and YARN HA",
+        "current_state": "Open",
+        "age_days": 98
+      },
+      {
+        "item_id": "BIGTOP-4515",
+        "title": "Upgrade HBase to 2.6.5",
+        "current_state": "Patch Available",
+        "age_days": 96
+      },
+      {
+        "item_id": "BIGTOP-4521",
+        "title": "Define Bigtop 3.6 release BOM",
+        "current_state": "Open",
+        "age_days": 27
+      },
+      {
+        "item_id": "BIGTOP-4526",
+        "title": "Upgrade the base Docker image of Rocky 9",
+        "current_state": "Open",
+        "age_days": 4
+      },
+      {
+        "item_id": "BIGTOP-4527",
+        "title": "Upgrade Phoenix to 5.3.0",
+        "current_state": "Patch Available",
+        "age_days": 4
+      },
+      {
+        "item_id": "BIGTOP-4528",
+        "title": "conf-select is missing",
+        "current_state": "Open",
+        "age_days": 4
+      },
+      {
+        "item_id": "BIGTOP-4529",
+        "title": "Upgrade Spark to 3.5.8",
+        "current_state": "Patch Available",
+        "age_days": 2
+      }
+    ]
+  },
+  "input": {
+    "repo": "jira:BIGTOP",
+    "asof": "2026-05-12",
+    "workflow": [
+      "Open",
+      "In Progress",
+      "Patch Available"
+    ],
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow aging --repo jira:BIGTOP --asof 2026-05-12 --workflow 'Open,In Progress,Patch Available' --history-start 2026-04-12 --history-end 2026-05-11",
+  "logs": []
+}

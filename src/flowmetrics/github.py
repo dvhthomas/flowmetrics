@@ -12,7 +12,7 @@ import httpx
 from dateutil.parser import isoparse
 
 from .cache import CacheMiss, FileCache
-from .compute import WorkItem
+from .compute import StatusInterval, WorkItem
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
@@ -237,6 +237,118 @@ def _pr_node_to_events(node: dict[str, Any]) -> WorkItem | None:
         is_bot=_is_bot(author),
         author_login=(author or {}).get("login"),
     )
+
+
+# ---------------------------------------------------------------------------
+# Open-PR fetch for Aging
+# ---------------------------------------------------------------------------
+#
+# A deliberately simple lifecycle: Draft → Awaiting Review → Changes
+# Requested → Approved → (Merged or Closed). We derive the current phase
+# from `isDraft` + `reviewDecision` — the two fields GitHub exposes
+# natively. We do NOT try to reconstruct a label-driven workflow (see
+# docs/DECISIONS.md #9 — that's gh-velocity's domain).
+
+OPEN_PR_QUERY = """
+query($q: String!, $first: Int!, $after: String) {
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    issueCount
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        createdAt
+        isDraft
+        reviewDecision
+        author {
+          __typename
+          login
+        }
+      }
+    }
+  }
+  rateLimit { remaining limit resetAt cost }
+}
+""".strip()
+
+
+# Workflow ordering used for charts and CLI defaults. Earliest → latest.
+GITHUB_PR_WORKFLOW: tuple[str, ...] = (
+    "Draft",
+    "Awaiting Review",
+    "Changes Requested",
+    "Approved",
+)
+
+
+def _pr_open_phase(*, is_draft: bool, review_decision: str | None) -> str:
+    """Derive a PR's current open-phase from GitHub's two native signals.
+
+    Draft wins over reviewDecision (a drafted PR sitting at Approved
+    still belongs in the Draft column — the author hasn't asked for
+    re-review yet). REVIEW_REQUIRED and null both mean "no actionable
+    review state yet"; we collapse them into one Awaiting Review column.
+    """
+    if is_draft:
+        return "Draft"
+    if review_decision == "CHANGES_REQUESTED":
+        return "Changes Requested"
+    if review_decision == "APPROVED":
+        return "Approved"
+    return "Awaiting Review"
+
+
+def fetch_open_prs(
+    client: GitHubClient,
+    repo: str,
+    *,
+    asof: date,
+    page_size: int = 100,
+) -> list[WorkItem]:
+    """Fetch every open PR in `repo`, with a synthetic status_interval
+    ending at `asof` so `compute_aging` can read the current phase.
+
+    `asof` is a date; the synthetic interval ends at 00:00 UTC of the
+    next day so an item created today reads as age=0 rather than -1.
+    """
+    q = f"repo:{repo} is:pr is:open archived:false"
+    asof_dt = datetime.combine(asof, datetime.min.time()).replace(tzinfo=UTC)
+    items: list[WorkItem] = []
+    after: str | None = None
+    while True:
+        payload = client.graphql(
+            OPEN_PR_QUERY,
+            {"q": q, "first": page_size, "after": after},
+        )
+        search = payload["data"]["search"]
+        for node in search.get("nodes") or []:
+            if not node or "number" not in node:
+                continue
+            created = _parse_dt(node["createdAt"])
+            phase = _pr_open_phase(
+                is_draft=bool(node.get("isDraft")),
+                review_decision=node.get("reviewDecision"),
+            )
+            end = asof_dt if asof_dt > created else created
+            author = node.get("author")
+            items.append(
+                WorkItem(
+                    item_id=f"#{node['number']}",
+                    title=node.get("title", ""),
+                    created_at=created,
+                    merged_at=None,
+                    activity=[],
+                    is_bot=_is_bot(author),
+                    author_login=(author or {}).get("login"),
+                    status_intervals=[StatusInterval(created, end, phase)],
+                )
+            )
+        page_info = search["pageInfo"]
+        if not page_info["hasNextPage"]:
+            break
+        after = page_info["endCursor"]
+    return items
 
 
 def fetch_prs_merged_in_window(

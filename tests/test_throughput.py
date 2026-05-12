@@ -2,12 +2,12 @@
 
 from datetime import UTC, date, datetime
 
-from flowmetrics.compute import PullRequestEvents
+from flowmetrics.compute import WorkItem
 from flowmetrics.throughput import daily_throughput
 
 
-def pr(number: int, merged_at: datetime) -> PullRequestEvents:
-    return PullRequestEvents(
+def pr(number: int, merged_at: datetime) -> WorkItem:
+    return WorkItem(
         item_id=f"#{number}",
         title=f"PR {number}",
         created_at=merged_at,  # not used by daily_throughput
@@ -51,7 +51,7 @@ class TestDailyThroughput:
         assert daily_throughput(prs, date(2026, 5, 4), date(2026, 5, 4)) == [1]
 
     def test_unmerged_prs_skipped(self):
-        unmerged = PullRequestEvents(
+        unmerged = WorkItem(
             item_id="#99",
             title="open",
             created_at=dt(2026, 5, 4, 9, 0),

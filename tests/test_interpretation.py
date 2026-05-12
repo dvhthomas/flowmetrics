@@ -17,14 +17,17 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
 
+from flowmetrics.cfd import CfdPoint
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.interpretation import (
+    interpret_cfd,
     interpret_efficiency,
     interpret_how_many,
     interpret_when_done,
 )
 from flowmetrics.report import (
+    CfdInput,
     EfficiencyInput,
     HowManyInput,
     TrainingSummary,
@@ -391,3 +394,63 @@ class TestInterpretHowMany:
         i = interpret_how_many(input_, training, hist, percentiles)
         text = " ".join(i.next_actions).lower()
         assert "horizon" in text or "longer" in text
+
+
+# ---------------------------------------------------------------------------
+# CFD
+# ---------------------------------------------------------------------------
+
+
+def _cfd_input(repo="acme/widget"):
+    return CfdInput(
+        repo=repo,
+        start=date(2026, 5, 4),
+        stop=date(2026, 5, 10),
+        workflow=("Open", "In Progress", "Done"),
+        interval_days=1,
+        offline=False,
+    )
+
+
+def _cfd_points_growing() -> list[CfdPoint]:
+    return [
+        CfdPoint(date(2026, 5, 4), {"Open": 0, "In Progress": 0, "Done": 0}),
+        CfdPoint(date(2026, 5, 5), {"Open": 2, "In Progress": 1, "Done": 0}),
+        CfdPoint(date(2026, 5, 6), {"Open": 4, "In Progress": 2, "Done": 1}),
+        CfdPoint(date(2026, 5, 10), {"Open": 8, "In Progress": 5, "Done": 3}),
+    ]
+
+
+class TestInterpretCfd:
+    def test_headline_names_repo_arrivals_and_departures(self):
+        i = interpret_cfd(_cfd_input(), _cfd_points_growing())
+        assert "acme/widget" in i.headline
+        # arrivals=8, departures=3, WIP=5 at end
+        assert "8" in i.headline
+        assert "3" in i.headline
+
+    def test_key_insight_names_biggest_wip_band(self):
+        # At end: Open-band = Open - In Progress = 8 - 5 = 3
+        # In Progress-band = In Progress - Done = 5 - 3 = 2
+        # Open-band is wider → bottleneck is at "Open"
+        i = interpret_cfd(_cfd_input(), _cfd_points_growing())
+        assert "Open" in i.key_insight or "WIP" in i.key_insight
+
+    def test_caveats_warn_past_data_only(self):
+        i = interpret_cfd(_cfd_input(), _cfd_points_growing())
+        text = " ".join(i.caveats).lower()
+        assert "past" in text or "history" in text or "projection" in text
+
+    def test_empty_points_handled_safely(self):
+        i = interpret_cfd(_cfd_input(), [])
+        assert "acme/widget" in i.headline
+        assert i.next_actions  # must always give the reader something to do
+
+    def test_no_completed_items_calls_out_zero_throughput(self):
+        points = [
+            CfdPoint(date(2026, 5, 4), {"Open": 1, "In Progress": 0, "Done": 0}),
+            CfdPoint(date(2026, 5, 10), {"Open": 5, "In Progress": 5, "Done": 0}),
+        ]
+        i = interpret_cfd(_cfd_input(), points)
+        text = (i.key_insight + " " + " ".join(i.next_actions)).lower()
+        assert "0" in i.headline or "no" in text or "zero" in text

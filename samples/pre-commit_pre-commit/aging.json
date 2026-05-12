@@ -1,0 +1,98 @@
+{
+  "schema": "flowmetrics.aging.v1",
+  "command": "aging",
+  "generated_at": "2026-05-12T13:15:36.473778-06:00",
+  "headline": "WIP Aging for pre-commit/pre-commit as of May 12, 2026: 6 in-flight items, 6 already past P85 (1.1d), 6 past P95 (1.1d).",
+  "definition": "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
+  "summary": {
+    "in_flight_count": 6,
+    "wip_by_state": {
+      "Awaiting Review": 5,
+      "Changes Requested": 1
+    },
+    "cycle_time_percentiles_days": {
+      "50": 0.006099537037037037,
+      "70": 0.8099305555555556,
+      "85": 1.0534837962962964,
+      "95": 1.0534837962962964
+    },
+    "completed_count_for_percentiles": 4
+  },
+  "key_insight": "6 item(s) have aged past the P85 cycle time (1.1d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #3427, #3460, #3498. Concentrate decision-making here.",
+  "next_actions": [
+    "6 item(s) past P95 (1.1d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "Biggest WIP column is 'Awaiting Review' with 5 item(s). If that band is upstream (queue), pull policy. If downstream (review/test), capacity.",
+    "Re-check daily; Aging is a leading indicator of forecast slip."
+  ],
+  "caveats": [
+    "Aging is a snapshot as of May 12, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 12, 2026 \u2192 May 11, 2026 (4 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second."
+  ],
+  "vocabulary": {
+    "Work Item Age": "Elapsed time since an item entered the workflow. Applies only to in-flight items \u2014 once an item exits, that elapsed time becomes the item's Cycle Time. Vacanti, WWIBD pp. 50.",
+    "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y). Vacanti, WWIBD Figure 3.2."
+  },
+  "chart_data": {
+    "items": [
+      {
+        "item_id": "#3617",
+        "title": "feature: fetch tag pointing to HEAD in shallow clone",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#3605",
+        "title": "use git cat-file -e instead of git rev-list in _rev_exists",
+        "current_state": "Changes Requested",
+        "age_days": 137
+      },
+      {
+        "item_id": "#3498",
+        "title": "Julia: support `language_version`",
+        "current_state": "Awaiting Review",
+        "age_days": 295
+      },
+      {
+        "item_id": "#3497",
+        "title": "Julia: copy src files",
+        "current_state": "Awaiting Review",
+        "age_days": 295
+      },
+      {
+        "item_id": "#3460",
+        "title": "fix: Proper way of finding `npm pack` `filename` output.",
+        "current_state": "Awaiting Review",
+        "age_days": 368
+      },
+      {
+        "item_id": "#3427",
+        "title": "Fix pre-push after rebase",
+        "current_state": "Awaiting Review",
+        "age_days": 424
+      }
+    ]
+  },
+  "input": {
+    "repo": "pre-commit/pre-commit",
+    "asof": "2026-05-12",
+    "workflow": [
+      "Draft",
+      "Awaiting Review",
+      "Changes Requested",
+      "Approved"
+    ],
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow aging --repo pre-commit/pre-commit --asof 2026-05-12 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-12 --history-end 2026-05-11",
+  "logs": []
+}

@@ -1,0 +1,6064 @@
+{
+  "schema": "flowmetrics.aging.v1",
+  "command": "aging",
+  "generated_at": "2026-05-12T13:15:26.261779-06:00",
+  "headline": "WIP Aging for huggingface/transformers as of May 12, 2026: 1000 in-flight items, 933 already past P85 (13.9d), 860 past P95 (36.5d).",
+  "definition": "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
+  "summary": {
+    "in_flight_count": 1000,
+    "wip_by_state": {
+      "Draft": 165,
+      "Awaiting Review": 719,
+      "Approved": 110,
+      "Changes Requested": 6
+    },
+    "cycle_time_percentiles_days": {
+      "50": 2.5189699074074072,
+      "70": 6.981134259259259,
+      "85": 13.869965277777778,
+      "95": 36.517094907407404
+    },
+    "completed_count_for_percentiles": 241
+  },
+  "key_insight": "933 item(s) have aged past the P85 cycle time (13.9d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #35517, #35535, #35550. Concentrate decision-making here.",
+  "next_actions": [
+    "860 item(s) past P95 (36.5d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "Biggest WIP column is 'Awaiting Review' with 719 item(s). If that band is upstream (queue), pull policy. If downstream (review/test), capacity.",
+    "Re-check daily; Aging is a leading indicator of forecast slip."
+  ],
+  "caveats": [
+    "Aging is a snapshot as of May 12, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 12, 2026 \u2192 May 11, 2026 (241 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second."
+  ],
+  "vocabulary": {
+    "Work Item Age": "Elapsed time since an item entered the workflow. Applies only to in-flight items \u2014 once an item exits, that elapsed time becomes the item's Cycle Time. Vacanti, WWIBD pp. 50.",
+    "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y). Vacanti, WWIBD Figure 3.2."
+  },
+  "chart_data": {
+    "items": [
+      {
+        "item_id": "#45919",
+        "title": "Add Sapiens2 Model",
+        "current_state": "Draft",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45918",
+        "title": "Add initial torch_tpu backend support",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45917",
+        "title": "Stop align_special_tokens from rewriting eos_token_id when no alignment is needed",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45916",
+        "title": "Fix TAPAS tokenizer crash on pandas 3.x string-dtype tables",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45914",
+        "title": "Block image_start/end_token_id in generation test sampling",
+        "current_state": "Approved",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45912",
+        "title": "Fix fsdp2 for gemma models with shared kv states",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45911",
+        "title": "[CB] Hide activation footprint by using the CUDA graph pool",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45903",
+        "title": "Fix M-RoPE `inv_freq` device and `meta` \u2192 `to_empty` re-init in Qwen3-VL family",
+        "current_state": "Awaiting Review",
+        "age_days": 0
+      },
+      {
+        "item_id": "#45900",
+        "title": "[docs] ALMModelTest",
+        "current_state": "Approved",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45899",
+        "title": "[docs] decode fast path",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45898",
+        "title": "[fix] Add `fatal_error` to `ContinuousBatchingManager` so the serving layer can detect a dead CB worker",
+        "current_state": "Approved",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45896",
+        "title": "Enhance apply_chat_template to support custom field prefilling (reasoning_content, thinking, etc.)",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45895",
+        "title": "Fix undefined 'input' variable",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45890",
+        "title": "exaone4_5: add XPU expectations",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45883",
+        "title": "Fix Gemma4 inputs_embeds OOM during per-layer lookup",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45880",
+        "title": "add DeepSeek-V4-Flash-Base support, also add the testcase(dequantize=\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 1
+      },
+      {
+        "item_id": "#45868",
+        "title": "feat(t5gemma2): add Flash Attention 2 support",
+        "current_state": "Awaiting Review",
+        "age_days": 2
+      },
+      {
+        "item_id": "#45863",
+        "title": "fix: add HF_USE_MLX opt-out for MLX detection",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#45862",
+        "title": "[new model] Add Zyphra/ZAYA1-8B",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#45861",
+        "title": "Fix M-RoPE device mismatch in Qwen3VL family under FSDP2 CPU offload",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#45858",
+        "title": "hy_v3: add XPU expectations",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#45857",
+        "title": "Fix `tie_word_embeddings` not lifted from `text_config` for some VLM configs (BC regression)",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#45851",
+        "title": "[docs] chat template",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45848",
+        "title": "Add Maximal Update Parametrization (\u03bcP)",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45847",
+        "title": "Streamable chat parsing",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45846",
+        "title": "[Cache] Add `Cache.snapshot()` / `Cache.restore(snapshot)` for tentative-forward rollback",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45843",
+        "title": "fix model parallel issues for deimv2",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45840",
+        "title": "fix: ModuleNotFoundError caused by distributed race condition in ci/cd",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45838",
+        "title": "[Model] Add PP-OCRv6 Text Recognition Models Support",
+        "current_state": "Approved",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45835",
+        "title": "fix: kosmos2.5: properly expand embeddings table",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#45829",
+        "title": "fix(rf_detr): correct paper URL and stale checkpoint references",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45827",
+        "title": "Delete dead code in qwen-vl series",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45825",
+        "title": "[CI] Replace PAT with GitHub App token in repo-consistency-bot",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45822",
+        "title": "Fix added-token prefix space in SentencePiece fast tokenizers",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45821",
+        "title": "[CB] [Major] Add tensor paralellism",
+        "current_state": "Approved",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45819",
+        "title": "fix: use per-instance lru_cache in compile_compatible_method_lru_cache to prevent memory leak",
+        "current_state": "Draft",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45818",
+        "title": "trainer: clear MPS graph cache after each optimizer step (pytorch#182648)",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45817",
+        "title": "Fix model parallel bugs for Gemma4",
+        "current_state": "Awaiting Review",
+        "age_days": 5
+      },
+      {
+        "item_id": "#45814",
+        "title": "Add pretrained model-family distributed smoke matrix",
+        "current_state": "Awaiting Review",
+        "age_days": 6
+      },
+      {
+        "item_id": "#45813",
+        "title": "fix: route Granite models to TokenizersBackend to preserve tokenizer.json pre-tokenizer",
+        "current_state": "Approved",
+        "age_days": 6
+      },
+      {
+        "item_id": "#45795",
+        "title": "[docs] adding audio/video processors",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#45794",
+        "title": "Fix WeightConverter substring match on leaf-style source patterns",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#45790",
+        "title": "No agent PR descriptions",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#45784",
+        "title": "fix: remove upper bound on tokenizers version constraint",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#45783",
+        "title": "[generation] Encode multimodal data only once",
+        "current_state": "Awaiting Review",
+        "age_days": 7
+      },
+      {
+        "item_id": "#45776",
+        "title": "Gate enable_gqa=True on actual flash-attention eligibility",
+        "current_state": "Draft",
+        "age_days": 8
+      },
+      {
+        "item_id": "#45773",
+        "title": "Fix UnboundLocalError for `is_updated` in encoder-decoder cross-attention",
+        "current_state": "Approved",
+        "age_days": 8
+      },
+      {
+        "item_id": "#45756",
+        "title": "fix attribute access in PermuteForRope._apply",
+        "current_state": "Awaiting Review",
+        "age_days": 9
+      },
+      {
+        "item_id": "#45752",
+        "title": "Fix unhandled exception noise from background safetensors conversion thread",
+        "current_state": "Awaiting Review",
+        "age_days": 9
+      },
+      {
+        "item_id": "#45751",
+        "title": "Add Conformer model",
+        "current_state": "Awaiting Review",
+        "age_days": 9
+      },
+      {
+        "item_id": "#45745",
+        "title": "feat: add crop() to StaticCache layers for assisted generation",
+        "current_state": "Awaiting Review",
+        "age_days": 10
+      },
+      {
+        "item_id": "#45743",
+        "title": "fix(bitsandbytes): implement reverse_op for Bnb4bitDeserialize and Bnb8bitDeserialize",
+        "current_state": "Awaiting Review",
+        "age_days": 10
+      },
+      {
+        "item_id": "#45742",
+        "title": "feat(llama): add has_weight parameter to LlamaRMSNorm for FlashNorm-folded checkpoints (+12.77% e2e on Llama-3.2-1B at bf16/A100)",
+        "current_state": "Awaiting Review",
+        "age_days": 10
+      },
+      {
+        "item_id": "#45738",
+        "title": "fix(musicgen_melody): use DynamicCache instead of EncoderDecoderCache",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#45737",
+        "title": "Add regression test for MusicgenMelody audio conditioning (GH #45647)",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#45734",
+        "title": "fix(quantizers): make user-supplied skip_modules additive with auto-detected defaults",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#45732",
+        "title": "[skills] fine-tuning",
+        "current_state": "Draft",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45730",
+        "title": "gpt_oss multi-GPU AMD support",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45729",
+        "title": "fix: AutoConfig reloads wrong class after save_pretrained + local register",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45720",
+        "title": "chore(mlinter): implement part of rule TRF003",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45718",
+        "title": "Fix check_auto.py wiping auto_mappings.py due to missing flush",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45714",
+        "title": "fix: restore vocabulary loading in CamembertTokenizer",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45709",
+        "title": "Added SWA and Linear Attention to Llama3.2-1b",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45707",
+        "title": "Fix padding calculation in new_conv_state assignment",
+        "current_state": "Awaiting Review",
+        "age_days": 12
+      },
+      {
+        "item_id": "#45705",
+        "title": "[skills] model doc",
+        "current_state": "Draft",
+        "age_days": 13
+      },
+      {
+        "item_id": "#45699",
+        "title": "Add FP8 kernel acceleration for compressed-tensors quantized models",
+        "current_state": "Awaiting Review",
+        "age_days": 13
+      },
+      {
+        "item_id": "#45694",
+        "title": "Fix train_batch_size and eval_batch_size to respect split_batches config",
+        "current_state": "Awaiting Review",
+        "age_days": 13
+      },
+      {
+        "item_id": "#45690",
+        "title": "[serve] Support for reasoning ",
+        "current_state": "Awaiting Review",
+        "age_days": 14
+      },
+      {
+        "item_id": "#45683",
+        "title": "Exclude audio modules from conversion process",
+        "current_state": "Awaiting Review",
+        "age_days": 14
+      },
+      {
+        "item_id": "#45682",
+        "title": "FIX Restore LoRA hotswapping functionality",
+        "current_state": "Awaiting Review",
+        "age_days": 14
+      },
+      {
+        "item_id": "#45679",
+        "title": "TST Run fast PEFT tests in normal CI",
+        "current_state": "Approved",
+        "age_days": 14
+      },
+      {
+        "item_id": "#45670",
+        "title": "[nit] glmasr should be in AutoModelForMultimodalLM",
+        "current_state": "Awaiting Review",
+        "age_days": 14
+      },
+      {
+        "item_id": "#45668",
+        "title": "[GGUF] Add support for Qwen3.5 MoE (qwen35moe arch)",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#45666",
+        "title": "Extended n-to-1 kernel fusion via `KernelConfig` ",
+        "current_state": "Draft",
+        "age_days": 15
+      },
+      {
+        "item_id": "#45662",
+        "title": "Fix EP + FSDP2: experts silently overwritten by rank-0 broadcast",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#45651",
+        "title": "[Trainer] Optimize LengthGroupedSampler computation with select_columns and tqdm",
+        "current_state": "Awaiting Review",
+        "age_days": 16
+      },
+      {
+        "item_id": "#45649",
+        "title": "Fix OOM regression for FSDP2 + cpu_ram_efficient_loading on large models",
+        "current_state": "Approved",
+        "age_days": 17
+      },
+      {
+        "item_id": "#45645",
+        "title": "Fix xdist collisions for captured_info artifacts and preserve CI debug logs",
+        "current_state": "Awaiting Review",
+        "age_days": 17
+      },
+      {
+        "item_id": "#45640",
+        "title": "\ud83d\udea8\ud83d\udea8\ud83d\udea8 [Trainer] Default to FSDP2, simplify API around fsdp + fsdp_config",
+        "current_state": "Approved",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45639",
+        "title": "Make patched testing debug logs xdist-safe",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45638",
+        "title": "Add Multi-Token Prediction (MTP) support for Qwen3.5",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45635",
+        "title": "qa: speed up dtype regex weight load + reduce dtype tests to 3 random",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45634",
+        "title": "DeepGEMM BF16 + mixed FP8/FP4 + MegaMoE + refactor",
+        "current_state": "Approved",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45630",
+        "title": "Add new model: Kimi2-6",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45627",
+        "title": "Processing Utils: honor pre-built sub-processor kwargs in from_pretrained",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45618",
+        "title": "Add MTP speculative decoding via MTPCandidateGenerator",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45614",
+        "title": "Add missing requests dependency to transformers[serving]",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#45613",
+        "title": "[New Model] Add MiniCPM3 support ",
+        "current_state": "Awaiting Review",
+        "age_days": 19
+      },
+      {
+        "item_id": "#45609",
+        "title": "make it possible to ser/deser HF MoE models with torchao",
+        "current_state": "Draft",
+        "age_days": 19
+      },
+      {
+        "item_id": "#45604",
+        "title": "Agent first cli with skill",
+        "current_state": "Draft",
+        "age_days": 19
+      },
+      {
+        "item_id": "#45599",
+        "title": "qa: more lazy loading",
+        "current_state": "Draft",
+        "age_days": 19
+      },
+      {
+        "item_id": "#45586",
+        "title": "Add Audio-Visual Flamingo model",
+        "current_state": "Awaiting Review",
+        "age_days": 20
+      },
+      {
+        "item_id": "#45578",
+        "title": "Remove attribute_map from GptOssConfig",
+        "current_state": "Awaiting Review",
+        "age_days": 20
+      },
+      {
+        "item_id": "#45570",
+        "title": "Fix whisper long-form generation when eos_token_id is a list",
+        "current_state": "Awaiting Review",
+        "age_days": 20
+      },
+      {
+        "item_id": "#45569",
+        "title": "Proper nemotron H and 3 and 2",
+        "current_state": "Draft",
+        "age_days": 20
+      },
+      {
+        "item_id": "#45552",
+        "title": "Remove warnings for modernbert",
+        "current_state": "Awaiting Review",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45550",
+        "title": "Add runner selection for mi325 GPU type",
+        "current_state": "Draft",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45549",
+        "title": "fix: apply channel averaging correctly in audio feature extractors",
+        "current_state": "Awaiting Review",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45548",
+        "title": "Fix EP + DeepSpeed ZeRO-3 loading via accelerate launch",
+        "current_state": "Approved",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45546",
+        "title": "feat: Add GGUF loading support for Llama 4 (text)",
+        "current_state": "Awaiting Review",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45543",
+        "title": "ci: OTEL support",
+        "current_state": "Draft",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45541",
+        "title": "Fix local_files_only tokenizer fallback when tokenizer files are missing (Issue 45538)",
+        "current_state": "Approved",
+        "age_days": 21
+      },
+      {
+        "item_id": "#45534",
+        "title": "\ud83d\udea8 [ALM] Add base model without head",
+        "current_state": "Draft",
+        "age_days": 22
+      },
+      {
+        "item_id": "#45524",
+        "title": "utils: handle flash_attn missing from importlib packages_distributions without crashing",
+        "current_state": "Awaiting Review",
+        "age_days": 22
+      },
+      {
+        "item_id": "#45523",
+        "title": "Fix Seq2SeqLM ExecuTorch export: add encoder_attention_mask to decoder and use static encoder shapes",
+        "current_state": "Awaiting Review",
+        "age_days": 22
+      },
+      {
+        "item_id": "#45512",
+        "title": "[OutputRecorder] re.search on layer_name",
+        "current_state": "Awaiting Review",
+        "age_days": 23
+      },
+      {
+        "item_id": "#45497",
+        "title": "Add V-JEPA 2.1 inference support",
+        "current_state": "Awaiting Review",
+        "age_days": 25
+      },
+      {
+        "item_id": "#45493",
+        "title": "Modularize `ProcessorMixin` into smaller components",
+        "current_state": "Approved",
+        "age_days": 25
+      },
+      {
+        "item_id": "#45490",
+        "title": "Add ctsm model",
+        "current_state": "Awaiting Review",
+        "age_days": 25
+      },
+      {
+        "item_id": "#45487",
+        "title": "Fix model parallel issue for altclip model and ChineseClip model",
+        "current_state": "Awaiting Review",
+        "age_days": 25
+      },
+      {
+        "item_id": "#45465",
+        "title": "[docs] contributing",
+        "current_state": "Awaiting Review",
+        "age_days": 27
+      },
+      {
+        "item_id": "#45462",
+        "title": "chore(sec): added a handful of security checks",
+        "current_state": "Awaiting Review",
+        "age_days": 27
+      },
+      {
+        "item_id": "#45453",
+        "title": "Draft commit",
+        "current_state": "Draft",
+        "age_days": 27
+      },
+      {
+        "item_id": "#45452",
+        "title": "refactor: replace wildcard imports with explicit imports in model __init__.py files",
+        "current_state": "Awaiting Review",
+        "age_days": 27
+      },
+      {
+        "item_id": "#45438",
+        "title": "Add Gemma4ForSequenceClassification",
+        "current_state": "Awaiting Review",
+        "age_days": 28
+      },
+      {
+        "item_id": "#45422",
+        "title": "Drop `content=None` from messages in `apply_chat_template`",
+        "current_state": "Approved",
+        "age_days": 28
+      },
+      {
+        "item_id": "#45421",
+        "title": "Improve nested `base_model_prefix` handling in weight conversion and loading",
+        "current_state": "Awaiting Review",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45415",
+        "title": "Adds type checking to `src/transformers/*py`",
+        "current_state": "Awaiting Review",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45413",
+        "title": "Fix EtaLogitsWarper on fully masked logits",
+        "current_state": "Awaiting Review",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45401",
+        "title": "Add support for Voxtral-4B-TTS-2603 to transformers",
+        "current_state": "Draft",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45396",
+        "title": "Extract dynamic vision/audio tensors into standalone pure functions",
+        "current_state": "Approved",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45389",
+        "title": "Require input_ids for repetition penalty",
+        "current_state": "Awaiting Review",
+        "age_days": 29
+      },
+      {
+        "item_id": "#45382",
+        "title": "Add AudioGen (AudioCraft) to MusicGen conversion scripts",
+        "current_state": "Draft",
+        "age_days": 30
+      },
+      {
+        "item_id": "#45379",
+        "title": "fix(config): add deepstack_visual_indexes to Qwen3_5MoeVisionConfig",
+        "current_state": "Awaiting Review",
+        "age_days": 31
+      },
+      {
+        "item_id": "#45378",
+        "title": "fix(mistral): guard ReasoningEffort import for older mistral_common versions",
+        "current_state": "Awaiting Review",
+        "age_days": 31
+      },
+      {
+        "item_id": "#45363",
+        "title": "n-to-1 kernel fusion via `KernelConfig`",
+        "current_state": "Draft",
+        "age_days": 32
+      },
+      {
+        "item_id": "#45360",
+        "title": "Replace deprecated `huggingface-cli` references with `hf`",
+        "current_state": "Approved",
+        "age_days": 32
+      },
+      {
+        "item_id": "#45355",
+        "title": "Add universal phone recognition model - PhoneticXeus",
+        "current_state": "Awaiting Review",
+        "age_days": 32
+      },
+      {
+        "item_id": "#45346",
+        "title": "Fix Double Application of Softmax for Router Logits in MoE models",
+        "current_state": "Awaiting Review",
+        "age_days": 33
+      },
+      {
+        "item_id": "#45333",
+        "title": "Add heterogeneous config support (per-layer configuration)",
+        "current_state": "Awaiting Review",
+        "age_days": 33
+      },
+      {
+        "item_id": "#45332",
+        "title": "Add heterogeneous model support (per-layer config and modeling)",
+        "current_state": "Awaiting Review",
+        "age_days": 33
+      },
+      {
+        "item_id": "#45321",
+        "title": "Remove references to torchao's AffineQuantizedTensor",
+        "current_state": "Approved",
+        "age_days": 34
+      },
+      {
+        "item_id": "#45317",
+        "title": "Fix AttributeError in _patch_mistral_regex when fix_mistral_regex=True  ",
+        "current_state": "Approved",
+        "age_days": 34
+      },
+      {
+        "item_id": "#45300",
+        "title": "Fix Nemotron-H: add mlp layer type support",
+        "current_state": "Awaiting Review",
+        "age_days": 35
+      },
+      {
+        "item_id": "#45296",
+        "title": "Add GGUF support to Gemma4 (31B & 26B-A4B) text ",
+        "current_state": "Approved",
+        "age_days": 35
+      },
+      {
+        "item_id": "#45294",
+        "title": "feat: add Gemma4ForSequenceClassification",
+        "current_state": "Awaiting Review",
+        "age_days": 35
+      },
+      {
+        "item_id": "#45293",
+        "title": "Fix \"AttributeError: NewTokenizer has no attribute special_attribute_present\" (Remove `REGISTERED_FAST_ALIASES`)",
+        "current_state": "Approved",
+        "age_days": 35
+      },
+      {
+        "item_id": "#45273",
+        "title": "fix: liger unnecessarily materializes logits in VRAM during eval, causing OOM",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#45270",
+        "title": "[Trainer] Support multi-loss component logging",
+        "current_state": "Draft",
+        "age_days": 36
+      },
+      {
+        "item_id": "#45267",
+        "title": "Add docstring to FFN.forward in DistilBERT",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#45254",
+        "title": "Fix more integration tests for important models",
+        "current_state": "Awaiting Review",
+        "age_days": 37
+      },
+      {
+        "item_id": "#45244",
+        "title": "Let's CI go great",
+        "current_state": "Awaiting Review",
+        "age_days": 38
+      },
+      {
+        "item_id": "#45233",
+        "title": "feat: make timesfm2_5 onnx export compatible",
+        "current_state": "Awaiting Review",
+        "age_days": 38
+      },
+      {
+        "item_id": "#45221",
+        "title": "user friendly error when loading audio from video",
+        "current_state": "Approved",
+        "age_days": 39
+      },
+      {
+        "item_id": "#45218",
+        "title": "Proposal: Agent-first CLI",
+        "current_state": "Draft",
+        "age_days": 39
+      },
+      {
+        "item_id": "#45213",
+        "title": "DO NOT MERGE - model creation skill",
+        "current_state": "Draft",
+        "age_days": 39
+      },
+      {
+        "item_id": "#45202",
+        "title": "Fix gemma4 has flash-attention incompatbile head-dim=512",
+        "current_state": "Approved",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45193",
+        "title": "Config can apply pyndatic validation without torch-dependence",
+        "current_state": "Awaiting Review",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45189",
+        "title": "Add doc test CI workflow reusing existing model job infrastructure",
+        "current_state": "Awaiting Review",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45186",
+        "title": "Add new model: Isaac ",
+        "current_state": "Awaiting Review",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45181",
+        "title": "Make the cli a top-level package",
+        "current_state": "Draft",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45176",
+        "title": "added efficietvitsam model to HF",
+        "current_state": "Awaiting Review",
+        "age_days": 40
+      },
+      {
+        "item_id": "#45170",
+        "title": "`layrnorm` -> `layernorm`",
+        "current_state": "Awaiting Review",
+        "age_days": 41
+      },
+      {
+        "item_id": "#45168",
+        "title": "Update min_lr and max_lr default values to better defaults",
+        "current_state": "Approved",
+        "age_days": 41
+      },
+      {
+        "item_id": "#45167",
+        "title": "Add anthropic style of function schema",
+        "current_state": "Awaiting Review",
+        "age_days": 41
+      },
+      {
+        "item_id": "#45157",
+        "title": "[WIP] PrismML Bonsai model support",
+        "current_state": "Draft",
+        "age_days": 41
+      },
+      {
+        "item_id": "#45153",
+        "title": "[`FA`] Native torch integration",
+        "current_state": "Draft",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45149",
+        "title": "DO NOT MERGE adding SAML3-LiteText with a skill, first pass",
+        "current_state": "Draft",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45147",
+        "title": "Fix broken HQQ support",
+        "current_state": "Awaiting Review",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45144",
+        "title": "Add Xiaomi MiMo-V2",
+        "current_state": "Approved",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45134",
+        "title": "Optimize Parakeet feature extraction on CUDA",
+        "current_state": "Awaiting Review",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45133",
+        "title": "Add sarvam model",
+        "current_state": "Draft",
+        "age_days": 42
+      },
+      {
+        "item_id": "#45128",
+        "title": "Fix: handle future annotations in _process_kwargs_parameters",
+        "current_state": "Awaiting Review",
+        "age_days": 43
+      },
+      {
+        "item_id": "#45115",
+        "title": "Refactor/nemotron h inherit granitemoehybrid",
+        "current_state": "Draft",
+        "age_days": 43
+      },
+      {
+        "item_id": "#45114",
+        "title": "fix: lets fix all doctests",
+        "current_state": "Awaiting Review",
+        "age_days": 43
+      },
+      {
+        "item_id": "#45113",
+        "title": "Add GDS support for safetensors loading ",
+        "current_state": "Awaiting Review",
+        "age_days": 43
+      },
+      {
+        "item_id": "#45110",
+        "title": "Add SAM 3.1",
+        "current_state": "Awaiting Review",
+        "age_days": 43
+      },
+      {
+        "item_id": "#45105",
+        "title": "Fix @auto_docstring crash with from __future__ import annotations in _process_kwargs_parameters",
+        "current_state": "Awaiting Review",
+        "age_days": 44
+      },
+      {
+        "item_id": "#45101",
+        "title": "Adding support for Nandi Models",
+        "current_state": "Changes Requested",
+        "age_days": 44
+      },
+      {
+        "item_id": "#45097",
+        "title": "Add old InternVL2-1B/2B support to the InternVL conversion script #45092",
+        "current_state": "Awaiting Review",
+        "age_days": 44
+      },
+      {
+        "item_id": "#45086",
+        "title": "fix AttributeError in _patch_mistral_regex",
+        "current_state": "Awaiting Review",
+        "age_days": 45
+      },
+      {
+        "item_id": "#45082",
+        "title": "[VidEoMT] Update conversion script",
+        "current_state": "Awaiting Review",
+        "age_days": 45
+      },
+      {
+        "item_id": "#45077",
+        "title": "fix: pin 50 unpinned actions to commit SHA, extract 1 secret to env var",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45075",
+        "title": "Add Deepseek-OCR-2 model",
+        "current_state": "Approved",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45073",
+        "title": "Refactor OwlViT to modular Transformers",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45067",
+        "title": "feat: trainer resume_from_checkpoint support hub downloads (#43375)",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45064",
+        "title": "refactor: shard checkers",
+        "current_state": "Draft",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45060",
+        "title": "Fix PIL backend fallback when torchvision is unavailable",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45056",
+        "title": "[`auto_docstring`] needs to be only run on __doc__ ",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45055",
+        "title": "Save model config in Trainer checkpoints for non-PreTrainedModel models",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#45037",
+        "title": "add missing colon in custom_attention function signature in attention\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 47
+      },
+      {
+        "item_id": "#45034",
+        "title": "Pass packed boundary metadata to Qwen3.5 linear-attention fast kernels from data collator",
+        "current_state": "Approved",
+        "age_days": 47
+      },
+      {
+        "item_id": "#45028",
+        "title": "TP refactor for FSDP + TP integration",
+        "current_state": "Awaiting Review",
+        "age_days": 47
+      },
+      {
+        "item_id": "#45017",
+        "title": "[WIP][Fix] GLM 5 set `apply_rotary_pos_emb` to `is_neox_style=False` && remove `F.relu()`",
+        "current_state": "Approved",
+        "age_days": 47
+      },
+      {
+        "item_id": "#44989",
+        "title": "\ud83d\udea8 Distributed training API",
+        "current_state": "Draft",
+        "age_days": 48
+      },
+      {
+        "item_id": "#44981",
+        "title": "Trainer: set skip_logits for loss-only eval when liger enabled",
+        "current_state": "Awaiting Review",
+        "age_days": 48
+      },
+      {
+        "item_id": "#44979",
+        "title": "Module Fusion API",
+        "current_state": "Awaiting Review",
+        "age_days": 49
+      },
+      {
+        "item_id": "#44974",
+        "title": "Refactor core_model_loading to support FSDP shard-on-read loading",
+        "current_state": "Awaiting Review",
+        "age_days": 49
+      },
+      {
+        "item_id": "#44973",
+        "title": "Fix max_seqlen type in vision attention for torch.compile + FA2",
+        "current_state": "Approved",
+        "age_days": 49
+      },
+      {
+        "item_id": "#44965",
+        "title": "try",
+        "current_state": "Awaiting Review",
+        "age_days": 49
+      },
+      {
+        "item_id": "#44958",
+        "title": "fixed import error with PILImageResampling",
+        "current_state": "Awaiting Review",
+        "age_days": 50
+      },
+      {
+        "item_id": "#44952",
+        "title": "Fix: Add correct return behaviour when output_hidden_states=True for CLIP and SIGLIP vision models",
+        "current_state": "Awaiting Review",
+        "age_days": 50
+      },
+      {
+        "item_id": "#44942",
+        "title": "Add inference time layer fusion optimisations via `PreTrainedModel.from_pretrained(fuse_layers=True)`",
+        "current_state": "Draft",
+        "age_days": 50
+      },
+      {
+        "item_id": "#44940",
+        "title": "Fix tie_weights skipping logic is not tied to model thread scope",
+        "current_state": "Awaiting Review",
+        "age_days": 50
+      },
+      {
+        "item_id": "#44923",
+        "title": "fix: avoid unconditional model_info call in _patch_mistral_regex",
+        "current_state": "Draft",
+        "age_days": 51
+      },
+      {
+        "item_id": "#44907",
+        "title": "Remove unnecessary expand_as in get_placeholder_mask across VLMs",
+        "current_state": "Awaiting Review",
+        "age_days": 52
+      },
+      {
+        "item_id": "#44893",
+        "title": "add `StaticLayer.crop()` to match `DynamicLayer` API",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#44891",
+        "title": "[Trainer] add MoERouterHealthCallback Callback",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#44889",
+        "title": "[DeepSpeed] Fix evaluate()/predict() before train()",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#44875",
+        "title": "refactor: improved the cli server module code organization",
+        "current_state": "Draft",
+        "age_days": 53
+      },
+      {
+        "item_id": "#44872",
+        "title": "Fix: Update outdated sampler comment in generation/utils.py",
+        "current_state": "Awaiting Review",
+        "age_days": 53
+      },
+      {
+        "item_id": "#44836",
+        "title": "Add cu_seqlens support to OlmoHybridGatedDeltaNet for packed sequences",
+        "current_state": "Draft",
+        "age_days": 55
+      },
+      {
+        "item_id": "#44830",
+        "title": "Add AudioFlamingoNext model",
+        "current_state": "Awaiting Review",
+        "age_days": 55
+      },
+      {
+        "item_id": "#44827",
+        "title": "Fix Mistral4 tests",
+        "current_state": "Awaiting Review",
+        "age_days": 55
+      },
+      {
+        "item_id": "#44815",
+        "title": "Dequant fix",
+        "current_state": "Draft",
+        "age_days": 55
+      },
+      {
+        "item_id": "#44794",
+        "title": "Refacto GGUF weight conversion",
+        "current_state": "Draft",
+        "age_days": 56
+      },
+      {
+        "item_id": "#44781",
+        "title": "Fix `_set_model_specific_special_tokens` to accept list-format `extra_special_tokens`",
+        "current_state": "Awaiting Review",
+        "age_days": 56
+      },
+      {
+        "item_id": "#44775",
+        "title": "[docs] n-d parallelism",
+        "current_state": "Draft",
+        "age_days": 57
+      },
+      {
+        "item_id": "#44772",
+        "title": "bitsandbytes: Update links and docs",
+        "current_state": "Approved",
+        "age_days": 57
+      },
+      {
+        "item_id": "#44771",
+        "title": "wtf",
+        "current_state": "Draft",
+        "age_days": 57
+      },
+      {
+        "item_id": "#44731",
+        "title": "[Tests] Fix slow video tensor creation from list of numpy arrays in SmolVLM",
+        "current_state": "Awaiting Review",
+        "age_days": 58
+      },
+      {
+        "item_id": "#44729",
+        "title": "Avoid floating point math for ceil operations",
+        "current_state": "Awaiting Review",
+        "age_days": 58
+      },
+      {
+        "item_id": "#44724",
+        "title": "Fix some missing / incorrect entries in auto files",
+        "current_state": "Draft",
+        "age_days": 58
+      },
+      {
+        "item_id": "#44722",
+        "title": "Refactor gptj output tracing to use standardized decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 58
+      },
+      {
+        "item_id": "#44713",
+        "title": "[ColQwen2] Refactor output tracing (issue #43979)",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#44697",
+        "title": "fix: torch_float should return float, not int",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#44682",
+        "title": "transformers serve + llamacpp",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44680",
+        "title": "Allow kernel modules to declare their preferred mask function",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44676",
+        "title": "fix(gpt2): Resolve NaN/Inf issue in lm_head on Python 3.13 with tied weights",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44662",
+        "title": "[model] Add PenguinVL implementation",
+        "current_state": "Approved",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44660",
+        "title": "Fix: avoid late CUDA OOM in load_best_model_at_end with PEFT models",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44659",
+        "title": "docs: remove outdated use_diff docstring from DistributedConfig.to_js\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44650",
+        "title": "Fix Seq2SeqTrainer generation path for decoder-only models",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44646",
+        "title": "Fix typo: seperate -> separate",
+        "current_state": "Approved",
+        "age_days": 60
+      },
+      {
+        "item_id": "#44642",
+        "title": "Clarify that causal LM labels are shifted internally",
+        "current_state": "Awaiting Review",
+        "age_days": 61
+      },
+      {
+        "item_id": "#44641",
+        "title": "Conditinally passing and_mask_function arg to create_causal_mask ",
+        "current_state": "Draft",
+        "age_days": 61
+      },
+      {
+        "item_id": "#44635",
+        "title": "[Gemma] Modular-friendly buffers",
+        "current_state": "Awaiting Review",
+        "age_days": 61
+      },
+      {
+        "item_id": "#44626",
+        "title": "don't break legacy behavior when enforced!",
+        "current_state": "Awaiting Review",
+        "age_days": 61
+      },
+      {
+        "item_id": "#44615",
+        "title": "Restore is_torch_fx_available for trust_remote_code backwards compatibility",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44606",
+        "title": "optionally override tokenizer class with serialized tokenizer ",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44603",
+        "title": "fixed dockerfile for arm64 systems",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44601",
+        "title": "[Distributed] Add PP support natively",
+        "current_state": "Draft",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44594",
+        "title": "[Pipeline] Add top_k, label filtering, box_format and score sorting to ObjectDetectionPipeline",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44587",
+        "title": "Fix: Handling fused qkv result tensor slicing for tp sharded qkv weights",
+        "current_state": "Draft",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44585",
+        "title": "Fix missing rms_norm_eps in DeepseekV3 MLA layernorms",
+        "current_state": "Awaiting Review",
+        "age_days": 62
+      },
+      {
+        "item_id": "#44569",
+        "title": "Add SarvamMLA model (sarvamai/sarvam-105b)",
+        "current_state": "Awaiting Review",
+        "age_days": 63
+      },
+      {
+        "item_id": "#44553",
+        "title": "[`FA`] Refactor FA CB kwargs",
+        "current_state": "Draft",
+        "age_days": 63
+      },
+      {
+        "item_id": "#44550",
+        "title": "Improve clarity and grammar in Auto Classes documentation",
+        "current_state": "Approved",
+        "age_days": 64
+      },
+      {
+        "item_id": "#44547",
+        "title": "Fix position_ids docstring in modeling_flash_attention_utils.py",
+        "current_state": "Approved",
+        "age_days": 64
+      },
+      {
+        "item_id": "#44543",
+        "title": "Fix assistant_masks for multimodal inputs in apply_chat_template",
+        "current_state": "Awaiting Review",
+        "age_days": 64
+      },
+      {
+        "item_id": "#44535",
+        "title": "Fix crash in Qwen2_5_VLProcessor when using batched input with padding=False",
+        "current_state": "Awaiting Review",
+        "age_days": 64
+      },
+      {
+        "item_id": "#44517",
+        "title": "Add qwen3 tts",
+        "current_state": "Awaiting Review",
+        "age_days": 66
+      },
+      {
+        "item_id": "#44495",
+        "title": "[`Gradient Ckpting`] Remove unnecessary attribute definitions",
+        "current_state": "Draft",
+        "age_days": 67
+      },
+      {
+        "item_id": "#44467",
+        "title": "Placeholder tokens update",
+        "current_state": "Awaiting Review",
+        "age_days": 68
+      },
+      {
+        "item_id": "#44445",
+        "title": "Adding support for GraniteDoclingHybrid",
+        "current_state": "Draft",
+        "age_days": 69
+      },
+      {
+        "item_id": "#44438",
+        "title": "Add flashoptim",
+        "current_state": "Approved",
+        "age_days": 69
+      },
+      {
+        "item_id": "#44420",
+        "title": "[docs] distributed training",
+        "current_state": "Awaiting Review",
+        "age_days": 70
+      },
+      {
+        "item_id": "#44408",
+        "title": "Add option to export  encoder hidden states for Granite-speech",
+        "current_state": "Awaiting Review",
+        "age_days": 70
+      },
+      {
+        "item_id": "#44407",
+        "title": "docs: add energy efficiency considerations to bitsandbytes quantization guide",
+        "current_state": "Approved",
+        "age_days": 70
+      },
+      {
+        "item_id": "#44394",
+        "title": "\ud83d\udea8\ud83d\udea7 FeatureExtractor \u2192 AudioProcessor",
+        "current_state": "Draft",
+        "age_days": 71
+      },
+      {
+        "item_id": "#44385",
+        "title": "Fix make check-repo",
+        "current_state": "Awaiting Review",
+        "age_days": 71
+      },
+      {
+        "item_id": "#44375",
+        "title": "Add RF-DETR",
+        "current_state": "Awaiting Review",
+        "age_days": 72
+      },
+      {
+        "item_id": "#44369",
+        "title": "Feature/integrations docs fix",
+        "current_state": "Awaiting Review",
+        "age_days": 72
+      },
+      {
+        "item_id": "#44348",
+        "title": "Enable MetalConfig to load pre-quantized MLX models from HuggingFace Hub",
+        "current_state": "Awaiting Review",
+        "age_days": 73
+      },
+      {
+        "item_id": "#44314",
+        "title": "add HyperClovaX Vision",
+        "current_state": "Approved",
+        "age_days": 74
+      },
+      {
+        "item_id": "#44298",
+        "title": "Auto detect wrong mapping models",
+        "current_state": "Draft",
+        "age_days": 75
+      },
+      {
+        "item_id": "#44270",
+        "title": "Add correct typing to custom images_kwargs in ProcessorsKwargs",
+        "current_state": "Awaiting Review",
+        "age_days": 76
+      },
+      {
+        "item_id": "#44264",
+        "title": "[`Moe`] Enable aux loss automatically when in training + coef is not 0",
+        "current_state": "Draft",
+        "age_days": 77
+      },
+      {
+        "item_id": "#44259",
+        "title": "Async data producer",
+        "current_state": "Draft",
+        "age_days": 77
+      },
+      {
+        "item_id": "#44257",
+        "title": "use nanmean for aggregating loss",
+        "current_state": "Approved",
+        "age_days": 77
+      },
+      {
+        "item_id": "#44252",
+        "title": "Timm unification continued",
+        "current_state": "Awaiting Review",
+        "age_days": 77
+      },
+      {
+        "item_id": "#44228",
+        "title": "[Quantisation] account for nested tensors from quantisers",
+        "current_state": "Awaiting Review",
+        "age_days": 78
+      },
+      {
+        "item_id": "#44215",
+        "title": "Add sequence classification capability to Granite models",
+        "current_state": "Approved",
+        "age_days": 79
+      },
+      {
+        "item_id": "#44189",
+        "title": "fix: don't move model to device under other dist train backends",
+        "current_state": "Awaiting Review",
+        "age_days": 80
+      },
+      {
+        "item_id": "#44184",
+        "title": "feat: add OpenAI CircuitGPT core architecture and sparse linear layers",
+        "current_state": "Awaiting Review",
+        "age_days": 81
+      },
+      {
+        "item_id": "#44178",
+        "title": "Add xcodec2 model",
+        "current_state": "Awaiting Review",
+        "age_days": 81
+      },
+      {
+        "item_id": "#44171",
+        "title": "Parakeet tdt",
+        "current_state": "Approved",
+        "age_days": 81
+      },
+      {
+        "item_id": "#44161",
+        "title": "Refactor LongT5 to use @capture_outputs and @can_return_tuple decorators for unified output handling (Fixes #43979)",
+        "current_state": "Awaiting Review",
+        "age_days": 82
+      },
+      {
+        "item_id": "#44159",
+        "title": "Add SDPA and Flash Attention support for OWL-ViT",
+        "current_state": "Awaiting Review",
+        "age_days": 82
+      },
+      {
+        "item_id": "#44154",
+        "title": "Refactored vits to match standardized output collection interface",
+        "current_state": "Awaiting Review",
+        "age_days": 82
+      },
+      {
+        "item_id": "#44142",
+        "title": "[voxtral-realtime] get more perfs!",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#44129",
+        "title": "Refactor SpeechT5 output tracing to standardized output capture",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#44123",
+        "title": "Avoid device sync in training loss accumulation",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#44116",
+        "title": "[WIP] [Flaubert] Refactor output tracing to decorator-based interface",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44114",
+        "title": "Migrate wav2vec2, wav2vec2_conformer, and wav2vec2_bert to standardized output collection decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44101",
+        "title": "[XLM] Refactor output tracing to align with capture_outputs standardized architecture",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44098",
+        "title": "[ViLT] Refactor output handling to align with standardized patterns",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44086",
+        "title": "[MGP-STR] Refactor output tracing to use capture_outputs/can_return_tuple decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44085",
+        "title": "Refactor RemBERT to use output tracing decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44083",
+        "title": "FSDP2 native support in transformers ",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44076",
+        "title": "Refectored modeling_imagegpt.py to enable hooks to capture_outputs",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44074",
+        "title": "[TextNet] Refactor output tracing using capture_outputs decorator",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44073",
+        "title": "[VisualBert] Refactor output tracing using capture_outputs and can_return_tuple decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44072",
+        "title": "refactor efficientnet output tracing with @capture_outputs and @can_r\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44071",
+        "title": "[Refactor] Migrate MPT to standardized output tracing decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44070",
+        "title": "Add GGUF loading support for Qwen3-Next (qwen3_next) architecture",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44068",
+        "title": "Refactor GPT-Neo to use `@capture_outputs` and `@can_return_tuple` decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44066",
+        "title": "Refactor GPT-J to use standardized output tracing (#43979)",
+        "current_state": "Awaiting Review",
+        "age_days": 84
+      },
+      {
+        "item_id": "#44059",
+        "title": "[GPT2] Refactor output tracing to use capture_outputs/can_return_tuple decorators",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44056",
+        "title": "[MPNet] Refactor output tracing using capture_outputs decorator",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44054",
+        "title": "Flash mla interface",
+        "current_state": "Draft",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44044",
+        "title": "Refactor DeBERTa's output tracing interface",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44030",
+        "title": "refactor output tracing in `dpr`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44029",
+        "title": "refactor output tracing in `rwkv`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44028",
+        "title": "refactor output tracing for `superpoint`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44027",
+        "title": "refactor output tracing in `speech_encoder_decoder`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44026",
+        "title": "refactor output tracing for `vision_encoder_decoder`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44025",
+        "title": "refactor output tracing for `depth_anything`",
+        "current_state": "Awaiting Review",
+        "age_days": 85
+      },
+      {
+        "item_id": "#44024",
+        "title": "Focalnet standardized outputs",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44019",
+        "title": "Refactor `resnet` to use `@capture_outputs` / `@can_return_tuple` output tracing",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44018",
+        "title": "Refactor GPT-Neo output tracing to use capture_outputs/can_return_tuple",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44017",
+        "title": "Refactor output tracing in segformers (#43979)",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44015",
+        "title": "Refactor GPT2-based models to standardized output collection interface",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44013",
+        "title": "Ouptut tracing: Standardizing MobileNetv2",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44010",
+        "title": "[SqueezeBert] Migrate to standardized output collection decorators",
+        "current_state": "Approved",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44007",
+        "title": "[ResNet] Refactor output tracing to decorator-based interface",
+        "current_state": "Awaiting Review",
+        "age_days": 86
+      },
+      {
+        "item_id": "#44004",
+        "title": "refactor output tracing for `codegen`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#44003",
+        "title": "refactor output tracing in `mamba`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#44002",
+        "title": "refactor output tracing in `upernet`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#44001",
+        "title": "refactor output tracing in `univnet`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#44000",
+        "title": "refactor output tracing in `vision_text_dual_encoder`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43999",
+        "title": "refactor output tracing in `mobilenet_v1`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43998",
+        "title": "refactor output tracing in `timm_backbone`",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43997",
+        "title": "Migrate RegNet to standardized output tracing",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43996",
+        "title": "Refactor FNet and CVT output tracing",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43995",
+        "title": "Refactoring falcon model to match standardized output collection interface",
+        "current_state": "Awaiting Review",
+        "age_days": 87
+      },
+      {
+        "item_id": "#43989",
+        "title": "Fix AutoVideoProcessor class lookup when torchvision is unavailable",
+        "current_state": "Approved",
+        "age_days": 88
+      },
+      {
+        "item_id": "#43973",
+        "title": "Add lfm2.5 audio",
+        "current_state": "Draft",
+        "age_days": 88
+      },
+      {
+        "item_id": "#43967",
+        "title": "Fix AttributeError in run_classification.py when detecting multi-label data",
+        "current_state": "Awaiting Review",
+        "age_days": 89
+      },
+      {
+        "item_id": "#43961",
+        "title": "Replace mutable default arguments with None",
+        "current_state": "Awaiting Review",
+        "age_days": 89
+      },
+      {
+        "item_id": "#43915",
+        "title": "add PaddleOCR-VL conversion",
+        "current_state": "Awaiting Review",
+        "age_days": 90
+      },
+      {
+        "item_id": "#43911",
+        "title": "add Llama to mapping names in tokenization_auto.py",
+        "current_state": "Awaiting Review",
+        "age_days": 90
+      },
+      {
+        "item_id": "#43888",
+        "title": "Support for BharatGen's Param2MoE model architecture",
+        "current_state": "Awaiting Review",
+        "age_days": 91
+      },
+      {
+        "item_id": "#43875",
+        "title": "Improve handling of QuantizedLayer.reset",
+        "current_state": "Awaiting Review",
+        "age_days": 91
+      },
+      {
+        "item_id": "#43863",
+        "title": "[whisper] allow to pass text/audio specific kwargs",
+        "current_state": "Approved",
+        "age_days": 92
+      },
+      {
+        "item_id": "#43842",
+        "title": "fix(cli): Fix TypeAdapter NameError when pydantic is not installed",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#43838",
+        "title": "Qwen3 ASR and Forced Aligner",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#43836",
+        "title": "fix: wrapped TypeAdpater in string literals (for now)",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#43833",
+        "title": "fix: ensure dtype consistency in grouped_mm under autocast",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#43826",
+        "title": "fix: error message of pipeline",
+        "current_state": "Awaiting Review",
+        "age_days": 93
+      },
+      {
+        "item_id": "#43823",
+        "title": "Add `facebook/MobileLLM-125M`",
+        "current_state": "Awaiting Review",
+        "age_days": 94
+      },
+      {
+        "item_id": "#43816",
+        "title": "fix: add id and resume parameters to SwanLab integration",
+        "current_state": "Awaiting Review",
+        "age_days": 94
+      },
+      {
+        "item_id": "#43785",
+        "title": "Fix FSDP_CPU_RAM_EFFICIENT_LOADING (#43749)",
+        "current_state": "Awaiting Review",
+        "age_days": 95
+      },
+      {
+        "item_id": "#43779",
+        "title": "SwanLab: Add support for id and resume arguments in SwanLabCallback",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#43775",
+        "title": "fix(moe): normalize auxiliary loss by top_k for correct load balancing",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#43757",
+        "title": "Avoid hard failure for gpt-oss GGUF architecture by falling back to g\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#43751",
+        "title": "Fix ruff warnings",
+        "current_state": "Awaiting Review",
+        "age_days": 96
+      },
+      {
+        "item_id": "#43747",
+        "title": "Remove CompressedLinear support for compressed-tensors > 0.13",
+        "current_state": "Awaiting Review",
+        "age_days": 97
+      },
+      {
+        "item_id": "#43743",
+        "title": "Modular playground",
+        "current_state": "Awaiting Review",
+        "age_days": 97
+      },
+      {
+        "item_id": "#43665",
+        "title": "fix",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43663",
+        "title": "Add _get_signature_columns method to allow custom trainers to override column filtering",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43656",
+        "title": "Fix TypeAdapter NameError in transformers CLI",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43654",
+        "title": "fix(tokenizer): Avert special token property overwrites in batch add_tokens calls",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43651",
+        "title": "Add _loss_is_scaled_for_ga to allow custom trainers to control gradient accumulation loss scaling",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43649",
+        "title": "Check new failures reporting 5",
+        "current_state": "Awaiting Review",
+        "age_days": 101
+      },
+      {
+        "item_id": "#43636",
+        "title": "Add _metrics dict to Trainer for custom metric logging",
+        "current_state": "Awaiting Review",
+        "age_days": 102
+      },
+      {
+        "item_id": "#43613",
+        "title": "Add Promptable Visual Segmentation pipeline",
+        "current_state": "Awaiting Review",
+        "age_days": 102
+      },
+      {
+        "item_id": "#43612",
+        "title": "Add Promptable Concept Segmentation pipeline",
+        "current_state": "Awaiting Review",
+        "age_days": 102
+      },
+      {
+        "item_id": "#43549",
+        "title": "[kernels] exception handling for fa kernels",
+        "current_state": "Approved",
+        "age_days": 104
+      },
+      {
+        "item_id": "#43543",
+        "title": "Fix fp16 underflow in MoE load balancing loss by enforcing fp32 softmax",
+        "current_state": "Awaiting Review",
+        "age_days": 104
+      },
+      {
+        "item_id": "#43542",
+        "title": "fix: output router capture wrong router logits in qwen moe models",
+        "current_state": "Approved",
+        "age_days": 104
+      },
+      {
+        "item_id": "#43532",
+        "title": "[don't merge] Show diff",
+        "current_state": "Awaiting Review",
+        "age_days": 105
+      },
+      {
+        "item_id": "#43506",
+        "title": "Add RishAI model with full transformers integration",
+        "current_state": "Awaiting Review",
+        "age_days": 106
+      },
+      {
+        "item_id": "#43498",
+        "title": "fix/backward compatibility for tie_weights",
+        "current_state": "Draft",
+        "age_days": 106
+      },
+      {
+        "item_id": "#43492",
+        "title": "Perception Encoder follow up PR",
+        "current_state": "Draft",
+        "age_days": 106
+      },
+      {
+        "item_id": "#43488",
+        "title": "[don't merge] bad format to check repo bot",
+        "current_state": "Awaiting Review",
+        "age_days": 106
+      },
+      {
+        "item_id": "#43484",
+        "title": "Optimize Ernie 4.5 VL timestamp rendering with cached overlays",
+        "current_state": "Awaiting Review",
+        "age_days": 106
+      },
+      {
+        "item_id": "#43469",
+        "title": "argparser: Allow optional bool flags without values",
+        "current_state": "Awaiting Review",
+        "age_days": 108
+      },
+      {
+        "item_id": "#43466",
+        "title": "Fix mask loss to ignore padding areas in object detection",
+        "current_state": "Awaiting Review",
+        "age_days": 108
+      },
+      {
+        "item_id": "#43451",
+        "title": "Add Molmo2",
+        "current_state": "Awaiting Review",
+        "age_days": 109
+      },
+      {
+        "item_id": "#43448",
+        "title": "Add Molmo",
+        "current_state": "Awaiting Review",
+        "age_days": 109
+      },
+      {
+        "item_id": "#43446",
+        "title": "[`typings`] Automatically type decorator return types as `tuple | X`",
+        "current_state": "Approved",
+        "age_days": 109
+      },
+      {
+        "item_id": "#43424",
+        "title": "Add test to ensure executorch exportability with dynamic shapes",
+        "current_state": "Awaiting Review",
+        "age_days": 110
+      },
+      {
+        "item_id": "#43395",
+        "title": "Fix label truncation for per-sample nested structures in Trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 111
+      },
+      {
+        "item_id": "#43382",
+        "title": "Allow Path type in transformers.image_utils.load_image function",
+        "current_state": "Approved",
+        "age_days": 112
+      },
+      {
+        "item_id": "#43378",
+        "title": "feat(models): Make MimiModel encoding padding-aware to ensure batch-to-individual consistency",
+        "current_state": "Awaiting Review",
+        "age_days": 112
+      },
+      {
+        "item_id": "#43363",
+        "title": "[Improvement] Update `DistributedLengthGroupedSampler` to allow customizing length function",
+        "current_state": "Awaiting Review",
+        "age_days": 112
+      },
+      {
+        "item_id": "#43340",
+        "title": "Claude code skills for transformers-api",
+        "current_state": "Awaiting Review",
+        "age_days": 113
+      },
+      {
+        "item_id": "#43333",
+        "title": "Fix typo: interupted -> interrupted",
+        "current_state": "Approved",
+        "age_days": 115
+      },
+      {
+        "item_id": "#43310",
+        "title": "Replace regex with re",
+        "current_state": "Awaiting Review",
+        "age_days": 117
+      },
+      {
+        "item_id": "#43297",
+        "title": "[Feat] Reduces redundant tokenization of <pad> tags to accelerate Qwen3VL.",
+        "current_state": "Awaiting Review",
+        "age_days": 117
+      },
+      {
+        "item_id": "#43291",
+        "title": "Fix whisper tests",
+        "current_state": "Awaiting Review",
+        "age_days": 118
+      },
+      {
+        "item_id": "#43271",
+        "title": "Fix typo: necesary \u2192 necessary",
+        "current_state": "Approved",
+        "age_days": 118
+      },
+      {
+        "item_id": "#43270",
+        "title": "fix _retrieve_segment timestamps offset bug",
+        "current_state": "Awaiting Review",
+        "age_days": 118
+      },
+      {
+        "item_id": "#43267",
+        "title": "Add auto_docstring decorator to Sam3ImageProcessorFast",
+        "current_state": "Awaiting Review",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43265",
+        "title": "Adding Omnilingual ASR models",
+        "current_state": "Draft",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43254",
+        "title": "Add supported kwargs to fixed_cross_entropy",
+        "current_state": "Awaiting Review",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43251",
+        "title": "Fix(43240): pass kwargs to nn.functional.cross_entropy",
+        "current_state": "Awaiting Review",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43249",
+        "title": "[WIP] Processor moves to `device` in `__call__`",
+        "current_state": "Awaiting Review",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43246",
+        "title": "GptOss slow tests",
+        "current_state": "Draft",
+        "age_days": 119
+      },
+      {
+        "item_id": "#43238",
+        "title": "Fix ObjectDetectionPipeline batch processing bug #31356",
+        "current_state": "Awaiting Review",
+        "age_days": 120
+      },
+      {
+        "item_id": "#43213",
+        "title": "feat: allow output_hidden_states and output_attensions to record outputs of specific layers",
+        "current_state": "Awaiting Review",
+        "age_days": 122
+      },
+      {
+        "item_id": "#43212",
+        "title": "Add regression test for offline tokenizer loading (fixes #43200)",
+        "current_state": "Awaiting Review",
+        "age_days": 122
+      },
+      {
+        "item_id": "#43151",
+        "title": "Make TF32 tests hardware-aware for PyTorch 2.9+",
+        "current_state": "Awaiting Review",
+        "age_days": 125
+      },
+      {
+        "item_id": "#43149",
+        "title": "docs(serving): add minimal Python client examples for chat completion\u2026",
+        "current_state": "Changes Requested",
+        "age_days": 125
+      },
+      {
+        "item_id": "#43139",
+        "title": "[perf] optimize whisper GPU performance",
+        "current_state": "Draft",
+        "age_days": 125
+      },
+      {
+        "item_id": "#43133",
+        "title": "Fix flaky SAM-HQ integration tests by adding set_seed",
+        "current_state": "Awaiting Review",
+        "age_days": 126
+      },
+      {
+        "item_id": "#43104",
+        "title": "docs: clarify tokenizer decoder behavior in v5 (#43066)",
+        "current_state": "Awaiting Review",
+        "age_days": 127
+      },
+      {
+        "item_id": "#43102",
+        "title": "Add CPU vs GPU performance comparison example",
+        "current_state": "Awaiting Review",
+        "age_days": 128
+      },
+      {
+        "item_id": "#43096",
+        "title": "Fix save_pretrained for quantized models with custom serialization",
+        "current_state": "Awaiting Review",
+        "age_days": 128
+      },
+      {
+        "item_id": "#43094",
+        "title": "Avoid inline .item() sync in decoder start token check",
+        "current_state": "Awaiting Review",
+        "age_days": 128
+      },
+      {
+        "item_id": "#43088",
+        "title": "Skip attention_mask.all() GPU-CPU sync during generation",
+        "current_state": "Awaiting Review",
+        "age_days": 129
+      },
+      {
+        "item_id": "#43085",
+        "title": "Add async_stopping_criteria flag to reduce GPU-CPU syncs during generation",
+        "current_state": "Awaiting Review",
+        "age_days": 129
+      },
+      {
+        "item_id": "#43077",
+        "title": "compileable=>compilable",
+        "current_state": "Awaiting Review",
+        "age_days": 131
+      },
+      {
+        "item_id": "#43063",
+        "title": "Improve documentation for SegFormer image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 134
+      },
+      {
+        "item_id": "#43056",
+        "title": "Perf: enable pin_memory in DataLoader for CLM no_trainer example",
+        "current_state": "Awaiting Review",
+        "age_days": 136
+      },
+      {
+        "item_id": "#43044",
+        "title": "[SAM3] Enable single-scale input support in Mask Decoder",
+        "current_state": "Awaiting Review",
+        "age_days": 137
+      },
+      {
+        "item_id": "#43036",
+        "title": "Docs: fix grammar in Pipeline section",
+        "current_state": "Awaiting Review",
+        "age_days": 138
+      },
+      {
+        "item_id": "#43028",
+        "title": "Fix default interpolation to BICUBIC for ViT, EfficientNet, PVT",
+        "current_state": "Awaiting Review",
+        "age_days": 139
+      },
+      {
+        "item_id": "#43020",
+        "title": "Add mimo v2 flash",
+        "current_state": "Awaiting Review",
+        "age_days": 140
+      },
+      {
+        "item_id": "#43015",
+        "title": "FIX: TF32 warning (#43012)",
+        "current_state": "Awaiting Review",
+        "age_days": 140
+      },
+      {
+        "item_id": "#42982",
+        "title": "Add HumanV: decoder-only causal LM",
+        "current_state": "Awaiting Review",
+        "age_days": 142
+      },
+      {
+        "item_id": "#42979",
+        "title": "Fix dtype mismatch in in modeling_llava_next",
+        "current_state": "Awaiting Review",
+        "age_days": 142
+      },
+      {
+        "item_id": "#42978",
+        "title": "Add ViT NEPA",
+        "current_state": "Approved",
+        "age_days": 142
+      },
+      {
+        "item_id": "#42976",
+        "title": "Upgrade GitHub Actions to latest versions",
+        "current_state": "Awaiting Review",
+        "age_days": 143
+      },
+      {
+        "item_id": "#42975",
+        "title": "Upgrade GitHub Actions for Node 24 compatibility",
+        "current_state": "Awaiting Review",
+        "age_days": 143
+      },
+      {
+        "item_id": "#42944",
+        "title": "[Quantization] From config Quantization for FP8",
+        "current_state": "Awaiting Review",
+        "age_days": 145
+      },
+      {
+        "item_id": "#42942",
+        "title": "Fix result retrieval starvation and terminate request-scoped iteration on completion",
+        "current_state": "Awaiting Review",
+        "age_days": 145
+      },
+      {
+        "item_id": "#42919",
+        "title": "[WIP] Video support in vLLM backend",
+        "current_state": "Awaiting Review",
+        "age_days": 146
+      },
+      {
+        "item_id": "#42916",
+        "title": "Fix: Apply clean_up_tokenization_spaces in TokenizersBackend._decode",
+        "current_state": "Awaiting Review",
+        "age_days": 146
+      },
+      {
+        "item_id": "#42908",
+        "title": "Fix gguf tokenizers",
+        "current_state": "Awaiting Review",
+        "age_days": 147
+      },
+      {
+        "item_id": "#42900",
+        "title": "Fix: Set clean_up_tokenization_spaces",
+        "current_state": "Awaiting Review",
+        "age_days": 147
+      },
+      {
+        "item_id": "#42887",
+        "title": "[Quantization] [Compressed Tensors] Support Transforms, Fix Tests",
+        "current_state": "Draft",
+        "age_days": 148
+      },
+      {
+        "item_id": "#42881",
+        "title": "[GGUF] Add attn_logit_softcapping to Gemma2/Gemma3 config mapping",
+        "current_state": "Draft",
+        "age_days": 148
+      },
+      {
+        "item_id": "#42876",
+        "title": "Document tensor parallelism configuration with Trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 148
+      },
+      {
+        "item_id": "#42865",
+        "title": "Raise explicit error when FP8 is requested via from_config",
+        "current_state": "Awaiting Review",
+        "age_days": 149
+      },
+      {
+        "item_id": "#42829",
+        "title": "[WIP] End-to-end exportable pipelines (object detection)",
+        "current_state": "Awaiting Review",
+        "age_days": 151
+      },
+      {
+        "item_id": "#42824",
+        "title": "Fix torch only support for fast Processors",
+        "current_state": "Approved",
+        "age_days": 152
+      },
+      {
+        "item_id": "#42816",
+        "title": "validate tokenizer components",
+        "current_state": "Awaiting Review",
+        "age_days": 152
+      },
+      {
+        "item_id": "#42793",
+        "title": "[Quantization] Fixing last issues for a green 2026 CI hopefully",
+        "current_state": "Awaiting Review",
+        "age_days": 152
+      },
+      {
+        "item_id": "#42785",
+        "title": "Fixing wrong information in Mimi Docs",
+        "current_state": "Awaiting Review",
+        "age_days": 153
+      },
+      {
+        "item_id": "#42781",
+        "title": "Add VibeVoice Realtime",
+        "current_state": "Draft",
+        "age_days": 153
+      },
+      {
+        "item_id": "#42774",
+        "title": "Fix: add None check for extractors in video_processor_class_from_name",
+        "current_state": "Awaiting Review",
+        "age_days": 153
+      },
+      {
+        "item_id": "#42767",
+        "title": "fix: add mapping of deepseek_v32 model type",
+        "current_state": "Awaiting Review",
+        "age_days": 153
+      },
+      {
+        "item_id": "#42765",
+        "title": "Add distributed training CI",
+        "current_state": "Draft",
+        "age_days": 153
+      },
+      {
+        "item_id": "#42744",
+        "title": "[FP8 Devstral 24B] Repro PR",
+        "current_state": "Draft",
+        "age_days": 154
+      },
+      {
+        "item_id": "#42742",
+        "title": "Remove redundant else in activations.py",
+        "current_state": "Awaiting Review",
+        "age_days": 154
+      },
+      {
+        "item_id": "#42717",
+        "title": "image_transforms: fix tensor annotations",
+        "current_state": "Awaiting Review",
+        "age_days": 155
+      },
+      {
+        "item_id": "#42706",
+        "title": "Nit parakeet",
+        "current_state": "Awaiting Review",
+        "age_days": 155
+      },
+      {
+        "item_id": "#42668",
+        "title": "More robust processor from pretrained",
+        "current_state": "Awaiting Review",
+        "age_days": 158
+      },
+      {
+        "item_id": "#42665",
+        "title": "Some optimizations for offloading",
+        "current_state": "Awaiting Review",
+        "age_days": 158
+      },
+      {
+        "item_id": "#42655",
+        "title": "New Feature: Enabling Speculative Decoding with Batch Size > 1 (If draft and target model share tokenizer)",
+        "current_state": "Awaiting Review",
+        "age_days": 158
+      },
+      {
+        "item_id": "#42631",
+        "title": "Make GraniteMoeHybridModel compatible with torch.export",
+        "current_state": "Awaiting Review",
+        "age_days": 159
+      },
+      {
+        "item_id": "#42598",
+        "title": "[pipeline] fix unwanted import failure",
+        "current_state": "Awaiting Review",
+        "age_days": 160
+      },
+      {
+        "item_id": "#42588",
+        "title": "Document the /v1/models endpoint",
+        "current_state": "Awaiting Review",
+        "age_days": 160
+      },
+      {
+        "item_id": "#42572",
+        "title": "docs: add doctest for SqueezeBERT",
+        "current_state": "Awaiting Review",
+        "age_days": 161
+      },
+      {
+        "item_id": "#42542",
+        "title": "handle get_input_embeddings() on models like gemma3 gracefully",
+        "current_state": "Awaiting Review",
+        "age_days": 161
+      },
+      {
+        "item_id": "#42527",
+        "title": "Added doctests for SwiftFormer model",
+        "current_state": "Awaiting Review",
+        "age_days": 162
+      },
+      {
+        "item_id": "#42521",
+        "title": "Fix FSDP2 defaulting to version 1 in TrainingArguments; add dynamic plugin param passthrough",
+        "current_state": "Approved",
+        "age_days": 162
+      },
+      {
+        "item_id": "#42496",
+        "title": "feat: allow CP with trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 164
+      },
+      {
+        "item_id": "#42493",
+        "title": "fix: remove trailing os sep in local pretrained model path",
+        "current_state": "Draft",
+        "age_days": 164
+      },
+      {
+        "item_id": "#42467",
+        "title": "Fixes StaticCache Crashes ",
+        "current_state": "Awaiting Review",
+        "age_days": 165
+      },
+      {
+        "item_id": "#42461",
+        "title": "Refactor RMSNorm implementations to use torch.nn.functional.rms_norm",
+        "current_state": "Awaiting Review",
+        "age_days": 166
+      },
+      {
+        "item_id": "#42453",
+        "title": "Add SDPA and FlashAttention support to T5",
+        "current_state": "Awaiting Review",
+        "age_days": 166
+      },
+      {
+        "item_id": "#42446",
+        "title": "Fix DataParallel dtype access in smolvlm",
+        "current_state": "Awaiting Review",
+        "age_days": 166
+      },
+      {
+        "item_id": "#42437",
+        "title": "One tok typing",
+        "current_state": "Awaiting Review",
+        "age_days": 166
+      },
+      {
+        "item_id": "#42432",
+        "title": "Add VideoToTextPipeline with smart frame sampling and system prompts",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42430",
+        "title": "\ud83d\udea8 Clean up `image-text-to-text` pipeline",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42424",
+        "title": "[WIP] attempt to fix ooms in tests",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42415",
+        "title": "initial clean",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42413",
+        "title": "Add chatterbox support",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42412",
+        "title": "Replace Optional and Union typing with | in examples",
+        "current_state": "Awaiting Review",
+        "age_days": 167
+      },
+      {
+        "item_id": "#42403",
+        "title": "Sam3 release on v4.57.3",
+        "current_state": "Awaiting Review",
+        "age_days": 168
+      },
+      {
+        "item_id": "#42385",
+        "title": "Fix weight tying logic between `_tied_weights_keys` and `tie_word_embeddings`",
+        "current_state": "Awaiting Review",
+        "age_days": 168
+      },
+      {
+        "item_id": "#42345",
+        "title": "GPT-OSS Flash Attention and memory-efficient attention via Native PyTorch SDPA",
+        "current_state": "Awaiting Review",
+        "age_days": 170
+      },
+      {
+        "item_id": "#42311",
+        "title": "Fix: Guard against None num_query_tokens in Blip2Processor (to avoid TypeError)",
+        "current_state": "Awaiting Review",
+        "age_days": 173
+      },
+      {
+        "item_id": "#42310",
+        "title": "[WIP] Add moondream3 model",
+        "current_state": "Draft",
+        "age_days": 173
+      },
+      {
+        "item_id": "#42292",
+        "title": "docs: clarify recommended usage of max_new_tokens in generate()",
+        "current_state": "Awaiting Review",
+        "age_days": 173
+      },
+      {
+        "item_id": "#42277",
+        "title": "doc(kernels): update kernels integration documentation",
+        "current_state": "Awaiting Review",
+        "age_days": 174
+      },
+      {
+        "item_id": "#42256",
+        "title": "Integrate Core AutoAWQ Inference Components into Transformers",
+        "current_state": "Awaiting Review",
+        "age_days": 175
+      },
+      {
+        "item_id": "#42244",
+        "title": "[core] Fix torchao loading",
+        "current_state": "Awaiting Review",
+        "age_days": 176
+      },
+      {
+        "item_id": "#42229",
+        "title": "Add openpangu_moe model",
+        "current_state": "Awaiting Review",
+        "age_days": 177
+      },
+      {
+        "item_id": "#42228",
+        "title": "Support .to(device) or Device Aware Handling for Segmentation Labels in EOMTImageProcessor #42205",
+        "current_state": "Approved",
+        "age_days": 177
+      },
+      {
+        "item_id": "#42210",
+        "title": "[WIP] started adding support for evo2",
+        "current_state": "Awaiting Review",
+        "age_days": 179
+      },
+      {
+        "item_id": "#42166",
+        "title": "add internvl_flash model",
+        "current_state": "Awaiting Review",
+        "age_days": 181
+      },
+      {
+        "item_id": "#42134",
+        "title": "Add AutoMergeAdapters utility for merging multiple LoRA adapters with\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42133",
+        "title": "Fix qwen moe Load balancing loss calculation outside training",
+        "current_state": "Awaiting Review",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42131",
+        "title": "Mistral Tokenizer Converter Script - Initialization with Pattern Argument",
+        "current_state": "Draft",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42130",
+        "title": "Try refactoring logging to make type checks pass",
+        "current_state": "Awaiting Review",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42127",
+        "title": "Standardize conv len function for audio models",
+        "current_state": "Awaiting Review",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42124",
+        "title": "\ud83d\udcda docs(qwen3): add comprehensive usage examples and model details",
+        "current_state": "Awaiting Review",
+        "age_days": 183
+      },
+      {
+        "item_id": "#42112",
+        "title": "Add max_thinking_tokens for reasoning models (issue #42111)",
+        "current_state": "Awaiting Review",
+        "age_days": 184
+      },
+      {
+        "item_id": "#42098",
+        "title": "Fix mel length computation in Qwen2-Audio",
+        "current_state": "Awaiting Review",
+        "age_days": 186
+      },
+      {
+        "item_id": "#42051",
+        "title": "Fix model_input_names singleton issue causing shared state",
+        "current_state": "Awaiting Review",
+        "age_days": 187
+      },
+      {
+        "item_id": "#42039",
+        "title": "[WIP] \ud83d\udea8 clean xcodec \ud83e\uddfc",
+        "current_state": "Draft",
+        "age_days": 188
+      },
+      {
+        "item_id": "#42000",
+        "title": "Fix Mixtral: Docstring uses consistent 'top_k_index' and 'top_k_weights' in MixtralSparseMoeBlock",
+        "current_state": "Awaiting Review",
+        "age_days": 190
+      },
+      {
+        "item_id": "#41992",
+        "title": "[PoC] HF exporters",
+        "current_state": "Approved",
+        "age_days": 190
+      },
+      {
+        "item_id": "#41980",
+        "title": "Correct type hint in config models",
+        "current_state": "Awaiting Review",
+        "age_days": 191
+      },
+      {
+        "item_id": "#41977",
+        "title": "Add Phi3.5 Vision Model",
+        "current_state": "Awaiting Review",
+        "age_days": 191
+      },
+      {
+        "item_id": "#41973",
+        "title": "Fix import error with huggingface_hub v1.0.0+",
+        "current_state": "Awaiting Review",
+        "age_days": 191
+      },
+      {
+        "item_id": "#41967",
+        "title": "feat: RoPE-related typing improvements",
+        "current_state": "Draft",
+        "age_days": 193
+      },
+      {
+        "item_id": "#41928",
+        "title": "fix: add clear error message when mistral-common is missing for AutoTokenizer loading Voxtral",
+        "current_state": "Awaiting Review",
+        "age_days": 195
+      },
+      {
+        "item_id": "#41904",
+        "title": "Fix inaccurate eval and train loss computation with variable batch sizes",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41901",
+        "title": "[executorch] Update pytree registration for DynamicCache",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41899",
+        "title": "Testing checkpoint limit changes from PR #37196",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41895",
+        "title": "Add Telugu Sentiment Classification Example using DistilBERT",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41886",
+        "title": "ADD FG-CLIP2",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41882",
+        "title": "Support fdma for models with attention bias",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41880",
+        "title": "Indonesian Language Support for ReadMe",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41879",
+        "title": "Fix/processor multiple tokenizers",
+        "current_state": "Awaiting Review",
+        "age_days": 197
+      },
+      {
+        "item_id": "#41855",
+        "title": "Add Mistral tokenizer missing methods",
+        "current_state": "Approved",
+        "age_days": 199
+      },
+      {
+        "item_id": "#41851",
+        "title": "Fix deepcopy in ProcessorMixin.to_dict for GemmaTokenizerFast",
+        "current_state": "Awaiting Review",
+        "age_days": 200
+      },
+      {
+        "item_id": "#41844",
+        "title": "Fix FSDPv2 checkpoint saving on TPU by using recursive unwrap",
+        "current_state": "Awaiting Review",
+        "age_days": 200
+      },
+      {
+        "item_id": "#41827",
+        "title": "[`Flash Attention`] Disable packed sequences with pos ids only during torch compile",
+        "current_state": "Draft",
+        "age_days": 201
+      },
+      {
+        "item_id": "#41823",
+        "title": "Lfm2-VL vllm",
+        "current_state": "Draft",
+        "age_days": 201
+      },
+      {
+        "item_id": "#41807",
+        "title": "git commit -m \"Fix: corrected outdated documentation link in README.md\"",
+        "current_state": "Awaiting Review",
+        "age_days": 201
+      },
+      {
+        "item_id": "#41800",
+        "title": "Increasing clarity",
+        "current_state": "Awaiting Review",
+        "age_days": 202
+      },
+      {
+        "item_id": "#41798",
+        "title": "p-less Sampling:  A Robust Hyperparameter-Free Approach for LLM Decoding",
+        "current_state": "Awaiting Review",
+        "age_days": 202
+      },
+      {
+        "item_id": "#41797",
+        "title": "Add deepseek ocr",
+        "current_state": "Awaiting Review",
+        "age_days": 202
+      },
+      {
+        "item_id": "#41794",
+        "title": "Enable flake8-pie rules",
+        "current_state": "Awaiting Review",
+        "age_days": 202
+      },
+      {
+        "item_id": "#41776",
+        "title": "Add safety checking infrastructure for text generation",
+        "current_state": "Draft",
+        "age_days": 202
+      },
+      {
+        "item_id": "#41754",
+        "title": "Add pytree registration for static cache",
+        "current_state": "Draft",
+        "age_days": 203
+      },
+      {
+        "item_id": "#41734",
+        "title": "Fix CUDA errors in sharded generation with Qwen3",
+        "current_state": "Awaiting Review",
+        "age_days": 205
+      },
+      {
+        "item_id": "#41733",
+        "title": "transformers CLI documentation issue",
+        "current_state": "Awaiting Review",
+        "age_days": 205
+      },
+      {
+        "item_id": "#41724",
+        "title": "Fix confusing warning in EncoderDecoderModel when creating decoder_input_ids from labels",
+        "current_state": "Awaiting Review",
+        "age_days": 205
+      },
+      {
+        "item_id": "#41721",
+        "title": "Fix Qwen3-VL Processor flattening multi-image batches (fix #41709)",
+        "current_state": "Awaiting Review",
+        "age_days": 206
+      },
+      {
+        "item_id": "#41718",
+        "title": "AutoTokenizer: clear ImportError when loading Voxtral without mistral-common + unit test",
+        "current_state": "Awaiting Review",
+        "age_days": 206
+      },
+      {
+        "item_id": "#41710",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `main_classes/backbones.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 206
+      },
+      {
+        "item_id": "#41701",
+        "title": "Fix qwen3_vl mix precision dtype",
+        "current_state": "Awaiting Review",
+        "age_days": 207
+      },
+      {
+        "item_id": "#41698",
+        "title": "Fix tokenizer check script: safe dataset access, default checkpoints, and tested in dry-run mode",
+        "current_state": "Awaiting Review",
+        "age_days": 207
+      },
+      {
+        "item_id": "#41687",
+        "title": "fix(data): Handle integer labels in DataCollatorWithFlattening",
+        "current_state": "Approved",
+        "age_days": 207
+      },
+      {
+        "item_id": "#41654",
+        "title": "Improve LLaMA tokenizer error when vocab is missing: suggest installi\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 208
+      },
+      {
+        "item_id": "#41631",
+        "title": "Incorrect access of dataset field fixed",
+        "current_state": "Awaiting Review",
+        "age_days": 209
+      },
+      {
+        "item_id": "#41606",
+        "title": "fix(processing): Filter kwargs in ProcessorMixin call to prevent Type\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 209
+      },
+      {
+        "item_id": "#41597",
+        "title": "Standardize RoBERTa model card following issue #36979",
+        "current_state": "Awaiting Review",
+        "age_days": 209
+      },
+      {
+        "item_id": "#41594",
+        "title": "Add beginner-friendly sentiment analysis example",
+        "current_state": "Awaiting Review",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41593",
+        "title": "examples: add multi-label text classification (BCEWithLogitsLoss, met\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41592",
+        "title": "Improve AutoTokenizer error message for Voxtral models missing mistral-common",
+        "current_state": "Awaiting Review",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41584",
+        "title": "Add clear error message for missing SentencePiece model in `get_spm_processor` (fix #41553)",
+        "current_state": "Awaiting Review",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41565",
+        "title": "\ud83c\udf10 [i18n-KO] Updated `perf_train_gpu_many.md`",
+        "current_state": "Draft",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41561",
+        "title": "Optimize Mamba2 memory usage by replacing broadcast with einsum",
+        "current_state": "Approved",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41557",
+        "title": "Update modeling_llama4.py",
+        "current_state": "Awaiting Review",
+        "age_days": 210
+      },
+      {
+        "item_id": "#41531",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `video_processor.md` to Korean",
+        "current_state": "Approved",
+        "age_days": 212
+      },
+      {
+        "item_id": "#41528",
+        "title": "Add position encoding interpolation to DeiT",
+        "current_state": "Awaiting Review",
+        "age_days": 212
+      },
+      {
+        "item_id": "#41527",
+        "title": "\ud83c\udf10 [i18n-KO] Translated selecting.md to Korean",
+        "current_state": "Draft",
+        "age_days": 212
+      },
+      {
+        "item_id": "#41524",
+        "title": "Add max_eval_batches argument to TrainingArguments",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#41523",
+        "title": "Add test coverage for ConvNextImageProcessorFast",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#41522",
+        "title": "Fix _init_weights to safely skip int8 quantized weights",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#41521",
+        "title": "Fix forced_bos_token_id not set in generation_config",
+        "current_state": "Awaiting Review",
+        "age_days": 213
+      },
+      {
+        "item_id": "#41491",
+        "title": "Add skip_unnecessary_grad_clip to TrainingArguments for optimized gradient clipping",
+        "current_state": "Awaiting Review",
+        "age_days": 215
+      },
+      {
+        "item_id": "#41490",
+        "title": "Fix _init_weights to safely skip int8 tensors in Qwen2_5_VL model",
+        "current_state": "Awaiting Review",
+        "age_days": 215
+      },
+      {
+        "item_id": "#41488",
+        "title": "Create 1",
+        "current_state": "Awaiting Review",
+        "age_days": 215
+      },
+      {
+        "item_id": "#41485",
+        "title": "Fix smolvlm2 dtype mismatch final",
+        "current_state": "Awaiting Review",
+        "age_days": 215
+      },
+      {
+        "item_id": "#41458",
+        "title": "Adding ScatterMoE kernel support for Granite models. ",
+        "current_state": "Awaiting Review",
+        "age_days": 216
+      },
+      {
+        "item_id": "#41441",
+        "title": "Enhance the handling of Union types in HfArgumentParser",
+        "current_state": "Awaiting Review",
+        "age_days": 216
+      },
+      {
+        "item_id": "#41419",
+        "title": "First QAT for Finegrained FP8",
+        "current_state": "Awaiting Review",
+        "age_days": 217
+      },
+      {
+        "item_id": "#41406",
+        "title": "\ud83d\udea8 [v5] Remove deprecated cache classes",
+        "current_state": "Awaiting Review",
+        "age_days": 217
+      },
+      {
+        "item_id": "#41362",
+        "title": "Added Hacktoberfest banner image to README.md",
+        "current_state": "Awaiting Review",
+        "age_days": 218
+      },
+      {
+        "item_id": "#41356",
+        "title": "Add DEIMv2 model, image processor, and basic tests",
+        "current_state": "Awaiting Review",
+        "age_days": 219
+      },
+      {
+        "item_id": "#41349",
+        "title": "Create (3d_parrallel_v2.py) - Add 3D parallelism training example script",
+        "current_state": "Awaiting Review",
+        "age_days": 219
+      },
+      {
+        "item_id": "#41333",
+        "title": "Add DeepseekVLV2 Model",
+        "current_state": "Awaiting Review",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41330",
+        "title": "Unskip and fix offline mode tests, use HF_HUB_OFFLINE, make hermetic",
+        "current_state": "Draft",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41329",
+        "title": "Fix GIL=0 segfault and Add GIL=0 compat for regex paths",
+        "current_state": "Awaiting Review",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41319",
+        "title": "Use torch._check instead of a test in Gemma3Model",
+        "current_state": "Approved",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41315",
+        "title": "[model deprecations] Define new version-based model deprecation/deletions with user warnings/exceptions",
+        "current_state": "Awaiting Review",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41313",
+        "title": "Jitter noise PR",
+        "current_state": "Awaiting Review",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41312",
+        "title": "tests: unskip and fix offline mode test using HF_HUB_OFFLINE + hermetic cache warmup",
+        "current_state": "Awaiting Review",
+        "age_days": 221
+      },
+      {
+        "item_id": "#41304",
+        "title": "Fix equality-vs-assignment bug in GptqHfQuantizer.update_device_map",
+        "current_state": "Awaiting Review",
+        "age_days": 222
+      },
+      {
+        "item_id": "#41299",
+        "title": "copied changes from soghomon-b:add-eval-step-limit-31561",
+        "current_state": "Awaiting Review",
+        "age_days": 222
+      },
+      {
+        "item_id": "#41291",
+        "title": "Add-Deimv2",
+        "current_state": "Awaiting Review",
+        "age_days": 222
+      },
+      {
+        "item_id": "#41273",
+        "title": "fix(quantization): Skip weight initialization for quantized models",
+        "current_state": "Awaiting Review",
+        "age_days": 222
+      },
+      {
+        "item_id": "#41272",
+        "title": "feat: Add HRM Model",
+        "current_state": "Awaiting Review",
+        "age_days": 223
+      },
+      {
+        "item_id": "#41254",
+        "title": "docs: Add Hacktoberfest banner, Contributing and License sections to README",
+        "current_state": "Awaiting Review",
+        "age_days": 223
+      },
+      {
+        "item_id": "#41251",
+        "title": "Add deepseek 3.2 exp",
+        "current_state": "Awaiting Review",
+        "age_days": 223
+      },
+      {
+        "item_id": "#41239",
+        "title": "Add num_hidden_layers to t5gemma's top level config",
+        "current_state": "Awaiting Review",
+        "age_days": 224
+      },
+      {
+        "item_id": "#41224",
+        "title": "Add DINOv3ViTForImageClassification support",
+        "current_state": "Approved",
+        "age_days": 224
+      },
+      {
+        "item_id": "#41215",
+        "title": "Fix CLIP memory leak causing 600-800MB accumulation per batch",
+        "current_state": "Awaiting Review",
+        "age_days": 224
+      },
+      {
+        "item_id": "#41202",
+        "title": "[WIP] standardize audio kwargs",
+        "current_state": "Draft",
+        "age_days": 225
+      },
+      {
+        "item_id": "#41169",
+        "title": "Fix TorchDynamo crash in StaticCache by validating offloading and offload_only_non_sliding arguments",
+        "current_state": "Awaiting Review",
+        "age_days": 229
+      },
+      {
+        "item_id": "#41162",
+        "title": "Add Sinhala (\u0dc3\u0dd2\u0d82\u0dc4\u0dbd) translation of README",
+        "current_state": "Awaiting Review",
+        "age_days": 229
+      },
+      {
+        "item_id": "#41160",
+        "title": "[docs] update tips syntax",
+        "current_state": "Approved",
+        "age_days": 229
+      },
+      {
+        "item_id": "#41159",
+        "title": "Support setting total_train_batch_size.",
+        "current_state": "Awaiting Review",
+        "age_days": 229
+      },
+      {
+        "item_id": "#41144",
+        "title": "Support automatic conversion from zero checkpoint to universal checkpoint.",
+        "current_state": "Awaiting Review",
+        "age_days": 229
+      },
+      {
+        "item_id": "#41132",
+        "title": "fix(SpeechT5Config): missing annotation on `inputs_to_logits_ratio` property",
+        "current_state": "Approved",
+        "age_days": 230
+      },
+      {
+        "item_id": "#41121",
+        "title": "fix: resolve the unexpected video frame drop issue of the InternVL model with multiple video inputs",
+        "current_state": "Awaiting Review",
+        "age_days": 230
+      },
+      {
+        "item_id": "#41116",
+        "title": "Add MiniCPM3",
+        "current_state": "Awaiting Review",
+        "age_days": 230
+      },
+      {
+        "item_id": "#41105",
+        "title": "Fix is_torch_neuroncore_available",
+        "current_state": "Draft",
+        "age_days": 231
+      },
+      {
+        "item_id": "#41097",
+        "title": "Delay and probably avoid unnecessary graph breaks in _upad_input of modeling_flash_attention_utils.py",
+        "current_state": "Awaiting Review",
+        "age_days": 231
+      },
+      {
+        "item_id": "#41095",
+        "title": "Add LLaVA-OneVision-1.5 model and related configurations",
+        "current_state": "Approved",
+        "age_days": 231
+      },
+      {
+        "item_id": "#41077",
+        "title": "Fix: add num_hidden_layers property to T5GemmaConfig and add test for use_cache",
+        "current_state": "Awaiting Review",
+        "age_days": 232
+      },
+      {
+        "item_id": "#41075",
+        "title": "Fix Qwen3 deterministic generation when do_sample=False and num_beams=1 for Greedy Decoding",
+        "current_state": "Awaiting Review",
+        "age_days": 232
+      },
+      {
+        "item_id": "#41053",
+        "title": "Qwen3 moe",
+        "current_state": "Draft",
+        "age_days": 232
+      },
+      {
+        "item_id": "#41041",
+        "title": "[WIP] Add YuE model",
+        "current_state": "Draft",
+        "age_days": 232
+      },
+      {
+        "item_id": "#41040",
+        "title": "Add Keye vl 8b 1.5",
+        "current_state": "Awaiting Review",
+        "age_days": 232
+      },
+      {
+        "item_id": "#41037",
+        "title": "Tests: Apertus integration tests",
+        "current_state": "Approved",
+        "age_days": 233
+      },
+      {
+        "item_id": "#41035",
+        "title": "docs: update speech recognition examples to use modern Common Voice d\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 233
+      },
+      {
+        "item_id": "#41033",
+        "title": "feat: make audio feature extractors torch.export-able",
+        "current_state": "Awaiting Review",
+        "age_days": 233
+      },
+      {
+        "item_id": "#41024",
+        "title": "Deprecate `max_size` in ConditionalDetrImageProcessor with warning",
+        "current_state": "Awaiting Review",
+        "age_days": 234
+      },
+      {
+        "item_id": "#41022",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `backbones.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 234
+      },
+      {
+        "item_id": "#41021",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `video_processors.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 234
+      },
+      {
+        "item_id": "#41009",
+        "title": "Add Lexa-Delta model support",
+        "current_state": "Awaiting Review",
+        "age_days": 235
+      },
+      {
+        "item_id": "#40976",
+        "title": "Better defaults for assisted generation",
+        "current_state": "Draft",
+        "age_days": 236
+      },
+      {
+        "item_id": "#40962",
+        "title": "perceptron: Isaac-0.1 implementation",
+        "current_state": "Awaiting Review",
+        "age_days": 236
+      },
+      {
+        "item_id": "#40954",
+        "title": "Fix Issue #40913: Respect user-provided chat_template parameter in processor creation",
+        "current_state": "Awaiting Review",
+        "age_days": 237
+      },
+      {
+        "item_id": "#40908",
+        "title": "Fix `load_balancing_loss_func` incompatible with `past_key_values`",
+        "current_state": "Awaiting Review",
+        "age_days": 238
+      },
+      {
+        "item_id": "#40898",
+        "title": "Adding [T5/MT5/UMT5]EncoderForSequenceClassification",
+        "current_state": "Awaiting Review",
+        "age_days": 239
+      },
+      {
+        "item_id": "#40888",
+        "title": "DOC Fix help for chat and serve commands",
+        "current_state": "Awaiting Review",
+        "age_days": 239
+      },
+      {
+        "item_id": "#40887",
+        "title": "Refactor output handling in generate for cleaner decoding methods",
+        "current_state": "Awaiting Review",
+        "age_days": 239
+      },
+      {
+        "item_id": "#40877",
+        "title": "Bug #40833: Fix for kv_offset calculation for mixed padding",
+        "current_state": "Awaiting Review",
+        "age_days": 239
+      },
+      {
+        "item_id": "#40871",
+        "title": "Refactor benchmark utils: add type hints, GPU metrics helper, and con\u2026",
+        "current_state": "Changes Requested",
+        "age_days": 240
+      },
+      {
+        "item_id": "#40870",
+        "title": "Reduce vRAM usage during generation by allowing to transfer logits to CPU",
+        "current_state": "Awaiting Review",
+        "age_days": 241
+      },
+      {
+        "item_id": "#40861",
+        "title": "Support n_groups>1 for mamba2 ",
+        "current_state": "Awaiting Review",
+        "age_days": 241
+      },
+      {
+        "item_id": "#40857",
+        "title": "Token",
+        "current_state": "Awaiting Review",
+        "age_days": 242
+      },
+      {
+        "item_id": "#40840",
+        "title": "feat: add qwen2 pruning support",
+        "current_state": "Awaiting Review",
+        "age_days": 242
+      },
+      {
+        "item_id": "#40820",
+        "title": "Add models to benchmarks",
+        "current_state": "Awaiting Review",
+        "age_days": 243
+      },
+      {
+        "item_id": "#40790",
+        "title": "Handle loading non-existent checkpoints or corrupted checkpoints.",
+        "current_state": "Awaiting Review",
+        "age_days": 244
+      },
+      {
+        "item_id": "#40783",
+        "title": "Fix None quantization_config equivalence with omitted param in AutoModel.from_pretrained",
+        "current_state": "Awaiting Review",
+        "age_days": 244
+      },
+      {
+        "item_id": "#40759",
+        "title": "feat: add qwen3 pruning support",
+        "current_state": "Awaiting Review",
+        "age_days": 245
+      },
+      {
+        "item_id": "#40756",
+        "title": "[WIP] Add Canary",
+        "current_state": "Draft",
+        "age_days": 246
+      },
+      {
+        "item_id": "#40755",
+        "title": "[TimesFM] Add support for forecasting with covariates",
+        "current_state": "Awaiting Review",
+        "age_days": 246
+      },
+      {
+        "item_id": "#40740",
+        "title": "Configure assistant model's generation_config with user parameters",
+        "current_state": "Awaiting Review",
+        "age_days": 248
+      },
+      {
+        "item_id": "#40738",
+        "title": "Docs: Clarify rjieba installation for RoFormerTokenizer",
+        "current_state": "Awaiting Review",
+        "age_days": 248
+      },
+      {
+        "item_id": "#40736",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `jan.md` to Korean",
+        "current_state": "Approved",
+        "age_days": 248
+      },
+      {
+        "item_id": "#40728",
+        "title": "feat(serve): add OTEL",
+        "current_state": "Draft",
+        "age_days": 249
+      },
+      {
+        "item_id": "#40714",
+        "title": "Remove TF and Flax from README",
+        "current_state": "Awaiting Review",
+        "age_days": 249
+      },
+      {
+        "item_id": "#40695",
+        "title": "remove vision2seq vs image-text-to-text",
+        "current_state": "Awaiting Review",
+        "age_days": 250
+      },
+      {
+        "item_id": "#40670",
+        "title": "Add ability to run Gemma 2 models without post layer norm",
+        "current_state": "Awaiting Review",
+        "age_days": 251
+      },
+      {
+        "item_id": "#40648",
+        "title": "Bump torch from 2.7.1 to 2.8.0 in /examples/flax/vision",
+        "current_state": "Awaiting Review",
+        "age_days": 251
+      },
+      {
+        "item_id": "#40640",
+        "title": "Resume training by trained samples to avoid elastic job loss or over-reading of data.",
+        "current_state": "Draft",
+        "age_days": 251
+      },
+      {
+        "item_id": "#40637",
+        "title": "[WIP]Add openpangu_dense model",
+        "current_state": "Draft",
+        "age_days": 251
+      },
+      {
+        "item_id": "#40633",
+        "title": "Add support for Custom Accelerate Instance in Trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 252
+      },
+      {
+        "item_id": "#40587",
+        "title": "feat(utils): add vision utils for embedding images and getting the hidden size",
+        "current_state": "Awaiting Review",
+        "age_days": 253
+      },
+      {
+        "item_id": "#40563",
+        "title": "fix to get output of intermediate output of dinov3 for more use case",
+        "current_state": "Awaiting Review",
+        "age_days": 255
+      },
+      {
+        "item_id": "#40546",
+        "title": "Implement VibeVoice ",
+        "current_state": "Changes Requested",
+        "age_days": 256
+      },
+      {
+        "item_id": "#40524",
+        "title": "Use begin_of_sequence token in all sliding windows for correct model behaviour",
+        "current_state": "Awaiting Review",
+        "age_days": 257
+      },
+      {
+        "item_id": "#40520",
+        "title": "[generate] add faster `stop_strings` stopping criteria",
+        "current_state": "Awaiting Review",
+        "age_days": 257
+      },
+      {
+        "item_id": "#40515",
+        "title": "Add Context-Aware Tokenizer Selection Utility Based on Corpus Analysis",
+        "current_state": "Awaiting Review",
+        "age_days": 257
+      },
+      {
+        "item_id": "#40505",
+        "title": "Refactor Siglip-like models",
+        "current_state": "Draft",
+        "age_days": 258
+      },
+      {
+        "item_id": "#40493",
+        "title": "Update dtypes to suit colab bf16 -> fp16 -> fp32.",
+        "current_state": "Awaiting Review",
+        "age_days": 258
+      },
+      {
+        "item_id": "#40492",
+        "title": "avoid divid zero errors.",
+        "current_state": "Awaiting Review",
+        "age_days": 258
+      },
+      {
+        "item_id": "#40473",
+        "title": "[tests] Unskip DeBERTaV2 tokenizer parity tests; re-enable fast/slow checks",
+        "current_state": "Awaiting Review",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40471",
+        "title": "DOC: Standardize CodeGen model card (issue #36979)",
+        "current_state": "Awaiting Review",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40465",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `tools.md` to Korean",
+        "current_state": "Awaiting Review",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40464",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `agents.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40448",
+        "title": "[model] Support MiniCPM-V 4.5",
+        "current_state": "Awaiting Review",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40446",
+        "title": "Add convert_segmentation_map_to_binary_masks_sorted function for hand\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 259
+      },
+      {
+        "item_id": "#40438",
+        "title": "Resolve automatic label name detection when single label provided",
+        "current_state": "Awaiting Review",
+        "age_days": 260
+      },
+      {
+        "item_id": "#40425",
+        "title": "Fix check_quantized_param method when param_value is a safetensors slice",
+        "current_state": "Awaiting Review",
+        "age_days": 260
+      },
+      {
+        "item_id": "#40404",
+        "title": "update model card for gpt-j",
+        "current_state": "Approved",
+        "age_days": 261
+      },
+      {
+        "item_id": "#40403",
+        "title": "Customizable Logit Warping Strategies for Generation #40010",
+        "current_state": "Awaiting Review",
+        "age_days": 262
+      },
+      {
+        "item_id": "#40400",
+        "title": "fixed redundant words in readme.md",
+        "current_state": "Awaiting Review",
+        "age_days": 262
+      },
+      {
+        "item_id": "#40395",
+        "title": "\ud83c\udf10 [i18n-KO] Updated `text_generation.md`",
+        "current_state": "Awaiting Review",
+        "age_days": 262
+      },
+      {
+        "item_id": "#40392",
+        "title": "Remove debug print statement from ShieldGemma2 conversion script",
+        "current_state": "Awaiting Review",
+        "age_days": 263
+      },
+      {
+        "item_id": "#40390",
+        "title": "Fix typo: 'lenght' to 'length'",
+        "current_state": "Approved",
+        "age_days": 263
+      },
+      {
+        "item_id": "#40388",
+        "title": "Add fromjson filter to Jinja2 chat templates",
+        "current_state": "Awaiting Review",
+        "age_days": 263
+      },
+      {
+        "item_id": "#40385",
+        "title": "Fix typo: 'seperate' -> 'separate' in mm_grounding_dino conversion sc\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 263
+      },
+      {
+        "item_id": "#40358",
+        "title": "Fix MXFP4 mlp_forward to handle 2D and 3D hidden_states shapes for multi-turn chat",
+        "current_state": "Awaiting Review",
+        "age_days": 264
+      },
+      {
+        "item_id": "#40328",
+        "title": "[rfc] Prototype to make torch.compile work with DynamicCache",
+        "current_state": "Awaiting Review",
+        "age_days": 265
+      },
+      {
+        "item_id": "#40299",
+        "title": "Remove deprecated max_size parameter from ConditionalDetr image processors",
+        "current_state": "Awaiting Review",
+        "age_days": 266
+      },
+      {
+        "item_id": "#40286",
+        "title": "Add MOSS-TTSD with XY-Tokenizer",
+        "current_state": "Awaiting Review",
+        "age_days": 266
+      },
+      {
+        "item_id": "#40265",
+        "title": "Enable PLW and PLE rules",
+        "current_state": "Draft",
+        "age_days": 266
+      },
+      {
+        "item_id": "#40244",
+        "title": "add-loftr-keypoints-to-map",
+        "current_state": "Awaiting Review",
+        "age_days": 267
+      },
+      {
+        "item_id": "#40225",
+        "title": "docs: clarify decoder_input_ids vs decoder_inputs_embeds usage (#39542)",
+        "current_state": "Awaiting Review",
+        "age_days": 268
+      },
+      {
+        "item_id": "#40221",
+        "title": "FIX: enable load_best_model_at_end within SaveStrategy.BEST and initialize metric_for_best_model as loss when SaveStrategy.BEST",
+        "current_state": "Awaiting Review",
+        "age_days": 269
+      },
+      {
+        "item_id": "#40209",
+        "title": "Add fast image processor for  ViViT ",
+        "current_state": "Awaiting Review",
+        "age_days": 270
+      },
+      {
+        "item_id": "#40208",
+        "title": "Save only model sharded sd",
+        "current_state": "Approved",
+        "age_days": 270
+      },
+      {
+        "item_id": "#40180",
+        "title": "Enable native mxfp4 training support for GPT-OSS models",
+        "current_state": "Awaiting Review",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40177",
+        "title": "Revert text_positions in Qwen25VL",
+        "current_state": "Awaiting Review",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40171",
+        "title": "Rename to CamelCase",
+        "current_state": "Approved",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40155",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `t5.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40149",
+        "title": "Implemented fast image processor for VitPose",
+        "current_state": "Awaiting Review",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40148",
+        "title": "Update utils.py: fix nan",
+        "current_state": "Awaiting Review",
+        "age_days": 271
+      },
+      {
+        "item_id": "#40131",
+        "title": "add missing Arabic translations",
+        "current_state": "Awaiting Review",
+        "age_days": 272
+      },
+      {
+        "item_id": "#40123",
+        "title": "Lazily import torchao Int4WeightOnlyConfig to avoid side effects",
+        "current_state": "Awaiting Review",
+        "age_days": 272
+      },
+      {
+        "item_id": "#40115",
+        "title": "[layer_types] update layer_types with conv",
+        "current_state": "Draft",
+        "age_days": 273
+      },
+      {
+        "item_id": "#40114",
+        "title": "Fix torch.export compatibility for Mixtral MoE models ",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#40102",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `auto_docstring.md` to Korean",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#40092",
+        "title": "Optimize LlamaAttention by fusing QKV projections",
+        "current_state": "Awaiting Review",
+        "age_days": 273
+      },
+      {
+        "item_id": "#40090",
+        "title": "Fix RuntimeError when loading quantized models with int8 weights (#39366)",
+        "current_state": "Awaiting Review",
+        "age_days": 274
+      },
+      {
+        "item_id": "#40065",
+        "title": "Delay float32 upcast in ForCausalLMLoss after filtering ignore_index",
+        "current_state": "Awaiting Review",
+        "age_days": 275
+      },
+      {
+        "item_id": "#40064",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `videomae.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 275
+      },
+      {
+        "item_id": "#40061",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `vitdet.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 275
+      },
+      {
+        "item_id": "#40059",
+        "title": "Fix Inefficient GELU implementation in GPT2",
+        "current_state": "Awaiting Review",
+        "age_days": 276
+      },
+      {
+        "item_id": "#40058",
+        "title": "GGUF Qwen2VL",
+        "current_state": "Awaiting Review",
+        "age_days": 276
+      },
+      {
+        "item_id": "#40055",
+        "title": "Auto-log parallelism info to wandb.config using HF Accelerate",
+        "current_state": "Awaiting Review",
+        "age_days": 276
+      },
+      {
+        "item_id": "#40047",
+        "title": "Update wavlm.md to match new model card template",
+        "current_state": "Awaiting Review",
+        "age_days": 277
+      },
+      {
+        "item_id": "#40023",
+        "title": "Add support for SDPA for OWLViT and OWLv2",
+        "current_state": "Awaiting Review",
+        "age_days": 277
+      },
+      {
+        "item_id": "#40022",
+        "title": "fix: resolve dropout type error in DogeDecoder",
+        "current_state": "Awaiting Review",
+        "age_days": 277
+      },
+      {
+        "item_id": "#39999",
+        "title": "allow TP to work in ND-parallel with fsdp cpu ram efficient loading",
+        "current_state": "Draft",
+        "age_days": 278
+      },
+      {
+        "item_id": "#39997",
+        "title": "make sure position_ids are passed in for causal mask creation for gpt-oss",
+        "current_state": "Awaiting Review",
+        "age_days": 278
+      },
+      {
+        "item_id": "#39987",
+        "title": "Add a VGGT(Visual Geometry Grounded Transformer) model compatible with huggingface transfromers",
+        "current_state": "Awaiting Review",
+        "age_days": 278
+      },
+      {
+        "item_id": "#39962",
+        "title": "Use torch._check instead of a test to make the model Gemma3 exportable",
+        "current_state": "Awaiting Review",
+        "age_days": 279
+      },
+      {
+        "item_id": "#39941",
+        "title": "fixing image_utils.py todo",
+        "current_state": "Awaiting Review",
+        "age_days": 279
+      },
+      {
+        "item_id": "#39931",
+        "title": "Registers StaticCache serialization functions for torch.export.export",
+        "current_state": "Awaiting Review",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39922",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `attention_interface.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39920",
+        "title": "\ud83c\udf10 [i18n-KO] Updated ko/perf_train_special.md",
+        "current_state": "Draft",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39917",
+        "title": "\ud83c\udf10 [i18n-KO] Updated ko/perf_train_cpu.md",
+        "current_state": "Draft",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39901",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `fp_quant` to Korean",
+        "current_state": "Draft",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39899",
+        "title": "[model] Support MiniCPM-V 4.0",
+        "current_state": "Awaiting Review",
+        "age_days": 280
+      },
+      {
+        "item_id": "#39895",
+        "title": "Add Videoprism",
+        "current_state": "Approved",
+        "age_days": 281
+      },
+      {
+        "item_id": "#39886",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `perf_train_gaudi.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 281
+      },
+      {
+        "item_id": "#39866",
+        "title": "make sure model.save_pretrained has the correct is_main_process",
+        "current_state": "Approved",
+        "age_days": 283
+      },
+      {
+        "item_id": "#39859",
+        "title": "WIP: Initial support for bnb 4bit on any nn.Parameter",
+        "current_state": "Draft",
+        "age_days": 284
+      },
+      {
+        "item_id": "#39831",
+        "title": "refactor(modeling_llama): make RotaryEmbedding default path explicit",
+        "current_state": "Awaiting Review",
+        "age_days": 285
+      },
+      {
+        "item_id": "#39807",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `bamba.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 285
+      },
+      {
+        "item_id": "#39796",
+        "title": "[pipelines] text-to-audio pipeline standardization",
+        "current_state": "Awaiting Review",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39794",
+        "title": "Fix ProphetNet forward to handle tuple encoder_outputs",
+        "current_state": "Awaiting Review",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39793",
+        "title": "Fix DAC conversion script",
+        "current_state": "Awaiting Review",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39792",
+        "title": "Served models handle with nested content",
+        "current_state": "Awaiting Review",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39785",
+        "title": "fix mllama integration tests",
+        "current_state": "Approved",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39772",
+        "title": "Fix missing initializations for models created in 2022",
+        "current_state": "Awaiting Review",
+        "age_days": 286
+      },
+      {
+        "item_id": "#39760",
+        "title": "[Draft] Add Llasa TTS family of models",
+        "current_state": "Draft",
+        "age_days": 287
+      },
+      {
+        "item_id": "#39756",
+        "title": "Fix rope_deltas corruption in Qwen2.5VL during CFG generation",
+        "current_state": "Draft",
+        "age_days": 287
+      },
+      {
+        "item_id": "#39751",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `text-to-speech.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 287
+      },
+      {
+        "item_id": "#39741",
+        "title": "Fix HfArgumentParser to filter out dict types from Union",
+        "current_state": "Awaiting Review",
+        "age_days": 288
+      },
+      {
+        "item_id": "#39735",
+        "title": "handle multimodal models with tp_plan on the text_config",
+        "current_state": "Draft",
+        "age_days": 288
+      },
+      {
+        "item_id": "#39722",
+        "title": "[Feat] Adding Intern-S1",
+        "current_state": "Approved",
+        "age_days": 288
+      },
+      {
+        "item_id": "#39718",
+        "title": "Fix SigLIP2 documentation model/processor mismatch",
+        "current_state": "Awaiting Review",
+        "age_days": 288
+      },
+      {
+        "item_id": "#39708",
+        "title": "\ud83c\udf10[i18n-bn] Introduce Bengali version of Transformers documentation",
+        "current_state": "Awaiting Review",
+        "age_days": 289
+      },
+      {
+        "item_id": "#39698",
+        "title": "Fix exaone4 layer_types ZeroDivision/TypeError when sliding_window_pattern is None/\"LLLG\"",
+        "current_state": "Awaiting Review",
+        "age_days": 290
+      },
+      {
+        "item_id": "#39697",
+        "title": "use untyped storage for dtensors due to deprecation",
+        "current_state": "Draft",
+        "age_days": 290
+      },
+      {
+        "item_id": "#39690",
+        "title": "Allow custom hf_quantizer in from_pretrained",
+        "current_state": "Awaiting Review",
+        "age_days": 290
+      },
+      {
+        "item_id": "#39683",
+        "title": "Fix issue #39191 respect accelerate config to disable torch.dynamo compilation",
+        "current_state": "Approved",
+        "age_days": 291
+      },
+      {
+        "item_id": "#39675",
+        "title": "[BugFix]: Support dict and config file path for deepspeed",
+        "current_state": "Awaiting Review",
+        "age_days": 291
+      },
+      {
+        "item_id": "#39674",
+        "title": "Fix loss scaling and token aggregation to use only data parallel group",
+        "current_state": "Awaiting Review",
+        "age_days": 291
+      },
+      {
+        "item_id": "#39632",
+        "title": "fix dead NVIDIA link ",
+        "current_state": "Approved",
+        "age_days": 292
+      },
+      {
+        "item_id": "#39631",
+        "title": "[serve] Add speech-to-text",
+        "current_state": "Draft",
+        "age_days": 292
+      },
+      {
+        "item_id": "#39625",
+        "title": "Fix: allow Union[str, dict, None] fields like deepspeed to be passed via CLI",
+        "current_state": "Awaiting Review",
+        "age_days": 292
+      },
+      {
+        "item_id": "#39617",
+        "title": "Fix FSDP v1 bug: trainer incorrectly uses an unwrapped model",
+        "current_state": "Awaiting Review",
+        "age_days": 293
+      },
+      {
+        "item_id": "#39599",
+        "title": "Fix: check TrainerState file exists before loading during resume",
+        "current_state": "Awaiting Review",
+        "age_days": 293
+      },
+      {
+        "item_id": "#39588",
+        "title": "WIP, reference modeling",
+        "current_state": "Draft",
+        "age_days": 294
+      },
+      {
+        "item_id": "#39575",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `vitpose.md` to Korean",
+        "current_state": "Approved",
+        "age_days": 294
+      },
+      {
+        "item_id": "#39563",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `vision-encoder-decoder.md` to Korean",
+        "current_state": "Approved",
+        "age_days": 295
+      },
+      {
+        "item_id": "#39560",
+        "title": "fix load_model_end = true work when save_steps < eval_steps",
+        "current_state": "Awaiting Review",
+        "age_days": 295
+      },
+      {
+        "item_id": "#39559",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `main_classes/deepspeed.md` to Korean",
+        "current_state": "Draft",
+        "age_days": 295
+      },
+      {
+        "item_id": "#39555",
+        "title": "[WIP]\u00a0try to relax the tie_weights method",
+        "current_state": "Draft",
+        "age_days": 295
+      },
+      {
+        "item_id": "#39544",
+        "title": "\ud83c\udf10 [i18n-KO] Translated feature_extractors.md to Korea",
+        "current_state": "Approved",
+        "age_days": 295
+      },
+      {
+        "item_id": "#39541",
+        "title": "Add Muon optimizer implementation and integration",
+        "current_state": "Awaiting Review",
+        "age_days": 296
+      },
+      {
+        "item_id": "#39534",
+        "title": "Add Beit3 model",
+        "current_state": "Awaiting Review",
+        "age_days": 296
+      },
+      {
+        "item_id": "#39517",
+        "title": "\ud83c\udf10 [i18n-KO] Translated `compressed_tensor.md`  to Korean",
+        "current_state": "Approved",
+        "age_days": 297
+      },
+      {
+        "item_id": "#39493",
+        "title": "[Voxtral] nit + pin correct mistral common version",
+        "current_state": "Awaiting Review",
+        "age_days": 298
+      },
+      {
+        "item_id": "#39491",
+        "title": "Fix: Skip weight initialization for quantized int8 models",
+        "current_state": "Awaiting Review",
+        "age_days": 299
+      },
+      {
+        "item_id": "#39480",
+        "title": "Add model arcinstitute state",
+        "current_state": "Draft",
+        "age_days": 299
+      },
+      {
+        "item_id": "#39468",
+        "title": "Fix quantized model dispatch with device_map='auto'",
+        "current_state": "Awaiting Review",
+        "age_days": 299
+      },
+      {
+        "item_id": "#39466",
+        "title": "README: Update Bert Japanese model card",
+        "current_state": "Awaiting Review",
+        "age_days": 299
+      },
+      {
+        "item_id": "#39464",
+        "title": "Skipping `initialize_weights` when model is quantized",
+        "current_state": "Awaiting Review",
+        "age_days": 299
+      },
+      {
+        "item_id": "#39456",
+        "title": "Fix quantized model initialization for int8 dtypes",
+        "current_state": "Awaiting Review",
+        "age_days": 300
+      },
+      {
+        "item_id": "#39449",
+        "title": "Fix logger warnings in Gemma model test files",
+        "current_state": "Awaiting Review",
+        "age_days": 300
+      },
+      {
+        "item_id": "#39435",
+        "title": "Add a unit test for BartModel to compare eager, sdpa on one particular set of inputs",
+        "current_state": "Awaiting Review",
+        "age_days": 301
+      },
+      {
+        "item_id": "#39403",
+        "title": "Add Vocos model",
+        "current_state": "Changes Requested",
+        "age_days": 302
+      },
+      {
+        "item_id": "#39357",
+        "title": "Update docstring for glm4v",
+        "current_state": "Awaiting Review",
+        "age_days": 305
+      },
+      {
+        "item_id": "#39353",
+        "title": "fix colpali mapping",
+        "current_state": "Awaiting Review",
+        "age_days": 305
+      },
+      {
+        "item_id": "#39309",
+        "title": "Fix audio pipeline with torchcodec input",
+        "current_state": "Approved",
+        "age_days": 307
+      },
+      {
+        "item_id": "#39303",
+        "title": "Fix critical typos in code example",
+        "current_state": "Awaiting Review",
+        "age_days": 307
+      },
+      {
+        "item_id": "#39297",
+        "title": "Fix bug with deepspeed  and accelerator args in training_args.py",
+        "current_state": "Awaiting Review",
+        "age_days": 307
+      },
+      {
+        "item_id": "#39293",
+        "title": "Add T5LA models",
+        "current_state": "Awaiting Review",
+        "age_days": 307
+      },
+      {
+        "item_id": "#39264",
+        "title": "Fix: Add version check for timm to support mobilenetv5 models (fixes #39208)",
+        "current_state": "Awaiting Review",
+        "age_days": 309
+      },
+      {
+        "item_id": "#39257",
+        "title": "Fix to tuple conversion with config",
+        "current_state": "Awaiting Review",
+        "age_days": 309
+      },
+      {
+        "item_id": "#39251",
+        "title": "Fix slow test_moshika_greedy_unconditional_fp16",
+        "current_state": "Awaiting Review",
+        "age_days": 309
+      },
+      {
+        "item_id": "#39236",
+        "title": "added moment_p sampling",
+        "current_state": "Awaiting Review",
+        "age_days": 311
+      },
+      {
+        "item_id": "#39222",
+        "title": "Enable granite 4 hybrid integration tests",
+        "current_state": "Awaiting Review",
+        "age_days": 312
+      },
+      {
+        "item_id": "#39212",
+        "title": "Add Ukrainian translation of README.md",
+        "current_state": "Awaiting Review",
+        "age_days": 313
+      },
+      {
+        "item_id": "#39211",
+        "title": "Add mobilenet_v5 stub implementation to fix \"Unknown Model\" error",
+        "current_state": "Awaiting Review",
+        "age_days": 313
+      },
+      {
+        "item_id": "#39209",
+        "title": "Standardize FSMT class naming: PretrainedFSMTModel \u2192 PreTrainedFSMTModel",
+        "current_state": "Awaiting Review",
+        "age_days": 313
+      },
+      {
+        "item_id": "#39206",
+        "title": "fix: filter None router logits in Qwen3 MoE and handle empty router logits (#39203)",
+        "current_state": "Awaiting Review",
+        "age_days": 313
+      },
+      {
+        "item_id": "#39183",
+        "title": "Add a 'chat' extra",
+        "current_state": "Approved",
+        "age_days": 314
+      },
+      {
+        "item_id": "#39150",
+        "title": "Efficient Expert Weight Fusion for Moe deepseek v3",
+        "current_state": "Awaiting Review",
+        "age_days": 315
+      },
+      {
+        "item_id": "#39140",
+        "title": "feat(trainer): emergency checkpointing on crashes & SIGTERM/SIGINT",
+        "current_state": "Awaiting Review",
+        "age_days": 315
+      },
+      {
+        "item_id": "#39109",
+        "title": "Fix: rename 'eval_strategy' to 'evaluation_strategy' in TrainingArgum\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 317
+      },
+      {
+        "item_id": "#39108",
+        "title": "Disable static cache on certain MoE models",
+        "current_state": "Approved",
+        "age_days": 317
+      },
+      {
+        "item_id": "#39103",
+        "title": "Fix audio-related config naming for Gemma3n ",
+        "current_state": "Awaiting Review",
+        "age_days": 318
+      },
+      {
+        "item_id": "#39084",
+        "title": "Refactor gemma3n",
+        "current_state": "Draft",
+        "age_days": 319
+      },
+      {
+        "item_id": "#39047",
+        "title": "RFC: refactor causal lm loss to handle lm_head in loss function",
+        "current_state": "Awaiting Review",
+        "age_days": 320
+      },
+      {
+        "item_id": "#39046",
+        "title": "Fix deprecated max_size parameter handling in DETR image processors",
+        "current_state": "Awaiting Review",
+        "age_days": 320
+      },
+      {
+        "item_id": "#39037",
+        "title": "fix `kosmos2` tests",
+        "current_state": "Awaiting Review",
+        "age_days": 321
+      },
+      {
+        "item_id": "#39012",
+        "title": "[WIP] Fix DeepseekV3ModelTest::test_torch_compile_for_training",
+        "current_state": "Draft",
+        "age_days": 322
+      },
+      {
+        "item_id": "#39009",
+        "title": "Add submodels support check function",
+        "current_state": "Draft",
+        "age_days": 322
+      },
+      {
+        "item_id": "#38999",
+        "title": "Use deep copies instead of shallow copies for bbox_embed in GroundingDINO decoder (#37333).",
+        "current_state": "Awaiting Review",
+        "age_days": 322
+      },
+      {
+        "item_id": "#38991",
+        "title": "Remove `return_dict` kwarg from all the models",
+        "current_state": "Draft",
+        "age_days": 323
+      },
+      {
+        "item_id": "#38988",
+        "title": "Check docstring inside modular files as well",
+        "current_state": "Awaiting Review",
+        "age_days": 323
+      },
+      {
+        "item_id": "#38962",
+        "title": "Update test_candidate_generator.py",
+        "current_state": "Awaiting Review",
+        "age_days": 325
+      },
+      {
+        "item_id": "#38959",
+        "title": "Updated the model card for wav2vec2-phoneme",
+        "current_state": "Awaiting Review",
+        "age_days": 325
+      },
+      {
+        "item_id": "#38958",
+        "title": "Updated model card for wav2vec2-conformer",
+        "current_state": "Awaiting Review",
+        "age_days": 325
+      },
+      {
+        "item_id": "#38957",
+        "title": "Update wav2vec2-bert model card",
+        "current_state": "Awaiting Review",
+        "age_days": 325
+      },
+      {
+        "item_id": "#38956",
+        "title": "Updating model card for wav2vec2",
+        "current_state": "Awaiting Review",
+        "age_days": 326
+      },
+      {
+        "item_id": "#38955",
+        "title": "docs: Musicgen melody model card",
+        "current_state": "Awaiting Review",
+        "age_days": 326
+      },
+      {
+        "item_id": "#38926",
+        "title": "Clarify Python and framework version support in installation.md",
+        "current_state": "Awaiting Review",
+        "age_days": 326
+      },
+      {
+        "item_id": "#38923",
+        "title": "Remove deprecated max_size support from YOLOS image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 327
+      },
+      {
+        "item_id": "#38908",
+        "title": "Add support to use config dtype in HybridChunkedCache",
+        "current_state": "Awaiting Review",
+        "age_days": 327
+      },
+      {
+        "item_id": "#38893",
+        "title": "Fix/deprecate max size conditional detr",
+        "current_state": "Draft",
+        "age_days": 328
+      },
+      {
+        "item_id": "#38888",
+        "title": "continue to fix distributed_type from TPU to XLA in LM examples (#38652)",
+        "current_state": "Awaiting Review",
+        "age_days": 328
+      },
+      {
+        "item_id": "#38886",
+        "title": "Allow compile with bnb",
+        "current_state": "Awaiting Review",
+        "age_days": 328
+      },
+      {
+        "item_id": "#38884",
+        "title": "Llama 4 conversion fix for moe models",
+        "current_state": "Awaiting Review",
+        "age_days": 328
+      },
+      {
+        "item_id": "#38877",
+        "title": "DOC: Clarify attention_mask usage in BertModel forward method",
+        "current_state": "Awaiting Review",
+        "age_days": 328
+      },
+      {
+        "item_id": "#38861",
+        "title": "Add SamImageProcessorFast with 4x performance improvement",
+        "current_state": "Awaiting Review",
+        "age_days": 329
+      },
+      {
+        "item_id": "#38859",
+        "title": "Add MobileViT fast image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 329
+      },
+      {
+        "item_id": "#38839",
+        "title": "[DO NOT MERGE] Testing saftensors 0.6.0",
+        "current_state": "Draft",
+        "age_days": 330
+      },
+      {
+        "item_id": "#38810",
+        "title": "Add kwargs support in WhisperForConditionalGeneration",
+        "current_state": "Approved",
+        "age_days": 333
+      },
+      {
+        "item_id": "#38805",
+        "title": "Add Dust3R",
+        "current_state": "Awaiting Review",
+        "age_days": 333
+      },
+      {
+        "item_id": "#38793",
+        "title": "Fix Typos in Comments and Improve Clarity",
+        "current_state": "Approved",
+        "age_days": 334
+      },
+      {
+        "item_id": "#38786",
+        "title": "Provide clearer instructions on how to specify target language.",
+        "current_state": "Approved",
+        "age_days": 334
+      },
+      {
+        "item_id": "#38764",
+        "title": "Fixes issue #38709 for CLIP and XCLIP",
+        "current_state": "Awaiting Review",
+        "age_days": 335
+      },
+      {
+        "item_id": "#38759",
+        "title": "Add chatterbox",
+        "current_state": "Draft",
+        "age_days": 335
+      },
+      {
+        "item_id": "#38757",
+        "title": "Add S3 tokenizer",
+        "current_state": "Draft",
+        "age_days": 335
+      },
+      {
+        "item_id": "#38756",
+        "title": "Add HiFTNet",
+        "current_state": "Draft",
+        "age_days": 335
+      },
+      {
+        "item_id": "#38752",
+        "title": "Fix/gpu memory leak autoprocessor",
+        "current_state": "Awaiting Review",
+        "age_days": 335
+      },
+      {
+        "item_id": "#38684",
+        "title": "Fix AssertionError when saving CodeT5+ 2B checkpoints (Resolves #38602)",
+        "current_state": "Awaiting Review",
+        "age_days": 337
+      },
+      {
+        "item_id": "#38671",
+        "title": "Adding custom 3d mask into ModernBert",
+        "current_state": "Awaiting Review",
+        "age_days": 338
+      },
+      {
+        "item_id": "#38666",
+        "title": "docs: clarify compute_loss parameter num_items_in_batch",
+        "current_state": "Approved",
+        "age_days": 339
+      },
+      {
+        "item_id": "#38655",
+        "title": "minor docstring fixups",
+        "current_state": "Approved",
+        "age_days": 339
+      },
+      {
+        "item_id": "#38647",
+        "title": "Reparent all the remaining Causal LM tests",
+        "current_state": "Awaiting Review",
+        "age_days": 340
+      },
+      {
+        "item_id": "#38638",
+        "title": "5GB to 50GB as a default",
+        "current_state": "Approved",
+        "age_days": 340
+      },
+      {
+        "item_id": "#38626",
+        "title": "fix: Added code to match interpolation of Google's ViT implementation\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 341
+      },
+      {
+        "item_id": "#38604",
+        "title": "Update Mamba configuration to enable bias by default in the mixer blo\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 341
+      },
+      {
+        "item_id": "#38598",
+        "title": "Deprecated sigopt from hyperparameter search",
+        "current_state": "Awaiting Review",
+        "age_days": 342
+      },
+      {
+        "item_id": "#38587",
+        "title": "Refactor Bamba tests to inherit from CausalLMModelTester base classes",
+        "current_state": "Awaiting Review",
+        "age_days": 342
+      },
+      {
+        "item_id": "#38569",
+        "title": "Add Bagel",
+        "current_state": "Draft",
+        "age_days": 343
+      },
+      {
+        "item_id": "#38568",
+        "title": "Update Wav2Vec2 documentation to create model cards",
+        "current_state": "Awaiting Review",
+        "age_days": 343
+      },
+      {
+        "item_id": "#38564",
+        "title": "Fix ModernBERT tokenizer issue with is_split_into_words flag",
+        "current_state": "Awaiting Review",
+        "age_days": 343
+      },
+      {
+        "item_id": "#38550",
+        "title": "Improve GPTNeoX model card following standardization guidelines",
+        "current_state": "Awaiting Review",
+        "age_days": 343
+      },
+      {
+        "item_id": "#38547",
+        "title": "Fix CTRL model DataParallel compatibility",
+        "current_state": "Awaiting Review",
+        "age_days": 343
+      },
+      {
+        "item_id": "#38534",
+        "title": "fixed a bug which was causing only partial files to be imported",
+        "current_state": "Awaiting Review",
+        "age_days": 344
+      },
+      {
+        "item_id": "#38532",
+        "title": "On branch fix-void-segment-mask-input [WIP]",
+        "current_state": "Awaiting Review",
+        "age_days": 344
+      },
+      {
+        "item_id": "#38478",
+        "title": "Fix meta tensor copy error",
+        "current_state": "Draft",
+        "age_days": 348
+      },
+      {
+        "item_id": "#38473",
+        "title": "docs: Add Turkish translation for README",
+        "current_state": "Awaiting Review",
+        "age_days": 348
+      },
+      {
+        "item_id": "#38470",
+        "title": "Add detailed ConvBERT model card with usage, architecture, and refere\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 348
+      },
+      {
+        "item_id": "#38444",
+        "title": "Add configurable normalization schemes to SigLIP image processors",
+        "current_state": "Awaiting Review",
+        "age_days": 349
+      },
+      {
+        "item_id": "#38437",
+        "title": "Continuous batchin: offer only the next token",
+        "current_state": "Awaiting Review",
+        "age_days": 349
+      },
+      {
+        "item_id": "#38432",
+        "title": "More coverage for LossKwargs + cleaning",
+        "current_state": "Awaiting Review",
+        "age_days": 349
+      },
+      {
+        "item_id": "#38421",
+        "title": "[Qwen2.5-VL] Fix empty string input crash in processor",
+        "current_state": "Awaiting Review",
+        "age_days": 349
+      },
+      {
+        "item_id": "#38400",
+        "title": "[WIP] Tokenizer Refactor",
+        "current_state": "Awaiting Review",
+        "age_days": 350
+      },
+      {
+        "item_id": "#38388",
+        "title": "Fix Whisper inference regression with backward-compatible logprob calculation",
+        "current_state": "Awaiting Review",
+        "age_days": 351
+      },
+      {
+        "item_id": "#38387",
+        "title": "Expanded `UserWarning` message on parameter edge case",
+        "current_state": "Awaiting Review",
+        "age_days": 351
+      },
+      {
+        "item_id": "#38364",
+        "title": "Lag kv cache",
+        "current_state": "Awaiting Review",
+        "age_days": 351
+      },
+      {
+        "item_id": "#38339",
+        "title": "Bump minimum version of accelerate",
+        "current_state": "Awaiting Review",
+        "age_days": 354
+      },
+      {
+        "item_id": "#38338",
+        "title": "Support CLIP w/ Registers & Fusion MLP Gate",
+        "current_state": "Awaiting Review",
+        "age_days": 354
+      },
+      {
+        "item_id": "#38272",
+        "title": "Fix the shape of ModernBertForMaskedLM's output hidden_states",
+        "current_state": "Draft",
+        "age_days": 356
+      },
+      {
+        "item_id": "#38237",
+        "title": "[gptq] Fixing gptq tests after new release of gptqmodel",
+        "current_state": "Awaiting Review",
+        "age_days": 357
+      },
+      {
+        "item_id": "#38209",
+        "title": "[Meta MTIA] Support hoisted rotary embeddings.",
+        "current_state": "Awaiting Review",
+        "age_days": 358
+      },
+      {
+        "item_id": "#38196",
+        "title": "Update kwargs for DDP",
+        "current_state": "Awaiting Review",
+        "age_days": 358
+      },
+      {
+        "item_id": "#38185",
+        "title": "Add SVE implementation for Mamba Sequential Scan Algorithm",
+        "current_state": "Awaiting Review",
+        "age_days": 360
+      },
+      {
+        "item_id": "#38173",
+        "title": "[WIP] new BLT",
+        "current_state": "Draft",
+        "age_days": 361
+      },
+      {
+        "item_id": "#38150",
+        "title": "Allow qwen/emu3 to process low res images",
+        "current_state": "Approved",
+        "age_days": 362
+      },
+      {
+        "item_id": "#38141",
+        "title": "Fix FSDP + llava-next/llava-onevision",
+        "current_state": "Awaiting Review",
+        "age_days": 362
+      },
+      {
+        "item_id": "#38114",
+        "title": "Force real tensors and clone state_dict in src/transformers/modeling_utils.py",
+        "current_state": "Draft",
+        "age_days": 364
+      },
+      {
+        "item_id": "#38111",
+        "title": "Support TP for save_pretrained()",
+        "current_state": "Draft",
+        "age_days": 364
+      },
+      {
+        "item_id": "#38064",
+        "title": "Added scores in the streamer classes based on generation flag",
+        "current_state": "Awaiting Review",
+        "age_days": 367
+      },
+      {
+        "item_id": "#38055",
+        "title": "SQuat cache implementation",
+        "current_state": "Draft",
+        "age_days": 368
+      },
+      {
+        "item_id": "#38054",
+        "title": "fix-mask2former-overlapping-annotations",
+        "current_state": "Awaiting Review",
+        "age_days": 368
+      },
+      {
+        "item_id": "#38030",
+        "title": "Add `TemplateConstraint` and `OrdredConstraint` features (#27706)",
+        "current_state": "Awaiting Review",
+        "age_days": 369
+      },
+      {
+        "item_id": "#37998",
+        "title": "Update AMD docker with needed packages",
+        "current_state": "Draft",
+        "age_days": 370
+      },
+      {
+        "item_id": "#37994",
+        "title": "proof of concept for using dataset of test cases for tokenizer tests",
+        "current_state": "Awaiting Review",
+        "age_days": 370
+      },
+      {
+        "item_id": "#37975",
+        "title": "[vLLM] GPT2 with transformers backend",
+        "current_state": "Approved",
+        "age_days": 371
+      },
+      {
+        "item_id": "#37967",
+        "title": "feat: Add encode, patch_token to RagTokenizer (fixes #35532)",
+        "current_state": "Draft",
+        "age_days": 372
+      },
+      {
+        "item_id": "#37963",
+        "title": "Object detection experiment",
+        "current_state": "Draft",
+        "age_days": 372
+      },
+      {
+        "item_id": "#37944",
+        "title": "fix graph break for torch.compile in attention mask check",
+        "current_state": "Draft",
+        "age_days": 374
+      },
+      {
+        "item_id": "#37933",
+        "title": "Feat: Add ddp_param_to_hook_all_reduce option",
+        "current_state": "Draft",
+        "age_days": 375
+      },
+      {
+        "item_id": "#37921",
+        "title": "Fix wrong example in grounding dino",
+        "current_state": "Awaiting Review",
+        "age_days": 375
+      },
+      {
+        "item_id": "#37917",
+        "title": "support MiniCPM-o2.6",
+        "current_state": "Awaiting Review",
+        "age_days": 376
+      },
+      {
+        "item_id": "#37904",
+        "title": "Feat: Add class_proba option to semantic segmentation post-processing",
+        "current_state": "Draft",
+        "age_days": 377
+      },
+      {
+        "item_id": "#37889",
+        "title": "add profiler to trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 377
+      },
+      {
+        "item_id": "#37884",
+        "title": "Get our efficiency back",
+        "current_state": "Awaiting Review",
+        "age_days": 377
+      },
+      {
+        "item_id": "#37875",
+        "title": "Add DEIM object detection model",
+        "current_state": "Draft",
+        "age_days": 378
+      },
+      {
+        "item_id": "#37870",
+        "title": "Bump transformers from 4.48.0 to 4.50.0 in /examples/tensorflow/language-modeling-tpu",
+        "current_state": "Draft",
+        "age_days": 378
+      },
+      {
+        "item_id": "#37869",
+        "title": "Hybrid cache v2",
+        "current_state": "Awaiting Review",
+        "age_days": 378
+      },
+      {
+        "item_id": "#37846",
+        "title": "Integrating Kimi-Audio",
+        "current_state": "Draft",
+        "age_days": 378
+      },
+      {
+        "item_id": "#37845",
+        "title": "Remove redundancies for Qwen3MoeDecoderLayer ",
+        "current_state": "Awaiting Review",
+        "age_days": 378
+      },
+      {
+        "item_id": "#37837",
+        "title": "feat: Add ConvaiCausalLM model for Hindi Causal Language Modeling",
+        "current_state": "Awaiting Review",
+        "age_days": 379
+      },
+      {
+        "item_id": "#37795",
+        "title": "fix qwen2.5-omini cant be loaded from AutoModel",
+        "current_state": "Awaiting Review",
+        "age_days": 382
+      },
+      {
+        "item_id": "#37792",
+        "title": "Adding features like Tokenizer evaluation/benchmarking",
+        "current_state": "Awaiting Review",
+        "age_days": 382
+      },
+      {
+        "item_id": "#37769",
+        "title": "Vectorize deepseek moe",
+        "current_state": "Awaiting Review",
+        "age_days": 383
+      },
+      {
+        "item_id": "#37763",
+        "title": "general spm converter",
+        "current_state": "Draft",
+        "age_days": 383
+      },
+      {
+        "item_id": "#37762",
+        "title": "Add update_tp_plan() for Quark",
+        "current_state": "Awaiting Review",
+        "age_days": 383
+      },
+      {
+        "item_id": "#37687",
+        "title": "Handle audio/ video default arguments in processor's apply_chat_template",
+        "current_state": "Awaiting Review",
+        "age_days": 385
+      },
+      {
+        "item_id": "#37653",
+        "title": "Non model inits",
+        "current_state": "Awaiting Review",
+        "age_days": 386
+      },
+      {
+        "item_id": "#37643",
+        "title": "Add support for manually setting `head_dim` in Qwen2 MoE",
+        "current_state": "Awaiting Review",
+        "age_days": 386
+      },
+      {
+        "item_id": "#37642",
+        "title": "Add time-based evaluation strategy to Trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 387
+      },
+      {
+        "item_id": "#37635",
+        "title": "Add resume checkpoint support to ClearML callback",
+        "current_state": "Awaiting Review",
+        "age_days": 387
+      },
+      {
+        "item_id": "#37634",
+        "title": "Add PLM Model",
+        "current_state": "Awaiting Review",
+        "age_days": 387
+      },
+      {
+        "item_id": "#37623",
+        "title": "Make hybrid cache exportable",
+        "current_state": "Awaiting Review",
+        "age_days": 389
+      },
+      {
+        "item_id": "#37611",
+        "title": "Add FastImageProcessor for InstructBLIPVideo",
+        "current_state": "Draft",
+        "age_days": 389
+      },
+      {
+        "item_id": "#37596",
+        "title": "Tests for the new Tensor Parallel integration",
+        "current_state": "Awaiting Review",
+        "age_days": 390
+      },
+      {
+        "item_id": "#37582",
+        "title": "Add code examples for creating & fine\u2011tuning EncoderDecoderModel (fixes #16135)",
+        "current_state": "Draft",
+        "age_days": 390
+      },
+      {
+        "item_id": "#37539",
+        "title": "Mllama fast image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37537",
+        "title": "Fast tokenizer encoding doesn't handle empty string input",
+        "current_state": "Approved",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37535",
+        "title": "Qwen2.5-VL fix redundant cu_window_seqlens",
+        "current_state": "Draft",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37534",
+        "title": "Docs: fix docstrings for Gemma3 modeling",
+        "current_state": "Approved",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37528",
+        "title": "Phi3",
+        "current_state": "Draft",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37522",
+        "title": "internalize build_inputs_with_special_tokens and prepare_for_model",
+        "current_state": "Awaiting Review",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37512",
+        "title": "Update tokenization_utils_base.py",
+        "current_state": "Approved",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37511",
+        "title": "fix: qwen2.5 omni apply_chat_template system content check",
+        "current_state": "Awaiting Review",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37509",
+        "title": "[fix] Trainer num_tokens() count",
+        "current_state": "Draft",
+        "age_days": 392
+      },
+      {
+        "item_id": "#37487",
+        "title": "fix: :bug: Support explicitly passing callback",
+        "current_state": "Draft",
+        "age_days": 393
+      },
+      {
+        "item_id": "#37475",
+        "title": "trainer.py fix loss aggregation over multiple devices",
+        "current_state": "Awaiting Review",
+        "age_days": 394
+      },
+      {
+        "item_id": "#37473",
+        "title": "Modular m4t speecht5 sew",
+        "current_state": "Awaiting Review",
+        "age_days": 394
+      },
+      {
+        "item_id": "#37460",
+        "title": "Fix interpolation of convnext image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 396
+      },
+      {
+        "item_id": "#37453",
+        "title": "feat: Add gradient testing for Flash Attention 2",
+        "current_state": "Draft",
+        "age_days": 396
+      },
+      {
+        "item_id": "#37442",
+        "title": "Implemented update function in cache_utils.py, with a test file test_cache_utils.py ",
+        "current_state": "Awaiting Review",
+        "age_days": 396
+      },
+      {
+        "item_id": "#37432",
+        "title": "allow accelerate prepare for torch compiled models",
+        "current_state": "Draft",
+        "age_days": 397
+      },
+      {
+        "item_id": "#37417",
+        "title": "[bug] fsdp training save checkpoint twice",
+        "current_state": "Draft",
+        "age_days": 397
+      },
+      {
+        "item_id": "#37397",
+        "title": "Add support for Moonlight 16B, add aux loss for Deepseek v3 model finetuning.",
+        "current_state": "Draft",
+        "age_days": 398
+      },
+      {
+        "item_id": "#37396",
+        "title": "Next batch of models with removed return_dict",
+        "current_state": "Awaiting Review",
+        "age_days": 398
+      },
+      {
+        "item_id": "#37377",
+        "title": "Update fastspeech2 model card",
+        "current_state": "Awaiting Review",
+        "age_days": 399
+      },
+      {
+        "item_id": "#37374",
+        "title": "Fix typo in Gemma3ForCausalLM doctest",
+        "current_state": "Approved",
+        "age_days": 399
+      },
+      {
+        "item_id": "#37357",
+        "title": "support overlapping masks in mask2former image processor",
+        "current_state": "Awaiting Review",
+        "age_days": 399
+      },
+      {
+        "item_id": "#37350",
+        "title": "Haocheng lu2",
+        "current_state": "Awaiting Review",
+        "age_days": 400
+      },
+      {
+        "item_id": "#37297",
+        "title": "Added fast processor for llava-next-video model",
+        "current_state": "Changes Requested",
+        "age_days": 403
+      },
+      {
+        "item_id": "#37267",
+        "title": "Add Magma Agentic Model from Microsoft",
+        "current_state": "Draft",
+        "age_days": 403
+      },
+      {
+        "item_id": "#37259",
+        "title": "Bye bye env vars, keep everything as configs",
+        "current_state": "Awaiting Review",
+        "age_days": 404
+      },
+      {
+        "item_id": "#37252",
+        "title": "[don't merge yet] Revert \"Revert #37031\"",
+        "current_state": "Draft",
+        "age_days": 404
+      },
+      {
+        "item_id": "#37243",
+        "title": "Fix Flash Attention guard",
+        "current_state": "Approved",
+        "age_days": 404
+      },
+      {
+        "item_id": "#37231",
+        "title": "Update model-card for Autofomer",
+        "current_state": "Approved",
+        "age_days": 404
+      },
+      {
+        "item_id": "#37226",
+        "title": "[RFC] Fix Gemma 3 FP16 with activation scaling",
+        "current_state": "Draft",
+        "age_days": 405
+      },
+      {
+        "item_id": "#37225",
+        "title": "Adding MLPSpeculator support for assisted generation",
+        "current_state": "Awaiting Review",
+        "age_days": 405
+      },
+      {
+        "item_id": "#37210",
+        "title": "add fast image processor for pix2struct ",
+        "current_state": "Draft",
+        "age_days": 405
+      },
+      {
+        "item_id": "#37196",
+        "title": "Added separate limits for saving full checkpoints and model weights",
+        "current_state": "Awaiting Review",
+        "age_days": 405
+      },
+      {
+        "item_id": "#37191",
+        "title": "Add Fast Image Processor for VideoMAE ",
+        "current_state": "Awaiting Review",
+        "age_days": 405
+      },
+      {
+        "item_id": "#37177",
+        "title": "trying custom tokenizer fix",
+        "current_state": "Draft",
+        "age_days": 406
+      },
+      {
+        "item_id": "#37168",
+        "title": "Idefics2 Fast Image processor ",
+        "current_state": "Awaiting Review",
+        "age_days": 406
+      },
+      {
+        "item_id": "#37155",
+        "title": "docs: Update LayoutLMv3 model card with standardized format and impro\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 407
+      },
+      {
+        "item_id": "#37150",
+        "title": "[New Model Addition] Baichuan M1",
+        "current_state": "Draft",
+        "age_days": 407
+      },
+      {
+        "item_id": "#37127",
+        "title": "refactor(audio_processing): replace pipe with temp files for FFmpeg p\u2026",
+        "current_state": "Draft",
+        "age_days": 407
+      },
+      {
+        "item_id": "#37119",
+        "title": "Add FastImageProcessor for EfficientNet",
+        "current_state": "Awaiting Review",
+        "age_days": 407
+      },
+      {
+        "item_id": "#37106",
+        "title": "Add Sdpa Support: `[Electra]`",
+        "current_state": "Awaiting Review",
+        "age_days": 409
+      },
+      {
+        "item_id": "#37096",
+        "title": "Add Plain-DETR",
+        "current_state": "Draft",
+        "age_days": 410
+      },
+      {
+        "item_id": "#37094",
+        "title": "Add ImageProcessorFast to Efficientnet processor ",
+        "current_state": "Awaiting Review",
+        "age_days": 410
+      },
+      {
+        "item_id": "#37082",
+        "title": "[draft] random tests order",
+        "current_state": "Awaiting Review",
+        "age_days": 410
+      },
+      {
+        "item_id": "#37072",
+        "title": "Reverse dependency map shouldn't be created when test_all is set",
+        "current_state": "Draft",
+        "age_days": 410
+      },
+      {
+        "item_id": "#37049",
+        "title": "Adding a stub for MiniCPM-o to the models",
+        "current_state": "Awaiting Review",
+        "age_days": 411
+      },
+      {
+        "item_id": "#37045",
+        "title": " Add Fast Image Processor for Idefics3",
+        "current_state": "Awaiting Review",
+        "age_days": 411
+      },
+      {
+        "item_id": "#37042",
+        "title": "Feature universe - \u91cf\u5b50\u7ecf\u5178\u540c\u6784Transformer\u6a21\u578b\u5b9e\u73b0\u4e0e\u4f18\u5316 | Quantum-Classical Isomorphic Transformer Model Implementation and Optimization",
+        "current_state": "Draft",
+        "age_days": 411
+      },
+      {
+        "item_id": "#37025",
+        "title": "fix best_model_checkpoint is None issue when distiributed training",
+        "current_state": "Awaiting Review",
+        "age_days": 411
+      },
+      {
+        "item_id": "#37009",
+        "title": "Export Whisper to ExecuTorch",
+        "current_state": "Awaiting Review",
+        "age_days": 412
+      },
+      {
+        "item_id": "#36999",
+        "title": "Add Fast SamImageProcessor",
+        "current_state": "Awaiting Review",
+        "age_days": 412
+      },
+      {
+        "item_id": "#36969",
+        "title": "Make executorch integration more seamless by analyzing model signature",
+        "current_state": "Approved",
+        "age_days": 413
+      },
+      {
+        "item_id": "#36952",
+        "title": "Added Sapnous Architecture",
+        "current_state": "Awaiting Review",
+        "age_days": 413
+      },
+      {
+        "item_id": "#36948",
+        "title": "Update image_processing_qwen2_vl.py\u3002fix bug.",
+        "current_state": "Awaiting Review",
+        "age_days": 413
+      },
+      {
+        "item_id": "#36943",
+        "title": "Static cache should support indexing",
+        "current_state": "Awaiting Review",
+        "age_days": 414
+      },
+      {
+        "item_id": "#36928",
+        "title": "Remove the redundant shift during the loss computation in the Moshi m\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 414
+      },
+      {
+        "item_id": "#36919",
+        "title": "[qwen2-audio] remove default template",
+        "current_state": "Awaiting Review",
+        "age_days": 414
+      },
+      {
+        "item_id": "#36905",
+        "title": "LogfireCallback: Integrating Logfire with Hugging Face\u2019s Trainer",
+        "current_state": "Awaiting Review",
+        "age_days": 416
+      },
+      {
+        "item_id": "#36901",
+        "title": "Add NGen3 ",
+        "current_state": "Awaiting Review",
+        "age_days": 416
+      },
+      {
+        "item_id": "#36894",
+        "title": "Enable tracing for Moshi",
+        "current_state": "Awaiting Review",
+        "age_days": 417
+      },
+      {
+        "item_id": "#36892",
+        "title": "[WIP] Computer vision util: vision visualizer",
+        "current_state": "Approved",
+        "age_days": 417
+      },
+      {
+        "item_id": "#36883",
+        "title": "Fix `resume_from_checkpoint` not recognising `\"last-checkpoint\"`",
+        "current_state": "Awaiting Review",
+        "age_days": 417
+      },
+      {
+        "item_id": "#36870",
+        "title": "Improve Model Download Speeds By ~3x For Large Models",
+        "current_state": "Awaiting Review",
+        "age_days": 417
+      },
+      {
+        "item_id": "#36839",
+        "title": "Haocheng lu",
+        "current_state": "Approved",
+        "age_days": 419
+      },
+      {
+        "item_id": "#36809",
+        "title": "fix unexpected kws of input_ids when setup no speech detection of whisper",
+        "current_state": "Awaiting Review",
+        "age_days": 419
+      },
+      {
+        "item_id": "#36808",
+        "title": "Support loading custom code objects (`trust_remote_code=True`) in offline mode from local",
+        "current_state": "Awaiting Review",
+        "age_days": 419
+      },
+      {
+        "item_id": "#36807",
+        "title": "Add long vita",
+        "current_state": "Awaiting Review",
+        "age_days": 419
+      },
+      {
+        "item_id": "#36791",
+        "title": "Update configuration_auto.py for NGen3",
+        "current_state": "Awaiting Review",
+        "age_days": 420
+      },
+      {
+        "item_id": "#36787",
+        "title": "Create modeling_ngen3.py for NGen3",
+        "current_state": "Awaiting Review",
+        "age_days": 420
+      },
+      {
+        "item_id": "#36782",
+        "title": "Fix attention_mask dimension issue in GPT2Model",
+        "current_state": "Awaiting Review",
+        "age_days": 420
+      },
+      {
+        "item_id": "#36760",
+        "title": "feat: expose the strict flag to allow catching missing model layers while loading a checkpoint",
+        "current_state": "Awaiting Review",
+        "age_days": 421
+      },
+      {
+        "item_id": "#36737",
+        "title": "[WP] PagedAttention + Prefix Cache for FlashAttention2",
+        "current_state": "Draft",
+        "age_days": 423
+      },
+      {
+        "item_id": "#36711",
+        "title": "[WIP] Add DINO DETR Model to HuggingFace Transformers",
+        "current_state": "Awaiting Review",
+        "age_days": 424
+      },
+      {
+        "item_id": "#36708",
+        "title": "Fix long lagging when streaming text without spaces and NJK chars",
+        "current_state": "Awaiting Review",
+        "age_days": 425
+      },
+      {
+        "item_id": "#36706",
+        "title": "Limit numpy version to <2.0.0",
+        "current_state": "Draft",
+        "age_days": 425
+      },
+      {
+        "item_id": "#36647",
+        "title": "Fix device issue in modeling_qwen2",
+        "current_state": "Approved",
+        "age_days": 427
+      },
+      {
+        "item_id": "#36621",
+        "title": "[WIP] Add support to load models with transforms",
+        "current_state": "Draft",
+        "age_days": 429
+      },
+      {
+        "item_id": "#36597",
+        "title": "Attention mechanisms elaboration",
+        "current_state": "Awaiting Review",
+        "age_days": 432
+      },
+      {
+        "item_id": "#36556",
+        "title": "add-LongVITAModel",
+        "current_state": "Draft",
+        "age_days": 433
+      },
+      {
+        "item_id": "#36553",
+        "title": "add-long-vita",
+        "current_state": "Draft",
+        "age_days": 433
+      },
+      {
+        "item_id": "#36514",
+        "title": "Refactor object-detection models",
+        "current_state": "Draft",
+        "age_days": 435
+      },
+      {
+        "item_id": "#36496",
+        "title": "Add an event related to forward in the TrainerCallback",
+        "current_state": "Approved",
+        "age_days": 436
+      },
+      {
+        "item_id": "#36491",
+        "title": "Allow OOV Image Token for LLaVa Next Variants",
+        "current_state": "Awaiting Review",
+        "age_days": 436
+      },
+      {
+        "item_id": "#36478",
+        "title": "Sanitize Model Module Names to Follow Python Conventions",
+        "current_state": "Awaiting Review",
+        "age_days": 438
+      },
+      {
+        "item_id": "#36476",
+        "title": "Add NVIDIA Cosmos",
+        "current_state": "Awaiting Review",
+        "age_days": 438
+      },
+      {
+        "item_id": "#36432",
+        "title": "Add fetch_paginated_github_data to deduplicate GitHub API pagination \u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 440
+      },
+      {
+        "item_id": "#36412",
+        "title": "[i18n-zh] Translating kv_cache into zh-hans",
+        "current_state": "Approved",
+        "age_days": 440
+      },
+      {
+        "item_id": "#36401",
+        "title": "[Model] Optimize BERT memory usage and improve code readability",
+        "current_state": "Awaiting Review",
+        "age_days": 441
+      },
+      {
+        "item_id": "#36389",
+        "title": "Added Cosmos model files ",
+        "current_state": "Awaiting Review",
+        "age_days": 441
+      },
+      {
+        "item_id": "#36377",
+        "title": "Fix: Use config.use_sliding_window instead of config.sliding_window",
+        "current_state": "Awaiting Review",
+        "age_days": 442
+      },
+      {
+        "item_id": "#36356",
+        "title": "Introduce numpy/numba optimization to `Qwen2VLImageProcessor`",
+        "current_state": "Awaiting Review",
+        "age_days": 443
+      },
+      {
+        "item_id": "#36303",
+        "title": "Modify save_steps when resuming from a checkpoint.",
+        "current_state": "Awaiting Review",
+        "age_days": 446
+      },
+      {
+        "item_id": "#36300",
+        "title": "Update computation method for training samples",
+        "current_state": "Awaiting Review",
+        "age_days": 446
+      },
+      {
+        "item_id": "#36287",
+        "title": "[modular] allow multiple modular files in the same model folder",
+        "current_state": "Awaiting Review",
+        "age_days": 447
+      },
+      {
+        "item_id": "#36221",
+        "title": "Prevent Reinitialization of Resized LM Head When `tie_word_embeddings` is False #35141",
+        "current_state": "Awaiting Review",
+        "age_days": 450
+      },
+      {
+        "item_id": "#36216",
+        "title": "[WIP] Add a dedicated tokenizer for byte level transformers",
+        "current_state": "Awaiting Review",
+        "age_days": 451
+      },
+      {
+        "item_id": "#36214",
+        "title": "Fix the eval_use_gather_object flag usage",
+        "current_state": "Approved",
+        "age_days": 451
+      },
+      {
+        "item_id": "#36211",
+        "title": "fix: condition bos_token_id and space as token",
+        "current_state": "Awaiting Review",
+        "age_days": 451
+      },
+      {
+        "item_id": "#36201",
+        "title": "Append best model checkpoint with active adapter when not default",
+        "current_state": "Approved",
+        "age_days": 452
+      },
+      {
+        "item_id": "#36198",
+        "title": "Fixed dynamic module import when there is more than one dot in class \u2026",
+        "current_state": "Approved",
+        "age_days": 452
+      },
+      {
+        "item_id": "#36197",
+        "title": "(ugly) Use  `parallelism=4` for `check_repository_consistency`",
+        "current_state": "Awaiting Review",
+        "age_days": 452
+      },
+      {
+        "item_id": "#36133",
+        "title": "Set evaluation and checkpointing defaults to 'epoch' and reduce loggi\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 455
+      },
+      {
+        "item_id": "#36095",
+        "title": "Fixup another model + encoder decoder",
+        "current_state": "Draft",
+        "age_days": 459
+      },
+      {
+        "item_id": "#36090",
+        "title": "Fix: Llama - adjust the rotary embedding dimensions.",
+        "current_state": "Awaiting Review",
+        "age_days": 459
+      },
+      {
+        "item_id": "#36089",
+        "title": "fix: dtype might change during resize",
+        "current_state": "Awaiting Review",
+        "age_days": 459
+      },
+      {
+        "item_id": "#36073",
+        "title": "Speedup modular conversion w/ multiproc",
+        "current_state": "Draft",
+        "age_days": 460
+      },
+      {
+        "item_id": "#36049",
+        "title": "Remove type hint `Unpack[FlashAttentionKwargs]`",
+        "current_state": "Awaiting Review",
+        "age_days": 461
+      },
+      {
+        "item_id": "#36038",
+        "title": "Fix bug in prepare_inputs_for_generation function: in Qwen2-VL (#36037)",
+        "current_state": "Awaiting Review",
+        "age_days": 462
+      },
+      {
+        "item_id": "#36011",
+        "title": "Fix ImportError: cannot import name 'GenerationMixin' from 'transformers.generation'",
+        "current_state": "Awaiting Review",
+        "age_days": 463
+      },
+      {
+        "item_id": "#36005",
+        "title": "[`Pegasus(-x)`] Fixup embedding interfaces on Encoder/Decoder",
+        "current_state": "Awaiting Review",
+        "age_days": 464
+      },
+      {
+        "item_id": "#35966",
+        "title": "[Qwen2_5_VL] Fix dtype mismatch in FA2 by removing forced float() cast in rotary embeddings",
+        "current_state": "Awaiting Review",
+        "age_days": 468
+      },
+      {
+        "item_id": "#35939",
+        "title": "[Whisper] Fix num_return_sequences behavior",
+        "current_state": "Draft",
+        "age_days": 469
+      },
+      {
+        "item_id": "#35920",
+        "title": " changed MllamaPreTrainedModel._prepare_4d_causal_attention_mask",
+        "current_state": "Awaiting Review",
+        "age_days": 470
+      },
+      {
+        "item_id": "#35904",
+        "title": "Fix Mask2Former Weight Initialization Issues #35877",
+        "current_state": "Awaiting Review",
+        "age_days": 470
+      },
+      {
+        "item_id": "#35887",
+        "title": "Adds GGUF support for Gemma models",
+        "current_state": "Approved",
+        "age_days": 472
+      },
+      {
+        "item_id": "#35886",
+        "title": "Add security validation for ZeroShotClassificationArgumentHandler hypothesis templates #35874",
+        "current_state": "Awaiting Review",
+        "age_days": 472
+      },
+      {
+        "item_id": "#35847",
+        "title": "Fix Jitter Noise Passing to Experts in Switch Transformers #33969",
+        "current_state": "Approved",
+        "age_days": 475
+      },
+      {
+        "item_id": "#35841",
+        "title": "Update modeling_attn_mask_utils.py",
+        "current_state": "Awaiting Review",
+        "age_days": 475
+      },
+      {
+        "item_id": "#35825",
+        "title": "Add MultipleChoice & QuestionAnswering heads to ModernBERT",
+        "current_state": "Awaiting Review",
+        "age_days": 475
+      },
+      {
+        "item_id": "#35819",
+        "title": "Exploring use of kwargs for timm model and transforms creation",
+        "current_state": "Draft",
+        "age_days": 476
+      },
+      {
+        "item_id": "#35799",
+        "title": "Fix Noise Computation for NEFTune During Packed Training #34659",
+        "current_state": "Awaiting Review",
+        "age_days": 477
+      },
+      {
+        "item_id": "#35796",
+        "title": "Fix IsADirectoryError in notebook progress bar display methods. Fixes #34766",
+        "current_state": "Awaiting Review",
+        "age_days": 477
+      },
+      {
+        "item_id": "#35793",
+        "title": "Fix docstring for get_candidates return shape",
+        "current_state": "Awaiting Review",
+        "age_days": 477
+      },
+      {
+        "item_id": "#35790",
+        "title": "Add StyleTTS 2",
+        "current_state": "Awaiting Review",
+        "age_days": 477
+      },
+      {
+        "item_id": "#35769",
+        "title": "Fixed ViTMAE for non-square images",
+        "current_state": "Awaiting Review",
+        "age_days": 478
+      },
+      {
+        "item_id": "#35764",
+        "title": "Add timm_wrapper support to AutoFeatureExtractor",
+        "current_state": "Awaiting Review",
+        "age_days": 479
+      },
+      {
+        "item_id": "#35760",
+        "title": "fix immediate quantization of the first token in QuantizedCache",
+        "current_state": "Awaiting Review",
+        "age_days": 480
+      },
+      {
+        "item_id": "#35732",
+        "title": "Generate handle per batch idx params",
+        "current_state": "Draft",
+        "age_days": 481
+      },
+      {
+        "item_id": "#35720",
+        "title": "Added support for GraniteForSequenceClassification",
+        "current_state": "Approved",
+        "age_days": 482
+      },
+      {
+        "item_id": "#35694",
+        "title": "Add internlm3 dense",
+        "current_state": "Approved",
+        "age_days": 483
+      },
+      {
+        "item_id": "#35674",
+        "title": "Fix Aria CI and testing",
+        "current_state": "Awaiting Review",
+        "age_days": 484
+      },
+      {
+        "item_id": "#35627",
+        "title": "Fix Batch Size Mismatch When Using `crops_n_layers` in `mask-generation` Pipeline #35530",
+        "current_state": "Awaiting Review",
+        "age_days": 486
+      },
+      {
+        "item_id": "#35585",
+        "title": "A new Traditional Chinese version of the README.md for run_on_remote.py",
+        "current_state": "Approved",
+        "age_days": 488
+      },
+      {
+        "item_id": "#35571",
+        "title": "Exploit symmetry of covariance matrices for faster & more stable diag\u2026",
+        "current_state": "Awaiting Review",
+        "age_days": 489
+      },
+      {
+        "item_id": "#35550",
+        "title": "Add AIMv2 to Transformers",
+        "current_state": "Awaiting Review",
+        "age_days": 490
+      },
+      {
+        "item_id": "#35535",
+        "title": "change README FILE",
+        "current_state": "Awaiting Review",
+        "age_days": 491
+      },
+      {
+        "item_id": "#35517",
+        "title": "Add support for 4D custom attention masks in GPT-2",
+        "current_state": "Awaiting Review",
+        "age_days": 492
+      }
+    ]
+  },
+  "input": {
+    "repo": "huggingface/transformers",
+    "asof": "2026-05-12",
+    "workflow": [
+      "Draft",
+      "Awaiting Review",
+      "Changes Requested",
+      "Approved"
+    ],
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow aging --repo huggingface/transformers --asof 2026-05-12 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-12 --history-end 2026-05-11",
+  "logs": []
+}

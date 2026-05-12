@@ -13,9 +13,12 @@ from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
+from flowmetrics.cfd import CfdPoint
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.report import (
+    CfdInput,
+    CfdReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -246,6 +249,59 @@ class TestReportVocabulary:
             "Percentile",
         ]:
             assert term in vocab, f"missing term: {term}"
+
+
+class TestCfdReport:
+    def _report(self, *, repo="acme/widget", offline=False) -> CfdReport:
+        return CfdReport(
+            input=CfdInput(
+                repo=repo,
+                start=date(2026, 5, 4),
+                stop=date(2026, 5, 10),
+                workflow=("Open", "In Progress", "Done"),
+                interval_days=1,
+                offline=offline,
+            ),
+            points=[
+                CfdPoint(
+                    sampled_on=date(2026, 5, 4),
+                    counts_by_state={"Open": 0, "In Progress": 0, "Done": 0},
+                ),
+                CfdPoint(
+                    sampled_on=date(2026, 5, 10),
+                    counts_by_state={"Open": 5, "In Progress": 2, "Done": 3},
+                ),
+            ],
+            interpretation=_interp(),
+        )
+
+    def test_schema_and_command_pinned(self):
+        r = self._report()
+        assert r.schema == "flowmetrics.cfd.v1"
+        assert r.command == "cfd"
+
+    def test_frozen(self):
+        r = self._report()
+        with pytest.raises(FrozenInstanceError):
+            r.command = "nope"  # type: ignore[misc]
+
+    def test_vocabulary_defines_cfd_terms(self):
+        vocab = report_vocabulary(self._report())
+        for term in ["Arrivals", "Departures", "WIP", "Cumulative Flow Diagram"]:
+            assert term in vocab, f"missing term: {term}"
+
+    def test_cli_invocation_round_trips_inputs(self):
+        cmd = cli_invocation(self._report())
+        assert cmd.startswith("uv run flow cfd")
+        assert "--repo acme/widget" in cmd
+        assert "--start 2026-05-04" in cmd
+        assert "--stop 2026-05-10" in cmd
+        assert "--workflow 'Open,In Progress,Done'" in cmd
+        assert "--interval-days 1" in cmd
+        assert "--offline" not in cmd
+
+    def test_cli_invocation_includes_offline_when_set(self):
+        assert "--offline" in cli_invocation(self._report(offline=True))
 
 
 class TestCliInvocation:

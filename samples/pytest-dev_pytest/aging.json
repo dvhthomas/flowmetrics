@@ -1,0 +1,820 @@
+{
+  "schema": "flowmetrics.aging.v1",
+  "command": "aging",
+  "generated_at": "2026-05-12T13:15:18.929794-06:00",
+  "headline": "WIP Aging for pytest-dev/pytest as of May 12, 2026: 126 in-flight items, 113 already past P85 (28.4d), 48 past P95 (256.5d).",
+  "definition": "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
+  "summary": {
+    "in_flight_count": 126,
+    "wip_by_state": {
+      "Approved": 13,
+      "Draft": 27,
+      "Changes Requested": 28,
+      "Awaiting Review": 58
+    },
+    "cycle_time_percentiles_days": {
+      "50": 1.370474537037037,
+      "70": 8.03329861111111,
+      "85": 28.41664351851852,
+      "95": 256.5313773148148
+    },
+    "completed_count_for_percentiles": 39
+  },
+  "key_insight": "113 item(s) have aged past the P85 cycle time (28.4d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #7941, #8056, #8358. Concentrate decision-making here.",
+  "next_actions": [
+    "48 item(s) past P95 (256.5d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "Biggest WIP column is 'Awaiting Review' with 58 item(s). If that band is upstream (queue), pull policy. If downstream (review/test), capacity.",
+    "Re-check daily; Aging is a leading indicator of forecast slip."
+  ],
+  "caveats": [
+    "Aging is a snapshot as of May 12, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 12, 2026 \u2192 May 11, 2026 (39 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second."
+  ],
+  "vocabulary": {
+    "Work Item Age": "Elapsed time since an item entered the workflow. Applies only to in-flight items \u2014 once an item exits, that elapsed time becomes the item's Cycle Time. Vacanti, WWIBD pp. 50.",
+    "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y). Vacanti, WWIBD Figure 3.2."
+  },
+  "chart_data": {
+    "items": [
+      {
+        "item_id": "#14468",
+        "title": "[PR #14467/7df5d80f backport][9.0.x] docs: clarify subtests progress output",
+        "current_state": "Approved",
+        "age_days": 0
+      },
+      {
+        "item_id": "#14463",
+        "title": "WIP: broaden isdict() to support generic Mapping types (#14461) [no review yet]",
+        "current_state": "Draft",
+        "age_days": 1
+      },
+      {
+        "item_id": "#14454",
+        "title": "determine_setup: use invocation_dir as rootdir when -c is given",
+        "current_state": "Changes Requested",
+        "age_days": 3
+      },
+      {
+        "item_id": "#14451",
+        "title": "terminal: add --name-only option to show only names of failed tests",
+        "current_state": "Awaiting Review",
+        "age_days": 3
+      },
+      {
+        "item_id": "#14448",
+        "title": "feat(rewrite): address assertion rewriting blind spots with systematic tests",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#14447",
+        "title": "fix(rewrite): prevent walrus operator double evaluation in assertions",
+        "current_state": "Awaiting Review",
+        "age_days": 4
+      },
+      {
+        "item_id": "#14446",
+        "title": "Fix walrus double eval",
+        "current_state": "Draft",
+        "age_days": 4
+      },
+      {
+        "item_id": "#14441",
+        "title": "reduce gc_collect_harder default to 1 on CPython",
+        "current_state": "Draft",
+        "age_days": 7
+      },
+      {
+        "item_id": "#14432",
+        "title": "Add tee-fd capture mode and capteefd fixtures",
+        "current_state": "Awaiting Review",
+        "age_days": 11
+      },
+      {
+        "item_id": "#14425",
+        "title": "Codex/assertion text diff blocks",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#14423",
+        "title": "test: cover tmpdir get_user OSError fallback",
+        "current_state": "Awaiting Review",
+        "age_days": 15
+      },
+      {
+        "item_id": "#14417",
+        "title": "Fix phantom nodeid for tests collected outside rootpath (#13254)",
+        "current_state": "Awaiting Review",
+        "age_days": 18
+      },
+      {
+        "item_id": "#14397",
+        "title": "Issue 14112",
+        "current_state": "Draft",
+        "age_days": 23
+      },
+      {
+        "item_id": "#14356",
+        "title": "Fix capture asymmetry in `suspend_global_capture(in_=True)`",
+        "current_state": "Awaiting Review",
+        "age_days": 36
+      },
+      {
+        "item_id": "#14332",
+        "title": "BugFix #14329",
+        "current_state": "Approved",
+        "age_days": 45
+      },
+      {
+        "item_id": "#14331",
+        "title": "fix: rm_rf now handles directories without S_IXUSR permission",
+        "current_state": "Awaiting Review",
+        "age_days": 46
+      },
+      {
+        "item_id": "#14327",
+        "title": "Avoid rechecking RaisesGroup callbacks",
+        "current_state": "Changes Requested",
+        "age_days": 47
+      },
+      {
+        "item_id": "#14288",
+        "title": "Track dynamic fixture dependencies",
+        "current_state": "Awaiting Review",
+        "age_days": 59
+      },
+      {
+        "item_id": "#14284",
+        "title": "Fix nested caplog.filtering early removal",
+        "current_state": "Awaiting Review",
+        "age_days": 60
+      },
+      {
+        "item_id": "#14273",
+        "title": "Fix session-end gc in unraisableexception plugin to respect warning filters",
+        "current_state": "Awaiting Review",
+        "age_days": 66
+      },
+      {
+        "item_id": "#14270",
+        "title": "warn on ambiguous -p plugin module usage",
+        "current_state": "Changes Requested",
+        "age_days": 67
+      },
+      {
+        "item_id": "#14261",
+        "title": "fix: Truncate short test summary to first line of error message if not in verbose mode.",
+        "current_state": "Awaiting Review",
+        "age_days": 68
+      },
+      {
+        "item_id": "#14260",
+        "title": "docs: clarify request fixture in indirect parametrization",
+        "current_state": "Awaiting Review",
+        "age_days": 68
+      },
+      {
+        "item_id": "#14249",
+        "title": "feat: a Nix build environment",
+        "current_state": "Changes Requested",
+        "age_days": 70
+      },
+      {
+        "item_id": "#14238",
+        "title": "bugfix #13224: hide progress dots in --quiet mode",
+        "current_state": "Changes Requested",
+        "age_days": 76
+      },
+      {
+        "item_id": "#14235",
+        "title": "Add diff of repr() when comparing custom classes",
+        "current_state": "Draft",
+        "age_days": 76
+      },
+      {
+        "item_id": "#14228",
+        "title": "Fix nested caplog.filtering with same filter object",
+        "current_state": "Awaiting Review",
+        "age_days": 79
+      },
+      {
+        "item_id": "#14227",
+        "title": "[DONTMERGE] refactor: clean up node constructors \u2014 move logic to from_parent",
+        "current_state": "Awaiting Review",
+        "age_days": 79
+      },
+      {
+        "item_id": "#14226",
+        "title": "Fix -v hint in raises match diff not working",
+        "current_state": "Awaiting Review",
+        "age_days": 79
+      },
+      {
+        "item_id": "#14221",
+        "title": "code: use current excinfo when formatting chained BaseExceptionGroup",
+        "current_state": "Awaiting Review",
+        "age_days": 81
+      },
+      {
+        "item_id": "#14220",
+        "title": "raises: fix stale loop variable in RaisesGroup error reporting",
+        "current_state": "Changes Requested",
+        "age_days": 81
+      },
+      {
+        "item_id": "#14211",
+        "title": "Simplify pytest_report_teststatus for subtests",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14210",
+        "title": "Fix autouse fixtures running in @unittest.skip classes",
+        "current_state": "Approved",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14209",
+        "title": "Fix monkeypatch.setattr() teardown crash on failed setattr",
+        "current_state": "Approved",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14208",
+        "title": "Fix nested caplog.filtering() removing filter early",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14207",
+        "title": "Fix known_args_namespace containing duplicate append-action values",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14206",
+        "title": "Fix ExceptionInfo.for_later() not populating _striptext",
+        "current_state": "Awaiting Review",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14205",
+        "title": "Fix capteesys producing doubled output with --capture=no",
+        "current_state": "Approved",
+        "age_days": 83
+      },
+      {
+        "item_id": "#14180",
+        "title": "Clarify retention policy",
+        "current_state": "Awaiting Review",
+        "age_days": 90
+      },
+      {
+        "item_id": "#14170",
+        "title": "Improve error message for module-level __getattr__ issues",
+        "current_state": "Approved",
+        "age_days": 93
+      },
+      {
+        "item_id": "#14169",
+        "title": "Fix fixture discovery to use definition order instead of alphabetical",
+        "current_state": "Changes Requested",
+        "age_days": 93
+      },
+      {
+        "item_id": "#14160",
+        "title": "Clean up capture code",
+        "current_state": "Awaiting Review",
+        "age_days": 98
+      },
+      {
+        "item_id": "#14158",
+        "title": "Initial structure to support threaded execution",
+        "current_state": "Draft",
+        "age_days": 99
+      },
+      {
+        "item_id": "#14157",
+        "title": "Added new flaky test plugin and papers",
+        "current_state": "Awaiting Review",
+        "age_days": 99
+      },
+      {
+        "item_id": "#14151",
+        "title": "Add --collect-only-tree flag for tree-style collection output",
+        "current_state": "Awaiting Review",
+        "age_days": 103
+      },
+      {
+        "item_id": "#14139",
+        "title": "Preserve dictionary insertion order in assertion output",
+        "current_state": "Draft",
+        "age_days": 112
+      },
+      {
+        "item_id": "#14128",
+        "title": "Docs: clarify conftest usage and fixture import pitfalls",
+        "current_state": "Awaiting Review",
+        "age_days": 114
+      },
+      {
+        "item_id": "#14127",
+        "title": "fix: validate marker names in -m expression with --strict-markers",
+        "current_state": "Approved",
+        "age_days": 114
+      },
+      {
+        "item_id": "#14126",
+        "title": "fix: show correct program name in argparse help/errors",
+        "current_state": "Awaiting Review",
+        "age_days": 114
+      },
+      {
+        "item_id": "#14122",
+        "title": "experiment: use uv and dependency-groups in build pipelines",
+        "current_state": "Draft",
+        "age_days": 115
+      },
+      {
+        "item_id": "#14119",
+        "title": "[DONT REVIEW] WIP: Migrate Node __init__ logic to from_parent factory methods",
+        "current_state": "Draft",
+        "age_days": 115
+      },
+      {
+        "item_id": "#14118",
+        "title": "Fix conftest fixture scoping when testpaths points outside rootdir",
+        "current_state": "Awaiting Review",
+        "age_days": 115
+      },
+      {
+        "item_id": "#14104",
+        "title": "Account for changes in fixture dependencies properly",
+        "current_state": "Approved",
+        "age_days": 121
+      },
+      {
+        "item_id": "#14098",
+        "title": "fix #14004 - connect conftests to nodeids/nodes instead of matching string prefixes - ensure we connect in the collect phase in case of directory confusion",
+        "current_state": "Awaiting Review",
+        "age_days": 123
+      },
+      {
+        "item_id": "#14091",
+        "title": "Inconsistent wasxfail value when combining pytest.mark.xfail fixture with explicit pytest.xfail or pytest.fail calls",
+        "current_state": "Awaiting Review",
+        "age_days": 126
+      },
+      {
+        "item_id": "#14084",
+        "title": "Fixed ``--pyargs`` not finding modules in the current directory when running pytest from a subdirectory",
+        "current_state": "Changes Requested",
+        "age_days": 129
+      },
+      {
+        "item_id": "#14082",
+        "title": "junitxml: preserve setup/call captured output for interlaced reports",
+        "current_state": "Changes Requested",
+        "age_days": 131
+      },
+      {
+        "item_id": "#14080",
+        "title": "fix missing type annotations on `makepyfile` and `maketxtfile` methods",
+        "current_state": "Approved",
+        "age_days": 132
+      },
+      {
+        "item_id": "#14072",
+        "title": "docs : clarify fixture scope behaviour for parametrized fixtures",
+        "current_state": "Awaiting Review",
+        "age_days": 135
+      },
+      {
+        "item_id": "#14071",
+        "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)",
+        "current_state": "Changes Requested",
+        "age_days": 135
+      },
+      {
+        "item_id": "#14070",
+        "title": " Fix scope resolution for parametrized fixtures using dict order",
+        "current_state": "Awaiting Review",
+        "age_days": 135
+      },
+      {
+        "item_id": "#14049",
+        "title": "Fix ExceptionGroup to respect __tracebackhide__ (fixes #14036)",
+        "current_state": "Awaiting Review",
+        "age_days": 147
+      },
+      {
+        "item_id": "#13987",
+        "title": "separate subtests failures to give better indication on tests analysis",
+        "current_state": "Changes Requested",
+        "age_days": 173
+      },
+      {
+        "item_id": "#13954",
+        "title": "doc: Clarify conftest.py hooks unavailable during pytest_addoption",
+        "current_state": "Approved",
+        "age_days": 181
+      },
+      {
+        "item_id": "#13907",
+        "title": "Access parametrization ids",
+        "current_state": "Awaiting Review",
+        "age_days": 184
+      },
+      {
+        "item_id": "#13879",
+        "title": "docs: fix misleading docstring about default vs skip=True in getoption",
+        "current_state": "Awaiting Review",
+        "age_days": 188
+      },
+      {
+        "item_id": "#13848",
+        "title": "Fix terminal reporter output not appearing with capture active",
+        "current_state": "Awaiting Review",
+        "age_days": 198
+      },
+      {
+        "item_id": "#13837",
+        "title": "Generalize `PYTEST_CURRENT_TEST` for threading",
+        "current_state": "Changes Requested",
+        "age_days": 202
+      },
+      {
+        "item_id": "#13826",
+        "title": "Fix: Skip system temp directories in rootdir detection (issue #13822)",
+        "current_state": "Changes Requested",
+        "age_days": 206
+      },
+      {
+        "item_id": "#13825",
+        "title": "feat:add tests with uv",
+        "current_state": "Awaiting Review",
+        "age_days": 206
+      },
+      {
+        "item_id": "#13824",
+        "title": "Fix issue #13817: Fixed ``AttributeError`` in ``Argument.__repr__`` when ``dest`` attribute is not set.",
+        "current_state": "Changes Requested",
+        "age_days": 206
+      },
+      {
+        "item_id": "#13819",
+        "title": "Fixed color inconsistency in verbose mode",
+        "current_state": "Changes Requested",
+        "age_days": 208
+      },
+      {
+        "item_id": "#13800",
+        "title": "Deduplicate pythonwarnings to fix -W duplication",
+        "current_state": "Awaiting Review",
+        "age_days": 216
+      },
+      {
+        "item_id": "#13796",
+        "title": "prevent capteesys from duplicating output when -s disables global capture",
+        "current_state": "Awaiting Review",
+        "age_days": 217
+      },
+      {
+        "item_id": "#13783",
+        "title": "Add public API function pytest.match_markexpr for marker expression e\u2026",
+        "current_state": "Changes Requested",
+        "age_days": 221
+      },
+      {
+        "item_id": "#13762",
+        "title": "[refactor] Start using match case in 'assertrepr_compare'",
+        "current_state": "Awaiting Review",
+        "age_days": 226
+      },
+      {
+        "item_id": "#13745",
+        "title": "fix #13564 - warn when fixtures get wrapped with a decorator",
+        "current_state": "Draft",
+        "age_days": 232
+      },
+      {
+        "item_id": "#13736",
+        "title": "runner: re-raise pytest.exit inside ExceptionGroups (fixes #13650)",
+        "current_state": "Changes Requested",
+        "age_days": 236
+      },
+      {
+        "item_id": "#13680",
+        "title": "improvement: show return type annotations in fixtures",
+        "current_state": "Changes Requested",
+        "age_days": 258
+      },
+      {
+        "item_id": "#13619",
+        "title": "Use predictable VMs for jobs in the CI",
+        "current_state": "Awaiting Review",
+        "age_days": 291
+      },
+      {
+        "item_id": "#13618",
+        "title": "feat(13617): record reason for deselection and allow it to be displayed",
+        "current_state": "Draft",
+        "age_days": 291
+      },
+      {
+        "item_id": "#13421",
+        "title": "Disable assertion rewriting external modules",
+        "current_state": "Changes Requested",
+        "age_days": 364
+      },
+      {
+        "item_id": "#13393",
+        "title": "Conflicting custom arguments bugfix #12824",
+        "current_state": "Awaiting Review",
+        "age_days": 383
+      },
+      {
+        "item_id": "#13370",
+        "title": "fix #6881 - add policies for too long ids from a str and use short as default",
+        "current_state": "Draft",
+        "age_days": 396
+      },
+      {
+        "item_id": "#13315",
+        "title": "Implement PEP 302 optional get_code loader method",
+        "current_state": "Approved",
+        "age_days": 418
+      },
+      {
+        "item_id": "#13242",
+        "title": "Allow parametrize to depend on previous parametrize",
+        "current_state": "Awaiting Review",
+        "age_days": 446
+      },
+      {
+        "item_id": "#13106",
+        "title": "Allow adding parameter names to auto-generated parametrized test IDs",
+        "current_state": "Awaiting Review",
+        "age_days": 493
+      },
+      {
+        "item_id": "#13058",
+        "title": "Triggers a warning  when overriding fixtures at the same level",
+        "current_state": "Awaiting Review",
+        "age_days": 515
+      },
+      {
+        "item_id": "#13044",
+        "title": "Fix for warning test arguments with default values",
+        "current_state": "Changes Requested",
+        "age_days": 519
+      },
+      {
+        "item_id": "#13002",
+        "title": "Save teardown exceptions for further teardowns",
+        "current_state": "Approved",
+        "age_days": 531
+      },
+      {
+        "item_id": "#12918",
+        "title": "Conditionally ignore collection of setuptools dirnames",
+        "current_state": "Changes Requested",
+        "age_days": 564
+      },
+      {
+        "item_id": "#12897",
+        "title": "adds `keep_ignores` kwarg to `pytest.warns`",
+        "current_state": "Awaiting Review",
+        "age_days": 573
+      },
+      {
+        "item_id": "#12877",
+        "title": "\ud83d\udc85 Migrate `coveragerc` to use `source_pkgs`",
+        "current_state": "Draft",
+        "age_days": 578
+      },
+      {
+        "item_id": "#12816",
+        "title": "no cache fixtures POC",
+        "current_state": "Draft",
+        "age_days": 605
+      },
+      {
+        "item_id": "#12812",
+        "title": "[Bug Fix] Pytester.syspathinsert() has no effect when using runpytest_subprocess() . closes #10651",
+        "current_state": "Draft",
+        "age_days": 606
+      },
+      {
+        "item_id": "#12634",
+        "title": "Truncate diff of very long texts if not in verbose mode (fix  #12406)",
+        "current_state": "Changes Requested",
+        "age_days": 661
+      },
+      {
+        "item_id": "#12616",
+        "title": "Load plugins referencing entry point name provided via config and env var",
+        "current_state": "Awaiting Review",
+        "age_days": 665
+      },
+      {
+        "item_id": "#12487",
+        "title": "introducing FunctionDefinition as actual Node/Collector",
+        "current_state": "Draft",
+        "age_days": 692
+      },
+      {
+        "item_id": "#12322",
+        "title": "WIP: Truncate objects the same way we truncate other messages",
+        "current_state": "Draft",
+        "age_days": 728
+      },
+      {
+        "item_id": "#12267",
+        "title": "Improved parameterized testing error logs / output of the file logs to match the output of the CLI logs",
+        "current_state": "Awaiting Review",
+        "age_days": 743
+      },
+      {
+        "item_id": "#12164",
+        "title": "move fixture finalizing to pytest_fixture_teardown hook",
+        "current_state": "Changes Requested",
+        "age_days": 777
+      },
+      {
+        "item_id": "#12082",
+        "title": "change param_index if param is pseudofixturedef",
+        "current_state": "Awaiting Review",
+        "age_days": 797
+      },
+      {
+        "item_id": "#11812",
+        "title": "terminal: include markers in `--collect-only` output",
+        "current_state": "Draft",
+        "age_days": 849
+      },
+      {
+        "item_id": "#11696",
+        "title": "Adding whitespace escaping on difference display",
+        "current_state": "Awaiting Review",
+        "age_days": 883
+      },
+      {
+        "item_id": "#11682",
+        "title": "Make use of `-I` in all Python invocations",
+        "current_state": "Changes Requested",
+        "age_days": 887
+      },
+      {
+        "item_id": "#11679",
+        "title": "Adding stdio option for show-capture",
+        "current_state": "Awaiting Review",
+        "age_days": 887
+      },
+      {
+        "item_id": "#11614",
+        "title": "type-ify nodes",
+        "current_state": "Draft",
+        "age_days": 910
+      },
+      {
+        "item_id": "#11533",
+        "title": "WIP: Rework fixture dependency graph calculation",
+        "current_state": "Awaiting Review",
+        "age_days": 934
+      },
+      {
+        "item_id": "#11524",
+        "title": "gh-11523: add importorskip(exc=...) kwarg",
+        "current_state": "Draft",
+        "age_days": 936
+      },
+      {
+        "item_id": "#11418",
+        "title": "Add hash comparison for pyc cache files",
+        "current_state": "Changes Requested",
+        "age_days": 977
+      },
+      {
+        "item_id": "#11284",
+        "title": "Feed a test only with initialnames, not the whole fixture closure",
+        "current_state": "Changes Requested",
+        "age_days": 1012
+      },
+      {
+        "item_id": "#11271",
+        "title": "Improvement: Base `FixtureArgKey`s on param values if possible, not param indices",
+        "current_state": "Changes Requested",
+        "age_days": 1015
+      },
+      {
+        "item_id": "#11257",
+        "title": "Resolve param indices using param values, not parameterset index",
+        "current_state": "Approved",
+        "age_days": 1019
+      },
+      {
+        "item_id": "#11243",
+        "title": "Remove `prune_dependency_tree` and reuse `getfixtureclosure` logic",
+        "current_state": "Awaiting Review",
+        "age_days": 1025
+      },
+      {
+        "item_id": "#10961",
+        "title": "Updated diff to show \\t in string comparison assertions",
+        "current_state": "Changes Requested",
+        "age_days": 1105
+      },
+      {
+        "item_id": "#10824",
+        "title": "Proposal: root spec import mode to replace legacy importing and importmode",
+        "current_state": "Draft",
+        "age_days": 1150
+      },
+      {
+        "item_id": "#10647",
+        "title": "Fix `MonkeyPatch.setattr`/`delattr` binding descriptors when `raising=False`",
+        "current_state": "Draft",
+        "age_days": 1218
+      },
+      {
+        "item_id": "#10645",
+        "title": "Fix `MonkeyPatch.setattr` leaving a new item in `vars(target)` when overriding an inherited attribute of a non-class object",
+        "current_state": "Draft",
+        "age_days": 1219
+      },
+      {
+        "item_id": "#10614",
+        "title": "Defer removing tmpdir",
+        "current_state": "Awaiting Review",
+        "age_days": 1233
+      },
+      {
+        "item_id": "#10589",
+        "title": "Allow users to override the hardcoded maxsize value",
+        "current_state": "Draft",
+        "age_days": 1244
+      },
+      {
+        "item_id": "#10215",
+        "title": "Adds checks for nested data structures not of the same type as the outermost structure.",
+        "current_state": "Awaiting Review",
+        "age_days": 1367
+      },
+      {
+        "item_id": "#9901",
+        "title": "RFC: Add Downstream Plugin Testing",
+        "current_state": "Awaiting Review",
+        "age_days": 1475
+      },
+      {
+        "item_id": "#8413",
+        "title": "fix #8412: ensure setup_method as fixture gets the same order as setup_method as xunit",
+        "current_state": "Draft",
+        "age_days": 1892
+      },
+      {
+        "item_id": "#8358",
+        "title": "refactor config file finding",
+        "current_state": "Draft",
+        "age_days": 1907
+      },
+      {
+        "item_id": "#8056",
+        "title": "[RFC] code location as a namedtuple",
+        "current_state": "Draft",
+        "age_days": 1998
+      },
+      {
+        "item_id": "#7941",
+        "title": "Clean garbage tmpdirs with tempfile.TemporaryDirectory",
+        "current_state": "Awaiting Review",
+        "age_days": 2025
+      }
+    ]
+  },
+  "input": {
+    "repo": "pytest-dev/pytest",
+    "asof": "2026-05-12",
+    "workflow": [
+      "Draft",
+      "Awaiting Review",
+      "Changes Requested",
+      "Approved"
+    ],
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow aging --repo pytest-dev/pytest --asof 2026-05-12 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-12 --history-end 2026-05-11",
+  "logs": []
+}

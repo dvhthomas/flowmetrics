@@ -8,6 +8,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 from ..report import (
+    AgingReport,
+    CfdReport,
     EfficiencyReport,
     ForecastHorizon,
     HowManyReport,
@@ -51,6 +53,10 @@ def render(report: Report, *, logs: list[str] | None = None) -> str:
         payload = _render_when_done(report)
     elif isinstance(report, HowManyReport):
         payload = _render_how_many(report)
+    elif isinstance(report, CfdReport):
+        payload = _render_cfd(report)
+    elif isinstance(report, AgingReport):
+        payload = _render_aging(report)
     else:  # pragma: no cover
         raise TypeError(f"unknown report type: {type(report).__name__}")
     payload["cli_invocation"] = cli_invocation(report)
@@ -190,6 +196,94 @@ def _render_when_done(report: WhenDoneReport) -> dict[str, Any]:
         "input": _encode(asdict(report.input)),
         "training": _render_training(report),
         "simulation": {"runs": report.simulation.runs, "seed": report.simulation.seed},
+        "docs": _DOCS,
+    }
+
+
+def _render_cfd(report: CfdReport) -> dict[str, Any]:
+    end = report.points[-1] if report.points else None
+    workflow = list(report.input.workflow)
+    arrivals = end.counts_by_state.get(workflow[0], 0) if end else 0
+    departures = end.counts_by_state.get(workflow[-1], 0) if end else 0
+    return {
+        "schema": report.schema,
+        "command": report.command,
+        "generated_at": report.generated_at.isoformat(),
+        "headline": report.interpretation.headline,
+        "definition": report_definition(report),
+        "summary": {
+            "workflow": workflow,
+            "samples": len(report.points),
+            "arrivals_at_end": arrivals,
+            "departures_at_end": departures,
+            "wip_at_end": arrivals - departures,
+        },
+        "key_insight": report.interpretation.key_insight,
+        "next_actions": list(report.interpretation.next_actions),
+        "caveats": list(report.interpretation.caveats),
+        "vocabulary": report_vocabulary(report),
+        "chart_data": {
+            "points": [
+                {
+                    "sampled_on": p.sampled_on.isoformat(),
+                    "counts_by_state": dict(p.counts_by_state),
+                }
+                for p in report.points
+            ],
+        },
+        "input": {
+            "repo": report.input.repo,
+            "start": report.input.start.isoformat(),
+            "stop": report.input.stop.isoformat(),
+            "workflow": list(report.input.workflow),
+            "interval_days": report.input.interval_days,
+            "offline": report.input.offline,
+        },
+        "docs": _DOCS,
+    }
+
+
+def _render_aging(report: AgingReport) -> dict[str, Any]:
+    wip_by_state: dict[str, int] = {}
+    for it in report.items:
+        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
+    return {
+        "schema": report.schema,
+        "command": report.command,
+        "generated_at": report.generated_at.isoformat(),
+        "headline": report.interpretation.headline,
+        "definition": report_definition(report),
+        "summary": {
+            "in_flight_count": len(report.items),
+            "wip_by_state": wip_by_state,
+            "cycle_time_percentiles_days": {
+                str(p): v for p, v in report.cycle_time_percentiles.items()
+            },
+            "completed_count_for_percentiles": report.completed_count,
+        },
+        "key_insight": report.interpretation.key_insight,
+        "next_actions": list(report.interpretation.next_actions),
+        "caveats": list(report.interpretation.caveats),
+        "vocabulary": report_vocabulary(report),
+        "chart_data": {
+            "items": [
+                {
+                    "item_id": it.item_id,
+                    "title": it.title,
+                    "current_state": it.current_state,
+                    "age_days": it.age_days,
+                }
+                for it in report.items
+            ],
+        },
+        "input": {
+            "repo": report.input.repo,
+            "asof": report.input.asof.isoformat(),
+            "workflow": list(report.input.workflow),
+            "history_start": report.input.history_start.isoformat(),
+            "history_end": report.input.history_end.isoformat(),
+            "offline": report.input.offline,
+        },
         "docs": _DOCS,
     }
 

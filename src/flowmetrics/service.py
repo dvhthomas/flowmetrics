@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .cache import FileCache
 from .compute import WindowResult, aggregate, compute_pr_flow
-from .github import GitHubClient, fetch_prs_merged_in_window
+from .github import GitHubClient, fetch_open_prs, fetch_prs_merged_in_window
 from .sources import Source
 from .sources.jira import JiraSource
 from .throughput import daily_throughput
@@ -66,6 +66,20 @@ class _GitHubSourceAdapter:
     def fetch_completed_in_window(self, start: date, stop: date):
         try:
             return fetch_prs_merged_in_window(self._client, self._repo, start, stop)
+        finally:
+            self._client.close()
+
+    def fetch_in_flight(self, asof: date):
+        """Open PRs as in-flight work items.
+
+        Phase derivation uses `isDraft` + `reviewDecision` — a four-state
+        review lifecycle (Draft → Awaiting Review → Changes Requested →
+        Approved). This is a deliberately simple lens on PR review flow;
+        for full WIP-state tracking on a GitHub project that uses issue
+        labels, see gh-velocity. See docs/DECISIONS.md #9.
+        """
+        try:
+            return fetch_open_prs(self._client, self._repo, asof=asof)
         finally:
             self._client.close()
 

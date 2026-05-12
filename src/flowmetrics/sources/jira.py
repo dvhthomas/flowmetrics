@@ -153,13 +153,26 @@ class JiraSource:
             "AND statusCategory = Done "
             "ORDER BY resolutiondate ASC"
         )
+        return self._paginated_fetch(jql, in_flight_asof=None)
+
+    def fetch_in_flight(self, asof: date) -> list[WorkItem]:
+        """Unresolved issues for this project, with their current status
+        appended as a final synthetic interval ending at `asof`."""
+        jql = (
+            f'project = "{self.project}" '
+            "AND resolution = Unresolved "
+            "ORDER BY created ASC"
+        )
+        return self._paginated_fetch(jql, in_flight_asof=asof)
+
+    def _paginated_fetch(self, jql: str, *, in_flight_asof: date | None) -> list[WorkItem]:
         items: list[WorkItem] = []
         start_at = 0
         max_results = 100
         while True:
             payload = self._search(jql, start_at, max_results)
             for issue in payload.get("issues", []):
-                item = _issue_to_work_item(issue)
+                item = _issue_to_work_item(issue, in_flight_asof=in_flight_asof)
                 if item is not None:
                     items.append(item)
             total = payload.get("total", 0)
@@ -169,19 +182,34 @@ class JiraSource:
         return items
 
 
-def _issue_to_work_item(issue: dict[str, Any]) -> WorkItem | None:
+def _issue_to_work_item(
+    issue: dict[str, Any],
+    *,
+    in_flight_asof: date | None = None,
+) -> WorkItem | None:
+    """Convert one Jira issue dict to a WorkItem.
+
+    `in_flight_asof=None` ⇒ completed-item path: requires `resolutiondate`
+    and emits intervals up to (but excluding) the resolution status.
+
+    `in_flight_asof=<date>` ⇒ in-flight path: skips items that DO have a
+    resolutiondate, and appends a final synthetic interval ending at
+    `in_flight_asof` with the current status (so Aging can read it).
+    """
     fields = issue.get("fields") or {}
-    if not fields.get("resolutiondate"):
+    has_resolution = bool(fields.get("resolutiondate"))
+    if in_flight_asof is None and not has_resolution:
+        return None
+    if in_flight_asof is not None and has_resolution:
         return None
 
     key = issue.get("key", "")
     title = fields.get("summary", "")
     created = _parse_dt(fields["created"])
-    resolved = _parse_dt(fields["resolutiondate"])
+    resolved = _parse_dt(fields["resolutiondate"]) if has_resolution else None
 
     # Walk the changelog forward; each status-field item closes the
-    # previous status's interval. The last transition's toString is the
-    # final "done" state and is not emitted as an interval.
+    # previous status's interval.
     status_changes: list[tuple[datetime, str, str]] = []
     activity: list[datetime] = []
     for history in (issue.get("changelog") or {}).get("histories", []):
@@ -198,6 +226,7 @@ def _issue_to_work_item(issue: dict[str, Any]) -> WorkItem | None:
     status_changes.sort(key=lambda x: x[0])
 
     intervals: list[StatusInterval] = []
+    current_status: str | None = None
     if status_changes:
         prev_ts = created
         prev_status = status_changes[0][1]  # fromString of first transition
@@ -205,6 +234,20 @@ def _issue_to_work_item(issue: dict[str, Any]) -> WorkItem | None:
             intervals.append(StatusInterval(prev_ts, ts, prev_status))
             prev_ts = ts
             prev_status = to_status
+        current_status = status_changes[-1][2]  # toString of last transition
+
+    if in_flight_asof is not None:
+        # In-flight items: append a final interval representing the
+        # currently-occupied status, ending at `asof`. If there were no
+        # transitions in the changelog, fall back to the `status.name`
+        # field on the issue (issues that never moved).
+        if current_status is None:
+            status_obj = fields.get("status") or {}
+            current_status = status_obj.get("name") or "Unknown"
+        last_start = intervals[-1].end if intervals else created
+        asof_dt = datetime.combine(in_flight_asof, datetime.min.time()).replace(tzinfo=UTC)
+        if asof_dt > last_start:
+            intervals.append(StatusInterval(last_start, asof_dt, current_status))
 
     reporter = fields.get("reporter") or {}
     author_login = reporter.get("name") or reporter.get("accountId")

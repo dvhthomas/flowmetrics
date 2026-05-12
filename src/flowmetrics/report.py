@@ -9,6 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
+from .aging import AgingItem
+from .cfd import CfdPoint
 from .compute import WindowResult
 from .forecast import ResultsHistogram
 
@@ -130,7 +132,61 @@ class HowManyReport:
     command: str = "forecast how-many"
 
 
-Report = EfficiencyReport | WhenDoneReport | HowManyReport
+# ---------------------------------------------------------------------------
+# CFD
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class CfdInput:
+    repo: str
+    start: date
+    stop: date
+    workflow: tuple[str, ...]  # earliest → latest workflow state
+    interval_days: int
+    offline: bool
+
+
+@dataclass(frozen=True)
+class CfdReport:
+    input: CfdInput
+    points: list[CfdPoint]
+    interpretation: Interpretation
+    generated_at: datetime = field(default_factory=lambda: datetime.now().astimezone())
+    schema: str = "flowmetrics.cfd.v1"
+    command: str = "cfd"
+
+
+# ---------------------------------------------------------------------------
+# Aging
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class AgingInput:
+    repo: str
+    asof: date
+    workflow: tuple[str, ...]
+    history_start: date  # window of completed items used for percentile lines
+    history_end: date
+    offline: bool
+
+
+@dataclass(frozen=True)
+class AgingReport:
+    input: AgingInput
+    items: list[AgingItem]
+    cycle_time_percentiles: dict[int, float]  # days
+    completed_count: int  # how many completed items fed the percentiles
+    interpretation: Interpretation
+    generated_at: datetime = field(default_factory=lambda: datetime.now().astimezone())
+    schema: str = "flowmetrics.aging.v1"
+    command: str = "aging"
+
+
+Report = (
+    EfficiencyReport | WhenDoneReport | HowManyReport | CfdReport | AgingReport
+)
 
 
 @dataclass(frozen=True)
@@ -196,7 +252,67 @@ _EFFICIENCY_VOCABULARY = {
     "Flow efficiency": ("active_time / cycle_time. Reported per-PR and as a portfolio."),
     "Portfolio flow efficiency": (
         "Σ active / Σ cycle across all merged PRs in this window. Vacanti's "
-        "system-level recipe — long-running PRs dominate, which is what you want."
+        "system-level recipe — long-running PRs dominate, which is what you "
+        "want. Contrast with mean(per-PR FE), which weights every PR equally: "
+        "fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, "
+        "even though the latter is where your wait time actually lives. "
+        "Portfolio = the system's number; mean per-PR = an aggregate of "
+        "individual ratios that hides where the queue is."
+    ),
+    "Mean per-PR FE (and why not to act on it)": (
+        "Simple average of each PR's individual flow efficiency. It tells you "
+        "what a typical PR's ratio looks like in isolation, but it does not "
+        "reflect the system — a long tail of small fast PRs makes it look "
+        "great even when one big PR sits in review for weeks. Reported for "
+        "transparency; do not optimize against it. Use Portfolio FE instead."
+    ),
+}
+
+
+_CFD_VOCABULARY = {
+    "Cumulative Flow Diagram": (
+        "Stacked area chart of cumulative counts per workflow state over time. "
+        "Each state's line counts items that have entered that state or any "
+        "later one — so the lines never cross and never decrease."
+    ),
+    "Arrivals": (
+        "Top line of a CFD. Cumulative count of items that have entered the "
+        "workflow (first state) by each sample date. Slope = arrival rate."
+    ),
+    "Departures": (
+        "Bottom line of a CFD. Cumulative count of items that have exited the "
+        "workflow (last state) by each sample date. Slope = throughput."
+    ),
+    "WIP": (
+        "Work In Progress. Vertical distance between two adjacent CFD lines "
+        "at a sample date = items currently in that workflow band. Per "
+        "Vacanti's CFD property #3."
+    ),
+    "Workflow state": (
+        "A named stage in your delivery process (e.g., Open, In Progress, "
+        "Done). CFDs require an ordered list — earliest stage to latest."
+    ),
+}
+
+
+_AGING_VOCABULARY = {
+    "Work Item Age": (
+        "Elapsed time since an item entered the workflow. Applies only to "
+        "in-flight items — once an item exits, that elapsed time becomes "
+        "the item's Cycle Time. Vacanti, WWIBD pp. 50."
+    ),
+    "In-flight items": (
+        "Items that have entered but not exited the workflow. Each in-flight "
+        "item is one dot on the Aging chart, in the column of its current state."
+    ),
+    "Cycle time percentile lines": (
+        "Reference checkpoints drawn from the cycle times of recently "
+        "completed items. If an in-flight item ages past P85, it's likely to "
+        "miss its forecast — actionable evidence to intervene."
+    ),
+    "Aging chart": (
+        "Plots in-flight items by current workflow state (x) and Age in days "
+        "(y). Vacanti, WWIBD Figure 3.2."
     ),
 }
 
@@ -236,6 +352,10 @@ def report_vocabulary(report: Report) -> dict[str, str]:
         return dict(_EFFICIENCY_VOCABULARY)
     if isinstance(report, WhenDoneReport | HowManyReport):
         return dict(_FORECAST_VOCABULARY)
+    if isinstance(report, CfdReport):
+        return dict(_CFD_VOCABULARY)
+    if isinstance(report, AgingReport):
+        return dict(_AGING_VOCABULARY)
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
@@ -265,6 +385,23 @@ def report_definition(report: Report) -> str:
             "The histogram is the distribution of simulated item counts; "
             "percentile lines mark confidence thresholds. Read BACKWARD: higher "
             "confidence = FEWER items, a more conservative commitment."
+        )
+    if isinstance(report, CfdReport):
+        return (
+            "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, "
+            "cumulative departures on bottom, intermediate workflow states "
+            "stacked between. Vertical distance at any sample date = WIP in "
+            "that band; slope = average arrival rate. Past data only — no "
+            "projections."
+        )
+    if isinstance(report, AgingReport):
+        return (
+            "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). "
+            "Each dot is one in-flight item, placed in the column of its "
+            "current workflow state at a height equal to its Age (days since "
+            "entering the workflow). Percentile lines come from the cycle "
+            "times of recently completed items — read horizontally as risk "
+            "thresholds: an item aging past P85 likely misses its forecast."
         )
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
@@ -316,6 +453,32 @@ def cli_invocation(report: Report) -> str:
         ]
         if report.simulation.seed is not None:
             parts.append(f"--seed {report.simulation.seed}")
+        if report.input.offline:
+            parts.append("--offline")
+        return " ".join(parts)
+
+    if isinstance(report, CfdReport):
+        parts = [
+            "uv run flow cfd",
+            f"--repo {report.input.repo}",
+            f"--start {report.input.start.isoformat()}",
+            f"--stop {report.input.stop.isoformat()}",
+            f"--workflow '{','.join(report.input.workflow)}'",
+            f"--interval-days {report.input.interval_days}",
+        ]
+        if report.input.offline:
+            parts.append("--offline")
+        return " ".join(parts)
+
+    if isinstance(report, AgingReport):
+        parts = [
+            "uv run flow aging",
+            f"--repo {report.input.repo}",
+            f"--asof {report.input.asof.isoformat()}",
+            f"--workflow '{','.join(report.input.workflow)}'",
+            f"--history-start {report.input.history_start.isoformat()}",
+            f"--history-end {report.input.history_end.isoformat()}",
+        ]
         if report.input.offline:
             parts.append("--offline")
         return " ".join(parts)

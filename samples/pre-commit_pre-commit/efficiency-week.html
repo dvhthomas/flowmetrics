@@ -49,7 +49,7 @@
 </head>
 <body>
 <h1>flowmetrics — efficiency pre-commit/pre-commit</h1>
-<p class="stamp">Generated 2026-05-12 12:16:13 MDT</p>
+<p class="stamp">Generated 2026-05-12 13:15:28 MDT</p>
 <div class="headline">No PRs merged in pre-commit/pre-commit between May 5, 2026 and May 11, 2026.</div>
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — Vacanti&#39;s recipe, the right number to act on.</div>
@@ -107,7 +107,9 @@ lone comment isn't counted as zero work).
   <dt><strong>Flow efficiency</strong></dt>
   <dd>active_time / cycle_time. Reported per-PR and as a portfolio.</dd>
   <dt><strong>Portfolio flow efficiency</strong></dt>
-  <dd>Σ active / Σ cycle across all merged PRs in this window. Vacanti&#39;s system-level recipe — long-running PRs dominate, which is what you want.</dd>
+  <dd>Σ active / Σ cycle across all merged PRs in this window. Vacanti&#39;s system-level recipe — long-running PRs dominate, which is what you want. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, even though the latter is where your wait time actually lives. Portfolio = the system&#39;s number; mean per-PR = an aggregate of individual ratios that hides where the queue is.</dd>
+  <dt><strong>Mean per-PR FE (and why not to act on it)</strong></dt>
+  <dd>Simple average of each PR&#39;s individual flow efficiency. It tells you what a typical PR&#39;s ratio looks like in isolation, but it does not reflect the system — a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead.</dd>
 </dl>
 </details>
 </body>
