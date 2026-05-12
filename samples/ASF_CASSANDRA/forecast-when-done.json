@@ -1,27 +1,27 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-12T11:51:03.493242-06:00",
-  "headline": "Forecast for astral-sh/uv: 85% confidence 25 items are done by 2026-05-18, starting 2026-05-12.",
+  "generated_at": "2026-05-12T11:51:29.458726-06:00",
+  "headline": "Forecast for jira:CASSANDRA: 85% confidence 25 items are done by 2026-05-28, starting 2026-05-12.",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
-      "50": "2026-05-15",
-      "70": "2026-05-17",
-      "85": "2026-05-18",
-      "95": "2026-05-20"
+      "50": "2026-05-22",
+      "70": "2026-05-25",
+      "85": "2026-05-28",
+      "95": "2026-05-31"
     },
     "reading": "forward \u2014 higher confidence means a later date",
     "horizon": {
-      "days_ahead": 6,
+      "days_ahead": 16,
       "training_window_days": 30,
-      "ratio": 0.2,
+      "ratio": 0.5333333333333333,
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is 2026-05-15. 95% confidence is 2026-05-20. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is 2026-05-22. 95% confidence is 2026-05-31. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
-    "Commit externally on the 85% date (2026-05-18), not the 50% date (2026-05-15).",
+    "Commit externally on the 85% date (2026-05-28), not the 50% date (2026-05-22).",
     "Re-run weekly to track drift in the forecast."
   ],
   "caveats": [
@@ -39,70 +39,142 @@
   "chart_data": {
     "histogram": [
       {
+        "date": "2026-05-12",
+        "frequency": 316
+      },
+      {
         "date": "2026-05-13",
-        "frequency": 1441
+        "frequency": 309
       },
       {
         "date": "2026-05-14",
-        "frequency": 1762
+        "frequency": 327
       },
       {
         "date": "2026-05-15",
-        "frequency": 1853
+        "frequency": 337
       },
       {
         "date": "2026-05-16",
-        "frequency": 1678
+        "frequency": 415
       },
       {
         "date": "2026-05-17",
-        "frequency": 1312
+        "frequency": 469
       },
       {
         "date": "2026-05-18",
-        "frequency": 835
+        "frequency": 515
       },
       {
         "date": "2026-05-19",
-        "frequency": 538
+        "frequency": 615
       },
       {
         "date": "2026-05-20",
-        "frequency": 297
+        "frequency": 644
       },
       {
         "date": "2026-05-21",
-        "frequency": 172
+        "frequency": 719
       },
       {
         "date": "2026-05-22",
-        "frequency": 60
+        "frequency": 665
       },
       {
         "date": "2026-05-23",
-        "frequency": 35
+        "frequency": 702
       },
       {
         "date": "2026-05-24",
-        "frequency": 10
+        "frequency": 676
       },
       {
         "date": "2026-05-25",
-        "frequency": 4
+        "frequency": 653
       },
       {
         "date": "2026-05-26",
-        "frequency": 1
+        "frequency": 561
       },
       {
         "date": "2026-05-27",
+        "frequency": 508
+      },
+      {
+        "date": "2026-05-28",
+        "frequency": 374
+      },
+      {
+        "date": "2026-05-29",
+        "frequency": 364
+      },
+      {
+        "date": "2026-05-30",
+        "frequency": 254
+      },
+      {
+        "date": "2026-05-31",
+        "frequency": 190
+      },
+      {
+        "date": "2026-06-01",
+        "frequency": 123
+      },
+      {
+        "date": "2026-06-02",
+        "frequency": 90
+      },
+      {
+        "date": "2026-06-03",
+        "frequency": 73
+      },
+      {
+        "date": "2026-06-04",
+        "frequency": 46
+      },
+      {
+        "date": "2026-06-05",
+        "frequency": 23
+      },
+      {
+        "date": "2026-06-06",
+        "frequency": 13
+      },
+      {
+        "date": "2026-06-07",
         "frequency": 2
+      },
+      {
+        "date": "2026-06-08",
+        "frequency": 9
+      },
+      {
+        "date": "2026-06-09",
+        "frequency": 4
+      },
+      {
+        "date": "2026-06-10",
+        "frequency": 1
+      },
+      {
+        "date": "2026-06-11",
+        "frequency": 1
+      },
+      {
+        "date": "2026-06-12",
+        "frequency": 1
+      },
+      {
+        "date": "2026-06-13",
+        "frequency": 1
       }
     ],
     "total_runs": 10000
   },
   "input": {
-    "repo": "astral-sh/uv",
+    "repo": "jira:CASSANDRA",
     "items": 25,
     "start_date": "2026-05-12",
     "history_start": "2026-04-12",
@@ -113,42 +185,42 @@
     "window_start": "2026-04-12",
     "window_end": "2026-05-11",
     "daily_throughput": [
-      2,
-      12,
       4,
+      56,
+      13,
+      2,
+      2,
+      5,
+      1,
+      0,
+      1,
+      4,
+      0,
+      2,
+      2,
+      0,
+      1,
       5,
       2,
-      9,
       1,
-      1,
-      24,
-      18,
       4,
-      7,
-      2,
-      1,
-      0,
-      23,
-      1,
-      14,
-      6,
       0,
       1,
-      1,
-      13,
-      12,
-      4,
-      6,
-      3,
+      0,
+      0,
       2,
       3,
-      16
+      1,
+      0,
+      1,
+      0,
+      0
     ],
-    "total_throughput": 197,
-    "avg_throughput_per_day": 6.566666666666666,
+    "total_throughput": 113,
+    "avg_throughput_per_day": 3.7666666666666666,
     "min_throughput_per_day": 0,
-    "max_throughput_per_day": 24,
-    "zero_throughput_days": 2
+    "max_throughput_per_day": 56,
+    "zero_throughput_days": 9
   },
   "simulation": {
     "runs": 10000,
@@ -159,6 +231,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo astral-sh/uv --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast when-done --repo jira:CASSANDRA --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
   "logs": []
 }

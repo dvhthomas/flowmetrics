@@ -1,15 +1,15 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-12T11:51:14.011613-06:00",
-  "headline": "Forecast for huggingface/transformers: 85% confidence we deliver at least 94 items by 2026-05-26 (window: 15 days).",
+  "generated_at": "2026-05-12T11:51:31.026620-06:00",
+  "headline": "Forecast for jira:CASSANDRA: 85% confidence we deliver at least 22 items by 2026-05-26 (window: 15 days).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {
-      "50": 120,
-      "70": 107,
-      "85": 94,
-      "95": 80
+      "50": 39,
+      "70": 28,
+      "85": 22,
+      "95": 17
     },
     "reading": "backward \u2014 higher confidence means FEWER items",
     "horizon": {
@@ -19,10 +19,10 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is 120 items; 95% commitment floor is 80. Higher confidence = fewer items \u2014 promising 80 leaves throughput on the table to buy certainty.",
+  "key_insight": "Median outcome is 39 items; 95% commitment floor is 17. Higher confidence = fewer items \u2014 promising 17 leaves throughput on the table to buy certainty.",
   "next_actions": [
-    "For external commitments, promise 94 items (or 80 if stakes are high).",
-    "For internal planning, treat 120 as the realistic target \u2014 half the time you deliver less.",
+    "For external commitments, promise 22 items (or 17 if stakes are high).",
+    "For internal planning, treat 39 as the realistic target \u2014 half the time you deliver less.",
     "Re-run weekly; the floor moves as historical throughput shifts."
   ],
   "caveats": [
@@ -40,180 +40,336 @@
   "chart_data": {
     "histogram": [
       {
-        "items": 36,
+        "items": 4,
         "frequency": 1
       },
       {
-        "items": 37,
+        "items": 5,
         "frequency": 1
       },
       {
-        "items": 43,
-        "frequency": 1
-      },
-      {
-        "items": 47,
-        "frequency": 2
-      },
-      {
-        "items": 48,
-        "frequency": 2
-      },
-      {
-        "items": 50,
-        "frequency": 1
-      },
-      {
-        "items": 51,
-        "frequency": 1
-      },
-      {
-        "items": 52,
-        "frequency": 4
-      },
-      {
-        "items": 53,
+        "items": 8,
         "frequency": 3
       },
       {
-        "items": 54,
-        "frequency": 1
-      },
-      {
-        "items": 55,
-        "frequency": 4
-      },
-      {
-        "items": 56,
-        "frequency": 1
-      },
-      {
-        "items": 57,
-        "frequency": 7
-      },
-      {
-        "items": 58,
-        "frequency": 7
-      },
-      {
-        "items": 59,
+        "items": 9,
         "frequency": 5
       },
       {
-        "items": 60,
-        "frequency": 6
+        "items": 10,
+        "frequency": 15
       },
       {
-        "items": 61,
-        "frequency": 1
+        "items": 11,
+        "frequency": 26
       },
       {
-        "items": 62,
-        "frequency": 10
+        "items": 12,
+        "frequency": 24
       },
       {
-        "items": 63,
-        "frequency": 9
+        "items": 13,
+        "frequency": 51
       },
       {
-        "items": 64,
-        "frequency": 10
+        "items": 14,
+        "frequency": 81
       },
       {
-        "items": 65,
-        "frequency": 12
+        "items": 15,
+        "frequency": 78
       },
       {
-        "items": 66,
-        "frequency": 16
+        "items": 16,
+        "frequency": 110
       },
       {
-        "items": 67,
-        "frequency": 21
+        "items": 17,
+        "frequency": 142
       },
       {
-        "items": 68,
-        "frequency": 11
+        "items": 18,
+        "frequency": 169
       },
       {
-        "items": 69,
-        "frequency": 16
+        "items": 19,
+        "frequency": 196
       },
       {
-        "items": 70,
-        "frequency": 22
+        "items": 20,
+        "frequency": 220
       },
       {
-        "items": 71,
-        "frequency": 25
+        "items": 21,
+        "frequency": 243
       },
       {
-        "items": 72,
-        "frequency": 29
+        "items": 22,
+        "frequency": 218
       },
       {
-        "items": 73,
-        "frequency": 17
+        "items": 23,
+        "frequency": 224
       },
       {
-        "items": 74,
-        "frequency": 28
+        "items": 24,
+        "frequency": 290
       },
       {
-        "items": 75,
-        "frequency": 35
+        "items": 25,
+        "frequency": 236
       },
       {
-        "items": 76,
-        "frequency": 44
+        "items": 26,
+        "frequency": 246
       },
       {
-        "items": 77,
-        "frequency": 36
+        "items": 27,
+        "frequency": 229
       },
       {
-        "items": 78,
-        "frequency": 33
+        "items": 28,
+        "frequency": 244
       },
       {
-        "items": 79,
-        "frequency": 44
+        "items": 29,
+        "frequency": 236
       },
       {
-        "items": 80,
-        "frequency": 47
+        "items": 30,
+        "frequency": 226
       },
       {
-        "items": 81,
-        "frequency": 48
+        "items": 31,
+        "frequency": 240
       },
       {
-        "items": 82,
-        "frequency": 68
+        "items": 32,
+        "frequency": 220
       },
       {
-        "items": 83,
+        "items": 33,
+        "frequency": 211
+      },
+      {
+        "items": 34,
+        "frequency": 189
+      },
+      {
+        "items": 35,
+        "frequency": 157
+      },
+      {
+        "items": 36,
+        "frequency": 140
+      },
+      {
+        "items": 37,
+        "frequency": 164
+      },
+      {
+        "items": 38,
+        "frequency": 143
+      },
+      {
+        "items": 39,
+        "frequency": 126
+      },
+      {
+        "items": 40,
+        "frequency": 108
+      },
+      {
+        "items": 41,
+        "frequency": 97
+      },
+      {
+        "items": 42,
+        "frequency": 99
+      },
+      {
+        "items": 43,
+        "frequency": 90
+      },
+      {
+        "items": 44,
+        "frequency": 74
+      },
+      {
+        "items": 45,
         "frequency": 55
       },
       {
+        "items": 46,
+        "frequency": 61
+      },
+      {
+        "items": 47,
+        "frequency": 46
+      },
+      {
+        "items": 48,
+        "frequency": 40
+      },
+      {
+        "items": 49,
+        "frequency": 33
+      },
+      {
+        "items": 50,
+        "frequency": 41
+      },
+      {
+        "items": 51,
+        "frequency": 38
+      },
+      {
+        "items": 52,
+        "frequency": 21
+      },
+      {
+        "items": 53,
+        "frequency": 23
+      },
+      {
+        "items": 54,
+        "frequency": 19
+      },
+      {
+        "items": 55,
+        "frequency": 15
+      },
+      {
+        "items": 56,
+        "frequency": 16
+      },
+      {
+        "items": 57,
+        "frequency": 17
+      },
+      {
+        "items": 58,
+        "frequency": 18
+      },
+      {
+        "items": 59,
+        "frequency": 8
+      },
+      {
+        "items": 60,
+        "frequency": 8
+      },
+      {
+        "items": 61,
+        "frequency": 5
+      },
+      {
+        "items": 62,
+        "frequency": 6
+      },
+      {
+        "items": 63,
+        "frequency": 5
+      },
+      {
+        "items": 64,
+        "frequency": 6
+      },
+      {
+        "items": 65,
+        "frequency": 11
+      },
+      {
+        "items": 66,
+        "frequency": 13
+      },
+      {
+        "items": 67,
+        "frequency": 25
+      },
+      {
+        "items": 68,
+        "frequency": 39
+      },
+      {
+        "items": 69,
+        "frequency": 48
+      },
+      {
+        "items": 70,
+        "frequency": 50
+      },
+      {
+        "items": 71,
+        "frequency": 68
+      },
+      {
+        "items": 72,
+        "frequency": 84
+      },
+      {
+        "items": 73,
+        "frequency": 93
+      },
+      {
+        "items": 74,
+        "frequency": 115
+      },
+      {
+        "items": 75,
+        "frequency": 123
+      },
+      {
+        "items": 76,
+        "frequency": 125
+      },
+      {
+        "items": 77,
+        "frequency": 163
+      },
+      {
+        "items": 78,
+        "frequency": 114
+      },
+      {
+        "items": 79,
+        "frequency": 142
+      },
+      {
+        "items": 80,
+        "frequency": 142
+      },
+      {
+        "items": 81,
+        "frequency": 130
+      },
+      {
+        "items": 82,
+        "frequency": 114
+      },
+      {
+        "items": 83,
+        "frequency": 126
+      },
+      {
         "items": 84,
-        "frequency": 59
+        "frequency": 117
       },
       {
         "items": 85,
-        "frequency": 53
+        "frequency": 107
       },
       {
         "items": 86,
-        "frequency": 60
+        "frequency": 100
       },
       {
         "items": 87,
-        "frequency": 52
+        "frequency": 107
       },
       {
         "items": 88,
-        "frequency": 79
+        "frequency": 100
       },
       {
         "items": 89,
@@ -221,391 +377,363 @@
       },
       {
         "items": 90,
-        "frequency": 73
+        "frequency": 88
       },
       {
         "items": 91,
-        "frequency": 76
+        "frequency": 87
       },
       {
         "items": 92,
-        "frequency": 84
+        "frequency": 72
       },
       {
         "items": 93,
-        "frequency": 109
+        "frequency": 70
       },
       {
         "items": 94,
-        "frequency": 110
-      },
-      {
-        "items": 95,
-        "frequency": 98
-      },
-      {
-        "items": 96,
-        "frequency": 101
-      },
-      {
-        "items": 97,
-        "frequency": 109
-      },
-      {
-        "items": 98,
-        "frequency": 118
-      },
-      {
-        "items": 99,
-        "frequency": 134
-      },
-      {
-        "items": 100,
-        "frequency": 118
-      },
-      {
-        "items": 101,
-        "frequency": 110
-      },
-      {
-        "items": 102,
-        "frequency": 127
-      },
-      {
-        "items": 103,
-        "frequency": 150
-      },
-      {
-        "items": 104,
-        "frequency": 151
-      },
-      {
-        "items": 105,
-        "frequency": 126
-      },
-      {
-        "items": 106,
-        "frequency": 133
-      },
-      {
-        "items": 107,
-        "frequency": 135
-      },
-      {
-        "items": 108,
-        "frequency": 148
-      },
-      {
-        "items": 109,
-        "frequency": 156
-      },
-      {
-        "items": 110,
-        "frequency": 151
-      },
-      {
-        "items": 111,
-        "frequency": 138
-      },
-      {
-        "items": 112,
-        "frequency": 132
-      },
-      {
-        "items": 113,
-        "frequency": 160
-      },
-      {
-        "items": 114,
-        "frequency": 153
-      },
-      {
-        "items": 115,
-        "frequency": 157
-      },
-      {
-        "items": 116,
-        "frequency": 159
-      },
-      {
-        "items": 117,
-        "frequency": 152
-      },
-      {
-        "items": 118,
-        "frequency": 155
-      },
-      {
-        "items": 119,
-        "frequency": 149
-      },
-      {
-        "items": 120,
-        "frequency": 165
-      },
-      {
-        "items": 121,
-        "frequency": 164
-      },
-      {
-        "items": 122,
-        "frequency": 142
-      },
-      {
-        "items": 123,
-        "frequency": 162
-      },
-      {
-        "items": 124,
-        "frequency": 160
-      },
-      {
-        "items": 125,
-        "frequency": 156
-      },
-      {
-        "items": 126,
-        "frequency": 137
-      },
-      {
-        "items": 127,
-        "frequency": 153
-      },
-      {
-        "items": 128,
-        "frequency": 127
-      },
-      {
-        "items": 129,
-        "frequency": 156
-      },
-      {
-        "items": 130,
-        "frequency": 150
-      },
-      {
-        "items": 131,
-        "frequency": 149
-      },
-      {
-        "items": 132,
-        "frequency": 138
-      },
-      {
-        "items": 133,
-        "frequency": 162
-      },
-      {
-        "items": 134,
-        "frequency": 122
-      },
-      {
-        "items": 135,
-        "frequency": 127
-      },
-      {
-        "items": 136,
-        "frequency": 153
-      },
-      {
-        "items": 137,
-        "frequency": 136
-      },
-      {
-        "items": 138,
-        "frequency": 100
-      },
-      {
-        "items": 139,
-        "frequency": 112
-      },
-      {
-        "items": 140,
-        "frequency": 103
-      },
-      {
-        "items": 141,
-        "frequency": 102
-      },
-      {
-        "items": 142,
-        "frequency": 106
-      },
-      {
-        "items": 143,
-        "frequency": 102
-      },
-      {
-        "items": 144,
-        "frequency": 85
-      },
-      {
-        "items": 145,
-        "frequency": 92
-      },
-      {
-        "items": 146,
-        "frequency": 95
-      },
-      {
-        "items": 147,
-        "frequency": 98
-      },
-      {
-        "items": 148,
-        "frequency": 78
-      },
-      {
-        "items": 149,
-        "frequency": 71
-      },
-      {
-        "items": 150,
-        "frequency": 78
-      },
-      {
-        "items": 151,
-        "frequency": 76
-      },
-      {
-        "items": 152,
-        "frequency": 63
-      },
-      {
-        "items": 153,
-        "frequency": 74
-      },
-      {
-        "items": 154,
-        "frequency": 63
-      },
-      {
-        "items": 155,
-        "frequency": 68
-      },
-      {
-        "items": 156,
-        "frequency": 62
-      },
-      {
-        "items": 157,
         "frequency": 58
       },
       {
-        "items": 158,
+        "items": 95,
         "frequency": 52
       },
       {
-        "items": 159,
-        "frequency": 52
-      },
-      {
-        "items": 160,
-        "frequency": 44
-      },
-      {
-        "items": 161,
+        "items": 96,
         "frequency": 38
       },
       {
-        "items": 162,
-        "frequency": 39
+        "items": 97,
+        "frequency": 40
       },
       {
-        "items": 163,
-        "frequency": 36
+        "items": 98,
+        "frequency": 37
       },
       {
-        "items": 164,
-        "frequency": 36
+        "items": 99,
+        "frequency": 31
       },
       {
-        "items": 165,
-        "frequency": 27
+        "items": 100,
+        "frequency": 31
       },
       {
-        "items": 166,
-        "frequency": 27
+        "items": 101,
+        "frequency": 18
       },
       {
-        "items": 167,
-        "frequency": 32
+        "items": 102,
+        "frequency": 16
       },
       {
-        "items": 168,
-        "frequency": 23
+        "items": 103,
+        "frequency": 13
       },
       {
-        "items": 169,
-        "frequency": 30
-      },
-      {
-        "items": 170,
-        "frequency": 21
-      },
-      {
-        "items": 171,
-        "frequency": 17
-      },
-      {
-        "items": 172,
-        "frequency": 23
-      },
-      {
-        "items": 173,
-        "frequency": 24
-      },
-      {
-        "items": 174,
+        "items": 104,
         "frequency": 19
       },
       {
-        "items": 175,
+        "items": 105,
         "frequency": 15
       },
       {
-        "items": 176,
-        "frequency": 14
-      },
-      {
-        "items": 177,
+        "items": 106,
         "frequency": 15
       },
       {
-        "items": 178,
+        "items": 107,
         "frequency": 9
       },
       {
-        "items": 179,
-        "frequency": 10
+        "items": 108,
+        "frequency": 8
       },
       {
-        "items": 180,
-        "frequency": 10
-      },
-      {
-        "items": 181,
+        "items": 109,
         "frequency": 7
       },
       {
-        "items": 182,
-        "frequency": 14
+        "items": 110,
+        "frequency": 4
       },
       {
-        "items": 183,
+        "items": 111,
         "frequency": 8
       },
       {
-        "items": 184,
-        "frequency": 8
+        "items": 112,
+        "frequency": 4
       },
       {
-        "items": 185,
+        "items": 113,
+        "frequency": 3
+      },
+      {
+        "items": 114,
+        "frequency": 2
+      },
+      {
+        "items": 115,
+        "frequency": 2
+      },
+      {
+        "items": 116,
+        "frequency": 2
+      },
+      {
+        "items": 117,
+        "frequency": 2
+      },
+      {
+        "items": 118,
+        "frequency": 1
+      },
+      {
+        "items": 119,
+        "frequency": 2
+      },
+      {
+        "items": 120,
+        "frequency": 6
+      },
+      {
+        "items": 121,
+        "frequency": 4
+      },
+      {
+        "items": 122,
+        "frequency": 4
+      },
+      {
+        "items": 123,
+        "frequency": 5
+      },
+      {
+        "items": 124,
         "frequency": 11
       },
       {
-        "items": 186,
+        "items": 125,
+        "frequency": 19
+      },
+      {
+        "items": 126,
+        "frequency": 20
+      },
+      {
+        "items": 127,
+        "frequency": 20
+      },
+      {
+        "items": 128,
+        "frequency": 18
+      },
+      {
+        "items": 129,
+        "frequency": 28
+      },
+      {
+        "items": 130,
+        "frequency": 29
+      },
+      {
+        "items": 131,
+        "frequency": 31
+      },
+      {
+        "items": 132,
+        "frequency": 36
+      },
+      {
+        "items": 133,
+        "frequency": 26
+      },
+      {
+        "items": 134,
+        "frequency": 25
+      },
+      {
+        "items": 135,
+        "frequency": 26
+      },
+      {
+        "items": 136,
+        "frequency": 27
+      },
+      {
+        "items": 137,
+        "frequency": 33
+      },
+      {
+        "items": 138,
+        "frequency": 30
+      },
+      {
+        "items": 139,
+        "frequency": 29
+      },
+      {
+        "items": 140,
+        "frequency": 23
+      },
+      {
+        "items": 141,
+        "frequency": 25
+      },
+      {
+        "items": 142,
+        "frequency": 25
+      },
+      {
+        "items": 143,
+        "frequency": 24
+      },
+      {
+        "items": 144,
+        "frequency": 22
+      },
+      {
+        "items": 145,
+        "frequency": 22
+      },
+      {
+        "items": 146,
+        "frequency": 16
+      },
+      {
+        "items": 147,
+        "frequency": 12
+      },
+      {
+        "items": 148,
+        "frequency": 16
+      },
+      {
+        "items": 149,
+        "frequency": 14
+      },
+      {
+        "items": 150,
+        "frequency": 12
+      },
+      {
+        "items": 151,
+        "frequency": 16
+      },
+      {
+        "items": 152,
+        "frequency": 10
+      },
+      {
+        "items": 153,
+        "frequency": 10
+      },
+      {
+        "items": 154,
+        "frequency": 9
+      },
+      {
+        "items": 155,
+        "frequency": 4
+      },
+      {
+        "items": 156,
+        "frequency": 5
+      },
+      {
+        "items": 157,
+        "frequency": 8
+      },
+      {
+        "items": 158,
+        "frequency": 4
+      },
+      {
+        "items": 159,
+        "frequency": 2
+      },
+      {
+        "items": 160,
+        "frequency": 3
+      },
+      {
+        "items": 161,
+        "frequency": 4
+      },
+      {
+        "items": 162,
+        "frequency": 4
+      },
+      {
+        "items": 163,
+        "frequency": 1
+      },
+      {
+        "items": 164,
+        "frequency": 3
+      },
+      {
+        "items": 165,
+        "frequency": 2
+      },
+      {
+        "items": 166,
+        "frequency": 1
+      },
+      {
+        "items": 167,
+        "frequency": 3
+      },
+      {
+        "items": 170,
+        "frequency": 2
+      },
+      {
+        "items": 173,
+        "frequency": 1
+      },
+      {
+        "items": 176,
+        "frequency": 3
+      },
+      {
+        "items": 178,
+        "frequency": 4
+      },
+      {
+        "items": 179,
+        "frequency": 2
+      },
+      {
+        "items": 180,
+        "frequency": 3
+      },
+      {
+        "items": 181,
+        "frequency": 2
+      },
+      {
+        "items": 182,
         "frequency": 6
+      },
+      {
+        "items": 183,
+        "frequency": 7
+      },
+      {
+        "items": 184,
+        "frequency": 3
+      },
+      {
+        "items": 185,
+        "frequency": 6
+      },
+      {
+        "items": 186,
+        "frequency": 5
       },
       {
         "items": 187,
@@ -613,23 +741,31 @@
       },
       {
         "items": 188,
-        "frequency": 2
+        "frequency": 6
+      },
+      {
+        "items": 189,
+        "frequency": 8
       },
       {
         "items": 190,
-        "frequency": 1
+        "frequency": 4
       },
       {
         "items": 191,
-        "frequency": 2
+        "frequency": 7
       },
       {
         "items": 192,
-        "frequency": 5
+        "frequency": 7
       },
       {
         "items": 193,
-        "frequency": 4
+        "frequency": 7
+      },
+      {
+        "items": 194,
+        "frequency": 2
       },
       {
         "items": 195,
@@ -637,53 +773,97 @@
       },
       {
         "items": 196,
-        "frequency": 3
-      },
-      {
-        "items": 197,
-        "frequency": 3
-      },
-      {
-        "items": 198,
-        "frequency": 2
-      },
-      {
-        "items": 201,
         "frequency": 1
       },
       {
-        "items": 202,
+        "items": 197,
         "frequency": 2
       },
       {
+        "items": 198,
+        "frequency": 3
+      },
+      {
+        "items": 199,
+        "frequency": 1
+      },
+      {
+        "items": 200,
+        "frequency": 1
+      },
+      {
         "items": 203,
-        "frequency": 4
+        "frequency": 2
       },
       {
         "items": 204,
+        "frequency": 5
+      },
+      {
+        "items": 205,
         "frequency": 1
       },
       {
         "items": 206,
-        "frequency": 1
-      },
-      {
-        "items": 207,
         "frequency": 2
       },
       {
-        "items": 211,
+        "items": 207,
+        "frequency": 1
+      },
+      {
+        "items": 209,
+        "frequency": 1
+      },
+      {
+        "items": 210,
+        "frequency": 1
+      },
+      {
+        "items": 212,
+        "frequency": 1
+      },
+      {
+        "items": 219,
+        "frequency": 1
+      },
+      {
+        "items": 223,
+        "frequency": 1
+      },
+      {
+        "items": 238,
         "frequency": 1
       },
       {
         "items": 239,
+        "frequency": 1
+      },
+      {
+        "items": 241,
+        "frequency": 1
+      },
+      {
+        "items": 242,
+        "frequency": 1
+      },
+      {
+        "items": 245,
+        "frequency": 1
+      },
+      {
+        "items": 251,
+        "frequency": 1
+      },
+      {
+        "items": 252,
         "frequency": 1
       }
     ],
     "total_runs": 10000
   },
   "input": {
-    "repo": "huggingface/transformers",
+    "repo": "jira:CASSANDRA",
     "start_date": "2026-05-12",
     "target_date": "2026-05-26",
     "history_start": "2026-04-12",
@@ -694,42 +874,42 @@
     "window_start": "2026-04-12",
     "window_end": "2026-05-11",
     "daily_throughput": [
-      0,
-      18,
-      12,
-      13,
-      8,
-      8,
-      0,
-      0,
-      17,
-      10,
-      26,
-      13,
-      8,
-      0,
-      0,
-      15,
-      16,
-      9,
-      8,
       4,
+      56,
+      13,
+      2,
+      2,
+      5,
       1,
+      0,
       1,
-      7,
-      12,
-      7,
-      9,
-      10,
+      4,
+      0,
+      2,
+      2,
+      0,
+      1,
+      5,
+      2,
+      1,
+      4,
+      0,
+      1,
       0,
       0,
-      9
+      2,
+      3,
+      1,
+      0,
+      1,
+      0,
+      0
     ],
-    "total_throughput": 241,
-    "avg_throughput_per_day": 8.033333333333333,
+    "total_throughput": 113,
+    "avg_throughput_per_day": 3.7666666666666666,
     "min_throughput_per_day": 0,
-    "max_throughput_per_day": 26,
-    "zero_throughput_days": 7
+    "max_throughput_per_day": 56,
+    "zero_throughput_days": 9
   },
   "simulation": {
     "runs": 10000,
@@ -740,6 +920,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --repo huggingface/transformers --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast how-many --repo jira:CASSANDRA --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
   "logs": []
 }

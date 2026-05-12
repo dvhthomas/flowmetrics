@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-12T11:19:05.104098-06:00",
+  "generated_at": "2026-05-12T11:51:26.590282-06:00",
   "headline": "Forecast for CalcMark/go-calcmark: 85% confidence we deliver at least 5 items by 2026-05-26 (window: 15 days).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
@@ -27,7 +27,7 @@
   ],
   "caveats": [
     "Confidence reads BACKWARD: higher % means FEWER items, not more.",
-    "Throughput unit is 'merged PRs' \u2014 assumes PR size is stable across windows.",
+    "Throughput unit is 'completed items' \u2014 assumes item size is stable across windows.",
     "No accounting for known disruptions (holidays, on-call rotations, launches)."
   ],
   "vocabulary": {

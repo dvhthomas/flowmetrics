@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:18:39.723226-06:00",
-  "headline": "Portfolio flow efficiency for astral-sh/uv 2026-05-05\u21922026-05-11: 8.4% across 46 merged PRs (31 human, 15 bot).",
+  "generated_at": "2026-05-12T11:51:02.034211-06:00",
+  "headline": "Portfolio flow efficiency for astral-sh/uv 2026-05-05\u21922026-05-11: 8.4% across 46 completed items (31 human, 15 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 46,
@@ -22,7 +22,7 @@
       "days": 2.360358796296296
     }
   },
-  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#19227) ran 7.5d and dominates the ratio.",
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#19227)  ran 7.5d and dominates the ratio.",
   "next_actions": [
     "Inspect the three slowest PRs (#19227, #19311, #19312) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
@@ -43,187 +43,187 @@
   "chart_data": {
     "per_pr_efficiency": [
       {
-        "pr_number": 19370,
+        "item_id": "#19370",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19361,
+        "item_id": "#19361",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19354,
+        "item_id": "#19354",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19353,
+        "item_id": "#19353",
         "efficiency": 0.07253677211364094
       },
       {
-        "pr_number": 19352,
+        "item_id": "#19352",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19351,
+        "item_id": "#19351",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19350,
+        "item_id": "#19350",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19349,
+        "item_id": "#19349",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19348,
+        "item_id": "#19348",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19346,
+        "item_id": "#19346",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19345,
+        "item_id": "#19345",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19343,
+        "item_id": "#19343",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19342,
+        "item_id": "#19342",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19341,
+        "item_id": "#19341",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19340,
+        "item_id": "#19340",
         "efficiency": 0.05994405221792993
       },
       {
-        "pr_number": 19334,
+        "item_id": "#19334",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19332,
+        "item_id": "#19332",
         "efficiency": 0.02999857488955394
       },
       {
-        "pr_number": 19331,
+        "item_id": "#19331",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19330,
+        "item_id": "#19330",
         "efficiency": 0.2167448919367078
       },
       {
-        "pr_number": 19328,
+        "item_id": "#19328",
         "efficiency": 0.020967523549778527
       },
       {
-        "pr_number": 19322,
+        "item_id": "#19322",
         "efficiency": 0.062265778760346176
       },
       {
-        "pr_number": 19320,
+        "item_id": "#19320",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19318,
+        "item_id": "#19318",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19313,
+        "item_id": "#19313",
         "efficiency": 0.09653027296616078
       },
       {
-        "pr_number": 19312,
+        "item_id": "#19312",
         "efficiency": 0.017621030373435317
       },
       {
-        "pr_number": 19311,
+        "item_id": "#19311",
         "efficiency": 0.023174971031286212
       },
       {
-        "pr_number": 19309,
+        "item_id": "#19309",
         "efficiency": 0.1792287322078782
       },
       {
-        "pr_number": 19306,
+        "item_id": "#19306",
         "efficiency": 0.11958223581204296
       },
       {
-        "pr_number": 19303,
+        "item_id": "#19303",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19302,
+        "item_id": "#19302",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19301,
+        "item_id": "#19301",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19294,
+        "item_id": "#19294",
         "efficiency": 0.02980083111206768
       },
       {
-        "pr_number": 19293,
+        "item_id": "#19293",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19292,
+        "item_id": "#19292",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19291,
+        "item_id": "#19291",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19288,
+        "item_id": "#19288",
         "efficiency": 0.09397940126846767
       },
       {
-        "pr_number": 19287,
+        "item_id": "#19287",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19286,
+        "item_id": "#19286",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19276,
+        "item_id": "#19276",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19273,
+        "item_id": "#19273",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19272,
+        "item_id": "#19272",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19271,
+        "item_id": "#19271",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19269,
+        "item_id": "#19269",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19268,
+        "item_id": "#19268",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19267,
+        "item_id": "#19267",
         "efficiency": 1.0
       },
       {
-        "pr_number": 19227,
+        "item_id": "#19227",
         "efficiency": 0.013209110305790441
       }
     ]
@@ -239,7 +239,7 @@
   "result": {
     "per_pr": [
       {
-        "pr_number": 19370,
+        "item_id": "#19370",
         "title": "Fix JUnit upload on Windows runners",
         "created_at": "2026-05-11T20:24:09+00:00",
         "merged_at": "2026-05-11T20:42:31+00:00",
@@ -258,7 +258,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19361,
+        "item_id": "#19361",
         "title": "Ensure publish to crates.io is idempotent",
         "created_at": "2026-05-11T14:44:45+00:00",
         "merged_at": "2026-05-11T15:48:02+00:00",
@@ -277,7 +277,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19354,
+        "item_id": "#19354",
         "title": "Update dependency astral-sh/uv to v0.11.13",
         "created_at": "2026-05-11T02:28:51+00:00",
         "merged_at": "2026-05-11T02:40:45+00:00",
@@ -296,7 +296,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19353,
+        "item_id": "#19353",
         "title": "Update Rust crate junction to v2",
         "created_at": "2026-05-11T00:05:03+00:00",
         "merged_at": "2026-05-11T13:52:13+00:00",
@@ -315,7 +315,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19352,
+        "item_id": "#19352",
         "title": "Update Rust crate criterion to v4.6.0",
         "created_at": "2026-05-11T00:04:52+00:00",
         "merged_at": "2026-05-11T00:26:27+00:00",
@@ -334,7 +334,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19351,
+        "item_id": "#19351",
         "title": "Update crate-ci/typos action to v1.46.0",
         "created_at": "2026-05-11T00:04:40+00:00",
         "merged_at": "2026-05-11T02:40:57+00:00",
@@ -353,7 +353,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19350,
+        "item_id": "#19350",
         "title": "Update CodSpeedHQ/action action to v4.15.0",
         "created_at": "2026-05-11T00:04:34+00:00",
         "merged_at": "2026-05-11T02:29:16+00:00",
@@ -372,7 +372,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19349,
+        "item_id": "#19349",
         "title": "Update taiki-e/install-action action to v2.75.30",
         "created_at": "2026-05-11T00:04:27+00:00",
         "merged_at": "2026-05-11T00:16:00+00:00",
@@ -391,7 +391,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19348,
+        "item_id": "#19348",
         "title": "Update Rust crate reqwest to v0.13.3",
         "created_at": "2026-05-11T00:04:18+00:00",
         "merged_at": "2026-05-11T02:28:08+00:00",
@@ -410,7 +410,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19346,
+        "item_id": "#19346",
         "title": "Update dependency astral-sh/uv to v0.11.12",
         "created_at": "2026-05-11T00:03:34+00:00",
         "merged_at": "2026-05-11T00:13:35+00:00",
@@ -429,7 +429,7 @@
         "author_login": "renovate"
       },
       {
-        "pr_number": 19345,
+        "item_id": "#19345",
         "title": "Bump version to 0.11.13",
         "created_at": "2026-05-11T00:03:33+00:00",
         "merged_at": "2026-05-11T00:37:45+00:00",
@@ -448,7 +448,7 @@
         "author_login": "jjhelmus"
       },
       {
-        "pr_number": 19343,
+        "item_id": "#19343",
         "title": "Avoid applying `.env` files in parent process",
         "created_at": "2026-05-10T23:21:33+00:00",
         "merged_at": "2026-05-11T03:30:25+00:00",
@@ -467,7 +467,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19342,
+        "item_id": "#19342",
         "title": "Sync latest Python releases",
         "created_at": "2026-05-10T23:19:39+00:00",
         "merged_at": "2026-05-10T23:58:26+00:00",
@@ -486,7 +486,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 19341,
+        "item_id": "#19341",
         "title": "Remove stale `uv-bench` platform tags input",
         "created_at": "2026-05-10T22:23:54+00:00",
         "merged_at": "2026-05-10T22:54:30+00:00",
@@ -505,7 +505,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19340,
+        "item_id": "#19340",
         "title": "Ignore `top_level.txt` entries in uninstall that are not valid Python identifiers",
         "created_at": "2026-05-10T22:05:11+00:00",
         "merged_at": "2026-05-11T23:06:35+00:00",
@@ -524,7 +524,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19334,
+        "item_id": "#19334",
         "title": "Respect `--require-hashes` when installing from `pylock.toml` files",
         "created_at": "2026-05-09T19:46:29+00:00",
         "merged_at": "2026-05-09T20:03:28+00:00",
@@ -543,7 +543,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19332,
+        "item_id": "#19332",
         "title": "Fix `uv tree` showing extra-conditional deps for packages required without extras",
         "created_at": "2026-05-09T14:05:27+00:00",
         "merged_at": "2026-05-11T01:10:33+00:00",
@@ -562,7 +562,7 @@
         "author_login": "nooscraft"
       },
       {
-        "pr_number": 19331,
+        "item_id": "#19331",
         "title": "Bump version to 0.11.12",
         "created_at": "2026-05-08T21:35:27+00:00",
         "merged_at": "2026-05-08T22:06:22+00:00",
@@ -581,7 +581,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19330,
+        "item_id": "#19330",
         "title": "Upload JUnit summaries for our tests",
         "created_at": "2026-05-08T19:20:54+00:00",
         "merged_at": "2026-05-09T05:13:55+00:00",
@@ -600,7 +600,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19328,
+        "item_id": "#19328",
         "title": "Encapsulate fastid APIs in their type",
         "created_at": "2026-05-08T17:09:01+00:00",
         "merged_at": "2026-05-11T02:35:37+00:00",
@@ -619,7 +619,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19322,
+        "item_id": "#19322",
         "title": "Sync latest Python releases",
         "created_at": "2026-05-08T00:51:48+00:00",
         "merged_at": "2026-05-08T21:28:10+00:00",
@@ -638,7 +638,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 19320,
+        "item_id": "#19320",
         "title": "Require git refs in URLs to be percent-encoded",
         "created_at": "2026-05-07T21:32:38+00:00",
         "merged_at": "2026-05-07T23:58:14+00:00",
@@ -657,7 +657,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19318,
+        "item_id": "#19318",
         "title": "Fix test filter to work with dot-dirs",
         "created_at": "2026-05-07T15:08:48+00:00",
         "merged_at": "2026-05-07T16:24:55+00:00",
@@ -676,7 +676,7 @@
         "author_login": "Gankra"
       },
       {
-        "pr_number": 19313,
+        "item_id": "#19313",
         "title": "Respect `--no-dev` over `UV_DEV=1`",
         "created_at": "2026-05-07T05:31:54+00:00",
         "merged_at": "2026-05-07T15:53:28+00:00",
@@ -695,7 +695,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19312,
+        "item_id": "#19312",
         "title": "Include data files in editable builds",
         "created_at": "2026-05-07T05:23:48+00:00",
         "merged_at": "2026-05-10T18:31:20+00:00",
@@ -714,7 +714,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19311,
+        "item_id": "#19311",
         "title": "Filter ANSI codes in logging output",
         "created_at": "2026-05-07T02:02:42+00:00",
         "merged_at": "2026-05-11T13:55:12+00:00",
@@ -733,7 +733,7 @@
         "author_login": "woodruffw"
       },
       {
-        "pr_number": 19309,
+        "item_id": "#19309",
         "title": "Fix bug from inconsistent workflow name in GHA-PyPI guide example",
         "created_at": "2026-05-07T00:46:31+00:00",
         "merged_at": "2026-05-07T17:33:31+00:00",
@@ -752,7 +752,7 @@
         "author_login": "brews"
       },
       {
-        "pr_number": 19306,
+        "item_id": "#19306",
         "title": "Add `--no-editable` support to `uv pip install`",
         "created_at": "2026-05-06T22:49:49+00:00",
         "merged_at": "2026-05-07T13:54:38+00:00",
@@ -771,7 +771,7 @@
         "author_login": "zsol"
       },
       {
-        "pr_number": 19303,
+        "item_id": "#19303",
         "title": "Bump version to 0.11.11",
         "created_at": "2026-05-06T18:49:52+00:00",
         "merged_at": "2026-05-06T19:34:21+00:00",
@@ -790,7 +790,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 19302,
+        "item_id": "#19302",
         "title": "Continue docs/versions/mirror publish on crates.io failure",
         "created_at": "2026-05-06T16:43:17+00:00",
         "merged_at": "2026-05-06T16:57:47+00:00",
@@ -809,7 +809,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19301,
+        "item_id": "#19301",
         "title": "fix(cache): accept legacy ID format from pre-0.11.9 cache entries (#19298)",
         "created_at": "2026-05-06T12:54:20+00:00",
         "merged_at": "2026-05-06T16:16:44+00:00",
@@ -828,7 +828,7 @@
         "author_login": "ChrisJr404"
       },
       {
-        "pr_number": 19294,
+        "item_id": "#19294",
         "title": "fix(lock): warning suggests non-existent --no-frozen flag (#19290)",
         "created_at": "2026-05-05T19:28:09+00:00",
         "merged_at": "2026-05-07T05:01:31+00:00",
@@ -847,7 +847,7 @@
         "author_login": "ChrisJr404"
       },
       {
-        "pr_number": 19293,
+        "item_id": "#19293",
         "title": "Bump version to 0.11.10",
         "created_at": "2026-05-05T18:49:13+00:00",
         "merged_at": "2026-05-05T19:39:52+00:00",
@@ -866,7 +866,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 19292,
+        "item_id": "#19292",
         "title": "Add job to prepare a release branch",
         "created_at": "2026-05-05T18:22:03+00:00",
         "merged_at": "2026-05-05T18:43:51+00:00",
@@ -885,7 +885,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19291,
+        "item_id": "#19291",
         "title": "Allow releases to continue on failure to publish to crates.io",
         "created_at": "2026-05-05T16:30:06+00:00",
         "merged_at": "2026-05-05T16:52:29+00:00",
@@ -904,7 +904,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19288,
+        "item_id": "#19288",
         "title": "Ensure that all Python downloads do not panic on `VersionRequest::from(PythonVersion)`",
         "created_at": "2026-05-05T14:43:40+00:00",
         "merged_at": "2026-05-06T20:46:22+00:00",
@@ -923,7 +923,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19287,
+        "item_id": "#19287",
         "title": "Increase the timeout for crates.io publishes",
         "created_at": "2026-05-05T14:37:58+00:00",
         "merged_at": "2026-05-05T17:09:47+00:00",
@@ -942,7 +942,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19286,
+        "item_id": "#19286",
         "title": "Allow pre-release Python requests with non-zero patch versions",
         "created_at": "2026-05-05T14:12:43+00:00",
         "merged_at": "2026-05-05T14:37:26+00:00",
@@ -961,7 +961,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19276,
+        "item_id": "#19276",
         "title": "Fix pre-release handling in the manual release script",
         "created_at": "2026-05-05T07:02:32+00:00",
         "merged_at": "2026-05-05T07:06:48+00:00",
@@ -980,7 +980,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19273,
+        "item_id": "#19273",
         "title": "Bump version to 0.11.9",
         "created_at": "2026-05-05T04:51:55+00:00",
         "merged_at": "2026-05-05T05:06:20+00:00",
@@ -999,7 +999,7 @@
         "author_login": "zanieb"
       },
       {
-        "pr_number": 19272,
+        "item_id": "#19272",
         "title": "Fix CI: update `python_upgrade` snapshot for `3.14.5rc1` pre-release, keep `LATEST_PYTHON_3_14` at stable `3.14.4`",
         "created_at": "2026-05-05T01:32:15+00:00",
         "merged_at": "2026-05-05T02:24:53+00:00",
@@ -1018,7 +1018,7 @@
         "author_login": "copilot-swe-agent"
       },
       {
-        "pr_number": 19271,
+        "item_id": "#19271",
         "title": "Bump `LATEST_PYTHON_3_14` to `3.14.5rc1`",
         "created_at": "2026-05-05T01:10:56+00:00",
         "merged_at": "2026-05-05T01:11:28+00:00",
@@ -1037,7 +1037,7 @@
         "author_login": "copilot-swe-agent"
       },
       {
-        "pr_number": 19269,
+        "item_id": "#19269",
         "title": "Fix transitive Git path dependencies in lockfiles",
         "created_at": "2026-05-05T00:35:51+00:00",
         "merged_at": "2026-05-05T00:47:10+00:00",
@@ -1056,7 +1056,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19268,
+        "item_id": "#19268",
         "title": "Sync latest Python releases",
         "created_at": "2026-05-05T00:35:11+00:00",
         "merged_at": "2026-05-05T02:33:33+00:00",
@@ -1075,7 +1075,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 19267,
+        "item_id": "#19267",
         "title": "Omit compatible release desugaring for pre-release hints",
         "created_at": "2026-05-05T00:02:03+00:00",
         "merged_at": "2026-05-05T00:11:22+00:00",
@@ -1094,7 +1094,7 @@
         "author_login": "charliermarsh"
       },
       {
-        "pr_number": 19227,
+        "item_id": "#19227",
         "title": "Detect TOML 1.1 and automatically enable the toml backwards compatibility preview feature",
         "created_at": "2026-04-30T18:29:47+00:00",
         "merged_at": "2026-05-08T06:32:56+00:00",

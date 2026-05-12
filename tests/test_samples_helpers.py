@@ -40,9 +40,15 @@ class TestRepoConfig:
             assert r.archetype
             assert "/" in r.slug, f"slug should be owner/name: {r.slug}"
 
-    def test_at_most_five_repos_to_respect_api_quota(self):
-        # Keep the runtime cost bounded — 5 repos × 3 commands ≈ 15 GraphQL pages
-        assert len(REPOS) <= 5
+    def test_at_most_eight_repos_to_respect_api_quota(self):
+        # Keep the runtime cost bounded. Cap covers 5 GitHub + a couple of
+        # Jira projects without blowing through anyone's API budget.
+        assert len(REPOS) <= 8
+
+    def test_includes_at_least_one_jira_source(self):
+        """Demo set advertises Jira parity — must include >=1 Jira entry."""
+        assert any(r.cache_subdir == "jira" for r in REPOS)
+        assert any("--jira-url" in r.cli_args for r in REPOS)
 
 
 # ---------------------------------------------------------------------------
@@ -52,7 +58,7 @@ class TestRepoConfig:
 
 def _sample_set(slug: str) -> SampleSet:
     return SampleSet(
-        repo=Repo(slug=slug, archetype="test"),
+        repo=Repo(slug=slug, archetype="test", cli_args=["--repo", slug]),
         efficiency_html=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.html"),
         efficiency_json=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.json"),
         efficiency_text=Path(f"samples/{slug.replace('/', '_')}/efficiency-week.txt"),

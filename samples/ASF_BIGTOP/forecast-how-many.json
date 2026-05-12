@@ -1,15 +1,15 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-12T11:51:09.569665-06:00",
-  "headline": "Forecast for pytest-dev/pytest: 85% confidence we deliver at least 13 items by 2026-05-26 (window: 15 days).",
+  "generated_at": "2026-05-12T11:51:36.861899-06:00",
+  "headline": "Forecast for jira:BIGTOP: 85% confidence we deliver at least 0 items by 2026-05-26 (window: 15 days).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {
-      "50": 19,
-      "70": 16,
-      "85": 13,
-      "95": 10
+      "50": 4,
+      "70": 1,
+      "85": 0,
+      "95": 0
     },
     "reading": "backward \u2014 higher confidence means FEWER items",
     "horizon": {
@@ -19,10 +19,10 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is 19 items; 95% commitment floor is 10. Higher confidence = fewer items \u2014 promising 10 leaves throughput on the table to buy certainty.",
+  "key_insight": "Median outcome is 4 items; 95% commitment floor is 0. Higher confidence = fewer items \u2014 promising 0 leaves throughput on the table to buy certainty.",
   "next_actions": [
-    "For external commitments, promise 13 items (or 10 if stakes are high).",
-    "For internal planning, treat 19 as the realistic target \u2014 half the time you deliver less.",
+    "For external commitments, promise 0 items (or 0 if stakes are high).",
+    "For internal planning, treat 4 as the realistic target \u2014 half the time you deliver less.",
     "Re-run weekly; the floor moves as historical throughput shifts."
   ],
   "caveats": [
@@ -40,190 +40,102 @@
   "chart_data": {
     "histogram": [
       {
+        "items": 0,
+        "frequency": 2084
+      },
+      {
         "items": 1,
-        "frequency": 1
+        "frequency": 1161
       },
       {
         "items": 2,
-        "frequency": 3
+        "frequency": 298
       },
       {
         "items": 3,
-        "frequency": 6
-      },
-      {
-        "items": 4,
-        "frequency": 11
-      },
-      {
-        "items": 5,
-        "frequency": 42
-      },
-      {
-        "items": 6,
-        "frequency": 39
-      },
-      {
-        "items": 7,
-        "frequency": 74
-      },
-      {
-        "items": 8,
-        "frequency": 108
-      },
-      {
-        "items": 9,
-        "frequency": 175
-      },
-      {
-        "items": 10,
-        "frequency": 200
-      },
-      {
-        "items": 11,
-        "frequency": 330
-      },
-      {
-        "items": 12,
-        "frequency": 336
-      },
-      {
-        "items": 13,
-        "frequency": 429
-      },
-      {
-        "items": 14,
-        "frequency": 473
-      },
-      {
-        "items": 15,
-        "frequency": 527
-      },
-      {
-        "items": 16,
-        "frequency": 599
-      },
-      {
-        "items": 17,
-        "frequency": 604
-      },
-      {
-        "items": 18,
-        "frequency": 579
-      },
-      {
-        "items": 19,
-        "frequency": 666
-      },
-      {
-        "items": 20,
-        "frequency": 612
-      },
-      {
-        "items": 21,
-        "frequency": 571
-      },
-      {
-        "items": 22,
-        "frequency": 562
-      },
-      {
-        "items": 23,
-        "frequency": 501
-      },
-      {
-        "items": 24,
-        "frequency": 449
-      },
-      {
-        "items": 25,
-        "frequency": 405
-      },
-      {
-        "items": 26,
-        "frequency": 363
-      },
-      {
-        "items": 27,
-        "frequency": 273
-      },
-      {
-        "items": 28,
-        "frequency": 245
-      },
-      {
-        "items": 29,
-        "frequency": 181
-      },
-      {
-        "items": 30,
-        "frequency": 152
-      },
-      {
-        "items": 31,
-        "frequency": 129
-      },
-      {
-        "items": 32,
-        "frequency": 111
-      },
-      {
-        "items": 33,
-        "frequency": 65
-      },
-      {
-        "items": 34,
-        "frequency": 48
-      },
-      {
-        "items": 35,
         "frequency": 41
       },
       {
-        "items": 36,
-        "frequency": 28
+        "items": 4,
+        "frequency": 2257
       },
       {
-        "items": 37,
-        "frequency": 17
+        "items": 5,
+        "frequency": 1223
       },
       {
-        "items": 38,
+        "items": 6,
+        "frequency": 278
+      },
+      {
+        "items": 7,
+        "frequency": 46
+      },
+      {
+        "items": 8,
+        "frequency": 1165
+      },
+      {
+        "items": 9,
+        "frequency": 569
+      },
+      {
+        "items": 10,
+        "frequency": 145
+      },
+      {
+        "items": 11,
         "frequency": 16
       },
       {
-        "items": 39,
-        "frequency": 11
+        "items": 12,
+        "frequency": 367
       },
       {
-        "items": 40,
-        "frequency": 7
+        "items": 13,
+        "frequency": 174
       },
       {
-        "items": 41,
-        "frequency": 4
+        "items": 14,
+        "frequency": 33
       },
       {
-        "items": 42,
+        "items": 15,
         "frequency": 1
       },
       {
-        "items": 43,
-        "frequency": 1
+        "items": 16,
+        "frequency": 77
       },
       {
-        "items": 44,
+        "items": 17,
+        "frequency": 36
+      },
+      {
+        "items": 18,
+        "frequency": 6
+      },
+      {
+        "items": 20,
+        "frequency": 18
+      },
+      {
+        "items": 21,
         "frequency": 3
       },
       {
-        "items": 47,
-        "frequency": 2
+        "items": 24,
+        "frequency": 1
+      },
+      {
+        "items": 25,
+        "frequency": 1
       }
     ],
     "total_runs": 10000
   },
   "input": {
-    "repo": "pytest-dev/pytest",
+    "repo": "jira:BIGTOP",
     "start_date": "2026-05-12",
     "target_date": "2026-05-26",
     "history_start": "2026-04-12",
@@ -234,42 +146,42 @@
     "window_start": "2026-04-12",
     "window_end": "2026-05-11",
     "daily_throughput": [
-      2,
-      2,
-      0,
-      0,
-      1,
-      0,
-      0,
-      0,
-      4,
-      4,
       0,
       0,
       0,
       1,
-      5,
       0,
-      1,
-      1,
       0,
-      5,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
       0,
       4,
       0,
       0,
       0,
-      1,
-      3,
-      2,
-      1,
-      2
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0,
+      0,
+      0
     ],
-    "total_throughput": 39,
-    "avg_throughput_per_day": 1.3,
+    "total_throughput": 9,
+    "avg_throughput_per_day": 0.3,
     "min_throughput_per_day": 0,
-    "max_throughput_per_day": 5,
-    "zero_throughput_days": 14
+    "max_throughput_per_day": 4,
+    "zero_throughput_days": 27
   },
   "simulation": {
     "runs": 10000,
@@ -280,6 +192,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --repo pytest-dev/pytest --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast how-many --repo jira:BIGTOP --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
   "logs": []
 }

@@ -1,0 +1,227 @@
+{
+  "schema": "flowmetrics.efficiency.v1",
+  "command": "efficiency week",
+  "generated_at": "2026-05-12T11:51:28.002516-06:00",
+  "headline": "Portfolio flow efficiency for jira:CASSANDRA 2026-05-05\u21922026-05-11: 0.1% across 7 completed items.",
+  "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
+  "summary": {
+    "pr_count": 7,
+    "human_pr_count": 7,
+    "bot_pr_count": 0,
+    "portfolio_efficiency": 0.0010654883671326611,
+    "median_efficiency": 0.02876639683423361,
+    "mean_efficiency": 0.02520451925170258,
+    "total_cycle": {
+      "seconds": 31543083.0,
+      "hours": 8761.9675,
+      "days": 365.08197916666666
+    },
+    "total_active": {
+      "seconds": 33608.788,
+      "hours": 9.335774444444445,
+      "days": 0.38899060185185186
+    }
+  },
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-20672)  ran 348.4d and dominates the ratio.",
+  "next_actions": [
+    "Inspect the three slowest PRs (CASSANDRA-20672, CASSANDRA-21346, CASSANDRA-21351) \u2014 they likely sat in review queue.",
+    "Compare to the previous 2-4 weeks to spot a trend.",
+    "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
+  ],
+  "caveats": [
+    "Never use this metric per engineer \u2014 it reflects the system, not individuals.",
+    "Per-PR FE is a directional indicator, not a precise measurement.",
+    "Active time uses gap=4.0h and min_cluster=30.0min \u2014 tuning these moves the number."
+  ],
+  "vocabulary": {
+    "Cycle time": "Wall-clock time from when a PR was opened until it was merged. The clock starts at `created_at` and stops at `merged_at`.",
+    "Active time": "The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.",
+    "Wait time": "cycle_time \u2212 active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). Vacanti's actionable signal \u2014 queues are where the system bottlenecks live.",
+    "Flow efficiency": "active_time / cycle_time. Reported per-PR and as a portfolio.",
+    "Portfolio flow efficiency": "\u03a3 active / \u03a3 cycle across all merged PRs in this window. Vacanti's system-level recipe \u2014 long-running PRs dominate, which is what you want."
+  },
+  "chart_data": {
+    "per_pr_efficiency": [
+      {
+        "item_id": "CASSANDRA-21348",
+        "efficiency": 0.04948907116345141
+      },
+      {
+        "item_id": "CASSANDRA-20672",
+        "efficiency": 0.00011959807075023205
+      },
+      {
+        "item_id": "CASSANDRA-21350",
+        "efficiency": 0.030737005077297874
+      },
+      {
+        "item_id": "CASSANDRA-21347",
+        "efficiency": 0.018041083934163118
+      },
+      {
+        "item_id": "CASSANDRA-21346",
+        "efficiency": 0.0063605364052368414
+      },
+      {
+        "item_id": "CASSANDRA-21351",
+        "efficiency": 0.02876639683423361
+      },
+      {
+        "item_id": "CASSANDRA-21355",
+        "efficiency": 0.04291794327678497
+      }
+    ]
+  },
+  "input": {
+    "repo": "jira:CASSANDRA",
+    "start": "2026-05-05",
+    "stop": "2026-05-11",
+    "gap_hours": 4.0,
+    "min_cluster_minutes": 30.0,
+    "offline": false
+  },
+  "result": {
+    "per_pr": [
+      {
+        "item_id": "CASSANDRA-21348",
+        "title": "system_views.settings fails for map settings with non-string keys",
+        "created_at": "2026-05-04T02:32:56+00:00",
+        "merged_at": "2026-05-05T08:51:31+00:00",
+        "cycle_time": {
+          "seconds": 109115.0,
+          "hours": 30.309722222222224,
+          "days": 1.2629050925925926
+        },
+        "active_time": {
+          "seconds": 5400.0,
+          "hours": 1.5,
+          "days": 0.0625
+        },
+        "efficiency": 0.04948907116345141,
+        "is_bot": false,
+        "author_login": "kjhoon0330"
+      },
+      {
+        "item_id": "CASSANDRA-20672",
+        "title": "release scripts should allow skipping the changelog update",
+        "created_at": "2025-05-22T11:51:32+00:00",
+        "merged_at": "2026-05-05T21:11:52+00:00",
+        "cycle_time": {
+          "seconds": 30100820.0,
+          "hours": 8361.33888888889,
+          "days": 348.3891203703704
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.00011959807075023205,
+        "is_bot": false,
+        "author_login": "brandon.williams"
+      },
+      {
+        "item_id": "CASSANDRA-21350",
+        "title": "Add no-build-accord Ant option to be able to skip Accord module rebuild",
+        "created_at": "2026-05-04T11:00:46+00:00",
+        "merged_at": "2026-05-06T11:48:50+00:00",
+        "cycle_time": {
+          "seconds": 175684.0,
+          "hours": 48.80111111111111,
+          "days": 2.03337962962963
+        },
+        "active_time": {
+          "seconds": 5400.0,
+          "hours": 1.5,
+          "days": 0.0625
+        },
+        "efficiency": 0.030737005077297874,
+        "is_bot": false,
+        "author_login": "dnk"
+      },
+      {
+        "item_id": "CASSANDRA-21347",
+        "title": "Avoid allocation by getFunctions in SelectStatement.authorize ",
+        "created_at": "2026-05-03T17:15:17+00:00",
+        "merged_at": "2026-05-06T12:24:26+00:00",
+        "cycle_time": {
+          "seconds": 241749.0,
+          "hours": 67.1525,
+          "days": 2.798020833333333
+        },
+        "active_time": {
+          "seconds": 4361.414,
+          "hours": 1.2115038888888887,
+          "days": 0.0504793287037037
+        },
+        "efficiency": 0.018041083934163118,
+        "is_bot": false,
+        "author_login": "dnk"
+      },
+      {
+        "item_id": "CASSANDRA-21346",
+        "title": "Update aber's gpg key in project's KEYS file",
+        "created_at": "2026-04-30T03:46:47+00:00",
+        "merged_at": "2026-05-06T16:59:57+00:00",
+        "cycle_time": {
+          "seconds": 565990.0,
+          "hours": 157.21944444444443,
+          "days": 6.550810185185185
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.0063605364052368414,
+        "is_bot": false,
+        "author_login": "aratnofsky"
+      },
+      {
+        "item_id": "CASSANDRA-21351",
+        "title": "Reduce memory allocations in SelectStatement.getQuery",
+        "created_at": "2026-05-04T11:11:08+00:00",
+        "merged_at": "2026-05-07T13:01:52+00:00",
+        "cycle_time": {
+          "seconds": 265844.0,
+          "hours": 73.84555555555555,
+          "days": 3.0768981481481483
+        },
+        "active_time": {
+          "seconds": 7647.374,
+          "hours": 2.1242705555555554,
+          "days": 0.08851127314814815
+        },
+        "efficiency": 0.02876639683423361,
+        "is_bot": false,
+        "author_login": "dnk"
+      },
+      {
+        "item_id": "CASSANDRA-21355",
+        "title": "Accord: Clean Shutdown/Restart, Rebootstrap, et al",
+        "created_at": "2026-05-08T20:52:50+00:00",
+        "merged_at": "2026-05-09T20:10:51+00:00",
+        "cycle_time": {
+          "seconds": 83881.0,
+          "hours": 23.30027777777778,
+          "days": 0.9708449074074074
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.04291794327678497,
+        "is_bot": false,
+        "author_login": "benedict"
+      }
+    ]
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow efficiency week --repo jira:CASSANDRA --start 2026-05-05 --stop 2026-05-11 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "logs": []
+}

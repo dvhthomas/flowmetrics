@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:18:44.368974-06:00",
-  "headline": "Portfolio flow efficiency for pytest-dev/pytest 2026-05-05\u21922026-05-11: 2.0% across 9 merged PRs (5 human, 4 bot).",
+  "generated_at": "2026-05-12T11:51:06.460166-06:00",
+  "headline": "Portfolio flow efficiency for pytest-dev/pytest 2026-05-05\u21922026-05-11: 2.0% across 9 completed items (5 human, 4 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 9,
@@ -22,7 +22,7 @@
       "days": 1.1463657407407408
     }
   },
-  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14375) ran 28.4d and dominates the ratio.",
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14375)  ran 28.4d and dominates the ratio.",
   "next_actions": [
     "Inspect the three slowest PRs (#14375, #14414, #14429) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
@@ -43,39 +43,39 @@
   "chart_data": {
     "per_pr_efficiency": [
       {
-        "pr_number": 14464,
+        "item_id": "#14464",
         "efficiency": 1.0
       },
       {
-        "pr_number": 14460,
+        "item_id": "#14460",
         "efficiency": 0.0999537251272559
       },
       {
-        "pr_number": 14455,
+        "item_id": "#14455",
         "efficiency": 0.17563545884763623
       },
       {
-        "pr_number": 14450,
+        "item_id": "#14450",
         "efficiency": 0.08034638218095791
       },
       {
-        "pr_number": 14449,
+        "item_id": "#14449",
         "efficiency": 0.049109213434098166
       },
       {
-        "pr_number": 14443,
+        "item_id": "#14443",
         "efficiency": 0.037332161300955936
       },
       {
-        "pr_number": 14429,
+        "item_id": "#14429",
         "efficiency": 0.030225753050454055
       },
       {
-        "pr_number": 14414,
+        "item_id": "#14414",
         "efficiency": 0.03475628263898077
       },
       {
-        "pr_number": 14375,
+        "item_id": "#14375",
         "efficiency": 0.002199415281374455
       }
     ]
@@ -91,7 +91,7 @@
   "result": {
     "per_pr": [
       {
-        "pr_number": 14464,
+        "item_id": "#14464",
         "title": "[pre-commit.ci] pre-commit autoupdate",
         "created_at": "2026-05-11T20:49:27+00:00",
         "merged_at": "2026-05-11T21:44:42+00:00",
@@ -110,7 +110,7 @@
         "author_login": "pre-commit-ci"
       },
       {
-        "pr_number": 14460,
+        "item_id": "#14460",
         "title": "pastebin: deprecate `--pastebin`",
         "created_at": "2026-05-10T20:44:07+00:00",
         "merged_at": "2026-05-11T11:44:32+00:00",
@@ -129,7 +129,7 @@
         "author_login": "bluetech"
       },
       {
-        "pr_number": 14455,
+        "item_id": "#14455",
         "title": "[automated] Update plugin list",
         "created_at": "2026-05-10T00:57:38+00:00",
         "merged_at": "2026-05-10T06:39:15+00:00",
@@ -148,7 +148,7 @@
         "author_login": "github-actions"
       },
       {
-        "pr_number": 14450,
+        "item_id": "#14450",
         "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration",
         "created_at": "2026-05-08T22:22:44+00:00",
         "merged_at": "2026-05-09T10:49:30+00:00",
@@ -167,7 +167,7 @@
         "author_login": "dependabot"
       },
       {
-        "pr_number": 14449,
+        "item_id": "#14449",
         "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts",
         "created_at": "2026-05-08T20:40:45+00:00",
         "merged_at": "2026-05-09T17:02:31+00:00",
@@ -186,7 +186,7 @@
         "author_login": "patchback"
       },
       {
-        "pr_number": 14443,
+        "item_id": "#14443",
         "title": "Fix strict options from addopts",
         "created_at": "2026-05-06T05:28:27+00:00",
         "merged_at": "2026-05-08T20:40:32+00:00",
@@ -205,7 +205,7 @@
         "author_login": "praneethhere"
       },
       {
-        "pr_number": 14429,
+        "item_id": "#14429",
         "title": "Fix Argument.__repr__ crash when _action is not initialized",
         "created_at": "2026-04-29T17:02:29+00:00",
         "merged_at": "2026-05-07T17:50:26+00:00",
@@ -224,7 +224,7 @@
         "author_login": "EternalRights"
       },
       {
-        "pr_number": 14414,
+        "item_id": "#14414",
         "title": "Add datetime/timedelta support to pytest.approx (#8395)",
         "created_at": "2026-04-23T11:02:53+00:00",
         "merged_at": "2026-05-08T07:57:43+00:00",
@@ -243,7 +243,7 @@
         "author_login": "hamza-mobeen"
       },
       {
-        "pr_number": 14375,
+        "item_id": "#14375",
         "title": "logging: also capture logs from non-propagating loggers",
         "created_at": "2026-04-10T09:36:06+00:00",
         "merged_at": "2026-05-08T19:36:04+00:00",

@@ -40,16 +40,64 @@ SAMPLES_END = "<!-- END SAMPLES -->"
 
 @dataclass(frozen=True)
 class Repo:
+    """One sample entry in the demo set.
+
+    `slug` is the display identifier (e.g. ``astral-sh/uv`` or ``ASF/BIGTOP``).
+    `cli_args` is the source-selection arguments passed to the CLI;
+    everything else (window, runs, seed, format) is added by the script.
+    `cache_subdir` keeps GitHub and Jira responses in tidy parallel dirs.
+    """
+
     slug: str
     archetype: str
+    cli_args: list[str]
+    cache_subdir: str = "github"
 
 
 REPOS: list[Repo] = [
-    Repo("astral-sh/uv", "Fast-moving Rust/Python tooling"),
-    Repo("pytest-dev/pytest", "Mature Python framework with active maintenance"),
-    Repo("huggingface/transformers", "ML library, mixed community + maintainer flow"),
-    Repo("pre-commit/pre-commit", "Developer-tooling Python project"),
-    Repo("CalcMark/go-calcmark", "Custom request: Go computational-document tool"),
+    Repo(
+        slug="astral-sh/uv",
+        archetype="Fast-moving Rust/Python tooling (GitHub)",
+        cli_args=["--repo", "astral-sh/uv"],
+    ),
+    Repo(
+        slug="pytest-dev/pytest",
+        archetype="Mature Python framework with active maintenance (GitHub)",
+        cli_args=["--repo", "pytest-dev/pytest"],
+    ),
+    Repo(
+        slug="huggingface/transformers",
+        archetype="ML library, mixed community + maintainer flow (GitHub)",
+        cli_args=["--repo", "huggingface/transformers"],
+    ),
+    Repo(
+        slug="pre-commit/pre-commit",
+        archetype="Developer-tooling Python project (GitHub)",
+        cli_args=["--repo", "pre-commit/pre-commit"],
+    ),
+    Repo(
+        slug="CalcMark/go-calcmark",
+        archetype="Custom request: Go computational-document tool (GitHub)",
+        cli_args=["--repo", "CalcMark/go-calcmark"],
+    ),
+    Repo(
+        slug="ASF/CASSANDRA",
+        archetype="Apache Cassandra — active distributed-database project (Jira)",
+        cli_args=[
+            "--jira-url", "https://issues.apache.org/jira",
+            "--jira-project", "CASSANDRA",
+        ],
+        cache_subdir="jira",
+    ),
+    Repo(
+        slug="ASF/BIGTOP",
+        archetype="Apache Bigtop — smaller-team build/packaging project (Jira)",
+        cli_args=[
+            "--jira-url", "https://issues.apache.org/jira",
+            "--jira-project", "BIGTOP",
+        ],
+        cache_subdir="jira",
+    ),
 ]
 
 
@@ -155,7 +203,8 @@ def build_readme_samples_section(sets: list[SampleSet], generated_at: datetime) 
     lines = [
         f"*Last generated: {generated_at.strftime('%Y-%m-%d %H:%M %Z').strip()}.*",
         "",
-        "Five public repos covering a spread of team archetypes. Every link below was",
+        f"{len(sets)} public sources covering a spread of team archetypes "
+        "(GitHub PR data and Apache Jira issue data). Every link below was",
         "produced by running this tool live against the real GitHub API and is",
         "regenerated every time `uv run python scripts/generate_samples.py` runs.",
         "",
@@ -216,60 +265,36 @@ def _produce_one_repo(repo: Repo, history_end: str, target_date: str) -> SampleS
     # Forecast start = today (work begins now); target_date passed in.
     today = datetime.now(UTC).date().isoformat()
 
+    cache_dir = PROJECT_ROOT / ".cache" / repo.cache_subdir
+    source_args = list(repo.cli_args)
+    common_cache = ["--cache-dir", str(cache_dir)]
+
     common_efficiency = [
-        "efficiency",
-        "week",
-        "--repo",
-        repo.slug,
-        "--start",
-        week_start,
-        "--stop",
-        week_stop,
-        "--cache-dir",
-        str(CACHE_DIR),
+        "efficiency", "week",
+        *source_args,
+        "--start", week_start, "--stop", week_stop,
+        *common_cache,
     ]
     history_start = (
         datetime.strptime(history_end, "%Y-%m-%d").replace(tzinfo=UTC).date() - timedelta(days=29)
     ).isoformat()
     common_when_done = [
-        "forecast",
-        "when-done",
-        "--repo",
-        repo.slug,
-        "--items",
-        "25",
-        "--history-start",
-        history_start,
-        "--history-end",
-        history_end,
-        "--start-date",
-        today,
-        "--runs",
-        "10000",
-        "--seed",
-        "42",
-        "--cache-dir",
-        str(CACHE_DIR),
+        "forecast", "when-done",
+        *source_args,
+        "--items", "25",
+        "--history-start", history_start, "--history-end", history_end,
+        "--start-date", today,
+        "--runs", "10000", "--seed", "42",
+        *common_cache,
     ]
     common_how_many = [
-        "forecast",
-        "how-many",
-        "--repo",
-        repo.slug,
-        "--target-date",
-        target_date,
-        "--history-start",
-        history_start,
-        "--history-end",
-        history_end,
-        "--start-date",
-        today,
-        "--runs",
-        "10000",
-        "--seed",
-        "42",
-        "--cache-dir",
-        str(CACHE_DIR),
+        "forecast", "how-many",
+        *source_args,
+        "--target-date", target_date,
+        "--history-start", history_start, "--history-end", history_end,
+        "--start-date", today,
+        "--runs", "10000", "--seed", "42",
+        *common_cache,
     ]
 
     sets = {}

@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:19:01.554550-06:00",
-  "headline": "Portfolio flow efficiency for CalcMark/go-calcmark 2026-05-05\u21922026-05-11: 100.0% across 9 merged PRs.",
+  "generated_at": "2026-05-12T11:51:23.188743-06:00",
+  "headline": "Portfolio flow efficiency for CalcMark/go-calcmark 2026-05-05\u21922026-05-11: 100.0% across 9 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 9,
@@ -42,39 +42,39 @@
   "chart_data": {
     "per_pr_efficiency": [
       {
-        "pr_number": 161,
+        "item_id": "#161",
         "efficiency": 1.0
       },
       {
-        "pr_number": 159,
+        "item_id": "#159",
         "efficiency": 1.0
       },
       {
-        "pr_number": 158,
+        "item_id": "#158",
         "efficiency": 1.0
       },
       {
-        "pr_number": 157,
+        "item_id": "#157",
         "efficiency": 1.0
       },
       {
-        "pr_number": 156,
+        "item_id": "#156",
         "efficiency": 1.0
       },
       {
-        "pr_number": 155,
+        "item_id": "#155",
         "efficiency": 1.0
       },
       {
-        "pr_number": 154,
+        "item_id": "#154",
         "efficiency": 1.0
       },
       {
-        "pr_number": 153,
+        "item_id": "#153",
         "efficiency": 1.0
       },
       {
-        "pr_number": 152,
+        "item_id": "#152",
         "efficiency": 1.0
       }
     ]
@@ -90,7 +90,7 @@
   "result": {
     "per_pr": [
       {
-        "pr_number": 161,
+        "item_id": "#161",
         "title": "test: lock in variable +/- percentage widening (cmw#83)",
         "created_at": "2026-05-11T18:09:39+00:00",
         "merged_at": "2026-05-11T18:11:12+00:00",
@@ -109,7 +109,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 159,
+        "item_id": "#159",
         "title": "fix(lsp): admit bare-IDENT-prefix-of-known-function as calc-shape for completion",
         "created_at": "2026-05-08T17:54:53+00:00",
         "merged_at": "2026-05-08T19:38:32+00:00",
@@ -128,7 +128,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 158,
+        "item_id": "#158",
         "title": "fix(detector): admit `5% of` and other unambiguous calc-shape partials",
         "created_at": "2026-05-07T21:01:01+00:00",
         "merged_at": "2026-05-07T21:01:10+00:00",
@@ -147,7 +147,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 157,
+        "item_id": "#157",
         "title": "feat(period): explicit-year quarter syntax (CY2026 Q3, Q3 2026, FY2027 FQ1, \u2026)",
         "created_at": "2026-05-07T19:32:34+00:00",
         "merged_at": "2026-05-07T19:32:43+00:00",
@@ -166,7 +166,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 156,
+        "item_id": "#156",
         "title": "chore(release): task release:dogfood gate before tagging",
         "created_at": "2026-05-07T13:15:31+00:00",
         "merged_at": "2026-05-07T13:49:25+00:00",
@@ -185,7 +185,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 155,
+        "item_id": "#155",
         "title": "fix(lsp): consult detector when lexer rejects in-flight input",
         "created_at": "2026-05-07T05:03:09+00:00",
         "merged_at": "2026-05-07T05:03:20+00:00",
@@ -204,7 +204,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 154,
+        "item_id": "#154",
         "title": "fix(detector): admit in-flight @directive / assignment lines as calc-shape",
         "created_at": "2026-05-07T04:54:50+00:00",
         "merged_at": "2026-05-07T04:54:59+00:00",
@@ -223,7 +223,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 153,
+        "item_id": "#153",
         "title": "fix(lsp): suppress completions on prose lines; variables only inside {{ ... }}",
         "created_at": "2026-05-07T04:27:52+00:00",
         "merged_at": "2026-05-07T04:40:16+00:00",
@@ -242,7 +242,7 @@
         "author_login": "dvhthomas"
       },
       {
-        "pr_number": 152,
+        "item_id": "#152",
         "title": "fix(detector): classify prose-with-emphasis as text, not calculation",
         "created_at": "2026-05-06T02:39:15+00:00",
         "merged_at": "2026-05-06T02:42:09+00:00",

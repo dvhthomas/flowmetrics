@@ -1,2 +1,2 @@
-Portfolio flow efficiency for huggingface/transformers 2026-05-05→2026-05-11: 1.2% across 47 merged 
-PRs.
+Portfolio flow efficiency for huggingface/transformers 2026-05-05→2026-05-11: 1.2% across 47 
+completed items.
