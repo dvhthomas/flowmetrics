@@ -14,6 +14,10 @@ DEFAULT_GAP = timedelta(hours=4)
 DEFAULT_MIN_CLUSTER = timedelta(minutes=30)
 DEFAULT_CACHE_DIR = Path(".cache/github")
 DEFAULT_TRAINING_DAYS = 30  # Vacanti's recommendation in "When Will It Be Done?"
+# Default mapping of named workflow statuses to "active". Used by the
+# status-duration computation when a source provides explicit statuses
+# (Jira). GitHub sources, which infer activity from events, ignore this.
+DEFAULT_ACTIVE_STATUSES: frozenset[str] = frozenset({"In Progress", "In Development"})
 
 
 def this_week_window(today: date | None = None) -> tuple[date, date]:
@@ -102,12 +106,22 @@ def flowmetrics_for_window(
     *,
     gap: timedelta = DEFAULT_GAP,
     min_cluster: timedelta = DEFAULT_MIN_CLUSTER,
+    active_statuses: frozenset[str] | None = None,
 ) -> WindowResult:
-    """Compute flow efficiency for items completed in `[start, stop]`."""
+    """Compute flow efficiency for items completed in `[start, stop]`.
+
+    `active_statuses` is only consulted when items carry
+    `status_intervals` (i.e. when the source has named statuses, like Jira).
+    """
     if start > stop:
         raise ValueError(f"start ({start}) must be <= stop ({stop})")
     items = source.fetch_completed_in_window(start, stop)
-    per_pr = [compute_pr_flow(item, gap=gap, min_cluster=min_cluster) for item in items]
+    per_pr = [
+        compute_pr_flow(
+            item, gap=gap, min_cluster=min_cluster, active_statuses=active_statuses
+        )
+        for item in items
+    ]
     return aggregate(per_pr)
 
 

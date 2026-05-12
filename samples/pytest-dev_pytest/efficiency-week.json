@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:51:06.460166-06:00",
+  "generated_at": "2026-05-12T12:02:45.042441-06:00",
   "headline": "Portfolio flow efficiency for pytest-dev/pytest 2026-05-05\u21922026-05-11: 2.0% across 9 completed items (5 human, 4 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {

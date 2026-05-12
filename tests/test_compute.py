@@ -4,6 +4,7 @@ import pytest
 
 from flowmetrics.compute import (
     PullRequestEvents,
+    StatusInterval,
     aggregate,
     compute_pr_flow,
 )
@@ -94,6 +95,135 @@ class TestComputePrFlow:
         assert result.cycle_time == timedelta(hours=49)
         assert result.active_time == timedelta(hours=2)
         assert result.efficiency == pytest.approx(2 / 49, abs=1e-4)
+
+
+class TestStatusDurationActiveTime:
+    """When a WorkItem carries `status_intervals`, active time becomes the
+    sum of durations spent in user-mapped active statuses. This is Vacanti's
+    canonical Jira model: measured time-in-status, not inferred event clusters.
+    """
+
+    def test_active_time_is_sum_of_in_progress_intervals(self):
+        # Issue created Mon 9am, In Progress Tue 9am, Resolved Fri 9am.
+        # 1 day Open, 3 days In Progress. Active=3d, cycle=4d, FE=75%.
+        item = PullRequestEvents(
+            item_id="BIGTOP-1",
+            title="example",
+            created_at=ts(2026, 5, 4, 9, 0),
+            merged_at=ts(2026, 5, 8, 9, 0),
+            status_intervals=[
+                StatusInterval(ts(2026, 5, 4, 9, 0), ts(2026, 5, 5, 9, 0), "Open"),
+                StatusInterval(ts(2026, 5, 5, 9, 0), ts(2026, 5, 8, 9, 0), "In Progress"),
+            ],
+        )
+        result = compute_pr_flow(
+            item, gap=GAP, min_cluster=MIN_CLUSTER,
+            active_statuses=frozenset({"In Progress"}),
+        )
+        assert result.cycle_time == timedelta(days=4)
+        assert result.active_time == timedelta(days=3)
+        assert result.efficiency == pytest.approx(0.75)
+
+    def test_zero_active_time_when_no_active_status_visited(self):
+        # All time in "Open" then "In Review" — neither marked active.
+        item = PullRequestEvents(
+            item_id="BIGTOP-2",
+            title="never active",
+            created_at=ts(2026, 5, 4, 9, 0),
+            merged_at=ts(2026, 5, 8, 9, 0),
+            status_intervals=[
+                StatusInterval(ts(2026, 5, 4, 9, 0), ts(2026, 5, 6, 9, 0), "Open"),
+                StatusInterval(ts(2026, 5, 6, 9, 0), ts(2026, 5, 8, 9, 0), "In Review"),
+            ],
+        )
+        result = compute_pr_flow(
+            item, gap=GAP, min_cluster=MIN_CLUSTER,
+            active_statuses=frozenset({"In Progress"}),
+        )
+        assert result.active_time == timedelta(0)
+        assert result.efficiency == pytest.approx(0.0)
+
+    def test_multiple_active_statuses_summed(self):
+        # Both "In Progress" and "In Development" treated as active.
+        item = PullRequestEvents(
+            item_id="X-3", title="multi active",
+            created_at=ts(2026, 5, 4, 9, 0),
+            merged_at=ts(2026, 5, 8, 9, 0),
+            status_intervals=[
+                StatusInterval(ts(2026, 5, 4, 9, 0), ts(2026, 5, 5, 9, 0), "In Progress"),
+                StatusInterval(ts(2026, 5, 5, 9, 0), ts(2026, 5, 6, 9, 0), "Code Review"),
+                StatusInterval(ts(2026, 5, 6, 9, 0), ts(2026, 5, 8, 9, 0), "In Development"),
+            ],
+        )
+        result = compute_pr_flow(
+            item, gap=GAP, min_cluster=MIN_CLUSTER,
+            active_statuses=frozenset({"In Progress", "In Development"}),
+        )
+        # 1 day In Progress + 2 days In Development = 3 days active
+        assert result.active_time == timedelta(days=3)
+
+    def test_event_clustering_path_used_when_no_status_intervals(self):
+        # Empty status_intervals (GitHub case) falls through to existing
+        # event-clustering path.
+        item = make_pr(
+            created=ts(2026, 5, 4, 9, 0),
+            merged=ts(2026, 5, 8, 9, 0),
+        )
+        assert item.status_intervals == []  # default empty
+        result = compute_pr_flow(
+            item, gap=GAP, min_cluster=MIN_CLUSTER,
+            active_statuses=frozenset({"In Progress"}),
+        )
+        # Same numbers as test_quiet_pr_has_low_flowmetrics: 1h active over 96h
+        assert result.cycle_time == timedelta(hours=96)
+        assert result.active_time == timedelta(hours=1)
+
+
+class TestServiceLayerPassesActiveStatuses:
+    """flowmetrics_for_window must thread active_statuses through to compute."""
+
+    def test_active_statuses_changes_active_time_for_jira_like_items(self, tmp_path):
+        from datetime import date as _date
+
+        from flowmetrics import flowmetrics_for_window
+        from flowmetrics.compute import WorkItem
+
+        class _FakeSource:
+            label = "fake"
+
+            def fetch_completed_in_window(self, start, stop):
+                # One Jira-like item: 1d Open + 3d In Progress + done at day 4.
+                return [
+                    WorkItem(
+                        item_id="X-1", title="t",
+                        created_at=ts(2026, 5, 4, 9, 0),
+                        merged_at=ts(2026, 5, 8, 9, 0),
+                        status_intervals=[
+                            StatusInterval(
+                                ts(2026, 5, 4, 9, 0),
+                                ts(2026, 5, 5, 9, 0), "Open",
+                            ),
+                            StatusInterval(
+                                ts(2026, 5, 5, 9, 0),
+                                ts(2026, 5, 8, 9, 0), "In Progress",
+                            ),
+                        ],
+                    ),
+                ]
+
+        # With In Progress mapped active → 75%
+        r = flowmetrics_for_window(
+            _FakeSource(), _date(2026, 5, 1), _date(2026, 5, 30),
+            active_statuses=frozenset({"In Progress"}),
+        )
+        assert r.portfolio_efficiency == pytest.approx(0.75)
+
+        # With no status mapped active → 0%
+        r2 = flowmetrics_for_window(
+            _FakeSource(), _date(2026, 5, 1), _date(2026, 5, 30),
+            active_statuses=frozenset({"Not A Real Status"}),
+        )
+        assert r2.portfolio_efficiency == pytest.approx(0.0)
 
 
 class TestAggregate:

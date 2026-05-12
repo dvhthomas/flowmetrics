@@ -1,25 +1,25 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:51:32.505167-06:00",
-  "headline": "Portfolio flow efficiency for jira:BIGTOP 2026-05-05\u21922026-05-11: 0.3% across 4 completed items.",
+  "generated_at": "2026-05-12T12:03:14.174657-06:00",
+  "headline": "Portfolio flow efficiency for jira:BIGTOP 2026-05-05\u21922026-05-11: 0.0% across 4 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 4,
     "human_pr_count": 4,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 0.0027466656604036776,
-    "median_efficiency": 0.004115827297731373,
-    "mean_efficiency": 0.007352137267411788,
+    "portfolio_efficiency": 0.0,
+    "median_efficiency": 0.0,
+    "mean_efficiency": 0.0,
     "total_cycle": {
       "seconds": 11355547.0,
       "hours": 3154.3186111111113,
       "days": 131.42994212962964
     },
     "total_active": {
-      "seconds": 31189.891,
-      "hours": 8.663858611111111,
-      "days": 0.3609941087962963
+      "seconds": 0.0,
+      "hours": 0.0,
+      "days": 0.0
     }
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (BIGTOP-4517)  ran 84.5d and dominates the ratio.",
@@ -44,19 +44,19 @@
     "per_pr_efficiency": [
       {
         "item_id": "BIGTOP-4523",
-        "efficiency": 0.006256587621490289
+        "efficiency": 0.0
       },
       {
         "item_id": "BIGTOP-4517",
-        "efficiency": 0.0004931795325562193
+        "efficiency": 0.0
       },
       {
         "item_id": "BIGTOP-4522",
-        "efficiency": 0.0019750669739724575
+        "efficiency": 0.0
       },
       {
         "item_id": "BIGTOP-4525",
-        "efficiency": 0.020683714941628187
+        "efficiency": 0.0
       }
     ]
   },
@@ -81,11 +81,11 @@
           "days": 17.81144675925926
         },
         "active_time": {
-          "seconds": 9628.319,
-          "hours": 2.6745330555555555,
-          "days": 0.1114388773148148
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.006256587621490289,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "iwasakims"
       },
@@ -100,11 +100,11 @@
           "days": 84.48579861111111
         },
         "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.0004931795325562193,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "iwasakims"
       },
@@ -119,11 +119,11 @@
           "days": 21.09633101851852
         },
         "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.0019750669739724575,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "iwasakims"
       },
@@ -138,11 +138,11 @@
           "days": 8.036365740740742
         },
         "active_time": {
-          "seconds": 14361.572,
-          "hours": 3.989325555555556,
-          "days": 0.16622189814814814
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.020683714941628187,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "iwasakims"
       }

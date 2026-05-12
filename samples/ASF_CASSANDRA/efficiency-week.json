@@ -1,25 +1,25 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T11:51:28.002516-06:00",
-  "headline": "Portfolio flow efficiency for jira:CASSANDRA 2026-05-05\u21922026-05-11: 0.1% across 7 completed items.",
+  "generated_at": "2026-05-12T12:03:07.470199-06:00",
+  "headline": "Portfolio flow efficiency for jira:CASSANDRA 2026-05-05\u21922026-05-11: 0.0% across 7 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 7,
     "human_pr_count": 7,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 0.0010654883671326611,
-    "median_efficiency": 0.02876639683423361,
-    "mean_efficiency": 0.02520451925170258,
+    "portfolio_efficiency": 1.6268764850918346e-05,
+    "median_efficiency": 0.0,
+    "mean_efficiency": 0.00031058217396271994,
     "total_cycle": {
       "seconds": 31543083.0,
       "hours": 8761.9675,
       "days": 365.08197916666666
     },
     "total_active": {
-      "seconds": 33608.788,
-      "hours": 9.335774444444445,
-      "days": 0.38899060185185186
+      "seconds": 513.167,
+      "hours": 0.1425463888888889,
+      "days": 0.005939432870370371
     }
   },
   "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-20672)  ran 348.4d and dominates the ratio.",
@@ -44,31 +44,31 @@
     "per_pr_efficiency": [
       {
         "item_id": "CASSANDRA-21348",
-        "efficiency": 0.04948907116345141
+        "efficiency": 0.00010400036658571233
       },
       {
         "item_id": "CASSANDRA-20672",
-        "efficiency": 0.00011959807075023205
+        "efficiency": 0.0
       },
       {
         "item_id": "CASSANDRA-21350",
-        "efficiency": 0.030737005077297874
+        "efficiency": 0.0
       },
       {
         "item_id": "CASSANDRA-21347",
-        "efficiency": 0.018041083934163118
+        "efficiency": 0.0020127818522517158
       },
       {
         "item_id": "CASSANDRA-21346",
-        "efficiency": 0.0063605364052368414
+        "efficiency": 0.0
       },
       {
         "item_id": "CASSANDRA-21351",
-        "efficiency": 0.02876639683423361
+        "efficiency": 5.729299890161147e-05
       },
       {
         "item_id": "CASSANDRA-21355",
-        "efficiency": 0.04291794327678497
+        "efficiency": 0.0
       }
     ]
   },
@@ -93,11 +93,11 @@
           "days": 1.2629050925925926
         },
         "active_time": {
-          "seconds": 5400.0,
-          "hours": 1.5,
-          "days": 0.0625
+          "seconds": 11.348,
+          "hours": 0.0031522222222222225,
+          "days": 0.0001313425925925926
         },
-        "efficiency": 0.04948907116345141,
+        "efficiency": 0.00010400036658571233,
         "is_bot": false,
         "author_login": "kjhoon0330"
       },
@@ -112,11 +112,11 @@
           "days": 348.3891203703704
         },
         "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.00011959807075023205,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "brandon.williams"
       },
@@ -131,11 +131,11 @@
           "days": 2.03337962962963
         },
         "active_time": {
-          "seconds": 5400.0,
-          "hours": 1.5,
-          "days": 0.0625
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.030737005077297874,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "dnk"
       },
@@ -150,11 +150,11 @@
           "days": 2.798020833333333
         },
         "active_time": {
-          "seconds": 4361.414,
-          "hours": 1.2115038888888887,
-          "days": 0.0504793287037037
+          "seconds": 486.588,
+          "hours": 0.13516333333333333,
+          "days": 0.005631805555555556
         },
-        "efficiency": 0.018041083934163118,
+        "efficiency": 0.0020127818522517158,
         "is_bot": false,
         "author_login": "dnk"
       },
@@ -169,11 +169,11 @@
           "days": 6.550810185185185
         },
         "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.0063605364052368414,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "aratnofsky"
       },
@@ -188,11 +188,11 @@
           "days": 3.0768981481481483
         },
         "active_time": {
-          "seconds": 7647.374,
-          "hours": 2.1242705555555554,
-          "days": 0.08851127314814815
+          "seconds": 15.231,
+          "hours": 0.004230833333333333,
+          "days": 0.0001762847222222222
         },
-        "efficiency": 0.02876639683423361,
+        "efficiency": 5.729299890161147e-05,
         "is_bot": false,
         "author_login": "dnk"
       },
@@ -207,11 +207,11 @@
           "days": 0.9708449074074074
         },
         "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
         },
-        "efficiency": 0.04291794327678497,
+        "efficiency": 0.0,
         "is_bot": false,
         "author_login": "benedict"
       }

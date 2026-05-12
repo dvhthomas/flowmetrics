@@ -46,6 +46,7 @@ from .report import (
     build_training_summary,
 )
 from .service import (
+    DEFAULT_ACTIVE_STATUSES,
     DEFAULT_CACHE_DIR,
     DEFAULT_GAP,
     DEFAULT_MIN_CLUSTER,
@@ -254,11 +255,18 @@ def efficiency() -> None:
     default=DEFAULT_MIN_CLUSTER.total_seconds() / 60,
     show_default=True,
 )
+@click.option(
+    "--active-statuses",
+    type=str,
+    default=",".join(sorted(DEFAULT_ACTIVE_STATUSES)),
+    show_default=True,
+    help="Jira only: comma-separated workflow statuses counted as active. "
+    "Ignored for GitHub (which infers activity from event timestamps).",
+)
 @_FORMAT_OPTION
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
 def week(
-
     repo: str | None,
     jira_url: str | None,
     jira_project: str | None,
@@ -268,6 +276,7 @@ def week(
     offline: bool,
     gap_hours: float,
     min_cluster_minutes: float,
+    active_statuses: str,
     fmt: str,
     output: Path | None,
     verbose: bool,
@@ -289,11 +298,16 @@ def week(
         cache_dir=cache_dir, offline=offline,
     )
 
+    active_set = frozenset(
+        s.strip() for s in active_statuses.split(",") if s.strip()
+    )
+
     def build() -> EfficiencyReport:
         result: WindowResult = flowmetrics_for_window(
             src, start_d, stop_d,
             gap=timedelta(hours=gap_hours),
             min_cluster=timedelta(minutes=min_cluster_minutes),
+            active_statuses=active_set,
         )
         input_ = EfficiencyInput(
             repo=src.label,

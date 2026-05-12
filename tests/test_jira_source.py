@@ -164,6 +164,92 @@ class TestFetchCompletedInWindow:
             source.fetch_completed_in_window(date(2026, 5, 4), date(2026, 5, 10))
 
 
+class TestStatusIntervalExtraction:
+    """JiraSource must produce WorkItem.status_intervals so the compute
+    layer can use Vacanti-canonical status-duration active-time math."""
+
+    def test_two_transitions_yield_three_intervals(self, tmp_path):
+        cache = FileCache(tmp_path)
+        base_url = "https://issues.apache.org/jira"
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
+        jql = (
+            'project = "BIGTOP" AND resolutiondate >= "2026-05-04" '
+            'AND resolutiondate <= "2026-05-10" AND statusCategory = Done '
+            "ORDER BY resolutiondate ASC"
+        )
+        # Open → In Progress at Tue 09:00 → Resolved at Fri 09:00.
+        # Created Mon 09:00.
+        response = {
+            "startAt": 0, "maxResults": 100, "total": 1,
+            "issues": [
+                _issue(
+                    key="BIGTOP-99",
+                    created="2026-05-04T09:00:00.000+0000",
+                    resolved="2026-05-08T09:00:00.000+0000",
+                    histories=[
+                        {
+                            "created": "2026-05-05T09:00:00.000+0000",
+                            "items": [{
+                                "field": "status",
+                                "fromString": "Open",
+                                "toString": "In Progress",
+                            }],
+                        },
+                        {
+                            "created": "2026-05-08T09:00:00.000+0000",
+                            "items": [{
+                                "field": "status",
+                                "fromString": "In Progress",
+                                "toString": "Resolved",
+                            }],
+                        },
+                    ],
+                ),
+            ],
+        }
+        _seed_jira(cache, base_url=base_url, jql=jql, response=response)
+        source = JiraSource(
+            base_url=base_url, project="BIGTOP", cache=cache,
+            read_only=True, http_client=_no_network_client(),
+        )
+        items = source.fetch_completed_in_window(start, stop)
+        item = items[0]
+        # Status intervals reconstruct the issue's status timeline
+        statuses = [(iv.status, iv.start, iv.end) for iv in item.status_intervals]
+        assert len(statuses) == 2
+        assert statuses[0] == (
+            "Open",
+            datetime(2026, 5, 4, 9, 0, tzinfo=UTC),
+            datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
+        )
+        assert statuses[1] == (
+            "In Progress",
+            datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
+            datetime(2026, 5, 8, 9, 0, tzinfo=UTC),
+        )
+
+    def test_no_status_history_yields_empty_intervals(self, tmp_path):
+        cache = FileCache(tmp_path)
+        base_url = "https://issues.apache.org/jira"
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
+        jql = (
+            'project = "BIGTOP" AND resolutiondate >= "2026-05-04" '
+            'AND resolutiondate <= "2026-05-10" AND statusCategory = Done '
+            "ORDER BY resolutiondate ASC"
+        )
+        response = {
+            "startAt": 0, "maxResults": 100, "total": 1,
+            "issues": [_issue(key="BIGTOP-100", histories=[])],
+        }
+        _seed_jira(cache, base_url=base_url, jql=jql, response=response)
+        source = JiraSource(
+            base_url=base_url, project="BIGTOP", cache=cache,
+            read_only=True, http_client=_no_network_client(),
+        )
+        items = source.fetch_completed_in_window(start, stop)
+        assert items[0].status_intervals == []
+
+
 class TestLabel:
     def test_label_combines_jira_and_project(self, tmp_path):
         source = JiraSource(

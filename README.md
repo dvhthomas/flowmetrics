@@ -113,7 +113,7 @@ The JSON envelope includes:
 ## Sample output
 
 <!-- BEGIN SAMPLES -->
-*Last generated: 2026-05-12 17:51 UTC.*
+*Last generated: 2026-05-12 18:02 UTC.*
 
 7 public sources covering a spread of team archetypes (GitHub PR data and Apache Jira issue data). Every link below was
 produced by running this tool live against the real GitHub API and is

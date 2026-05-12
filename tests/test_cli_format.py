@@ -311,6 +311,60 @@ class TestStderrEndsUpInJsonLogs:
         assert payload["logs"] == []
 
 
+class TestActiveStatusesFlag:
+    """--active-statuses parses correctly and reaches the compute layer
+    (verified via --format json, which exposes the input echo)."""
+
+    def test_flag_parses_comma_separated_statuses(self, monkeypatch):
+        captured: dict = {}
+
+        from flowmetrics import cli as cli_module
+
+        original = cli_module.flowmetrics_for_window
+
+        def spy(source, start, stop, **kwargs):
+            captured["active_statuses"] = kwargs.get("active_statuses")
+            return original(source, start, stop, **kwargs)
+
+        monkeypatch.setattr(cli_module, "flowmetrics_for_window", spy)
+
+        result = _invoke(
+            "efficiency", "week",
+            "--repo", "astral-sh/uv",
+            "--start", "2026-05-04", "--stop", "2026-05-10",
+            "--cache-dir", FIXTURE_CACHE, "--offline",
+            "--active-statuses", "In Progress,Code Review,In Development",
+        )
+        assert result.exit_code == 0
+        assert captured["active_statuses"] == frozenset(
+            {"In Progress", "Code Review", "In Development"}
+        )
+
+    def test_default_active_statuses_is_in_progress_plus_in_development(self, monkeypatch):
+        captured: dict = {}
+
+        from flowmetrics import cli as cli_module
+
+        original = cli_module.flowmetrics_for_window
+
+        def spy(source, start, stop, **kwargs):
+            captured["active_statuses"] = kwargs.get("active_statuses")
+            return original(source, start, stop, **kwargs)
+
+        monkeypatch.setattr(cli_module, "flowmetrics_for_window", spy)
+
+        result = _invoke(
+            "efficiency", "week",
+            "--repo", "astral-sh/uv",
+            "--start", "2026-05-04", "--stop", "2026-05-10",
+            "--cache-dir", FIXTURE_CACHE, "--offline",
+        )
+        assert result.exit_code == 0
+        assert captured["active_statuses"] == frozenset(
+            {"In Progress", "In Development"}
+        )
+
+
 class TestHtmlFormat:
     def test_writes_file_to_explicit_output(self, tmp_path):
         out = tmp_path / "report.html"

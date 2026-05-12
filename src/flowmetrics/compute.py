@@ -9,6 +9,21 @@ from .cluster import cluster_activity
 
 
 @dataclass(frozen=True)
+class StatusInterval:
+    """One uninterrupted span at a single workflow status.
+
+    Populated by sources that have explicit named states (Jira). For
+    sources like GitHub PRs that infer activity from event timestamps,
+    `status_intervals` stays empty and the compute layer falls back to
+    event clustering.
+    """
+
+    start: datetime
+    end: datetime
+    status: str
+
+
+@dataclass(frozen=True)
 class WorkItem:
     """One completed unit of work — a merged PR (GitHub), a resolved
     issue (Jira), etc. `item_id` is the source's display form:
@@ -22,6 +37,10 @@ class WorkItem:
     activity: list[datetime] = field(default_factory=list)
     is_bot: bool = False
     author_login: str | None = None
+    # Vacanti's canonical Jira input. If non-empty AND active_statuses are
+    # configured, compute_pr_flow uses status-duration math instead of
+    # event clustering. See docs/METRICS.md.
+    status_intervals: list[StatusInterval] = field(default_factory=list)
 
 
 # Backwards-compat alias — was named for the GitHub-only era.
@@ -62,23 +81,40 @@ def compute_pr_flow(
     *,
     gap: timedelta,
     min_cluster: timedelta,
+    active_statuses: frozenset[str] | None = None,
 ) -> FlowEfficiency:
     if pr.merged_at is None:
         raise ValueError(f"Item {pr.item_id} is not merged; cannot compute flow")
 
     cycle = pr.merged_at - pr.created_at
 
-    events = {pr.created_at, pr.merged_at}
-    for t in pr.activity:
-        if pr.created_at <= t <= pr.merged_at:
-            events.add(t)
-
-    clusters = cluster_activity(events, gap=gap)
-    raw_active = sum(
-        (max(end - start, min_cluster) for start, end in clusters),
-        start=timedelta(),
-    )
-    active = min(raw_active, cycle)
+    # Status-duration path: used when the source provides explicit
+    # named-status intervals (Jira) AND the caller has mapped some statuses
+    # as active. This is Vacanti's canonical Jira computation — measured,
+    # not inferred.
+    if pr.status_intervals and active_statuses:
+        raw_active = sum(
+            (
+                (interval.end - interval.start)
+                for interval in pr.status_intervals
+                if interval.status in active_statuses
+            ),
+            start=timedelta(),
+        )
+        active = min(raw_active, cycle)
+    else:
+        # Event-clustering path (GitHub: no explicit status, infer from
+        # event timestamps).
+        events = {pr.created_at, pr.merged_at}
+        for t in pr.activity:
+            if pr.created_at <= t <= pr.merged_at:
+                events.add(t)
+        clusters = cluster_activity(events, gap=gap)
+        raw_active = sum(
+            (max(end - start, min_cluster) for start, end in clusters),
+            start=timedelta(),
+        )
+        active = min(raw_active, cycle)
 
     efficiency = (
         active.total_seconds() / cycle.total_seconds() if cycle.total_seconds() > 0 else 1.0

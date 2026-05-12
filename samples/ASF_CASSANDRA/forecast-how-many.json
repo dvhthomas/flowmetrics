@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-12T11:51:31.026620-06:00",
+  "generated_at": "2026-05-12T12:03:12.658341-06:00",
   "headline": "Forecast for jira:CASSANDRA: 85% confidence we deliver at least 22 items by 2026-05-26 (window: 15 days).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {

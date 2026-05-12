@@ -26,7 +26,7 @@ import httpx
 from dateutil.parser import isoparse
 
 from ..cache import CacheMiss, FileCache
-from ..compute import WorkItem
+from ..compute import StatusInterval, WorkItem
 
 # Pseudo-query string used as part of the cache key. The actual REST API
 # uses query parameters, but for cache-key stability we hash this constant
@@ -179,16 +179,32 @@ def _issue_to_work_item(issue: dict[str, Any]) -> WorkItem | None:
     created = _parse_dt(fields["created"])
     resolved = _parse_dt(fields["resolutiondate"])
 
+    # Walk the changelog forward; each status-field item closes the
+    # previous status's interval. The last transition's toString is the
+    # final "done" state and is not emitted as an interval.
+    status_changes: list[tuple[datetime, str, str]] = []
     activity: list[datetime] = []
     for history in (issue.get("changelog") or {}).get("histories", []):
         if not history.get("created"):
             continue
         ts = _parse_dt(history["created"])
-        # Only count status transitions as activity (consistent with how
-        # GitHub treats timeline events: each transition = "something happened").
-        items = history.get("items") or []
-        if any(it.get("field") == "status" for it in items):
-            activity.append(ts)
+        for it in history.get("items") or []:
+            if it.get("field") == "status":
+                status_changes.append(
+                    (ts, it.get("fromString") or "Unknown", it.get("toString") or "Unknown")
+                )
+                activity.append(ts)
+                break
+    status_changes.sort(key=lambda x: x[0])
+
+    intervals: list[StatusInterval] = []
+    if status_changes:
+        prev_ts = created
+        prev_status = status_changes[0][1]  # fromString of first transition
+        for ts, _from, to_status in status_changes:
+            intervals.append(StatusInterval(prev_ts, ts, prev_status))
+            prev_ts = ts
+            prev_status = to_status
 
     reporter = fields.get("reporter") or {}
     author_login = reporter.get("name") or reporter.get("accountId")
@@ -199,8 +215,9 @@ def _issue_to_work_item(issue: dict[str, Any]) -> WorkItem | None:
         created_at=created,
         merged_at=resolved,
         activity=activity,
-        is_bot=False,  # Jira doesn't have a canonical bot marker; could be inferred later
+        is_bot=False,
         author_login=author_login,
+        status_intervals=intervals,
     )
 
 
