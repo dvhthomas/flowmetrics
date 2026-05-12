@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:10:37.917615-06:00",
-  "headline": "Portfolio flow efficiency for astral-sh/uv 2026-05-05\u21922026-05-11: 8.4% across 46 completed items (31 human, 15 bot).",
+  "generated_at": "2026-05-12T12:15:59.180104-06:00",
+  "headline": "Portfolio flow efficiency for astral-sh/uv May 5, 2026 \u2192 May 11, 2026: 8.4% across 46 completed items (31 human, 15 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 46,

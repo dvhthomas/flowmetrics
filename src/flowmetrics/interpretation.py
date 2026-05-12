@@ -19,6 +19,16 @@ def _pct(x: float) -> str:
     return f"{x * 100:.1f}%"
 
 
+def _prose_date(d: date) -> str:
+    """Prose date for headlines/insights/actions: ``Jan 12, 2026``.
+
+    Always includes the year — prose has no implicit context to fall
+    back on. Distinct from chart axis labels (`Jan 12`, no year unless
+    spanning a year boundary).
+    """
+    return f"{d.strftime('%b')} {d.day}, {d.year}"
+
+
 # ---------------------------------------------------------------------------
 # Efficiency
 # ---------------------------------------------------------------------------
@@ -34,7 +44,10 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
 
     if result.pr_count == 0:
         return Interpretation(
-            headline=f"No PRs merged in {input.repo} between {input.start} and {input.stop}.",
+            headline=(
+                f"No PRs merged in {input.repo} between "
+                f"{_prose_date(input.start)} and {_prose_date(input.stop)}."
+            ),
             key_insight="An empty window means nothing to measure — not a bad signal.",
             next_actions=[
                 "Widen the date window with --start/--stop.",
@@ -48,7 +61,8 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
     if result.bot_pr_count:
         bot_suffix = f" ({result.human_pr_count} human, {result.bot_pr_count} bot)"
     headline = (
-        f"Portfolio flow efficiency for {input.repo} {input.start}→{input.stop}: "
+        f"Portfolio flow efficiency for {input.repo} "
+        f"{_prose_date(input.start)} → {_prose_date(input.stop)}: "
         f"{_pct(portfolio)} across {result.pr_count} completed items{bot_suffix}."
     )
 
@@ -137,16 +151,18 @@ def interpret_when_done(
 
     headline = (
         f"Forecast for {input.repo}: 85% confidence {input.items} items are done "
-        f"by {p85}, starting {input.start_date}."
+        f"by {_prose_date(p85)}, starting {_prose_date(input.start_date)}."
     )
 
     key_insight = (
-        f"Median outcome is {p50}. 95% confidence is {p95}. The gap between 50% and 85% is "
-        "the wait-cost of being predictable — wider gap = more daily-throughput variance."
+        f"Median outcome is {_prose_date(p50)}. 95% confidence is "
+        f"{_prose_date(p95)}. The gap between 50% and 85% is the wait-cost of "
+        "being predictable — wider gap = more daily-throughput variance."
     )
 
     next_actions = [
-        f"Commit externally on the 85% date ({p85}), not the 50% date ({p50}).",
+        f"Commit externally on the 85% date ({_prose_date(p85)}), "
+        f"not the 50% date ({_prose_date(p50)}).",
         "Re-run weekly to track drift in the forecast.",
     ]
     if input.items > training.total_merges:
@@ -197,7 +213,7 @@ def interpret_how_many(
     days = (input.target_date - input.start_date).days + 1
     headline = (
         f"Forecast for {input.repo}: 85% confidence we deliver at least {p85} items by "
-        f"{input.target_date} (window: {days} days)."
+        f"{_prose_date(input.target_date)} (window: {days} days)."
     )
 
     key_insight = (

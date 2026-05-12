@@ -96,12 +96,16 @@ def _thin_xticks(ax, labels: list[str], n_max: int = 10) -> None:
 
 
 def _human_date_label(d: date, include_year: bool) -> str:
-    """Chart-friendly date label: `May-19` (or `May-19 2026` across year boundaries).
+    """Chart-friendly axis label: ``May 19`` (or ``May 19 2026`` when the
+    chart spans a year boundary). Space separator is more legible at
+    small axis-tick sizes than a dash.
 
-    ISO dates stay in code / JSON / `cli_invocation`; human-readable goes
-    on chart axes and legend labels.
+    Distinct from prose date formatting (`Jan 12, 2026`) used in
+    headlines/insights. ISO stays in code/JSON/`cli_invocation`.
     """
-    return d.strftime("%b-%d %Y" if include_year else "%b-%d")
+    if include_year:
+        return f"{d.strftime('%b')} {d.day} {d.year}"
+    return f"{d.strftime('%b')} {d.day}"
 
 
 def _needs_year_in_labels(dates: list[date]) -> bool:

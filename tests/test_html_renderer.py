@@ -224,6 +224,26 @@ class TestHowManyHtml:
         assert "BACKWARD" in text or "FEWER" in text
 
 
+class TestHumanDateLabel:
+    """Chart axis labels: `Jan 12` (space, no dash). Year only when the
+    chart spans a year boundary."""
+
+    def test_format_with_space_not_dash(self):
+        from datetime import date as _d
+
+        from flowmetrics.renderers.html_renderer import _human_date_label
+
+        assert _human_date_label(_d(2026, 1, 12), include_year=False) == "Jan 12"
+        assert "-" not in _human_date_label(_d(2026, 1, 12), include_year=False)
+
+    def test_format_with_year_when_required(self):
+        from datetime import date as _d
+
+        from flowmetrics.renderers.html_renderer import _human_date_label
+
+        assert _human_date_label(_d(2026, 1, 12), include_year=True) == "Jan 12 2026"
+
+
 class TestDefaultOutputPath:
     def test_filename_contains_repo_slug_and_timestamp(self):
         path = html_renderer.default_output_path(_efficiency_report())

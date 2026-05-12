@@ -1,2 +1,2 @@
-Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by 2027-01-01, starting 
-2026-05-12.
+Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by Jan 1, 2027, starting May 
+12, 2026.

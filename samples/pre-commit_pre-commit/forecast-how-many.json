@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-12T12:10:57.997983-06:00",
-  "headline": "Forecast for pre-commit/pre-commit: 85% confidence we deliver at least 0 items by 2026-05-26 (window: 15 days).",
+  "generated_at": "2026-05-12T12:16:19.398543-06:00",
+  "headline": "Forecast for pre-commit/pre-commit: 85% confidence we deliver at least 0 items by May 26, 2026 (window: 15 days).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {

@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency week",
-  "generated_at": "2026-05-12T12:10:51.794127-06:00",
-  "headline": "No PRs merged in pre-commit/pre-commit between 2026-05-05 and 2026-05-11.",
+  "generated_at": "2026-05-12T12:16:12.988569-06:00",
+  "headline": "No PRs merged in pre-commit/pre-commit between May 5, 2026 and May 11, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
     "pr_count": 0,

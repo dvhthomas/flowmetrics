@@ -1,1 +1,2 @@
-Forecast for jira:CASSANDRA: 85% confidence 25 items are done by 2026-05-28, starting 2026-05-12.
+Forecast for jira:CASSANDRA: 85% confidence 25 items are done by May 28, 2026, starting May 12, 
+2026.
