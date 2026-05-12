@@ -1,0 +1,2 @@
+Portfolio flow efficiency for CalcMark/go-calcmark 2026-05-05→2026-05-11: 100.0% across 9 merged 
+PRs.

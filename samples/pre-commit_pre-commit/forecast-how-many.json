@@ -1,0 +1,149 @@
+{
+  "schema": "flowmetrics.forecast.how_many.v1",
+  "command": "forecast how-many",
+  "generated_at": "2026-05-12T11:19:00.036132-06:00",
+  "headline": "Forecast for pre-commit/pre-commit: 85% confidence we deliver at least 0 items by 2026-05-26 (window: 15 days).",
+  "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
+  "summary": {
+    "percentiles": {
+      "50": 2,
+      "70": 1,
+      "85": 0,
+      "95": 0
+    },
+    "reading": "backward \u2014 higher confidence means FEWER items",
+    "horizon": {
+      "days_ahead": 14,
+      "training_window_days": 30,
+      "ratio": 0.4666666666666667,
+      "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
+    }
+  },
+  "key_insight": "Median outcome is 2 items; 95% commitment floor is 0. Higher confidence = fewer items \u2014 promising 0 leaves throughput on the table to buy certainty.",
+  "next_actions": [
+    "For external commitments, promise 0 items (or 0 if stakes are high).",
+    "For internal planning, treat 2 as the realistic target \u2014 half the time you deliver less.",
+    "Re-run weekly; the floor moves as historical throughput shifts."
+  ],
+  "caveats": [
+    "Confidence reads BACKWARD: higher % means FEWER items, not more.",
+    "Throughput unit is 'merged PRs' \u2014 assumes PR size is stable across windows.",
+    "No accounting for known disruptions (holidays, on-call rotations, launches)."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "items": 0,
+        "frequency": 2092
+      },
+      {
+        "items": 1,
+        "frequency": 2299
+      },
+      {
+        "items": 2,
+        "frequency": 2302
+      },
+      {
+        "items": 3,
+        "frequency": 1549
+      },
+      {
+        "items": 4,
+        "frequency": 960
+      },
+      {
+        "items": 5,
+        "frequency": 468
+      },
+      {
+        "items": 6,
+        "frequency": 202
+      },
+      {
+        "items": 7,
+        "frequency": 90
+      },
+      {
+        "items": 8,
+        "frequency": 26
+      },
+      {
+        "items": 9,
+        "frequency": 8
+      },
+      {
+        "items": 10,
+        "frequency": 4
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "pre-commit/pre-commit",
+    "start_date": "2026-05-12",
+    "target_date": "2026-05-26",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "total_throughput": 4,
+    "avg_throughput_per_day": 0.13333333333333333,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 2,
+    "zero_throughput_days": 27
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast how-many --repo pre-commit/pre-commit --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

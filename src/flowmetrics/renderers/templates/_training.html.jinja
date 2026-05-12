@@ -1,0 +1,9 @@
+<h2>Training window</h2>
+<table>
+  <tr><th>Window</th><td>{{ training.window_start }} → {{ training.window_end }}
+      ({{ training.daily_samples|length }} days)</td></tr>
+  <tr><th>Total merges</th><td class="num">{{ training.total_merges }}</td></tr>
+  <tr><th>Avg / day</th><td class="num">{{ "%.2f"|format(training.avg_per_day) }}</td></tr>
+  <tr><th>Zero-merge days</th><td class="num">{{ training.zero_days }} of {{ training.daily_samples|length }}</td></tr>
+</table>
+<img alt="Daily training throughput" src="data:image/png;base64,{{ chart_training_b64 }}" />

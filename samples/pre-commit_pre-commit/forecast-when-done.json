@@ -1,0 +1,1214 @@
+{
+  "schema": "flowmetrics.forecast.when_done.v1",
+  "command": "forecast when-done",
+  "generated_at": "2026-05-12T11:18:57.273203-06:00",
+  "headline": "Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by 2027-01-01, starting 2026-05-12.",
+  "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
+  "summary": {
+    "percentiles": {
+      "50": "2026-11-12",
+      "70": "2026-12-06",
+      "85": "2027-01-01",
+      "95": "2027-02-03"
+    },
+    "reading": "forward \u2014 higher confidence means a later date",
+    "horizon": {
+      "days_ahead": 234,
+      "training_window_days": 30,
+      "ratio": 7.8,
+      "reading": "Forecast horizon is much further out than the training data covers. High risk of regime change invalidating the result. Shorter is better."
+    }
+  },
+  "key_insight": "Median outcome is 2026-11-12. 95% confidence is 2027-02-03. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "next_actions": [
+    "Commit externally on the 85% date (2027-01-01), not the 50% date (2026-11-12).",
+    "Re-run weekly to track drift in the forecast.",
+    "Items to complete (25) exceeds total recent throughput (4 merges in 30d). Forecast is extrapolating past the training horizon \u2014 treat the tail with skepticism.",
+    "This forecast reaches 234 days out \u2014 7.8\u00d7 the training window. Shorter forecasts are more reliable; consider fewer items in a near-term commitment and re-forecasting after delivering them."
+  ],
+  "caveats": [
+    "Assumes the next weeks will look like the recent past \u2014 no regime change.",
+    "Zero-merge days are included as real samples; bad days happen in the simulator.",
+    "Throughput unit is 'merged PRs', not 'features' \u2014 works only if PR size is stable."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "date": "2026-07-15",
+        "frequency": 2
+      },
+      {
+        "date": "2026-07-22",
+        "frequency": 1
+      },
+      {
+        "date": "2026-07-25",
+        "frequency": 1
+      },
+      {
+        "date": "2026-07-27",
+        "frequency": 1
+      },
+      {
+        "date": "2026-07-29",
+        "frequency": 1
+      },
+      {
+        "date": "2026-07-30",
+        "frequency": 1
+      },
+      {
+        "date": "2026-07-31",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-01",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-02",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-03",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-04",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-05",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-06",
+        "frequency": 3
+      },
+      {
+        "date": "2026-08-07",
+        "frequency": 5
+      },
+      {
+        "date": "2026-08-08",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-09",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-10",
+        "frequency": 4
+      },
+      {
+        "date": "2026-08-11",
+        "frequency": 6
+      },
+      {
+        "date": "2026-08-12",
+        "frequency": 7
+      },
+      {
+        "date": "2026-08-13",
+        "frequency": 5
+      },
+      {
+        "date": "2026-08-14",
+        "frequency": 4
+      },
+      {
+        "date": "2026-08-15",
+        "frequency": 7
+      },
+      {
+        "date": "2026-08-16",
+        "frequency": 8
+      },
+      {
+        "date": "2026-08-17",
+        "frequency": 8
+      },
+      {
+        "date": "2026-08-18",
+        "frequency": 8
+      },
+      {
+        "date": "2026-08-19",
+        "frequency": 14
+      },
+      {
+        "date": "2026-08-20",
+        "frequency": 7
+      },
+      {
+        "date": "2026-08-21",
+        "frequency": 8
+      },
+      {
+        "date": "2026-08-22",
+        "frequency": 9
+      },
+      {
+        "date": "2026-08-23",
+        "frequency": 6
+      },
+      {
+        "date": "2026-08-24",
+        "frequency": 10
+      },
+      {
+        "date": "2026-08-25",
+        "frequency": 17
+      },
+      {
+        "date": "2026-08-26",
+        "frequency": 14
+      },
+      {
+        "date": "2026-08-27",
+        "frequency": 18
+      },
+      {
+        "date": "2026-08-28",
+        "frequency": 18
+      },
+      {
+        "date": "2026-08-29",
+        "frequency": 19
+      },
+      {
+        "date": "2026-08-30",
+        "frequency": 19
+      },
+      {
+        "date": "2026-08-31",
+        "frequency": 19
+      },
+      {
+        "date": "2026-09-01",
+        "frequency": 26
+      },
+      {
+        "date": "2026-09-02",
+        "frequency": 24
+      },
+      {
+        "date": "2026-09-03",
+        "frequency": 23
+      },
+      {
+        "date": "2026-09-04",
+        "frequency": 32
+      },
+      {
+        "date": "2026-09-05",
+        "frequency": 22
+      },
+      {
+        "date": "2026-09-06",
+        "frequency": 28
+      },
+      {
+        "date": "2026-09-07",
+        "frequency": 22
+      },
+      {
+        "date": "2026-09-08",
+        "frequency": 20
+      },
+      {
+        "date": "2026-09-09",
+        "frequency": 25
+      },
+      {
+        "date": "2026-09-10",
+        "frequency": 31
+      },
+      {
+        "date": "2026-09-11",
+        "frequency": 14
+      },
+      {
+        "date": "2026-09-12",
+        "frequency": 38
+      },
+      {
+        "date": "2026-09-13",
+        "frequency": 42
+      },
+      {
+        "date": "2026-09-14",
+        "frequency": 37
+      },
+      {
+        "date": "2026-09-15",
+        "frequency": 38
+      },
+      {
+        "date": "2026-09-16",
+        "frequency": 31
+      },
+      {
+        "date": "2026-09-17",
+        "frequency": 44
+      },
+      {
+        "date": "2026-09-18",
+        "frequency": 40
+      },
+      {
+        "date": "2026-09-19",
+        "frequency": 38
+      },
+      {
+        "date": "2026-09-20",
+        "frequency": 51
+      },
+      {
+        "date": "2026-09-21",
+        "frequency": 47
+      },
+      {
+        "date": "2026-09-22",
+        "frequency": 53
+      },
+      {
+        "date": "2026-09-23",
+        "frequency": 53
+      },
+      {
+        "date": "2026-09-24",
+        "frequency": 50
+      },
+      {
+        "date": "2026-09-25",
+        "frequency": 56
+      },
+      {
+        "date": "2026-09-26",
+        "frequency": 59
+      },
+      {
+        "date": "2026-09-27",
+        "frequency": 63
+      },
+      {
+        "date": "2026-09-28",
+        "frequency": 64
+      },
+      {
+        "date": "2026-09-29",
+        "frequency": 69
+      },
+      {
+        "date": "2026-09-30",
+        "frequency": 58
+      },
+      {
+        "date": "2026-10-01",
+        "frequency": 66
+      },
+      {
+        "date": "2026-10-02",
+        "frequency": 79
+      },
+      {
+        "date": "2026-10-03",
+        "frequency": 75
+      },
+      {
+        "date": "2026-10-04",
+        "frequency": 72
+      },
+      {
+        "date": "2026-10-05",
+        "frequency": 55
+      },
+      {
+        "date": "2026-10-06",
+        "frequency": 76
+      },
+      {
+        "date": "2026-10-07",
+        "frequency": 73
+      },
+      {
+        "date": "2026-10-08",
+        "frequency": 72
+      },
+      {
+        "date": "2026-10-09",
+        "frequency": 74
+      },
+      {
+        "date": "2026-10-10",
+        "frequency": 69
+      },
+      {
+        "date": "2026-10-11",
+        "frequency": 82
+      },
+      {
+        "date": "2026-10-12",
+        "frequency": 86
+      },
+      {
+        "date": "2026-10-13",
+        "frequency": 71
+      },
+      {
+        "date": "2026-10-14",
+        "frequency": 67
+      },
+      {
+        "date": "2026-10-15",
+        "frequency": 86
+      },
+      {
+        "date": "2026-10-16",
+        "frequency": 65
+      },
+      {
+        "date": "2026-10-17",
+        "frequency": 86
+      },
+      {
+        "date": "2026-10-18",
+        "frequency": 67
+      },
+      {
+        "date": "2026-10-19",
+        "frequency": 70
+      },
+      {
+        "date": "2026-10-20",
+        "frequency": 86
+      },
+      {
+        "date": "2026-10-21",
+        "frequency": 93
+      },
+      {
+        "date": "2026-10-22",
+        "frequency": 90
+      },
+      {
+        "date": "2026-10-23",
+        "frequency": 102
+      },
+      {
+        "date": "2026-10-24",
+        "frequency": 78
+      },
+      {
+        "date": "2026-10-25",
+        "frequency": 94
+      },
+      {
+        "date": "2026-10-26",
+        "frequency": 98
+      },
+      {
+        "date": "2026-10-27",
+        "frequency": 92
+      },
+      {
+        "date": "2026-10-28",
+        "frequency": 93
+      },
+      {
+        "date": "2026-10-29",
+        "frequency": 74
+      },
+      {
+        "date": "2026-10-30",
+        "frequency": 81
+      },
+      {
+        "date": "2026-10-31",
+        "frequency": 99
+      },
+      {
+        "date": "2026-11-01",
+        "frequency": 96
+      },
+      {
+        "date": "2026-11-02",
+        "frequency": 88
+      },
+      {
+        "date": "2026-11-03",
+        "frequency": 78
+      },
+      {
+        "date": "2026-11-04",
+        "frequency": 91
+      },
+      {
+        "date": "2026-11-05",
+        "frequency": 111
+      },
+      {
+        "date": "2026-11-06",
+        "frequency": 101
+      },
+      {
+        "date": "2026-11-07",
+        "frequency": 92
+      },
+      {
+        "date": "2026-11-08",
+        "frequency": 93
+      },
+      {
+        "date": "2026-11-09",
+        "frequency": 103
+      },
+      {
+        "date": "2026-11-10",
+        "frequency": 91
+      },
+      {
+        "date": "2026-11-11",
+        "frequency": 101
+      },
+      {
+        "date": "2026-11-12",
+        "frequency": 111
+      },
+      {
+        "date": "2026-11-13",
+        "frequency": 80
+      },
+      {
+        "date": "2026-11-14",
+        "frequency": 99
+      },
+      {
+        "date": "2026-11-15",
+        "frequency": 87
+      },
+      {
+        "date": "2026-11-16",
+        "frequency": 92
+      },
+      {
+        "date": "2026-11-17",
+        "frequency": 81
+      },
+      {
+        "date": "2026-11-18",
+        "frequency": 82
+      },
+      {
+        "date": "2026-11-19",
+        "frequency": 81
+      },
+      {
+        "date": "2026-11-20",
+        "frequency": 76
+      },
+      {
+        "date": "2026-11-21",
+        "frequency": 72
+      },
+      {
+        "date": "2026-11-22",
+        "frequency": 97
+      },
+      {
+        "date": "2026-11-23",
+        "frequency": 87
+      },
+      {
+        "date": "2026-11-24",
+        "frequency": 75
+      },
+      {
+        "date": "2026-11-25",
+        "frequency": 85
+      },
+      {
+        "date": "2026-11-26",
+        "frequency": 93
+      },
+      {
+        "date": "2026-11-27",
+        "frequency": 66
+      },
+      {
+        "date": "2026-11-28",
+        "frequency": 91
+      },
+      {
+        "date": "2026-11-29",
+        "frequency": 68
+      },
+      {
+        "date": "2026-11-30",
+        "frequency": 85
+      },
+      {
+        "date": "2026-12-01",
+        "frequency": 86
+      },
+      {
+        "date": "2026-12-02",
+        "frequency": 80
+      },
+      {
+        "date": "2026-12-03",
+        "frequency": 70
+      },
+      {
+        "date": "2026-12-04",
+        "frequency": 64
+      },
+      {
+        "date": "2026-12-05",
+        "frequency": 71
+      },
+      {
+        "date": "2026-12-06",
+        "frequency": 70
+      },
+      {
+        "date": "2026-12-07",
+        "frequency": 68
+      },
+      {
+        "date": "2026-12-08",
+        "frequency": 65
+      },
+      {
+        "date": "2026-12-09",
+        "frequency": 78
+      },
+      {
+        "date": "2026-12-10",
+        "frequency": 72
+      },
+      {
+        "date": "2026-12-11",
+        "frequency": 65
+      },
+      {
+        "date": "2026-12-12",
+        "frequency": 67
+      },
+      {
+        "date": "2026-12-13",
+        "frequency": 68
+      },
+      {
+        "date": "2026-12-14",
+        "frequency": 55
+      },
+      {
+        "date": "2026-12-15",
+        "frequency": 61
+      },
+      {
+        "date": "2026-12-16",
+        "frequency": 56
+      },
+      {
+        "date": "2026-12-17",
+        "frequency": 72
+      },
+      {
+        "date": "2026-12-18",
+        "frequency": 61
+      },
+      {
+        "date": "2026-12-19",
+        "frequency": 63
+      },
+      {
+        "date": "2026-12-20",
+        "frequency": 50
+      },
+      {
+        "date": "2026-12-21",
+        "frequency": 54
+      },
+      {
+        "date": "2026-12-22",
+        "frequency": 45
+      },
+      {
+        "date": "2026-12-23",
+        "frequency": 50
+      },
+      {
+        "date": "2026-12-24",
+        "frequency": 53
+      },
+      {
+        "date": "2026-12-25",
+        "frequency": 55
+      },
+      {
+        "date": "2026-12-26",
+        "frequency": 41
+      },
+      {
+        "date": "2026-12-27",
+        "frequency": 61
+      },
+      {
+        "date": "2026-12-28",
+        "frequency": 58
+      },
+      {
+        "date": "2026-12-29",
+        "frequency": 49
+      },
+      {
+        "date": "2026-12-30",
+        "frequency": 46
+      },
+      {
+        "date": "2026-12-31",
+        "frequency": 43
+      },
+      {
+        "date": "2027-01-01",
+        "frequency": 50
+      },
+      {
+        "date": "2027-01-02",
+        "frequency": 40
+      },
+      {
+        "date": "2027-01-03",
+        "frequency": 32
+      },
+      {
+        "date": "2027-01-04",
+        "frequency": 45
+      },
+      {
+        "date": "2027-01-05",
+        "frequency": 38
+      },
+      {
+        "date": "2027-01-06",
+        "frequency": 39
+      },
+      {
+        "date": "2027-01-07",
+        "frequency": 36
+      },
+      {
+        "date": "2027-01-08",
+        "frequency": 36
+      },
+      {
+        "date": "2027-01-09",
+        "frequency": 39
+      },
+      {
+        "date": "2027-01-10",
+        "frequency": 39
+      },
+      {
+        "date": "2027-01-11",
+        "frequency": 32
+      },
+      {
+        "date": "2027-01-12",
+        "frequency": 40
+      },
+      {
+        "date": "2027-01-13",
+        "frequency": 29
+      },
+      {
+        "date": "2027-01-14",
+        "frequency": 31
+      },
+      {
+        "date": "2027-01-15",
+        "frequency": 31
+      },
+      {
+        "date": "2027-01-16",
+        "frequency": 29
+      },
+      {
+        "date": "2027-01-17",
+        "frequency": 37
+      },
+      {
+        "date": "2027-01-18",
+        "frequency": 30
+      },
+      {
+        "date": "2027-01-19",
+        "frequency": 32
+      },
+      {
+        "date": "2027-01-20",
+        "frequency": 23
+      },
+      {
+        "date": "2027-01-21",
+        "frequency": 29
+      },
+      {
+        "date": "2027-01-22",
+        "frequency": 23
+      },
+      {
+        "date": "2027-01-23",
+        "frequency": 32
+      },
+      {
+        "date": "2027-01-24",
+        "frequency": 33
+      },
+      {
+        "date": "2027-01-25",
+        "frequency": 19
+      },
+      {
+        "date": "2027-01-26",
+        "frequency": 22
+      },
+      {
+        "date": "2027-01-27",
+        "frequency": 22
+      },
+      {
+        "date": "2027-01-28",
+        "frequency": 25
+      },
+      {
+        "date": "2027-01-29",
+        "frequency": 21
+      },
+      {
+        "date": "2027-01-30",
+        "frequency": 22
+      },
+      {
+        "date": "2027-01-31",
+        "frequency": 25
+      },
+      {
+        "date": "2027-02-01",
+        "frequency": 11
+      },
+      {
+        "date": "2027-02-02",
+        "frequency": 16
+      },
+      {
+        "date": "2027-02-03",
+        "frequency": 22
+      },
+      {
+        "date": "2027-02-04",
+        "frequency": 20
+      },
+      {
+        "date": "2027-02-05",
+        "frequency": 24
+      },
+      {
+        "date": "2027-02-06",
+        "frequency": 8
+      },
+      {
+        "date": "2027-02-07",
+        "frequency": 20
+      },
+      {
+        "date": "2027-02-08",
+        "frequency": 15
+      },
+      {
+        "date": "2027-02-09",
+        "frequency": 10
+      },
+      {
+        "date": "2027-02-10",
+        "frequency": 17
+      },
+      {
+        "date": "2027-02-11",
+        "frequency": 20
+      },
+      {
+        "date": "2027-02-12",
+        "frequency": 12
+      },
+      {
+        "date": "2027-02-13",
+        "frequency": 13
+      },
+      {
+        "date": "2027-02-14",
+        "frequency": 9
+      },
+      {
+        "date": "2027-02-15",
+        "frequency": 11
+      },
+      {
+        "date": "2027-02-16",
+        "frequency": 15
+      },
+      {
+        "date": "2027-02-17",
+        "frequency": 11
+      },
+      {
+        "date": "2027-02-18",
+        "frequency": 12
+      },
+      {
+        "date": "2027-02-19",
+        "frequency": 6
+      },
+      {
+        "date": "2027-02-20",
+        "frequency": 8
+      },
+      {
+        "date": "2027-02-21",
+        "frequency": 15
+      },
+      {
+        "date": "2027-02-22",
+        "frequency": 7
+      },
+      {
+        "date": "2027-02-23",
+        "frequency": 14
+      },
+      {
+        "date": "2027-02-24",
+        "frequency": 8
+      },
+      {
+        "date": "2027-02-25",
+        "frequency": 4
+      },
+      {
+        "date": "2027-02-26",
+        "frequency": 11
+      },
+      {
+        "date": "2027-02-27",
+        "frequency": 9
+      },
+      {
+        "date": "2027-02-28",
+        "frequency": 10
+      },
+      {
+        "date": "2027-03-01",
+        "frequency": 8
+      },
+      {
+        "date": "2027-03-02",
+        "frequency": 12
+      },
+      {
+        "date": "2027-03-03",
+        "frequency": 5
+      },
+      {
+        "date": "2027-03-04",
+        "frequency": 3
+      },
+      {
+        "date": "2027-03-05",
+        "frequency": 6
+      },
+      {
+        "date": "2027-03-06",
+        "frequency": 6
+      },
+      {
+        "date": "2027-03-07",
+        "frequency": 7
+      },
+      {
+        "date": "2027-03-08",
+        "frequency": 9
+      },
+      {
+        "date": "2027-03-09",
+        "frequency": 5
+      },
+      {
+        "date": "2027-03-10",
+        "frequency": 4
+      },
+      {
+        "date": "2027-03-11",
+        "frequency": 3
+      },
+      {
+        "date": "2027-03-12",
+        "frequency": 4
+      },
+      {
+        "date": "2027-03-13",
+        "frequency": 5
+      },
+      {
+        "date": "2027-03-14",
+        "frequency": 6
+      },
+      {
+        "date": "2027-03-15",
+        "frequency": 3
+      },
+      {
+        "date": "2027-03-16",
+        "frequency": 8
+      },
+      {
+        "date": "2027-03-17",
+        "frequency": 5
+      },
+      {
+        "date": "2027-03-18",
+        "frequency": 3
+      },
+      {
+        "date": "2027-03-19",
+        "frequency": 4
+      },
+      {
+        "date": "2027-03-20",
+        "frequency": 4
+      },
+      {
+        "date": "2027-03-22",
+        "frequency": 2
+      },
+      {
+        "date": "2027-03-23",
+        "frequency": 2
+      },
+      {
+        "date": "2027-03-24",
+        "frequency": 1
+      },
+      {
+        "date": "2027-03-25",
+        "frequency": 3
+      },
+      {
+        "date": "2027-03-26",
+        "frequency": 6
+      },
+      {
+        "date": "2027-03-27",
+        "frequency": 4
+      },
+      {
+        "date": "2027-03-29",
+        "frequency": 5
+      },
+      {
+        "date": "2027-03-31",
+        "frequency": 3
+      },
+      {
+        "date": "2027-04-02",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-04",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-06",
+        "frequency": 3
+      },
+      {
+        "date": "2027-04-07",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-08",
+        "frequency": 2
+      },
+      {
+        "date": "2027-04-09",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-10",
+        "frequency": 4
+      },
+      {
+        "date": "2027-04-11",
+        "frequency": 4
+      },
+      {
+        "date": "2027-04-12",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-15",
+        "frequency": 4
+      },
+      {
+        "date": "2027-04-16",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-17",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-18",
+        "frequency": 3
+      },
+      {
+        "date": "2027-04-19",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-20",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-21",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-22",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-24",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-26",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-27",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-28",
+        "frequency": 1
+      },
+      {
+        "date": "2027-04-29",
+        "frequency": 2
+      },
+      {
+        "date": "2027-05-06",
+        "frequency": 1
+      },
+      {
+        "date": "2027-05-09",
+        "frequency": 1
+      },
+      {
+        "date": "2027-05-12",
+        "frequency": 1
+      },
+      {
+        "date": "2027-05-13",
+        "frequency": 1
+      },
+      {
+        "date": "2027-05-17",
+        "frequency": 1
+      },
+      {
+        "date": "2027-05-19",
+        "frequency": 1
+      },
+      {
+        "date": "2027-06-01",
+        "frequency": 1
+      },
+      {
+        "date": "2027-07-12",
+        "frequency": 1
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "pre-commit/pre-commit",
+    "items": 25,
+    "start_date": "2026-05-12",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "total_throughput": 4,
+    "avg_throughput_per_day": 0.13333333333333333,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 2,
+    "zero_throughput_days": 27
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast when-done --repo pre-commit/pre-commit --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

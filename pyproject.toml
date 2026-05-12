@@ -1,0 +1,68 @@
+[project]
+name = "flowmetrics"
+version = "0.1.0"
+description = "Vacanti-style flow efficiency and Monte Carlo forecasting from GitHub PR data"
+readme = "README.md"
+authors = [
+    { name = "Dylan Thomas", email = "dvhthomas@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.3.3",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "matplotlib>=3.10.9",
+    "python-dateutil>=2.9.0.post0",
+    "rich>=15.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "SIM",           # simplify
+    "RUF",           # ruff's own
+]
+ignore = [
+    "E501",          # long lines (line-length handles most cases)
+    "RUF001",        # ambiguous unicode in strings — en-dash + arrows are intentional
+    "RUF003",        # ambiguous unicode in comments — same reason
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B008"]  # function-call default args are idiomatic in pytest fixtures
+
+[tool.ty.environment]
+root = ["./src"]
+
+[tool.pytest.ini_options]
+# Default run excludes the `integration` marker. Use `uv run pytest -m integration`
+# to opt into live-API tests (which require `gh auth login` or $GITHUB_TOKEN).
+# Unit tests must NEVER hit the network — conftest.py asserts that.
+addopts = "-m 'not integration'"
+markers = [
+    "integration: live GitHub API calls; opt-in only, default pytest run skips these.",
+]
+
+[project.scripts]
+flow = "flowmetrics:main"
+samples = "flowmetrics.serve:main"
+
+[build-system]
+requires = ["uv_build>=0.8.16,<0.9.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.12",
+    "ty>=0.0.35",
+]

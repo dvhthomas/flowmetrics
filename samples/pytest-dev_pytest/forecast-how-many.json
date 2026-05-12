@@ -1,0 +1,285 @@
+{
+  "schema": "flowmetrics.forecast.how_many.v1",
+  "command": "forecast how-many",
+  "generated_at": "2026-05-12T11:18:47.615716-06:00",
+  "headline": "Forecast for pytest-dev/pytest: 85% confidence we deliver at least 13 items by 2026-05-26 (window: 15 days).",
+  "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
+  "summary": {
+    "percentiles": {
+      "50": 19,
+      "70": 16,
+      "85": 13,
+      "95": 10
+    },
+    "reading": "backward \u2014 higher confidence means FEWER items",
+    "horizon": {
+      "days_ahead": 14,
+      "training_window_days": 30,
+      "ratio": 0.4666666666666667,
+      "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
+    }
+  },
+  "key_insight": "Median outcome is 19 items; 95% commitment floor is 10. Higher confidence = fewer items \u2014 promising 10 leaves throughput on the table to buy certainty.",
+  "next_actions": [
+    "For external commitments, promise 13 items (or 10 if stakes are high).",
+    "For internal planning, treat 19 as the realistic target \u2014 half the time you deliver less.",
+    "Re-run weekly; the floor moves as historical throughput shifts."
+  ],
+  "caveats": [
+    "Confidence reads BACKWARD: higher % means FEWER items, not more.",
+    "Throughput unit is 'merged PRs' \u2014 assumes PR size is stable across windows.",
+    "No accounting for known disruptions (holidays, on-call rotations, launches)."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "items": 1,
+        "frequency": 1
+      },
+      {
+        "items": 2,
+        "frequency": 3
+      },
+      {
+        "items": 3,
+        "frequency": 6
+      },
+      {
+        "items": 4,
+        "frequency": 11
+      },
+      {
+        "items": 5,
+        "frequency": 42
+      },
+      {
+        "items": 6,
+        "frequency": 39
+      },
+      {
+        "items": 7,
+        "frequency": 74
+      },
+      {
+        "items": 8,
+        "frequency": 108
+      },
+      {
+        "items": 9,
+        "frequency": 175
+      },
+      {
+        "items": 10,
+        "frequency": 200
+      },
+      {
+        "items": 11,
+        "frequency": 330
+      },
+      {
+        "items": 12,
+        "frequency": 336
+      },
+      {
+        "items": 13,
+        "frequency": 429
+      },
+      {
+        "items": 14,
+        "frequency": 473
+      },
+      {
+        "items": 15,
+        "frequency": 527
+      },
+      {
+        "items": 16,
+        "frequency": 599
+      },
+      {
+        "items": 17,
+        "frequency": 604
+      },
+      {
+        "items": 18,
+        "frequency": 579
+      },
+      {
+        "items": 19,
+        "frequency": 666
+      },
+      {
+        "items": 20,
+        "frequency": 612
+      },
+      {
+        "items": 21,
+        "frequency": 571
+      },
+      {
+        "items": 22,
+        "frequency": 562
+      },
+      {
+        "items": 23,
+        "frequency": 501
+      },
+      {
+        "items": 24,
+        "frequency": 449
+      },
+      {
+        "items": 25,
+        "frequency": 405
+      },
+      {
+        "items": 26,
+        "frequency": 363
+      },
+      {
+        "items": 27,
+        "frequency": 273
+      },
+      {
+        "items": 28,
+        "frequency": 245
+      },
+      {
+        "items": 29,
+        "frequency": 181
+      },
+      {
+        "items": 30,
+        "frequency": 152
+      },
+      {
+        "items": 31,
+        "frequency": 129
+      },
+      {
+        "items": 32,
+        "frequency": 111
+      },
+      {
+        "items": 33,
+        "frequency": 65
+      },
+      {
+        "items": 34,
+        "frequency": 48
+      },
+      {
+        "items": 35,
+        "frequency": 41
+      },
+      {
+        "items": 36,
+        "frequency": 28
+      },
+      {
+        "items": 37,
+        "frequency": 17
+      },
+      {
+        "items": 38,
+        "frequency": 16
+      },
+      {
+        "items": 39,
+        "frequency": 11
+      },
+      {
+        "items": 40,
+        "frequency": 7
+      },
+      {
+        "items": 41,
+        "frequency": 4
+      },
+      {
+        "items": 42,
+        "frequency": 1
+      },
+      {
+        "items": 43,
+        "frequency": 1
+      },
+      {
+        "items": 44,
+        "frequency": 3
+      },
+      {
+        "items": 47,
+        "frequency": 2
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "pytest-dev/pytest",
+    "start_date": "2026-05-12",
+    "target_date": "2026-05-26",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      2,
+      2,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      4,
+      4,
+      0,
+      0,
+      0,
+      1,
+      5,
+      0,
+      1,
+      1,
+      0,
+      5,
+      0,
+      4,
+      0,
+      0,
+      0,
+      1,
+      3,
+      2,
+      1,
+      2
+    ],
+    "total_throughput": 39,
+    "avg_throughput_per_day": 1.3,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 5,
+    "zero_throughput_days": 14
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast how-many --repo pytest-dev/pytest --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

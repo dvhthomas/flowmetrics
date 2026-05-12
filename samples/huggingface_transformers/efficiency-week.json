@@ -1,0 +1,1147 @@
+{
+  "schema": "flowmetrics.efficiency.v1",
+  "command": "efficiency week",
+  "generated_at": "2026-05-12T11:18:49.095145-06:00",
+  "headline": "Portfolio flow efficiency for huggingface/transformers 2026-05-05\u21922026-05-11: 1.2% across 47 merged PRs.",
+  "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
+  "summary": {
+    "pr_count": 47,
+    "human_pr_count": 47,
+    "bot_pr_count": 0,
+    "portfolio_efficiency": 0.01211510917751184,
+    "median_efficiency": 0.07320132604605323,
+    "mean_efficiency": 0.24632043317320768,
+    "total_cycle": {
+      "seconds": 79601924.0,
+      "hours": 22111.645555555555,
+      "days": 921.3185648148149
+    },
+    "total_active": {
+      "seconds": 964386.0,
+      "hours": 267.885,
+      "days": 11.161875
+    }
+  },
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#36895) ran 411.4d and dominates the ratio.",
+  "next_actions": [
+    "Inspect the three slowest PRs (#36895, #41693, #44664) \u2014 they likely sat in review queue.",
+    "Compare to the previous 2-4 weeks to spot a trend.",
+    "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
+  ],
+  "caveats": [
+    "Never use this metric per engineer \u2014 it reflects the system, not individuals.",
+    "Per-PR FE is a directional indicator, not a precise measurement.",
+    "Active time uses gap=4.0h and min_cluster=30.0min \u2014 tuning these moves the number."
+  ],
+  "vocabulary": {
+    "Cycle time": "Wall-clock time from when a PR was opened until it was merged. The clock starts at `created_at` and stops at `merged_at`.",
+    "Active time": "The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.",
+    "Wait time": "cycle_time \u2212 active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). Vacanti's actionable signal \u2014 queues are where the system bottlenecks live.",
+    "Flow efficiency": "active_time / cycle_time. Reported per-PR and as a portfolio.",
+    "Portfolio flow efficiency": "\u03a3 active / \u03a3 cycle across all merged PRs in this window. Vacanti's system-level recipe \u2014 long-running PRs dominate, which is what you want."
+  },
+  "chart_data": {
+    "per_pr_efficiency": [
+      {
+        "pr_number": 45885,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45884,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45881,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45845,
+        "efficiency": 0.2648281714043275
+      },
+      {
+        "pr_number": 45844,
+        "efficiency": 0.20012771392081738
+      },
+      {
+        "pr_number": 45842,
+        "efficiency": 0.1284292390567586
+      },
+      {
+        "pr_number": 45836,
+        "efficiency": 0.025684891456524136
+      },
+      {
+        "pr_number": 45833,
+        "efficiency": 0.07986866042507876
+      },
+      {
+        "pr_number": 45828,
+        "efficiency": 0.0259977006313279
+      },
+      {
+        "pr_number": 45826,
+        "efficiency": 0.14334063308779613
+      },
+      {
+        "pr_number": 45824,
+        "efficiency": 0.042219824553173524
+      },
+      {
+        "pr_number": 45815,
+        "efficiency": 0.12336794489565128
+      },
+      {
+        "pr_number": 45811,
+        "efficiency": 0.037577342924694404
+      },
+      {
+        "pr_number": 45808,
+        "efficiency": 0.14070727383377873
+      },
+      {
+        "pr_number": 45807,
+        "efficiency": 0.12809521408038732
+      },
+      {
+        "pr_number": 45806,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45805,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45804,
+        "efficiency": 0.03119836381914193
+      },
+      {
+        "pr_number": 45802,
+        "efficiency": 0.1035998835489065
+      },
+      {
+        "pr_number": 45799,
+        "efficiency": 0.07320132604605323
+      },
+      {
+        "pr_number": 45798,
+        "efficiency": 0.027872388397711785
+      },
+      {
+        "pr_number": 45792,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45791,
+        "efficiency": 0.1466883108171561
+      },
+      {
+        "pr_number": 45788,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45786,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45785,
+        "efficiency": 1.0
+      },
+      {
+        "pr_number": 45782,
+        "efficiency": 0.11100998321909042
+      },
+      {
+        "pr_number": 45770,
+        "efficiency": 0.11391099204286458
+      },
+      {
+        "pr_number": 45749,
+        "efficiency": 0.05062878457356276
+      },
+      {
+        "pr_number": 45746,
+        "efficiency": 0.048387157053641834
+      },
+      {
+        "pr_number": 45741,
+        "efficiency": 0.018636562865613125
+      },
+      {
+        "pr_number": 45711,
+        "efficiency": 0.009874664901417928
+      },
+      {
+        "pr_number": 45702,
+        "efficiency": 0.017999581126768992
+      },
+      {
+        "pr_number": 45687,
+        "efficiency": 0.12062864100273517
+      },
+      {
+        "pr_number": 45678,
+        "efficiency": 0.021348018780990827
+      },
+      {
+        "pr_number": 45661,
+        "efficiency": 0.13230577190568307
+      },
+      {
+        "pr_number": 45654,
+        "efficiency": 0.011519389800572844
+      },
+      {
+        "pr_number": 45615,
+        "efficiency": 0.0031655587211142765
+      },
+      {
+        "pr_number": 45597,
+        "efficiency": 0.04576723749331536
+      },
+      {
+        "pr_number": 45568,
+        "efficiency": 0.024787305154354945
+      },
+      {
+        "pr_number": 45477,
+        "efficiency": 0.04318532044923762
+      },
+      {
+        "pr_number": 45391,
+        "efficiency": 0.04863462236132547
+      },
+      {
+        "pr_number": 45351,
+        "efficiency": 0.010181621111878841
+      },
+      {
+        "pr_number": 44956,
+        "efficiency": 0.010887155757277334
+      },
+      {
+        "pr_number": 44664,
+        "efficiency": 0.0042258322107099205
+      },
+      {
+        "pr_number": 41693,
+        "efficiency": 0.005483952280517868
+      },
+      {
+        "pr_number": 36895,
+        "efficiency": 0.0016873234288019236
+      }
+    ]
+  },
+  "input": {
+    "repo": "huggingface/transformers",
+    "start": "2026-05-05",
+    "stop": "2026-05-11",
+    "gap_hours": 4.0,
+    "min_cluster_minutes": 30.0,
+    "offline": false
+  },
+  "result": {
+    "per_pr": [
+      {
+        "pr_number": 45885,
+        "title": "Remove deprecation cycle for inputs embeds",
+        "created_at": "2026-05-11T06:51:52+00:00",
+        "merged_at": "2026-05-11T07:28:38+00:00",
+        "cycle_time": {
+          "seconds": 2206.0,
+          "hours": 0.6127777777777778,
+          "days": 0.025532407407407406
+        },
+        "active_time": {
+          "seconds": 2206.0,
+          "hours": 0.6127777777777778,
+          "days": 0.025532407407407406
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "Cyrilvallez"
+      },
+      {
+        "pr_number": 45884,
+        "title": "Remove deprecation cycle for `cache_position` in masking primitives",
+        "created_at": "2026-05-11T05:55:00+00:00",
+        "merged_at": "2026-05-11T06:23:11+00:00",
+        "cycle_time": {
+          "seconds": 1691.0,
+          "hours": 0.4697222222222222,
+          "days": 0.01957175925925926
+        },
+        "active_time": {
+          "seconds": 1691.0,
+          "hours": 0.4697222222222222,
+          "days": 0.01957175925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "Cyrilvallez"
+      },
+      {
+        "pr_number": 45881,
+        "title": "[deepseek_v4] fix CSA per-query masking in eager path",
+        "created_at": "2026-05-11T03:38:30+00:00",
+        "merged_at": "2026-05-11T03:40:22+00:00",
+        "cycle_time": {
+          "seconds": 112.0,
+          "hours": 0.03111111111111111,
+          "days": 0.0012962962962962963
+        },
+        "active_time": {
+          "seconds": 112.0,
+          "hours": 0.03111111111111111,
+          "days": 0.0012962962962962963
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "ArthurZucker"
+      },
+      {
+        "pr_number": 45845,
+        "title": "fix(rf_detr): fix failing tests",
+        "created_at": "2026-05-08T08:29:23+00:00",
+        "merged_at": "2026-05-08T15:02:13+00:00",
+        "cycle_time": {
+          "seconds": 23570.0,
+          "hours": 6.5472222222222225,
+          "days": 0.2728009259259259
+        },
+        "active_time": {
+          "seconds": 6242.0,
+          "hours": 1.7338888888888888,
+          "days": 0.07224537037037038
+        },
+        "efficiency": 0.2648281714043275,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45844,
+        "title": "fix(granite4_vision): auto-fix failing tests",
+        "created_at": "2026-05-08T08:28:56+00:00",
+        "merged_at": "2026-05-08T15:00:26+00:00",
+        "cycle_time": {
+          "seconds": 23490.0,
+          "hours": 6.525,
+          "days": 0.271875
+        },
+        "active_time": {
+          "seconds": 4701.0,
+          "hours": 1.3058333333333334,
+          "days": 0.05440972222222222
+        },
+        "efficiency": 0.20012771392081738,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45842,
+        "title": "fix(laguna): fix failing tests",
+        "created_at": "2026-05-08T07:12:31+00:00",
+        "merged_at": "2026-05-08T14:59:42+00:00",
+        "cycle_time": {
+          "seconds": 28031.0,
+          "hours": 7.786388888888889,
+          "days": 0.3244328703703704
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.1284292390567586,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45836,
+        "title": "fix(minicpmv4_6): skip invalid failing tests",
+        "created_at": "2026-05-08T01:24:20+00:00",
+        "merged_at": "2026-05-11T12:32:21+00:00",
+        "cycle_time": {
+          "seconds": 299281.0,
+          "hours": 83.13361111111111,
+          "days": 3.463900462962963
+        },
+        "active_time": {
+          "seconds": 7687.0,
+          "hours": 2.1352777777777776,
+          "days": 0.08896990740740741
+        },
+        "efficiency": 0.025684891456524136,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45833,
+        "title": "Add Qwen3.5 support for token classification",
+        "created_at": "2026-05-07T23:30:45+00:00",
+        "merged_at": "2026-05-08T12:01:59+00:00",
+        "cycle_time": {
+          "seconds": 45074.0,
+          "hours": 12.520555555555555,
+          "days": 0.5216898148148148
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.07986866042507876,
+        "is_bot": false,
+        "author_login": "Ratwood98"
+      },
+      {
+        "pr_number": 45828,
+        "title": "[Weight converter] Revert unnecessary changes to `rename_source_key`",
+        "created_at": "2026-05-07T13:24:00+00:00",
+        "merged_at": "2026-05-11T14:46:11+00:00",
+        "cycle_time": {
+          "seconds": 350531.0,
+          "hours": 97.36972222222222,
+          "days": 4.05707175925926
+        },
+        "active_time": {
+          "seconds": 9113.0,
+          "hours": 2.531388888888889,
+          "days": 0.10547453703703703
+        },
+        "efficiency": 0.0259977006313279,
+        "is_bot": false,
+        "author_login": "yonigozlan"
+      },
+      {
+        "pr_number": 45826,
+        "title": "Fix gemma4 with multi-gpu setup",
+        "created_at": "2026-05-07T12:51:35+00:00",
+        "merged_at": "2026-05-07T19:50:10+00:00",
+        "cycle_time": {
+          "seconds": 25115.0,
+          "hours": 6.976388888888889,
+          "days": 0.2906828703703704
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.14334063308779613,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 45824,
+        "title": "fix: correct typo 'seperate' -> 'separate' in comments across multipl\u2026",
+        "created_at": "2026-05-07T11:50:40+00:00",
+        "merged_at": "2026-05-08T11:31:48+00:00",
+        "cycle_time": {
+          "seconds": 85268.0,
+          "hours": 23.685555555555556,
+          "days": 0.9868981481481481
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.042219824553173524,
+        "is_bot": false,
+        "author_login": "Caromisc"
+      },
+      {
+        "pr_number": 45815,
+        "title": "Get rid of deprecated use_return_dict call.",
+        "created_at": "2026-05-07T01:29:32+00:00",
+        "merged_at": "2026-05-07T09:35:53+00:00",
+        "cycle_time": {
+          "seconds": 29181.0,
+          "hours": 8.105833333333333,
+          "days": 0.33774305555555556
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.12336794489565128,
+        "is_bot": false,
+        "author_login": "rasmi"
+      },
+      {
+        "pr_number": 45811,
+        "title": "Warn about forgetting attention mask functions",
+        "created_at": "2026-05-06T16:55:33+00:00",
+        "merged_at": "2026-05-11T07:21:53+00:00",
+        "cycle_time": {
+          "seconds": 397580.0,
+          "hours": 110.43888888888888,
+          "days": 4.60162037037037
+        },
+        "active_time": {
+          "seconds": 14940.0,
+          "hours": 4.15,
+          "days": 0.17291666666666666
+        },
+        "efficiency": 0.037577342924694404,
+        "is_bot": false,
+        "author_login": "TuringTux"
+      },
+      {
+        "pr_number": 45808,
+        "title": "\ud83d\udea8 [Fuyu] Remove FuyuBatchFeature subclass, use BatchFeature with skip_tensor_conversion",
+        "created_at": "2026-05-06T15:57:21+00:00",
+        "merged_at": "2026-05-08T09:56:53+00:00",
+        "cycle_time": {
+          "seconds": 151172.0,
+          "hours": 41.992222222222225,
+          "days": 1.749675925925926
+        },
+        "active_time": {
+          "seconds": 21271.0,
+          "hours": 5.908611111111111,
+          "days": 0.24619212962962964
+        },
+        "efficiency": 0.14070727383377873,
+        "is_bot": false,
+        "author_login": "Abineshabee"
+      },
+      {
+        "pr_number": 45807,
+        "title": "Cache `merged_typed_dict` to not break `validate_typed_dict` caching",
+        "created_at": "2026-05-06T13:52:44+00:00",
+        "merged_at": "2026-05-07T11:54:40+00:00",
+        "cycle_time": {
+          "seconds": 79316.0,
+          "hours": 22.032222222222224,
+          "days": 0.9180092592592592
+        },
+        "active_time": {
+          "seconds": 10160.0,
+          "hours": 2.8222222222222224,
+          "days": 0.1175925925925926
+        },
+        "efficiency": 0.12809521408038732,
+        "is_bot": false,
+        "author_login": "lgeiger"
+      },
+      {
+        "pr_number": 45806,
+        "title": "Fix decorator order",
+        "created_at": "2026-05-06T13:18:40+00:00",
+        "merged_at": "2026-05-06T15:14:33+00:00",
+        "cycle_time": {
+          "seconds": 6953.0,
+          "hours": 1.9313888888888888,
+          "days": 0.08047453703703704
+        },
+        "active_time": {
+          "seconds": 6953.0,
+          "hours": 1.9313888888888888,
+          "days": 0.08047453703703704
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 45805,
+        "title": "[`Granite 4.1 Vision`] Fixup integration tests",
+        "created_at": "2026-05-06T12:55:55+00:00",
+        "merged_at": "2026-05-06T14:14:39+00:00",
+        "cycle_time": {
+          "seconds": 4724.0,
+          "hours": 1.3122222222222222,
+          "days": 0.054675925925925926
+        },
+        "active_time": {
+          "seconds": 4724.0,
+          "hours": 1.3122222222222222,
+          "days": 0.054675925925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "vasqu"
+      },
+      {
+        "pr_number": 45804,
+        "title": "Fix import error in moe.py by providing explicit schema to custom_op",
+        "created_at": "2026-05-06T11:49:41+00:00",
+        "merged_at": "2026-05-08T11:54:27+00:00",
+        "cycle_time": {
+          "seconds": 173086.0,
+          "hours": 48.07944444444445,
+          "days": 2.0033101851851853
+        },
+        "active_time": {
+          "seconds": 5400.0,
+          "hours": 1.5,
+          "days": 0.0625
+        },
+        "efficiency": 0.03119836381914193,
+        "is_bot": false,
+        "author_login": "rraghavkaushik"
+      },
+      {
+        "pr_number": 45802,
+        "title": "Keep deleting ",
+        "created_at": "2026-05-06T10:51:49+00:00",
+        "merged_at": "2026-05-08T09:37:00+00:00",
+        "cycle_time": {
+          "seconds": 168311.0,
+          "hours": 46.753055555555555,
+          "days": 1.9480439814814814
+        },
+        "active_time": {
+          "seconds": 17437.0,
+          "hours": 4.8436111111111115,
+          "days": 0.20181712962962964
+        },
+        "efficiency": 0.1035998835489065,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 45799,
+        "title": "Fix `kernelize()` crash for gpt_oss: missing `@use_kernel_func_from_hub` on `apply_rotary_pos_emb`",
+        "created_at": "2026-05-06T02:57:36+00:00",
+        "merged_at": "2026-05-07T13:03:47+00:00",
+        "cycle_time": {
+          "seconds": 122771.0,
+          "hours": 34.10305555555556,
+          "days": 1.420960648148148
+        },
+        "active_time": {
+          "seconds": 8987.0,
+          "hours": 2.4963888888888888,
+          "days": 0.10401620370370371
+        },
+        "efficiency": 0.07320132604605323,
+        "is_bot": false,
+        "author_login": "jiqing-feng"
+      },
+      {
+        "pr_number": 45798,
+        "title": "[docs] paper cuts",
+        "created_at": "2026-05-06T00:56:22+00:00",
+        "merged_at": "2026-05-11T20:09:19+00:00",
+        "cycle_time": {
+          "seconds": 501177.0,
+          "hours": 139.21583333333334,
+          "days": 5.800659722222222
+        },
+        "active_time": {
+          "seconds": 13969.0,
+          "hours": 3.8802777777777777,
+          "days": 0.16167824074074075
+        },
+        "efficiency": 0.027872388397711785,
+        "is_bot": false,
+        "author_login": "stevhliu"
+      },
+      {
+        "pr_number": 45792,
+        "title": "fix: forward use_cache kwarg to attention mixer in nemotron_h",
+        "created_at": "2026-05-05T17:24:06+00:00",
+        "merged_at": "2026-05-05T18:26:28+00:00",
+        "cycle_time": {
+          "seconds": 3742.0,
+          "hours": 1.0394444444444444,
+          "days": 0.04331018518518519
+        },
+        "active_time": {
+          "seconds": 3742.0,
+          "hours": 1.0394444444444444,
+          "days": 0.04331018518518519
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "CharlieKerfoot"
+      },
+      {
+        "pr_number": 45791,
+        "title": "fix: validate special token ids against attribute values",
+        "created_at": "2026-05-05T17:23:44+00:00",
+        "merged_at": "2026-05-06T14:06:03+00:00",
+        "cycle_time": {
+          "seconds": 74539.0,
+          "hours": 20.705277777777777,
+          "days": 0.8627199074074074
+        },
+        "active_time": {
+          "seconds": 10934.0,
+          "hours": 3.0372222222222223,
+          "days": 0.12655092592592593
+        },
+        "efficiency": 0.1466883108171561,
+        "is_bot": false,
+        "author_login": "CharlieKerfoot"
+      },
+      {
+        "pr_number": 45788,
+        "title": "First model",
+        "created_at": "2026-05-05T14:47:02+00:00",
+        "merged_at": "2026-05-05T15:08:45+00:00",
+        "cycle_time": {
+          "seconds": 1303.0,
+          "hours": 0.36194444444444446,
+          "days": 0.015081018518518518
+        },
+        "active_time": {
+          "seconds": 1303.0,
+          "hours": 0.36194444444444446,
+          "days": 0.015081018518518518
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "SindhuRaghuram97"
+      },
+      {
+        "pr_number": 45786,
+        "title": "Add `concurrency` to `PR CI` workflow file (`pr-ci-caller.yml`)",
+        "created_at": "2026-05-05T13:18:59+00:00",
+        "merged_at": "2026-05-05T13:26:41+00:00",
+        "cycle_time": {
+          "seconds": 462.0,
+          "hours": 0.12833333333333333,
+          "days": 0.005347222222222222
+        },
+        "active_time": {
+          "seconds": 462.0,
+          "hours": 0.12833333333333333,
+          "days": 0.005347222222222222
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "ydshieh"
+      },
+      {
+        "pr_number": 45785,
+        "title": "Fix CI: Allow more artifacts to be download in CI",
+        "created_at": "2026-05-05T13:08:18+00:00",
+        "merged_at": "2026-05-05T13:56:25+00:00",
+        "cycle_time": {
+          "seconds": 2887.0,
+          "hours": 0.8019444444444445,
+          "days": 0.033414351851851855
+        },
+        "active_time": {
+          "seconds": 2887.0,
+          "hours": 0.8019444444444445,
+          "days": 0.033414351851851855
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "ydshieh"
+      },
+      {
+        "pr_number": 45782,
+        "title": "Fix WeightConverter regex incorrectly matching shared_experts as experts in DeepSeek V4",
+        "created_at": "2026-05-05T09:41:39+00:00",
+        "merged_at": "2026-05-06T14:59:36+00:00",
+        "cycle_time": {
+          "seconds": 105477.0,
+          "hours": 29.299166666666668,
+          "days": 1.220798611111111
+        },
+        "active_time": {
+          "seconds": 11709.0,
+          "hours": 3.2525,
+          "days": 0.13552083333333334
+        },
+        "efficiency": 0.11100998321909042,
+        "is_bot": false,
+        "author_login": "silencelamb"
+      },
+      {
+        "pr_number": 45770,
+        "title": "Unwrap `text_config` in `AutoModelFor*.from_config`",
+        "created_at": "2026-05-04T00:39:39+00:00",
+        "merged_at": "2026-05-05T11:23:44+00:00",
+        "cycle_time": {
+          "seconds": 125045.0,
+          "hours": 34.734722222222224,
+          "days": 1.4472800925925926
+        },
+        "active_time": {
+          "seconds": 14244.0,
+          "hours": 3.9566666666666666,
+          "days": 0.16486111111111112
+        },
+        "efficiency": 0.11391099204286458,
+        "is_bot": false,
+        "author_login": "jamesbraza"
+      },
+      {
+        "pr_number": 45749,
+        "title": "fix: correct spelling in continuous_api docstring",
+        "created_at": "2026-05-03T06:21:02+00:00",
+        "merged_at": "2026-05-05T16:17:19+00:00",
+        "cycle_time": {
+          "seconds": 208577.0,
+          "hours": 57.93805555555556,
+          "days": 2.414085648148148
+        },
+        "active_time": {
+          "seconds": 10560.0,
+          "hours": 2.933333333333333,
+          "days": 0.12222222222222222
+        },
+        "efficiency": 0.05062878457356276,
+        "is_bot": false,
+        "author_login": "Dhruv908615"
+      },
+      {
+        "pr_number": 45746,
+        "title": "Fix link to modular transformers documentation",
+        "created_at": "2026-05-02T13:47:03+00:00",
+        "merged_at": "2026-05-05T16:06:34+00:00",
+        "cycle_time": {
+          "seconds": 267571.0,
+          "hours": 74.32527777777777,
+          "days": 3.096886574074074
+        },
+        "active_time": {
+          "seconds": 12947.0,
+          "hours": 3.596388888888889,
+          "days": 0.14984953703703704
+        },
+        "efficiency": 0.048387157053641834,
+        "is_bot": false,
+        "author_login": "SangbumChoi"
+      },
+      {
+        "pr_number": 45741,
+        "title": "deepseek r1 distilled tokenizer fix for qwen2 mapping",
+        "created_at": "2026-05-02T01:41:21+00:00",
+        "merged_at": "2026-05-05T10:10:34+00:00",
+        "cycle_time": {
+          "seconds": 289753.0,
+          "hours": 80.48694444444445,
+          "days": 3.353622685185185
+        },
+        "active_time": {
+          "seconds": 5400.0,
+          "hours": 1.5,
+          "days": 0.0625
+        },
+        "efficiency": 0.018636562865613125,
+        "is_bot": false,
+        "author_login": "itazap"
+      },
+      {
+        "pr_number": 45711,
+        "title": "refector: renamed file glob to cache to make it clearer",
+        "created_at": "2026-04-30T07:47:00+00:00",
+        "merged_at": "2026-05-06T15:41:14+00:00",
+        "cycle_time": {
+          "seconds": 546854.0,
+          "hours": 151.9038888888889,
+          "days": 6.329328703703704
+        },
+        "active_time": {
+          "seconds": 5400.0,
+          "hours": 1.5,
+          "days": 0.0625
+        },
+        "efficiency": 0.009874664901417928,
+        "is_bot": false,
+        "author_login": "tarekziade"
+      },
+      {
+        "pr_number": 45702,
+        "title": "Reorder decorators for autodoc and dataclass",
+        "created_at": "2026-04-29T16:42:01+00:00",
+        "merged_at": "2026-05-05T11:57:46+00:00",
+        "cycle_time": {
+          "seconds": 501345.0,
+          "hours": 139.2625,
+          "days": 5.802604166666667
+        },
+        "active_time": {
+          "seconds": 9024.0,
+          "hours": 2.506666666666667,
+          "days": 0.10444444444444445
+        },
+        "efficiency": 0.017999581126768992,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 45687,
+        "title": "fix: Added Mps support in float fallback backends list ",
+        "created_at": "2026-04-28T15:23:48+00:00",
+        "merged_at": "2026-05-05T08:28:02+00:00",
+        "cycle_time": {
+          "seconds": 579854.0,
+          "hours": 161.07055555555556,
+          "days": 6.711273148148148
+        },
+        "active_time": {
+          "seconds": 69947.0,
+          "hours": 19.42972222222222,
+          "days": 0.8095717592592593
+        },
+        "efficiency": 0.12062864100273517,
+        "is_bot": false,
+        "author_login": "rigen1048"
+      },
+      {
+        "pr_number": 45678,
+        "title": "Fix shared config mutation issue in flash_attn_from_config",
+        "created_at": "2026-04-28T09:53:08+00:00",
+        "merged_at": "2026-05-07T09:06:54+00:00",
+        "cycle_time": {
+          "seconds": 774826.0,
+          "hours": 215.22944444444445,
+          "days": 8.967893518518519
+        },
+        "active_time": {
+          "seconds": 16541.0,
+          "hours": 4.594722222222222,
+          "days": 0.19144675925925925
+        },
+        "efficiency": 0.021348018780990827,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45661,
+        "title": "[Weight Converter] More fine-grained mappings on classes, scoping for every transforms (including weight converter)",
+        "created_at": "2026-04-27T19:03:34+00:00",
+        "merged_at": "2026-05-07T02:55:35+00:00",
+        "cycle_time": {
+          "seconds": 805921.0,
+          "hours": 223.86694444444444,
+          "days": 9.327789351851852
+        },
+        "active_time": {
+          "seconds": 106628.0,
+          "hours": 29.61888888888889,
+          "days": 1.2341203703703705
+        },
+        "efficiency": 0.13230577190568307,
+        "is_bot": false,
+        "author_login": "yonigozlan"
+      },
+      {
+        "pr_number": 45654,
+        "title": "[CB] Refactor any model-related code in a separate class",
+        "created_at": "2026-04-27T09:23:34+00:00",
+        "merged_at": "2026-05-06T06:39:23+00:00",
+        "cycle_time": {
+          "seconds": 767749.0,
+          "hours": 213.26361111111112,
+          "days": 8.885983796296296
+        },
+        "active_time": {
+          "seconds": 8844.0,
+          "hours": 2.4566666666666666,
+          "days": 0.10236111111111111
+        },
+        "efficiency": 0.011519389800572844,
+        "is_bot": false,
+        "author_login": "remi-or"
+      },
+      {
+        "pr_number": 45615,
+        "title": "fix(qianfan_ocr): add XPU expectations",
+        "created_at": "2026-04-24T05:14:21+00:00",
+        "merged_at": "2026-05-07T09:08:21+00:00",
+        "cycle_time": {
+          "seconds": 1137240.0,
+          "hours": 315.9,
+          "days": 13.1625
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.0031655587211142765,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45597,
+        "title": "Add Granite 4.1 Vision (granite4_vision)",
+        "created_at": "2026-04-23T06:51:56+00:00",
+        "merged_at": "2026-05-05T16:30:03+00:00",
+        "cycle_time": {
+          "seconds": 1071487.0,
+          "hours": 297.6352777777778,
+          "days": 12.401469907407407
+        },
+        "active_time": {
+          "seconds": 49039.0,
+          "hours": 13.621944444444445,
+          "days": 0.5675810185185185
+        },
+        "efficiency": 0.04576723749331536,
+        "is_bot": false,
+        "author_login": "artem-spector"
+      },
+      {
+        "pr_number": 45568,
+        "title": "Gemma4: fix failed test cases",
+        "created_at": "2026-04-22T06:52:45+00:00",
+        "merged_at": "2026-05-05T15:16:18+00:00",
+        "cycle_time": {
+          "seconds": 1153413.0,
+          "hours": 320.3925,
+          "days": 13.3496875
+        },
+        "active_time": {
+          "seconds": 28590.0,
+          "hours": 7.941666666666666,
+          "days": 0.33090277777777777
+        },
+        "efficiency": 0.024787305154354945,
+        "is_bot": false,
+        "author_login": "kaixuanliu"
+      },
+      {
+        "pr_number": 45477,
+        "title": "Blockwise mask fn as opt arg in all masking functions",
+        "created_at": "2026-04-16T14:12:03+00:00",
+        "merged_at": "2026-05-06T09:43:21+00:00",
+        "cycle_time": {
+          "seconds": 1711878.0,
+          "hours": 475.52166666666665,
+          "days": 19.813402777777778
+        },
+        "active_time": {
+          "seconds": 73928.0,
+          "hours": 20.535555555555554,
+          "days": 0.8556481481481482
+        },
+        "efficiency": 0.04318532044923762,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 45391,
+        "title": "audio tester class",
+        "created_at": "2026-04-13T06:32:49+00:00",
+        "merged_at": "2026-05-11T12:10:04+00:00",
+        "cycle_time": {
+          "seconds": 2439435.0,
+          "hours": 677.6208333333333,
+          "days": 28.234201388888888
+        },
+        "active_time": {
+          "seconds": 118641.0,
+          "hours": 32.95583333333333,
+          "days": 1.3731597222222223
+        },
+        "efficiency": 0.04863462236132547,
+        "is_bot": false,
+        "author_login": "tarekziade"
+      },
+      {
+        "pr_number": 45351,
+        "title": "fix(testing_utils): guard get_device_capability with torch.cuda.is_available()",
+        "created_at": "2026-04-09T21:51:42+00:00",
+        "merged_at": "2026-05-11T03:13:26+00:00",
+        "cycle_time": {
+          "seconds": 2697704.0,
+          "hours": 749.3622222222223,
+          "days": 31.223425925925927
+        },
+        "active_time": {
+          "seconds": 27467.0,
+          "hours": 7.629722222222222,
+          "days": 0.3179050925925926
+        },
+        "efficiency": 0.010181621111878841,
+        "is_bot": false,
+        "author_login": "RudrenduPaul"
+      },
+      {
+        "pr_number": 44956,
+        "title": "Add HyperCLOVAX SEED Think 14B",
+        "created_at": "2026-03-23T19:34:30+00:00",
+        "merged_at": "2026-05-07T18:11:26+00:00",
+        "cycle_time": {
+          "seconds": 3883016.0,
+          "hours": 1078.6155555555556,
+          "days": 44.942314814814814
+        },
+        "active_time": {
+          "seconds": 42275.0,
+          "hours": 11.743055555555555,
+          "days": 0.48929398148148145
+        },
+        "efficiency": 0.010887155757277334,
+        "is_bot": false,
+        "author_login": "bigshanedogg"
+      },
+      {
+        "pr_number": 44664,
+        "title": ":rotating_light: Generic Sequence Classifier works for multimodal models",
+        "created_at": "2026-03-13T13:39:52+00:00",
+        "merged_at": "2026-05-08T13:26:59+00:00",
+        "cycle_time": {
+          "seconds": 4837627.0,
+          "hours": 1343.7852777777778,
+          "days": 55.99105324074074
+        },
+        "active_time": {
+          "seconds": 20443.0,
+          "hours": 5.6786111111111115,
+          "days": 0.2366087962962963
+        },
+        "efficiency": 0.0042258322107099205,
+        "is_bot": false,
+        "author_login": "zucchini-nlp"
+      },
+      {
+        "pr_number": 41693,
+        "title": "\ud83d\udea8 Refactor ViT to updated standards",
+        "created_at": "2025-10-17T15:05:33+00:00",
+        "merged_at": "2026-05-08T19:23:28+00:00",
+        "cycle_time": {
+          "seconds": 17554675.0,
+          "hours": 4876.298611111111,
+          "days": 203.1791087962963
+        },
+        "active_time": {
+          "seconds": 96269.0,
+          "hours": 26.74138888888889,
+          "days": 1.114224537037037
+        },
+        "efficiency": 0.005483952280517868,
+        "is_bot": false,
+        "author_login": "yonigozlan"
+      },
+      {
+        "pr_number": 36895,
+        "title": "Add RF-DETR",
+        "created_at": "2025-03-21T22:28:16+00:00",
+        "merged_at": "2026-05-07T06:56:40+00:00",
+        "cycle_time": {
+          "seconds": 35540904.0,
+          "hours": 9872.473333333333,
+          "days": 411.35305555555556
+        },
+        "active_time": {
+          "seconds": 59969.0,
+          "hours": 16.658055555555556,
+          "days": 0.6940856481481481
+        },
+        "efficiency": 0.0016873234288019236,
+        "is_bot": false,
+        "author_login": "sbucaille"
+      }
+    ]
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow efficiency week --repo huggingface/transformers --start 2026-05-05 --stop 2026-05-11 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "logs": []
+}

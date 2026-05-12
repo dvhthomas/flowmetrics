@@ -1,0 +1,87 @@
+{% extends "base.html.jinja" %}
+
+{# ── Above the fold: headline numbers + chart ────────────────────────── #}
+{% block content %}
+{% if report.result.pr_count == 0 %}
+<p>No PRs merged in this window.</p>
+{% else %}
+
+<h2>Headline numbers</h2>
+<table>
+  <tr><th>PRs merged</th><td class="num">{{ report.result.pr_count }}
+      {% if report.result.bot_pr_count -%}
+      <em style="color:#888">({{ report.result.human_pr_count }} human, {{ report.result.bot_pr_count }} bot)</em>
+      {%- endif %}
+  </td></tr>
+  <tr><th>Portfolio flow efficiency</th>
+      <td class="num"><strong>{{ "%.1f"|format(report.result.portfolio_efficiency * 100) }}%</strong></td></tr>
+  <tr><th>Total cycle time</th><td class="num">{{ fmt_duration(report.result.total_cycle) }}</td></tr>
+  <tr><th>Total active time</th><td class="num">{{ fmt_duration(report.result.total_active) }}</td></tr>
+</table>
+
+<img alt="Per-PR flow efficiency" src="data:image/png;base64,{{ chart_per_pr_b64 }}" />
+
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<strong>Why are so many PRs at 100%?</strong>
+A PR scores 100% when its entire cycle fits inside one activity cluster
+(default: 4-hour quiet-period threshold). Short PRs — automated version
+bumps, fast community fixes, dependabot updates — trivially fit inside
+one cluster because there's no time for a queue to form. The signal is
+in the <strong>portfolio number</strong> at the top and the
+<strong>long-running PRs</strong> at the head of this chart, not in the
+100%-bar tail.
+</p>
+{% endif %}
+{% endblock %}
+
+{# ── Below the fold: input parameters + per-PR detail ─────────────────── #}
+{% block detail %}
+<h2>Input parameters</h2>
+<table>
+  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
+  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }}</td></tr>
+</table>
+
+<p style="font-size:0.95rem; color:#444">
+<strong>How active time was calculated.</strong>
+We grouped each PR's events (commits, reviews, comments) into work sessions:
+events more than <strong>{{ report.input.gap_hours }} hours</strong> apart start a new
+session, and a single isolated event counts as at least
+<strong>{{ report.input.min_cluster_minutes }} minutes</strong> of active time (so a
+lone comment isn't counted as zero work).
+</p>
+
+{% if report.result.pr_count > 0 %}
+<details>
+<summary>Per-PR distribution (median / mean)</summary>
+<p>
+These are reported because people ask for them, but the
+<strong>portfolio</strong> number above is the right one. Mean of per-PR
+ratios is inflated by a long tail of tiny fast PRs; median tells you
+what a typical PR looks like in isolation but doesn't reflect the system.
+</p>
+<table>
+  <tr><th>Median per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.median_efficiency * 100) }}%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.mean_efficiency * 100) }}%</td></tr>
+</table>
+</details>
+
+<details>
+<summary>Show all {{ per_pr_sorted|length }} PRs (slowest first)</summary>
+<table>
+<thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
+<tbody>
+{% for p in per_pr_sorted %}
+  <tr>
+    <td>#{{ p.pr_number }}</td>
+    <td class="num">{{ fmt_duration(p.cycle_time) }}</td>
+    <td class="num">{{ fmt_duration(p.active_time) }}</td>
+    <td class="num">{{ "%.1f"|format(p.efficiency * 100) }}%</td>
+    <td>{{ p.title[:80] }}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</details>
+{% endif %}
+{% endblock %}

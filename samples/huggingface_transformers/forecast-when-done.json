@@ -1,0 +1,156 @@
+{
+  "schema": "flowmetrics.forecast.when_done.v1",
+  "command": "forecast when-done",
+  "generated_at": "2026-05-12T11:18:50.635503-06:00",
+  "headline": "Forecast for huggingface/transformers: 85% confidence 25 items are done by 2026-05-16, starting 2026-05-12.",
+  "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
+  "summary": {
+    "percentiles": {
+      "50": "2026-05-15",
+      "70": "2026-05-15",
+      "85": "2026-05-16",
+      "95": "2026-05-18"
+    },
+    "reading": "forward \u2014 higher confidence means a later date",
+    "horizon": {
+      "days_ahead": 4,
+      "training_window_days": 30,
+      "ratio": 0.13333333333333333,
+      "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
+    }
+  },
+  "key_insight": "Median outcome is 2026-05-15. 95% confidence is 2026-05-18. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "next_actions": [
+    "Commit externally on the 85% date (2026-05-16), not the 50% date (2026-05-15).",
+    "Re-run weekly to track drift in the forecast."
+  ],
+  "caveats": [
+    "Assumes the next weeks will look like the recent past \u2014 no regime change.",
+    "Zero-merge days are included as real samples; bad days happen in the simulator.",
+    "Throughput unit is 'merged PRs', not 'features' \u2014 works only if PR size is stable."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "date": "2026-05-12",
+        "frequency": 296
+      },
+      {
+        "date": "2026-05-13",
+        "frequency": 1538
+      },
+      {
+        "date": "2026-05-14",
+        "frequency": 2934
+      },
+      {
+        "date": "2026-05-15",
+        "frequency": 2403
+      },
+      {
+        "date": "2026-05-16",
+        "frequency": 1518
+      },
+      {
+        "date": "2026-05-17",
+        "frequency": 723
+      },
+      {
+        "date": "2026-05-18",
+        "frequency": 332
+      },
+      {
+        "date": "2026-05-19",
+        "frequency": 162
+      },
+      {
+        "date": "2026-05-20",
+        "frequency": 59
+      },
+      {
+        "date": "2026-05-21",
+        "frequency": 22
+      },
+      {
+        "date": "2026-05-22",
+        "frequency": 6
+      },
+      {
+        "date": "2026-05-23",
+        "frequency": 2
+      },
+      {
+        "date": "2026-05-24",
+        "frequency": 5
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "huggingface/transformers",
+    "items": 25,
+    "start_date": "2026-05-12",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      0,
+      18,
+      12,
+      13,
+      8,
+      8,
+      0,
+      0,
+      17,
+      10,
+      26,
+      13,
+      8,
+      0,
+      0,
+      15,
+      16,
+      9,
+      8,
+      4,
+      1,
+      1,
+      7,
+      12,
+      7,
+      9,
+      10,
+      0,
+      0,
+      9
+    ],
+    "total_throughput": 241,
+    "avg_throughput_per_day": 8.033333333333333,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 26,
+    "zero_throughput_days": 7
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

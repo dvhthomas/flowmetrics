@@ -1,0 +1,2 @@
+Portfolio flow efficiency for astral-sh/uv 2026-05-05→2026-05-11: 8.4% across 46 merged PRs (31 
+human, 15 bot).

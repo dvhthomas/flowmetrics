@@ -1,0 +1,434 @@
+{
+  "schema": "flowmetrics.forecast.when_done.v1",
+  "command": "forecast when-done",
+  "generated_at": "2026-05-12T11:19:03.383407-06:00",
+  "headline": "Forecast for CalcMark/go-calcmark: 85% confidence 25 items are done by 2026-06-29, starting 2026-05-12.",
+  "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
+  "summary": {
+    "percentiles": {
+      "50": "2026-06-15",
+      "70": "2026-06-22",
+      "85": "2026-06-29",
+      "95": "2026-07-09"
+    },
+    "reading": "forward \u2014 higher confidence means a later date",
+    "horizon": {
+      "days_ahead": 48,
+      "training_window_days": 30,
+      "ratio": 1.6,
+      "reading": "Forecast horizon extends past the training window \u2014 treat with caution. Shorter is better; consider tightening the question."
+    }
+  },
+  "key_insight": "Median outcome is 2026-06-15. 95% confidence is 2026-07-09. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "next_actions": [
+    "Commit externally on the 85% date (2026-06-29), not the 50% date (2026-06-15).",
+    "Re-run weekly to track drift in the forecast.",
+    "Items to complete (25) exceeds total recent throughput (22 merges in 30d). Forecast is extrapolating past the training horizon \u2014 treat the tail with skepticism.",
+    "This forecast reaches 48 days out \u2014 1.6\u00d7 the training window. Shorter forecasts are more reliable; consider fewer items in a near-term commitment and re-forecasting after delivering them."
+  ],
+  "caveats": [
+    "Assumes the next weeks will look like the recent past \u2014 no regime change.",
+    "Zero-merge days are included as real samples; bad days happen in the simulator.",
+    "Throughput unit is 'merged PRs', not 'features' \u2014 works only if PR size is stable."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "date": "2026-05-17",
+        "frequency": 4
+      },
+      {
+        "date": "2026-05-18",
+        "frequency": 3
+      },
+      {
+        "date": "2026-05-19",
+        "frequency": 7
+      },
+      {
+        "date": "2026-05-20",
+        "frequency": 9
+      },
+      {
+        "date": "2026-05-21",
+        "frequency": 16
+      },
+      {
+        "date": "2026-05-22",
+        "frequency": 21
+      },
+      {
+        "date": "2026-05-23",
+        "frequency": 38
+      },
+      {
+        "date": "2026-05-24",
+        "frequency": 46
+      },
+      {
+        "date": "2026-05-25",
+        "frequency": 40
+      },
+      {
+        "date": "2026-05-26",
+        "frequency": 78
+      },
+      {
+        "date": "2026-05-27",
+        "frequency": 92
+      },
+      {
+        "date": "2026-05-28",
+        "frequency": 134
+      },
+      {
+        "date": "2026-05-29",
+        "frequency": 136
+      },
+      {
+        "date": "2026-05-30",
+        "frequency": 144
+      },
+      {
+        "date": "2026-05-31",
+        "frequency": 167
+      },
+      {
+        "date": "2026-06-01",
+        "frequency": 240
+      },
+      {
+        "date": "2026-06-02",
+        "frequency": 203
+      },
+      {
+        "date": "2026-06-03",
+        "frequency": 232
+      },
+      {
+        "date": "2026-06-04",
+        "frequency": 250
+      },
+      {
+        "date": "2026-06-05",
+        "frequency": 281
+      },
+      {
+        "date": "2026-06-06",
+        "frequency": 326
+      },
+      {
+        "date": "2026-06-07",
+        "frequency": 322
+      },
+      {
+        "date": "2026-06-08",
+        "frequency": 305
+      },
+      {
+        "date": "2026-06-09",
+        "frequency": 295
+      },
+      {
+        "date": "2026-06-10",
+        "frequency": 297
+      },
+      {
+        "date": "2026-06-11",
+        "frequency": 304
+      },
+      {
+        "date": "2026-06-12",
+        "frequency": 342
+      },
+      {
+        "date": "2026-06-13",
+        "frequency": 320
+      },
+      {
+        "date": "2026-06-14",
+        "frequency": 318
+      },
+      {
+        "date": "2026-06-15",
+        "frequency": 316
+      },
+      {
+        "date": "2026-06-16",
+        "frequency": 327
+      },
+      {
+        "date": "2026-06-17",
+        "frequency": 296
+      },
+      {
+        "date": "2026-06-18",
+        "frequency": 285
+      },
+      {
+        "date": "2026-06-19",
+        "frequency": 264
+      },
+      {
+        "date": "2026-06-20",
+        "frequency": 270
+      },
+      {
+        "date": "2026-06-21",
+        "frequency": 245
+      },
+      {
+        "date": "2026-06-22",
+        "frequency": 247
+      },
+      {
+        "date": "2026-06-23",
+        "frequency": 221
+      },
+      {
+        "date": "2026-06-24",
+        "frequency": 218
+      },
+      {
+        "date": "2026-06-25",
+        "frequency": 194
+      },
+      {
+        "date": "2026-06-26",
+        "frequency": 203
+      },
+      {
+        "date": "2026-06-27",
+        "frequency": 157
+      },
+      {
+        "date": "2026-06-28",
+        "frequency": 172
+      },
+      {
+        "date": "2026-06-29",
+        "frequency": 156
+      },
+      {
+        "date": "2026-06-30",
+        "frequency": 140
+      },
+      {
+        "date": "2026-07-01",
+        "frequency": 129
+      },
+      {
+        "date": "2026-07-02",
+        "frequency": 138
+      },
+      {
+        "date": "2026-07-03",
+        "frequency": 98
+      },
+      {
+        "date": "2026-07-04",
+        "frequency": 118
+      },
+      {
+        "date": "2026-07-05",
+        "frequency": 97
+      },
+      {
+        "date": "2026-07-06",
+        "frequency": 91
+      },
+      {
+        "date": "2026-07-07",
+        "frequency": 75
+      },
+      {
+        "date": "2026-07-08",
+        "frequency": 67
+      },
+      {
+        "date": "2026-07-09",
+        "frequency": 50
+      },
+      {
+        "date": "2026-07-10",
+        "frequency": 52
+      },
+      {
+        "date": "2026-07-11",
+        "frequency": 60
+      },
+      {
+        "date": "2026-07-12",
+        "frequency": 37
+      },
+      {
+        "date": "2026-07-13",
+        "frequency": 35
+      },
+      {
+        "date": "2026-07-14",
+        "frequency": 31
+      },
+      {
+        "date": "2026-07-15",
+        "frequency": 28
+      },
+      {
+        "date": "2026-07-16",
+        "frequency": 22
+      },
+      {
+        "date": "2026-07-17",
+        "frequency": 24
+      },
+      {
+        "date": "2026-07-18",
+        "frequency": 22
+      },
+      {
+        "date": "2026-07-19",
+        "frequency": 22
+      },
+      {
+        "date": "2026-07-20",
+        "frequency": 17
+      },
+      {
+        "date": "2026-07-21",
+        "frequency": 12
+      },
+      {
+        "date": "2026-07-22",
+        "frequency": 10
+      },
+      {
+        "date": "2026-07-23",
+        "frequency": 14
+      },
+      {
+        "date": "2026-07-24",
+        "frequency": 11
+      },
+      {
+        "date": "2026-07-25",
+        "frequency": 13
+      },
+      {
+        "date": "2026-07-26",
+        "frequency": 6
+      },
+      {
+        "date": "2026-07-27",
+        "frequency": 5
+      },
+      {
+        "date": "2026-07-28",
+        "frequency": 12
+      },
+      {
+        "date": "2026-07-29",
+        "frequency": 5
+      },
+      {
+        "date": "2026-07-31",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-01",
+        "frequency": 4
+      },
+      {
+        "date": "2026-08-02",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-03",
+        "frequency": 1
+      },
+      {
+        "date": "2026-08-04",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-05",
+        "frequency": 4
+      },
+      {
+        "date": "2026-08-06",
+        "frequency": 2
+      },
+      {
+        "date": "2026-08-07",
+        "frequency": 2
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "CalcMark/go-calcmark",
+    "items": 25,
+    "start_date": "2026-05-12",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      6,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      6,
+      1,
+      0,
+      0,
+      1
+    ],
+    "total_throughput": 22,
+    "avg_throughput_per_day": 0.7333333333333333,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 6,
+    "zero_throughput_days": 21
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast when-done --repo CalcMark/go-calcmark --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

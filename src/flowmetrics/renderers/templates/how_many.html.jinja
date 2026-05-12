@@ -1,0 +1,45 @@
+{% extends "base.html.jinja" %}
+
+{# ── Above the fold: percentile table + chart ─────────────────────────── #}
+{% block content %}
+<div class="horizon {% if horizon.ratio <= 1.0 %}green{% elif horizon.ratio <= 2.0 %}yellow{% else %}red{% endif %}">
+<strong>Forecast horizon:</strong>
+{{ horizon.days_ahead }} days ahead, training window is {{ horizon.training_window_days }} days
+({{ "%.1f"|format(horizon.ratio) }}× the window). {{ horizon.reading }}
+</div>
+
+<h2>Confidence — minimum items we can commit to</h2>
+<p><em>Read BACKWARD: higher confidence ⇒ FEWER items (more conservative).</em></p>
+<table>
+<thead><tr><th>Confidence</th><th>Minimum items</th><th>How to use it</th></tr></thead>
+<tbody>
+  <tr><td>50%</td><td class="num">{{ report.percentiles[50] }}</td><td>median — do NOT commit to this</td></tr>
+  <tr><td>70%</td><td class="num">{{ report.percentiles[70] }}</td><td>internal stretch</td></tr>
+  <tr><td>85%</td><td class="num">{{ report.percentiles[85] }}</td><td>external commitment</td></tr>
+  <tr><td>95%</td><td class="num">{{ report.percentiles[95] }}</td><td>high-stakes commitment</td></tr>
+</tbody>
+</table>
+
+<img alt="How-many histogram" src="data:image/png;base64,{{ chart_histogram_b64 }}" />
+{% endblock %}
+
+{# ── Below the fold: input + training detail ──────────────────────────── #}
+{% block detail %}
+<h2>Input parameters</h2>
+<table>
+  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
+  <tr><th>Forecast window</th><td>{{ report.input.start_date }} → {{ report.input.target_date }}</td></tr>
+  <tr><th>Monte Carlo runs</th><td>{{ "{:,}".format(report.simulation.runs) }}</td></tr>
+  <tr><th>RNG seed</th><td>{{ report.simulation.seed if report.simulation.seed is not none else 'random' }}</td></tr>
+</table>
+
+<h2>Training window — historical throughput we sampled from</h2>
+<table>
+  <tr><th>Window</th><td>{{ training.window_start }} → {{ training.window_end }}
+      ({{ training.daily_samples|length }} days)</td></tr>
+  <tr><th>Total throughput (items)</th><td class="num">{{ training.total_merges }}</td></tr>
+  <tr><th>Average throughput / day</th><td class="num">{{ "%.2f"|format(training.avg_per_day) }}</td></tr>
+  <tr><th>Zero-throughput days</th><td class="num">{{ training.zero_days }} of {{ training.daily_samples|length }}</td></tr>
+</table>
+<img alt="Daily throughput in training window" src="data:image/png;base64,{{ chart_training_b64 }}" />
+{% endblock %}

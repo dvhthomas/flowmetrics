@@ -1,0 +1,2 @@
+Forecast for pre-commit/pre-commit: 85% confidence we deliver at least 0 items by 2026-05-26 
+(window: 15 days).

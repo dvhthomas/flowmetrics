@@ -1,0 +1,265 @@
+{
+  "schema": "flowmetrics.forecast.how_many.v1",
+  "command": "forecast how-many",
+  "generated_at": "2026-05-12T11:19:05.104098-06:00",
+  "headline": "Forecast for CalcMark/go-calcmark: 85% confidence we deliver at least 5 items by 2026-05-26 (window: 15 days).",
+  "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
+  "summary": {
+    "percentiles": {
+      "50": 10,
+      "70": 7,
+      "85": 5,
+      "95": 3
+    },
+    "reading": "backward \u2014 higher confidence means FEWER items",
+    "horizon": {
+      "days_ahead": 14,
+      "training_window_days": 30,
+      "ratio": 0.4666666666666667,
+      "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
+    }
+  },
+  "key_insight": "Median outcome is 10 items; 95% commitment floor is 3. Higher confidence = fewer items \u2014 promising 3 leaves throughput on the table to buy certainty.",
+  "next_actions": [
+    "For external commitments, promise 5 items (or 3 if stakes are high).",
+    "For internal planning, treat 10 as the realistic target \u2014 half the time you deliver less.",
+    "Re-run weekly; the floor moves as historical throughput shifts."
+  ],
+  "caveats": [
+    "Confidence reads BACKWARD: higher % means FEWER items, not more.",
+    "Throughput unit is 'merged PRs' \u2014 assumes PR size is stable across windows.",
+    "No accounting for known disruptions (holidays, on-call rotations, launches)."
+  ],
+  "vocabulary": {
+    "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
+    "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
+    "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
+    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
+  },
+  "chart_data": {
+    "histogram": [
+      {
+        "items": 0,
+        "frequency": 68
+      },
+      {
+        "items": 1,
+        "frequency": 127
+      },
+      {
+        "items": 2,
+        "frequency": 267
+      },
+      {
+        "items": 3,
+        "frequency": 436
+      },
+      {
+        "items": 4,
+        "frequency": 537
+      },
+      {
+        "items": 5,
+        "frequency": 538
+      },
+      {
+        "items": 6,
+        "frequency": 561
+      },
+      {
+        "items": 7,
+        "frequency": 569
+      },
+      {
+        "items": 8,
+        "frequency": 638
+      },
+      {
+        "items": 9,
+        "frequency": 670
+      },
+      {
+        "items": 10,
+        "frequency": 712
+      },
+      {
+        "items": 11,
+        "frequency": 591
+      },
+      {
+        "items": 12,
+        "frequency": 588
+      },
+      {
+        "items": 13,
+        "frequency": 513
+      },
+      {
+        "items": 14,
+        "frequency": 464
+      },
+      {
+        "items": 15,
+        "frequency": 438
+      },
+      {
+        "items": 16,
+        "frequency": 432
+      },
+      {
+        "items": 17,
+        "frequency": 354
+      },
+      {
+        "items": 18,
+        "frequency": 288
+      },
+      {
+        "items": 19,
+        "frequency": 232
+      },
+      {
+        "items": 20,
+        "frequency": 186
+      },
+      {
+        "items": 21,
+        "frequency": 187
+      },
+      {
+        "items": 22,
+        "frequency": 123
+      },
+      {
+        "items": 23,
+        "frequency": 112
+      },
+      {
+        "items": 24,
+        "frequency": 98
+      },
+      {
+        "items": 25,
+        "frequency": 62
+      },
+      {
+        "items": 26,
+        "frequency": 51
+      },
+      {
+        "items": 27,
+        "frequency": 47
+      },
+      {
+        "items": 28,
+        "frequency": 32
+      },
+      {
+        "items": 29,
+        "frequency": 17
+      },
+      {
+        "items": 30,
+        "frequency": 17
+      },
+      {
+        "items": 31,
+        "frequency": 19
+      },
+      {
+        "items": 32,
+        "frequency": 11
+      },
+      {
+        "items": 33,
+        "frequency": 3
+      },
+      {
+        "items": 34,
+        "frequency": 4
+      },
+      {
+        "items": 35,
+        "frequency": 2
+      },
+      {
+        "items": 36,
+        "frequency": 2
+      },
+      {
+        "items": 37,
+        "frequency": 1
+      },
+      {
+        "items": 39,
+        "frequency": 2
+      },
+      {
+        "items": 43,
+        "frequency": 1
+      }
+    ],
+    "total_runs": 10000
+  },
+  "input": {
+    "repo": "CalcMark/go-calcmark",
+    "start_date": "2026-05-12",
+    "target_date": "2026-05-26",
+    "history_start": "2026-04-12",
+    "history_end": "2026-05-11",
+    "offline": false
+  },
+  "training": {
+    "window_start": "2026-04-12",
+    "window_end": "2026-05-11",
+    "daily_throughput": [
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      6,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      6,
+      1,
+      0,
+      0,
+      1
+    ],
+    "total_throughput": 22,
+    "avg_throughput_per_day": 0.7333333333333333,
+    "min_throughput_per_day": 0,
+    "max_throughput_per_day": 6,
+    "zero_throughput_days": 21
+  },
+  "simulation": {
+    "runs": 10000,
+    "seed": 42
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow forecast how-many --repo CalcMark/go-calcmark --target-date 2026-05-26 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "logs": []
+}

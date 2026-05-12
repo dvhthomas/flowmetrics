@@ -1,0 +1,5682 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 101,
+      "limit": 5000,
+      "remaining": 4696,
+      "resetAt": "2026-05-12T17:42:23Z"
+    },
+    "search": {
+      "issueCount": 181,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-21T14:50:30Z",
+          "mergedAt": "2026-04-21T14:51:03Z",
+          "number": 19097,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:50:12Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T14:50:47Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:51:03Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:51:03Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Bump idna version in snapshot"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-21T14:41:55Z",
+          "mergedAt": "2026-04-21T18:47:07Z",
+          "number": 19096,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T15:15:37Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T15:54:46Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-21T16:11:49Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T18:47:07Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T18:47:07Z"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Use the newly stabilized `std::fmt::from_fn`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-21T14:39:44Z",
+          "mergedAt": "2026-04-21T18:02:05Z",
+          "number": 19095,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T16:46:51Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T17:50:25Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-21T17:50:28Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T17:57:09Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T18:02:05Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T18:02:05Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-05-02T14:13:55Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-05-02T14:16:38Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update PyTorch documentation for PyTorch 2.11"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-21T14:17:00Z",
+          "mergedAt": "2026-04-21T14:47:44Z",
+          "number": 19094,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:04:07Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:10:17Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T14:17:32Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:47:44Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:47:44Z"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add test for `exclude-newer-package` with missing `timestamp` in the lockfile"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-21T13:43:04Z",
+          "mergedAt": "2026-04-21T14:29:47Z",
+          "number": 19093,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T13:45:26Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T13:48:47Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T14:03:21Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:19:36Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:29:47Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:29:47Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fix `UV_NO_PROJECT` added-in metadata"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-04-21T13:03:58Z",
+          "mergedAt": "2026-04-21T18:03:06Z",
+          "number": 19092,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T13:40:37Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T13:47:21Z"
+              },
+              {
+                "__typename": "ConvertToDraftEvent",
+                "createdAt": "2026-04-21T13:54:41Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:58:23Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T14:59:45Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T16:23:24Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T18:03:06Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T18:03:06Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add `--python-downloads-json-url` to `python pin`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-20T21:12:56Z",
+          "mergedAt": "2026-04-21T17:43:23Z",
+          "number": 19088,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T19:50:41Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:14:37Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T17:34:53Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T17:35:37Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-21T17:35:40Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T17:38:20Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T17:43:23Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T17:43:23Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Ensure uv invocations of git do not inherit repository location environment variables"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Gankra"
+          },
+          "createdAt": "2026-04-20T20:31:54Z",
+          "mergedAt": "2026-04-21T17:12:36Z",
+          "number": 19087,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:28:35Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:28:35Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:28:35Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:36:35Z"
+                }
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-20T20:57:57Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-21T13:37:58Z"
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T14:04:37Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T14:04:47Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T15:09:07Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T17:12:36Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T17:12:36Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Support `uv lock` on a `pyproject.toml` that only contains dependency-groups"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-20T20:06:32Z",
+          "mergedAt": "2026-04-20T20:17:10Z",
+          "number": 19086,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T20:05:26Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-20T20:16:32Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T20:17:10Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T20:17:10Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Respect discovered hashes from lookahead build dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-20T18:54:21Z",
+          "mergedAt": "2026-04-20T18:58:36Z",
+          "number": 19083,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:53:38Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T18:54:45Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:58:36Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:58:36Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Remove duplicate hashbrown lockfile entry"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-20T16:30:23Z",
+          "mergedAt": "2026-04-20T16:39:45Z",
+          "number": 19082,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T16:28:36Z"
+                }
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-20T16:30:24Z"
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T16:35:00Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T16:39:45Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T16:39:45Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Support `pip uninstall -y`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-20T08:26:11Z",
+          "mergedAt": "2026-04-20T19:50:34Z",
+          "number": 19076,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T08:15:25Z"
+                }
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:42:34Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T19:18:50Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T19:50:26Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T19:50:34Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T19:50:34Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Run `LookaheadResolver` when resolving PEP 517 build requirements"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-20T01:47:34Z",
+          "mergedAt": "2026-04-20T10:30:20Z",
+          "number": 19073,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-19T20:02:32Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T01:48:11Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T10:30:20Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T10:30:20Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Move retry logic into its own file"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:57Z",
+          "mergedAt": "2026-04-29T14:23:24Z",
+          "number": 19072,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-29T09:57:52Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-29T14:23:24Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-29T14:23:24Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Vampire/setup-wsl action to v7"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:50Z",
+          "mergedAt": "2026-04-20T20:37:00Z",
+          "number": 19071,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T16:40:51Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T17:57:53Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T20:37:00Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T20:37:00Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update taiki-e/install-action action to v2.75.10"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:36Z",
+          "mergedAt": "2026-04-20T18:31:08Z",
+          "number": 19070,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:22:33Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:31:08Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:31:08Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate indexmap to v2.14.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:25Z",
+          "mergedAt": "2026-04-20T18:30:56Z",
+          "number": 19069,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:22:23Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:30:56Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:30:56Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate hashbrown to 0.17.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:15Z",
+          "mergedAt": "2026-04-22T03:24:33Z",
+          "number": 19068,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T19:52:15Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-22T03:24:33Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-22T03:24:33Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate fastrand to v2.4.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:02Z",
+          "mergedAt": "2026-04-21T17:44:00Z",
+          "number": 19067,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T17:13:25Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T17:43:53Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T17:44:00Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T17:44:00Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update pypa/gh-action-pypi-publish action to v1.14.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:55Z",
+          "mergedAt": "2026-04-20T18:29:55Z",
+          "number": 19066,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:21:52Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:29:55Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:29:55Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update PyO3/maturin-action action to v1.51.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:32Z",
+          "mergedAt": "2026-04-21T14:05:58Z",
+          "number": 19065,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:21:29Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:05:58Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:05:59Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update MSRV to v1.93.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:25Z",
+          "mergedAt": "2026-04-20T18:29:26Z",
+          "number": 19064,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:21:20Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:29:26Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:29:26Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update maturin to v1.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:05Z",
+          "mergedAt": "2026-04-20T18:29:47Z",
+          "number": 19062,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:21:03Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T16:46:10Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:29:47Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:29:48Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update aws-actions/configure-aws-credentials action to v6.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:59Z",
+          "mergedAt": "2026-04-20T18:30:22Z",
+          "number": 19061,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:20:57Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:30:22Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:30:23Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update astral-sh/setup-uv action to v8.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:51Z",
+          "mergedAt": "2026-04-20T18:30:35Z",
+          "number": 19060,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:20:49Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:30:35Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:30:35Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate tokio to v1.51.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:40Z",
+          "mergedAt": "2026-04-21T19:28:27Z",
+          "number": 19059,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:20:37Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-21T19:28:23Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T19:28:27Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T19:28:27Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate rustls to v0.23.38"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:44Z",
+          "mergedAt": "2026-04-20T18:35:32Z",
+          "number": 19058,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:19:42Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T18:35:25Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:35:32Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:35:32Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update peter-evans/create-pull-request action to v8.1.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:38Z",
+          "mergedAt": "2026-04-20T18:32:28Z",
+          "number": 19057,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:19:35Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T18:32:15Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:32:28Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:32:28Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update EmbarkStudios/cargo-deny-action action to v2.0.16"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:32Z",
+          "mergedAt": "2026-04-20T18:32:05Z",
+          "number": 19056,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:19:29Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:32:05Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:32:05Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update dependency astral-sh/uv to v0.11.7"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:24Z",
+          "mergedAt": "2026-04-20T18:32:39Z",
+          "number": 19055,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:19:22Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:32:39Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:32:39Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update CodSpeedHQ/action action to v4.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:18Z",
+          "mergedAt": "2026-04-20T18:32:33Z",
+          "number": 19054,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:19:13Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:32:33Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:32:33Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update actions/upload-artifact action to v7.0.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:18:25Z",
+          "mergedAt": "2026-04-21T14:05:43Z",
+          "number": 19053,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T01:18:21Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:05:43Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:05:43Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update acj/freebsd-firecracker-action action to v0.9.1"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-19T19:52:36Z",
+          "mergedAt": "2026-04-19T23:19:53Z",
+          "number": 19052,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-19T19:52:26Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-19T20:25:09Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-19T21:13:43Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-19T21:42:34Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-19T22:03:34Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-19T23:19:53Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-19T23:19:53Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T19:53:48Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add an environment variable for `UV_NO_PROJECT`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T21:02:11Z",
+          "mergedAt": "2026-04-17T21:25:53Z",
+          "number": 19040,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T20:24:01Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T20:47:22Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T21:02:30Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T21:04:21Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T21:06:52Z"
+                }
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T21:25:53Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T21:25:54Z"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Only update `test-system.yml` dependencies monthly"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T20:46:28Z",
+          "mergedAt": "2026-04-17T21:01:30Z",
+          "number": 19039,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T21:55:49Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T21:01:24Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T21:01:30Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T21:01:30Z"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Refactor `update_availability_range` to use iterator and collect"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-17T19:33:19Z",
+          "mergedAt": "2026-04-20T18:48:22Z",
+          "number": 19038,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T16:08:52Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T19:08:45Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T19:13:47Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T19:27:23Z"
+                }
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T19:40:23Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T19:45:47Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T20:01:59Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-20T15:07:16Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-20T15:07:22Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T15:59:56Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T17:04:45Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T17:05:34Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T17:06:18Z"
+                }
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-20T17:09:15Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T18:42:33Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:45:29Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:47:43Z"
+                }
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:48:22Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:48:23Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Cache positive OSV hits"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T18:24:39Z",
+          "mergedAt": "2026-04-20T18:50:13Z",
+          "number": 19035,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:27:21Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:44:54Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:52:00Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T19:34:24Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T18:38:57Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T18:50:13Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T18:50:14Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add `UV_PYTHON_NO_REGISTRY`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T17:22:40Z",
+          "mergedAt": "2026-04-20T19:13:41Z",
+          "number": 19034,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T17:23:16Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T17:23:57Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T17:24:32Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T17:32:33Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:04:51Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:04:51Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T18:04:51Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T19:34:44Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T19:35:19Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:57:47Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T18:58:48Z"
+                }
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T19:13:41Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T19:13:41Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Expose `UV_PYTHON_SEARCH_PATH` for Python discovery `PATH` overrides"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T14:05:12Z",
+          "mergedAt": "2026-04-20T19:03:38Z",
+          "number": 19032,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T12:56:08Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T14:05:15Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T16:32:22Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T16:42:42Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T19:03:38Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T19:03:38Z"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Use an Ubuntu snapshot for apt installs in CI for reproducibility"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T13:00:19Z",
+          "mergedAt": "2026-04-17T13:10:43Z",
+          "number": 19031,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T13:00:11Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T13:02:39Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T13:10:43Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T13:10:43Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add a lock equality assertion for `uv lock --check` with a relative exclude newer"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "eifinger"
+          },
+          "createdAt": "2026-04-17T06:58:39Z",
+          "mergedAt": "2026-04-17T13:55:46Z",
+          "number": 19030,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T06:55:58Z"
+                }
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-17T08:33:15Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T13:55:39Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T13:55:46Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T13:55:46Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Bump astral-sh/setup-uv version in docs"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-17T03:44:14Z",
+          "mergedAt": "2026-04-20T16:36:19Z",
+          "number": 19029,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-17T08:33:33Z"
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T13:52:52Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T14:06:50Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T14:48:44Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-18T22:23:17Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T15:57:53Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T15:59:30Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-20T16:03:31Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-20T16:08:26Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T16:36:19Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T16:36:19Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate webpki to v0.103.12"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T14:56:10Z",
+          "mergedAt": "2026-04-21T14:49:25Z",
+          "number": 19024,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T12:55:45Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T12:56:47Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T12:57:21Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T12:59:09Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T13:14:45Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-21T13:54:37Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-21T13:56:24Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-21T14:15:27Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-21T14:35:11Z"
+                }
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-21T14:49:25Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-21T14:49:25Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Allow `exclude-newer` to be missing from the lockfile when `exclude-newer-span` is present"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T14:20:15Z",
+          "mergedAt": "2026-04-20T14:36:40Z",
+          "number": 19022,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T14:23:26Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-16T14:39:20Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T11:51:04Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T12:50:24Z"
+              },
+              {
+                "__typename": "ConvertToDraftEvent",
+                "createdAt": "2026-04-17T12:55:40Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T13:09:31Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T16:41:46Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T16:44:05Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T16:44:12Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T16:45:06Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T16:45:09Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T16:55:39Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-20T14:36:40Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-20T14:36:40Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Use a no-op timestamp for `exclude-newer` in lockfiles when a relative value is configured"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T13:24:00Z",
+          "mergedAt": "2026-04-16T14:05:06Z",
+          "number": 19021,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-16T13:16:25Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-16T13:18:43Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-16T13:21:25Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T13:24:25Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T13:24:45Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T13:25:09Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-16T13:25:35Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-16T14:05:01Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-16T14:05:06Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-16T14:05:06Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Add test case for lock when `exclude-newer` is missing but `exclude-newer-span` is present"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T21:49:21Z",
+          "mergedAt": "2026-04-17T16:42:01Z",
+          "number": 19019,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T15:19:07Z"
+                }
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-15T21:51:29Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-16T12:59:43Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T16:34:49Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T16:42:01Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T16:42:01Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Only show the version number in `uv self version --short`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T21:23:28Z",
+          "mergedAt": "2026-04-15T21:47:00Z",
+          "number": 19018,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T21:29:53Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T21:29:53Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-15T21:47:00Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-15T21:47:00Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Silence warnings on empty `SSL_CERT_DIR` directory"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T20:53:17Z",
+          "mergedAt": "2026-04-15T21:03:37Z",
+          "number": 19017,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T20:52:42Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-15T20:53:22Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T20:55:11Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-15T21:03:37Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-15T21:03:37Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Bump version to 0.11.7"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T20:23:31Z",
+          "mergedAt": "2026-04-15T20:52:54Z",
+          "number": 19016,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T20:23:25Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T20:24:56Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-15T20:52:51Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-15T20:52:54Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-15T20:52:54Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Pin prettier in `scripts/generate-crate-readmes.py` to avoid prompts"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-15T16:27:43Z",
+          "mergedAt": "2026-04-17T15:24:49Z",
+          "number": 19012,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-16T14:27:12Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-16T14:28:32Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T14:31:19Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T14:37:28Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-16T14:38:31Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T14:41:10Z"
+              },
+              {
+                "__typename": "MentionedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T14:42:17Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T14:48:42Z"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-16T14:53:33Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T14:59:10Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-16T15:32:52Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T14:48:24Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T14:49:22Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T15:04:30Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T15:04:31Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T15:07:24Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-17T15:08:35Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T15:09:22Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T15:10:02Z"
+                }
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T15:24:49Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T15:24:49Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fix Python variant tagging in the Windows registry"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T14:16:31Z",
+          "mergedAt": "2026-04-15T21:47:25Z",
+          "number": 19010,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T01:38:39Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T01:41:48Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T14:05:09Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:16:42Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T14:16:47Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-15T14:16:55Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T14:27:49Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T14:39:12Z"
+                }
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-15T21:47:25Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-15T21:47:25Z"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Skip Pyodide pre-release builds during version sync"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-14T17:53:00Z",
+          "mergedAt": "2026-04-14T18:20:28Z",
+          "number": 19004,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T17:52:54Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-14T18:20:24Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-14T18:20:28Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-14T18:20:28Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Upgrade CPython build to 20260414"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "oconnor663"
+          },
+          "createdAt": "2026-04-13T22:23:54Z",
+          "mergedAt": "2026-04-14T00:24:29Z",
+          "number": 18997,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T22:22:56Z"
+                }
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-13T22:25:40Z"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-13T22:49:12Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-14T00:24:29Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-14T00:24:29Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "replace the RAYON_INITIALIZE `LazyLock` with a local `Once`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-13T18:21:26Z",
+          "mergedAt": "2026-04-14T13:29:24Z",
+          "number": 18994,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T18:26:31Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-13T18:26:54Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-13T18:27:01Z"
+              },
+              {
+                "__typename": "ReviewRequestRemovedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-13T18:27:02Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-13T18:27:04Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-14T10:26:51Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:18:58Z"
+                }
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-14T13:29:24Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-14T13:29:25Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Allow some modification of global preview state"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:09:16Z",
+          "mergedAt": "2026-04-18T22:21:24Z",
+          "number": 18991,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-18T21:48:32Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-18T22:21:24Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-18T22:21:24Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate similar to v3"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:09:07Z",
+          "mergedAt": "2026-04-13T13:09:48Z",
+          "number": 18990,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:57Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:09:48Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:09:48Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update taiki-e/install-action action to v2.73.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:52Z",
+          "mergedAt": "2026-04-13T13:09:27Z",
+          "number": 18989,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:50Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:09:27Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:09:28Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate tokio to v1.51.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:43Z",
+          "mergedAt": "2026-04-13T07:26:04Z",
+          "number": 18988,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:40Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-13T01:22:05Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-13T07:25:26Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T07:26:04Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T07:26:04Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate hyper to v1.9.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:32Z",
+          "mergedAt": "2026-04-13T13:17:02Z",
+          "number": 18987,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:29Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:17:02Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:17:02Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update docker/login-action action to v4.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:25Z",
+          "mergedAt": "2026-04-13T13:09:11Z",
+          "number": 18986,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:22Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:09:11Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:09:11Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update crate-ci/typos action to v1.45.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:19Z",
+          "mergedAt": "2026-04-13T13:08:58Z",
+          "number": 18985,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:17Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:08:58Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:08:58Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update CodSpeedHQ/action action to v4.13.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:13Z",
+          "mergedAt": "2026-04-13T13:08:48Z",
+          "number": 18984,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:10Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:08:48Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:08:48Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate insta to v1.47.2"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:04Z",
+          "mergedAt": "2026-04-13T13:08:40Z",
+          "number": 18983,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:08:01Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:08:40Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:08:40Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update Rust crate indexmap to v2.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:07:13Z",
+          "mergedAt": "2026-04-13T07:27:14Z",
+          "number": 18982,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T01:07:11Z"
+                }
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T07:27:14Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T07:27:14Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update dependency astral-sh/uv to v0.11.6"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:07:06Z",
+          "mergedAt": "2026-04-17T20:19:16Z",
+          "number": 18981,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T20:02:55Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T20:19:16Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T20:19:16Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Update cgr.dev/chainguard/python:latest-dev Docker digest to c2ac411"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T15:19:12Z",
+          "mergedAt": "2026-04-13T13:27:41Z",
+          "number": 18977,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-12T15:32:55Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-13T08:31:38Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T13:14:22Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T13:27:41Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T13:27:41Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Elevate configuration errors to `required-version` mismatches"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T13:02:02Z",
+          "mergedAt": "2026-04-12T13:18:52Z",
+          "number": 18976,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-12T13:08:17Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-12T13:11:30Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-12T13:18:52Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-12T13:18:52Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-12T14:45:53Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Emit JSON report for `uv sync --check` failures"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-10T21:08:56Z",
+          "mergedAt": "2026-04-12T10:58:31Z",
+          "number": 18970,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T21:04:27Z"
+                }
+              },
+              {
+                "__typename": "AssignedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T21:13:25Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T21:14:53Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-10T21:34:11Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-10T21:34:19Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T21:34:51Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-12T10:58:22Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-12T10:58:31Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-12T10:58:31Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fix two bugs in `uv audit`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-10T01:48:18Z",
+          "mergedAt": "2026-04-13T12:16:55Z",
+          "number": 18960,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T01:54:10Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-10T14:03:39Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-10T16:59:14Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-11T03:02:24Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-11T21:38:27Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-11T22:59:55Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-13T08:13:49Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-13T12:16:51Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T12:16:55Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T12:16:55Z"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fix equality comparisons for version specifiers with `~=` operators"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-04-10T00:41:42Z",
+          "mergedAt": "2026-04-16T04:28:48Z",
+          "number": 18958,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-10T00:45:16Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "AutoMergeDisabledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T00:46:08Z"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "UnlabeledEvent"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-16T04:16:55Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-16T04:28:48Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-16T04:28:48Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-09T20:47:27Z",
+          "mergedAt": "2026-04-17T18:41:53Z",
+          "number": 18956,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T20:43:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T20:56:44Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T21:01:02Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T21:01:41Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T21:06:21Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T21:21:03Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T21:31:11Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T11:59:22Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T12:13:36Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T13:05:56Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T13:06:50Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T13:07:11Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T13:09:00Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T13:09:55Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T13:10:36Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T13:22:30Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T15:57:55Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-17T18:41:34Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T18:41:53Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T18:41:53Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Review for `--index <name>` support"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-09T16:45:03Z",
+          "mergedAt": "2026-04-15T16:39:32Z",
+          "number": 18952,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-09T16:48:10Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-09T17:19:19Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-09T17:21:12Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-09T18:10:15Z"
+              },
+              {
+                "__typename": "MentionedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-09T18:36:54Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-09T18:46:49Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-09T18:55:30Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-09T18:55:33Z"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T14:31:32Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:34:29Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:36:21Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:42:58Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:45:19Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:50:58Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:51:33Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:51:53Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:52:27Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:54:31Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:57:22Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-15T14:59:33Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-15T15:25:39Z"
+                }
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-15T16:39:32Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-15T16:39:33Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Improve `--exclude-newer` hints "
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-09T09:20:57Z",
+          "mergedAt": "2026-04-13T09:12:07Z",
+          "number": 18945,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-09T10:58:05Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-09T10:58:05Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-09T11:09:23Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-09T13:26:24Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-09T13:27:10Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-09T21:03:34Z"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T11:27:42Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T12:32:13Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T12:51:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T12:51:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T12:51:41Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T12:51:43Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-10T12:58:19Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-10T16:08:19Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T16:50:27Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-10T16:50:33Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-13T08:57:32Z"
+                }
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-13T09:12:07Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-13T09:12:07Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Stronger Windows path normalization"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-07T02:28:51Z",
+          "mergedAt": "2026-04-14T14:01:32Z",
+          "number": 18891,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-07T13:07:41Z"
+              },
+              {
+                "__typename": "MentionedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-07T13:18:44Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-07T13:29:20Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-08T16:08:05Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-08T16:08:11Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-08T16:08:11Z"
+              },
+              {
+                "__typename": "ConvertToDraftEvent",
+                "createdAt": "2026-04-08T16:09:31Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-08T17:19:15Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-08T17:55:31Z"
+              },
+              {
+                "__typename": "ConvertToDraftEvent",
+                "createdAt": "2026-04-08T19:48:29Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-08T20:13:07Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-09T01:20:31Z"
+              },
+              {
+                "__typename": "ConvertToDraftEvent",
+                "createdAt": "2026-04-09T01:21:09Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-09T01:40:09Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-13T17:20:58Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-13T17:53:08Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:40:00Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:40:00Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:40:00Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:40:00Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:40:00Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T13:49:00Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-14T13:59:03Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-14T14:01:16Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-14T14:01:32Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-14T14:01:32Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Avoid installing tool workspace member dependencies as editable"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-02T14:03:57Z",
+          "mergedAt": "2026-04-27T23:11:11Z",
+          "number": 18821,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:29:21Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:36:54Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:41:38Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:55:18Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:59:11Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-27T14:59:26Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-27T15:43:20Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-27T15:59:48Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-27T23:11:11Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-27T23:11:11Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Catch missing uv build backend compatible version bumps"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-01T21:09:32Z",
+          "mergedAt": "2026-04-23T10:48:55Z",
+          "number": 18811,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-01T22:39:22Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-02T09:59:00Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-07T19:10:10Z"
+              },
+              {
+                "__typename": "AutoSquashEnabledEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-23T10:39:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-23T10:39:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-23T10:39:28Z"
+                }
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-23T10:39:28Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-23T10:48:55Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-23T10:48:55Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Pin the platform during reproducible trampoline builds"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-03-24T23:30:17Z",
+          "mergedAt": "2026-04-29T15:43:50Z",
+          "number": 18705,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-03-24T23:35:08Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-03-24T23:35:10Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-03-25T00:09:18Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-25T00:09:33Z"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-12T13:05:47Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-12T13:06:56Z"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-04-29T14:46:40Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-29T15:43:43Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-29T15:43:50Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-29T15:43:50Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Mark `--native-tls` and `UV_NATIVE_TLS` as deprecated"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-24T17:42:40Z",
+          "mergedAt": "2026-04-29T16:05:04Z",
+          "number": 18700,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-03-24T17:44:03Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-03-24T17:44:21Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-29T15:42:25Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-29T15:49:11Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-29T15:49:49Z"
+                }
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-29T15:50:12Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-29T15:50:16Z"
+                }
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-29T15:50:24Z"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-29T16:05:04Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-29T16:05:04Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Discover versioned Python executables when `requires-python` pins a version"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-03-23T19:29:03Z",
+          "mergedAt": "2026-04-17T17:40:30Z",
+          "number": 18682,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "BaseRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "BaseRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-23T19:58:08Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "BaseRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-03-24T14:32:30Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-03-26T11:39:57Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-03-26T11:40:01Z"
+              },
+              {
+                "__typename": "AutomaticBaseChangeSucceededEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-14T10:26:27Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-17T14:14:07Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-17T17:11:50Z"
+                }
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-17T17:40:30Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-17T17:40:30Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fetch uv from Astral mirror during self-update"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-05T19:05:59Z",
+          "mergedAt": "2026-04-30T14:06:38Z",
+          "number": 18323,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-03-05T19:05:53Z"
+                }
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-06T14:08:41Z"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "SubscribedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-15T16:54:21Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-09T14:08:46Z"
+              },
+              {
+                "__typename": "ReadyForReviewEvent",
+                "createdAt": "2026-04-29T18:20:40Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-29T18:21:02Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-29T18:24:55Z"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-30T14:06:38Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-30T14:06:38Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Fix file locks on Android"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-02-24T13:39:43Z",
+          "mergedAt": "2026-04-27T20:42:06Z",
+          "number": 18182,
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent"
+              },
+              {
+                "__typename": "UnsubscribedEvent"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-02-24T15:10:06Z"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-02-24T15:51:08Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-01T22:37:52Z"
+              },
+              {
+                "__typename": "ReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "CrossReferencedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-03-11T14:20:14Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "RenamedTitleEvent"
+              },
+              {
+                "__typename": "ReviewRequestedEvent",
+                "createdAt": "2026-03-17T08:12:07Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:30:40Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:40:42Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T14:46:15Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T15:31:47Z"
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T15:36:23Z"
+              },
+              {
+                "__typename": "IssueComment",
+                "createdAt": "2026-04-27T15:47:25Z"
+              },
+              {
+                "__typename": "PullRequestReview",
+                "submittedAt": "2026-04-27T15:58:38Z"
+              },
+              {
+                "__typename": "PullRequestCommit",
+                "commit": {
+                  "committedDate": "2026-04-27T16:13:47Z"
+                }
+              },
+              {
+                "__typename": "HeadRefForcePushedEvent"
+              },
+              {
+                "__typename": "MergedEvent",
+                "createdAt": "2026-04-27T20:42:06Z"
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-27T20:42:06Z"
+              },
+              {
+                "__typename": "HeadRefDeletedEvent"
+              }
+            ],
+            "pageInfo": {
+              "hasNextPage": false
+            }
+          },
+          "title": "Trim trailing whitespace in help output"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjE4MQ==",
+        "hasNextPage": false
+      }
+    }
+  }
+}

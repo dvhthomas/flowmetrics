@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
+         line-height: 1.55; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
+       margin-top: 2.5rem; }
+  .stamp { color: #777; font-size: 0.85rem; }
+  .headline { background: #f0f8ff; border-left: 4px solid #2b7cff;
+              padding: 0.7rem 1rem; font-size: 1.05rem; margin: 1rem 0; }
+  .insight { background: #fffbea; border-left: 4px solid #d4a72c;
+             padding: 0.7rem 1rem; margin: 1rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; background: #f7f7f7;
+             padding: 0.7rem 1rem; border-left: 4px solid #bbb; margin: 1rem 0; }
+  details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
+                      color: #2b7cff; }
+  details[open] > summary { margin-bottom: 0.5rem; }
+  .invocation { background: #1a1a1a; color: #f8f8f8; padding: 0.6rem 0.8rem;
+                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
+                overflow-x: auto; white-space: pre; }
+  .definition { background: #f0f4f8; border-left: 4px solid #6b7c93;
+                padding: 0.7rem 1rem; margin: 1rem 0; color: #333; }
+  .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
+             font-size: 0.95rem; }
+  .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
+  .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
+                    text-align: center; height: 0; position: relative; }
+  .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
+                           left: 50%; transform: translateX(-50%);
+                           background: white; padding: 0 0.8rem; color: #888;
+                           font-size: 0.85rem; letter-spacing: 0.1em;
+                           text-transform: uppercase; }
+  dl dt { margin-top: 0.6rem; }
+  dl dd { margin: 0.1rem 0 0.5rem 1.2rem; color: #444; }
+  table { border-collapse: collapse; margin: 0.5rem 0; }
+  th, td { padding: 0.3rem 0.7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #fafafa; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>{{ title }}</h1>
+<p class="stamp">Generated {{ generated_at.strftime("%Y-%m-%d %H:%M:%S %Z").strip() }}</p>
+<div class="headline">{{ interpretation.headline }}</div>
+
+<div class="definition"><strong>What this shows.</strong> {{ definition }}</div>
+
+{# Per-report block: should output the key numbers + chart only. #}
+{% block content %}{% endblock %}
+
+<h2>Key insight</h2>
+<div class="insight">{{ interpretation.key_insight }}</div>
+
+{% if interpretation.next_actions %}
+<h2>Next actions</h2>
+<ol>
+{% for action in interpretation.next_actions %}
+  <li>{{ action }}</li>
+{% endfor %}
+</ol>
+{% endif %}
+
+<hr class="detail-divider">
+
+{# Per-report detail block: input parameters, training, per-PR, etc. #}
+{% block detail %}{% endblock %}
+
+{% if interpretation.caveats %}
+<h2>Caveats</h2>
+<div class="caveats">
+<ul>
+{% for caveat in interpretation.caveats %}
+  <li>{{ caveat }}</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+
+<h2>Reproduce this report</h2>
+<div class="invocation">{{ invocation }}</div>
+
+<details>
+<summary>Vacanti vocabulary used in this report</summary>
+<dl>
+{% for term, defn in vocabulary.items() %}
+  <dt><strong>{{ term }}</strong></dt>
+  <dd>{{ defn }}</dd>
+{% endfor %}
+</dl>
+</details>
+</body>
+</html>
