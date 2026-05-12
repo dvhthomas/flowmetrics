@@ -16,12 +16,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from generate_samples import (
     REPOS,
-    SAMPLES_BEGIN,
-    SAMPLES_END,
     Repo,
     SampleSet,
     build_index_html,
-    rewrite_readme_samples_section,
 )
 
 # ---------------------------------------------------------------------------
@@ -166,37 +163,3 @@ class TestReferenceSection:
             datetime(2026, 5, 12, 14, 30, tzinfo=UTC),
         )
         assert "Reference" in out
-
-
-# ---------------------------------------------------------------------------
-# README rewrite
-# ---------------------------------------------------------------------------
-
-
-class TestRewriteReadmeSamplesSection:
-    def test_inserts_section_between_markers(self):
-        original = (
-            f"# Project\n\nIntro.\n\n{SAMPLES_BEGIN}\nold sample list\n{SAMPLES_END}\n\nTail."
-        )
-        new = rewrite_readme_samples_section(original, "new sample list")
-        assert SAMPLES_BEGIN in new
-        assert SAMPLES_END in new
-        assert "new sample list" in new
-        assert "old sample list" not in new
-        assert "# Project" in new
-        assert "Tail." in new
-
-    def test_raises_if_markers_missing(self):
-        import pytest
-
-        with pytest.raises(ValueError, match="marker"):
-            rewrite_readme_samples_section("README without markers", "new content")
-
-    def test_does_not_eat_surrounding_text(self):
-        original = (
-            f"# Title\n\n{SAMPLES_BEGIN}\nold\n{SAMPLES_END}\n\n## After samples\n\nMore content."
-        )
-        new = rewrite_readme_samples_section(original, "fresh content")
-        assert "## After samples" in new
-        assert "More content." in new
-        assert "# Title" in new

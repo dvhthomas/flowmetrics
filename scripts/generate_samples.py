@@ -1,18 +1,16 @@
 """Generate up-to-date demonstration samples across a curated repo list.
 
-This is the source of truth for the `samples/` directory and the
-README's "Sample output" section. Running it:
+This is the source of truth for the `samples/` directory. Running it:
 
     uv run python scripts/generate_samples.py
 
-makes live GitHub API calls (one cached pull per repo), writes one
-samples-dir per repo with json/text/html for each command, builds a
-`samples/index.html` overview, and rewrites the README between
-`<!-- BEGIN SAMPLES -->` / `<!-- END SAMPLES -->` markers.
+makes live GitHub and Jira API calls (cached on disk), writes one
+samples-dir per repo with json/text/html for each command, and
+rewrites `samples/index.html` — the canonical sample browser
+(linked from README + Pages site root).
 
-The pure helpers (REPOS, build_index_html, rewrite_readme_samples_section)
-are unit-tested. The CLI orchestration is integration-tested by running
-the script.
+The pure helpers (REPOS, build_index_html) are unit-tested. The CLI
+orchestration is integration-tested by running the script.
 """
 
 from __future__ import annotations
@@ -26,11 +24,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
 SAMPLES_DIR = PROJECT_ROOT / "samples"
-README = PROJECT_ROOT / "README.md"
 CACHE_DIR = PROJECT_ROOT / ".cache" / "github"
-
-SAMPLES_BEGIN = "<!-- BEGIN SAMPLES -->"
-SAMPLES_END = "<!-- END SAMPLES -->"
 
 
 # ---------------------------------------------------------------------------
@@ -281,62 +275,6 @@ there):</p>
 
 
 # ---------------------------------------------------------------------------
-# README rewrite
-# ---------------------------------------------------------------------------
-
-
-def rewrite_readme_samples_section(readme_text: str, new_section: str) -> str:
-    if SAMPLES_BEGIN not in readme_text or SAMPLES_END not in readme_text:
-        raise ValueError(f"README missing samples markers ({SAMPLES_BEGIN!r} / {SAMPLES_END!r})")
-    head, rest = readme_text.split(SAMPLES_BEGIN, 1)
-    _, tail = rest.split(SAMPLES_END, 1)
-    return f"{head}{SAMPLES_BEGIN}\n{new_section}\n{SAMPLES_END}{tail}"
-
-
-def _md_links(d: str, name: str, present: bool) -> str:
-    if not present:
-        return "*n/a*"
-    return (
-        f"[html](samples/{d}/{name}.html) · "
-        f"[text](samples/{d}/{name}.txt) · "
-        f"[json](samples/{d}/{name}.json)"
-    )
-
-
-def build_readme_samples_section(sets: list[SampleSet], generated_at: datetime) -> str:
-    lines = [
-        f"*Last generated: {generated_at.strftime('%Y-%m-%d %H:%M %Z').strip()}.*",
-        "",
-        f"{len(sets)} public sources covering a spread of team archetypes "
-        "(GitHub PR data and Apache Jira issue data). Every link below was",
-        "produced by running this tool live and is regenerated every time",
-        "`uv run python scripts/generate_samples.py` runs.",
-        "",
-        "GitHub PRs don't expose a multi-state workflow — CFD shows a "
-        "degenerate two-band (open → merged) view, and Aging uses a "
-        "deliberately simple review-decision lifecycle. See "
-        "[docs/DECISIONS.md #9](docs/DECISIONS.md#9-wip-tracking-source-is-per-system-not-generalized) "
-        "and [#10](docs/DECISIONS.md#10-for-github-only-pull-requests-count-as-work--issues-are-invisible).",
-        "",
-        "| Repo | Archetype | Efficiency | When-done | How-many | CFD | Aging |",
-        "|------|-----------|------------|-----------|----------|-----|-------|",
-    ]
-    for s in sets:
-        d = s.efficiency_html.parent.name
-        lines.append(
-            f"| `{s.repo.slug}` | {s.repo.archetype} "
-            f"| {_md_links(d, 'efficiency-week', True)} "
-            f"| {_md_links(d, 'forecast-when-done', True)} "
-            f"| {_md_links(d, 'forecast-how-many', True)} "
-            f"| {_md_links(d, 'cfd', s.cfd_html is not None)} "
-            f"| {_md_links(d, 'aging', s.aging_html is not None)} |"
-        )
-    lines.append("")
-    lines.append("Full overview: [samples/index.html](samples/index.html).")
-    return "\n".join(lines)
-
-
-# ---------------------------------------------------------------------------
 # Orchestration (live API)
 # ---------------------------------------------------------------------------
 
@@ -493,16 +431,11 @@ def main() -> None:
     if not sets:
         sys.exit("No samples were produced.")
 
-    # Index page
+    # Index page — the canonical browse surface for samples. The README
+    # links to it but doesn't duplicate the per-repo table.
     index_path = SAMPLES_DIR / "index.html"
     index_path.write_text(build_index_html(sets, generated_at), encoding="utf-8")
     print(f"\nWrote {index_path}")
-
-    # README rewrite
-    section = build_readme_samples_section(sets, generated_at)
-    readme_text = README.read_text(encoding="utf-8")
-    README.write_text(rewrite_readme_samples_section(readme_text, section), encoding="utf-8")
-    print(f"Updated {README}")
 
 
 if __name__ == "__main__":
