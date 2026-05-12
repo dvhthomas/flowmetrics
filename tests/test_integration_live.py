@@ -40,7 +40,7 @@ def test_one_day_live_fetch_against_astral_sh_uv(tmp_path):
     assert isinstance(prs, list)
     if prs:
         first = prs[0]
-        assert first.number > 0
+        assert first.item_id > 0
         assert first.merged_at is not None
         assert first.created_at <= first.merged_at
 

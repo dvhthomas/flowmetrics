@@ -12,7 +12,7 @@ import httpx
 from dateutil.parser import isoparse
 
 from .cache import CacheMiss, FileCache
-from .compute import PullRequestEvents
+from .compute import WorkItem
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
@@ -224,12 +224,12 @@ def _is_bot(author: dict[str, Any] | None) -> bool:
     return login.endswith("[bot]")
 
 
-def _pr_node_to_events(node: dict[str, Any]) -> PullRequestEvents | None:
+def _pr_node_to_events(node: dict[str, Any]) -> WorkItem | None:
     if not node.get("mergedAt"):
         return None
     author = node.get("author")
-    return PullRequestEvents(
-        number=node["number"],
+    return WorkItem(
+        item_id=f"#{node['number']}",
         title=node.get("title", ""),
         created_at=_parse_dt(node["createdAt"]),
         merged_at=_parse_dt(node["mergedAt"]),
@@ -246,10 +246,10 @@ def fetch_prs_merged_in_window(
     stop: date,
     *,
     page_size: int = 100,
-) -> list[PullRequestEvents]:
+) -> list[WorkItem]:
     """Fetch every PR merged in [start, stop] (inclusive)."""
     q = f"repo:{repo} is:pr is:merged merged:{start.isoformat()}..{stop.isoformat()}"
-    prs: list[PullRequestEvents] = []
+    prs: list[WorkItem] = []
     after: str | None = None
     while True:
         payload = client.graphql(

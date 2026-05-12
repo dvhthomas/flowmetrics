@@ -2,6 +2,7 @@ from .compute import (
     FlowEfficiency,
     PullRequestEvents,
     WindowResult,
+    WorkItem,
     aggregate,
     compute_pr_flow,
 )
@@ -20,8 +21,11 @@ from .service import (
     DEFAULT_TRAINING_DAYS,
     flowmetrics_for_window,
     historical_throughput_samples,
+    make_github_source,
+    make_jira_source,
     this_week_window,
 )
+from .sources import Source
 from .throughput import daily_throughput
 
 __all__ = [
@@ -32,7 +36,9 @@ __all__ = [
     "FlowEfficiency",
     "PullRequestEvents",
     "ResultsHistogram",
+    "Source",
     "WindowResult",
+    "WorkItem",
     "aggregate",
     "backward_percentile",
     "build_histogram",
@@ -41,6 +47,8 @@ __all__ = [
     "flowmetrics_for_window",
     "forward_percentile",
     "historical_throughput_samples",
+    "make_github_source",
+    "make_jira_source",
     "monte_carlo_how_many",
     "monte_carlo_when_done",
     "this_week_window",

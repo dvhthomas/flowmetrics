@@ -8,7 +8,7 @@ from flowmetrics.throughput import daily_throughput
 
 def pr(number: int, merged_at: datetime) -> PullRequestEvents:
     return PullRequestEvents(
-        number=number,
+        item_id=f"#{number}",
         title=f"PR {number}",
         created_at=merged_at,  # not used by daily_throughput
         merged_at=merged_at,
@@ -52,7 +52,7 @@ class TestDailyThroughput:
 
     def test_unmerged_prs_skipped(self):
         unmerged = PullRequestEvents(
-            number=99,
+            item_id="#99",
             title="open",
             created_at=dt(2026, 5, 4, 9, 0),
             merged_at=None,

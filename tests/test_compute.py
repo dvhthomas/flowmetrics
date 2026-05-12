@@ -23,7 +23,7 @@ def make_pr(
     activity: list[datetime] | None = None,
 ) -> PullRequestEvents:
     return PullRequestEvents(
-        number=number,
+        item_id=f"#{number}",
         title=f"PR #{number}",
         created_at=created,
         merged_at=merged,
@@ -34,7 +34,7 @@ def make_pr(
 class TestComputePrFlow:
     def test_unmerged_pr_is_rejected(self):
         pr = PullRequestEvents(
-            number=1,
+            item_id="#1",
             title="open",
             created_at=ts(2026, 5, 5, 9, 0),
             merged_at=None,
@@ -106,7 +106,7 @@ class TestAggregate:
     def test_aggregate_counts_bot_prs(self):
         prs = [
             PullRequestEvents(
-                number=1,
+                item_id="#1",
                 title="human",
                 created_at=ts(2026, 5, 5, 9, 0),
                 merged_at=ts(2026, 5, 5, 17, 0),
@@ -114,7 +114,7 @@ class TestAggregate:
                 is_bot=False,
             ),
             PullRequestEvents(
-                number=2,
+                item_id="#2",
                 title="bump",
                 created_at=ts(2026, 5, 5, 9, 0),
                 merged_at=ts(2026, 5, 5, 9, 5),
@@ -122,7 +122,7 @@ class TestAggregate:
                 is_bot=True,
             ),
             PullRequestEvents(
-                number=3,
+                item_id="#3",
                 title="bump 2",
                 created_at=ts(2026, 5, 5, 9, 0),
                 merged_at=ts(2026, 5, 5, 9, 5),

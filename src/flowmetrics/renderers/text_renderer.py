@@ -181,7 +181,7 @@ def _render_efficiency(report: EfficiencyReport, console: Console) -> None:
     pr_table.add_column("Title")
     for p in sorted(r.per_pr, key=lambda p: p.efficiency):
         pr_table.add_row(
-            f"#{p.pr_number}",
+            f"{p.item_id}",
             _fmt_duration(p.cycle_time),
             _fmt_duration(p.active_time),
             f"{p.efficiency * 100:.1f}%",

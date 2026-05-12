@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from flowmetrics import flowmetrics_for_window
+from flowmetrics import flowmetrics_for_window, make_github_source
 from flowmetrics.cache import CacheMiss
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "cache"
@@ -31,7 +31,7 @@ STOP = date(2026, 5, 10)
 )
 def test_flowmetrics_for_week_against_recorded_fixture():
     try:
-        result = flowmetrics_for_window(REPO, START, STOP, cache_dir=FIXTURE_DIR, read_only=True)
+        result = flowmetrics_for_window(make_github_source(REPO, cache_dir=FIXTURE_DIR, read_only=True), START, STOP)
     except CacheMiss as exc:
         pytest.fail(f"Fixture cache miss — PR_SEARCH_QUERY changed? Re-record. {exc}")
 

@@ -31,10 +31,10 @@ from flowmetrics.report import (
 )
 
 
-def _eff(pr_number=1, eff=0.5):
+def _eff(item_id="#1", eff=0.5):
     return FlowEfficiency(
-        pr_number=pr_number,
-        title=f"PR {pr_number}",
+        item_id=item_id,
+        title=f"PR {item_id}",
         created_at=datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
         merged_at=datetime(2026, 5, 5, 17, 0, tzinfo=UTC),
         cycle_time=timedelta(hours=8),

@@ -52,8 +52,11 @@ from .service import (
     DEFAULT_TRAINING_DAYS,
     flowmetrics_for_window,
     historical_throughput_samples,
+    make_github_source,
+    make_jira_source,
     this_week_window,
 )
+from .sources import Source
 
 
 def _parse_date(value: str) -> date:
@@ -82,6 +85,64 @@ _VERBOSE_OPTION = click.option(
     help="With --format text, print the full report (tables, interpretation, "
     "detail, vocabulary). Default text output is a one-line headline.",
 )
+
+_SOURCE_OPTIONS = [
+    click.option(
+        "--repo", default=None,
+        help="GitHub repo as owner/name (e.g. astral-sh/uv). "
+        "Mutually exclusive with --jira-url/--jira-project.",
+    ),
+    click.option(
+        "--jira-url", default=None,
+        help="Jira base URL (e.g. https://issues.apache.org/jira). "
+        "Used together with --jira-project.",
+    ),
+    click.option(
+        "--jira-project", default=None,
+        help="Jira project key (e.g. BIGTOP). Used together with --jira-url.",
+    ),
+]
+
+
+def _apply_source_options(f):
+    for decorator in reversed(_SOURCE_OPTIONS):
+        f = decorator(f)
+    return f
+
+
+def _build_source(
+    *,
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
+    cache_dir: Path,
+    offline: bool,
+) -> Source:
+    """Pick the source backend from whichever flag set the user provided.
+
+    `--repo` ⇒ GitHub. `--jira-url` + `--jira-project` ⇒ Jira. Mutually
+    exclusive; exactly one set must be present.
+    """
+    have_github = bool(repo)
+    have_jira = bool(jira_url or jira_project)
+    if have_github and have_jira:
+        raise click.UsageError(
+            "Pass either --repo (GitHub) or --jira-url + --jira-project (Jira), not both."
+        )
+    if have_github:
+        return make_github_source(repo, cache_dir=cache_dir, read_only=offline)
+    if have_jira:
+        if not (jira_url and jira_project):
+            raise click.UsageError(
+                "Jira needs both --jira-url AND --jira-project."
+            )
+        return make_jira_source(
+            jira_url, jira_project, cache_dir=cache_dir, read_only=offline
+        )
+    raise click.UsageError(
+        "No source specified. Pass --repo OWNER/NAME (GitHub) "
+        "or --jira-url URL + --jira-project KEY (Jira)."
+    )
 
 
 def _dispatch(
@@ -163,7 +224,7 @@ def efficiency() -> None:
 
 
 @efficiency.command()
-@click.option("--repo", required=True, help="GitHub repo as owner/name.")
+@_apply_source_options
 @click.option(
     "--start",
     type=str,
@@ -182,7 +243,7 @@ def efficiency() -> None:
 @click.option(
     "--offline/--online",
     default=False,
-    help="Offline reads cache only; online hits GitHub on cache miss.",
+    help="Offline reads cache only; online hits the source API on cache miss.",
 )
 @click.option(
     "--gap-hours", type=float, default=DEFAULT_GAP.total_seconds() / 3600, show_default=True
@@ -197,7 +258,10 @@ def efficiency() -> None:
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
 def week(
-    repo: str,
+
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
     start: str | None,
     stop: str | None,
     cache_dir: Path,
@@ -219,18 +283,20 @@ def week(
     else:
         raise click.UsageError("Provide both --start and --stop, or neither.")
 
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline,
+    )
+
     def build() -> EfficiencyReport:
         result: WindowResult = flowmetrics_for_window(
-            repo,
-            start_d,
-            stop_d,
-            cache_dir=cache_dir,
-            read_only=offline,
+            src, start_d, stop_d,
             gap=timedelta(hours=gap_hours),
             min_cluster=timedelta(minutes=min_cluster_minutes),
         )
         input_ = EfficiencyInput(
-            repo=repo,
+            repo=src.label,
             start=start_d,
             stop=stop_d,
             gap_hours=gap_hours,
@@ -294,26 +360,19 @@ def _apply_history_options(f: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def _resolve_history(
-    repo: str,
+    src: Source,
     history_start: str | None,
     history_end: str | None,
-    cache_dir: Path,
-    offline: bool,
 ) -> tuple[list[int], date, date]:
     start_date = _parse_date(history_start) if history_start else None
     end_date = _parse_date(history_end) if history_end else None
-    samples, start, end = historical_throughput_samples(
-        repo,
-        start_date=start_date,
-        end_date=end_date,
-        cache_dir=cache_dir,
-        read_only=offline,
+    return historical_throughput_samples(
+        src, start_date=start_date, end_date=end_date
     )
-    return samples, start, end
 
 
 @forecast.command("when-done")
-@click.option("--repo", required=True, help="GitHub repo as owner/name.")
+@_apply_source_options
 @click.option(
     "--items",
     "items",
@@ -331,7 +390,10 @@ def _resolve_history(
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
 def forecast_when_done(
-    repo: str,
+
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
     items: int,
     start_date: str | None,
     history_start: str | None,
@@ -350,13 +412,17 @@ def forecast_when_done(
     --format json (schema: flowmetrics.forecast.when_done.v1).
     """
 
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline,
+    )
+
     def build() -> WhenDoneReport:
-        samples, train_start, train_end = _resolve_history(
-            repo, history_start, history_end, cache_dir, offline
-        )
+        samples, train_start, train_end = _resolve_history(src, history_start, history_end)
         if sum(samples) == 0:
             raise RuntimeError(
-                f"No merges in training window {train_start}→{train_end}; cannot forecast."
+                f"No completed items in training window {train_start}→{train_end}; cannot forecast."
             )
         start = _parse_date(start_date) if start_date else date.today()
         rng = Random(seed) if seed is not None else Random()
@@ -365,7 +431,7 @@ def forecast_when_done(
         percentiles = {p: forward_percentile(hist, p) for p in (50, 70, 85, 95)}
 
         input_ = WhenDoneInput(
-            repo=repo,
+            repo=src.label,
             items=items,
             start_date=start,
             history_start=train_start,
@@ -386,7 +452,7 @@ def forecast_when_done(
 
 
 @forecast.command("how-many")
-@click.option("--repo", required=True)
+@_apply_source_options
 @click.option("--target-date", type=str, required=True)
 @click.option("--start-date", type=str, default=None)
 @_apply_history_options
@@ -394,7 +460,10 @@ def forecast_when_done(
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
 def forecast_how_many(
-    repo: str,
+
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
     target_date: str,
     start_date: str | None,
     history_start: str | None,
@@ -413,13 +482,17 @@ def forecast_how_many(
     --format json (schema: flowmetrics.forecast.how_many.v1).
     """
 
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline,
+    )
+
     def build() -> HowManyReport:
-        samples, train_start, train_end = _resolve_history(
-            repo, history_start, history_end, cache_dir, offline
-        )
+        samples, train_start, train_end = _resolve_history(src, history_start, history_end)
         if sum(samples) == 0:
             raise RuntimeError(
-                f"No merges in training window {train_start}→{train_end}; cannot forecast."
+                f"No completed items in training window {train_start}→{train_end}; cannot forecast."
             )
         start = _parse_date(start_date) if start_date else date.today()
         end = _parse_date(target_date)
@@ -429,7 +502,7 @@ def forecast_how_many(
         percentiles = {p: backward_percentile(hist, p) for p in (50, 70, 85, 95)}
 
         input_ = HowManyInput(
-            repo=repo,
+            repo=src.label,
             start_date=start,
             target_date=end,
             history_start=train_start,

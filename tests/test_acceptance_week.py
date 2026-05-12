@@ -12,7 +12,7 @@ from datetime import date
 
 import pytest
 
-from flowmetrics import flowmetrics_for_window, this_week_window
+from flowmetrics import flowmetrics_for_window, make_github_source, this_week_window
 from flowmetrics.cache import CacheMiss, FileCache
 from flowmetrics.github import PR_SEARCH_QUERY
 
@@ -140,7 +140,7 @@ class TestFlowEfficiencyForWindow:
         }
         _seed_cache(tmp_path, response)
 
-        result = flowmetrics_for_window(REPO, START, STOP, cache_dir=tmp_path, read_only=True)
+        result = flowmetrics_for_window(make_github_source(REPO, cache_dir=tmp_path, read_only=True), START, STOP)
 
         assert result.pr_count == 3
         # Vacanti's framing: portfolio efficiency is sum(active)/sum(cycle),
@@ -148,25 +148,23 @@ class TestFlowEfficiencyForWindow:
         # cycle time. We expect a single-digit-percent result.
         assert 0.0 < result.portfolio_efficiency < 0.20
         # The fast PR (#101) should be at or near 1.0
-        fast = next(p for p in result.per_pr if p.pr_number == 101)
+        fast = next(p for p in result.per_pr if p.item_id == "#101")
         assert fast.efficiency == pytest.approx(1.0)
         # The slow PR (#102) should be well under 5%
-        slow = next(p for p in result.per_pr if p.pr_number == 102)
+        slow = next(p for p in result.per_pr if p.item_id == "#102")
         assert slow.efficiency < 0.05
 
     def test_offline_with_no_cache_fails_loudly(self, tmp_path):
         # No cache primed, read_only=True → CacheMiss surfaces.
         with pytest.raises(CacheMiss):
-            flowmetrics_for_window(REPO, START, STOP, cache_dir=tmp_path, read_only=True)
+            flowmetrics_for_window(make_github_source(REPO, cache_dir=tmp_path, read_only=True), START, STOP)
 
     def test_invalid_window_is_rejected(self, tmp_path):
         with pytest.raises(ValueError):
             flowmetrics_for_window(
-                REPO,
+                make_github_source(REPO, cache_dir=tmp_path, read_only=True),
                 date(2026, 5, 10),
                 date(2026, 5, 4),
-                cache_dir=tmp_path,
-                read_only=True,
             )
 
     def test_zero_prs_in_window_returns_empty_result(self, tmp_path):
@@ -187,6 +185,6 @@ class TestFlowEfficiencyForWindow:
         }
         _seed_cache(tmp_path, response)
 
-        result = flowmetrics_for_window(REPO, START, STOP, cache_dir=tmp_path, read_only=True)
+        result = flowmetrics_for_window(make_github_source(REPO, cache_dir=tmp_path, read_only=True), START, STOP)
         assert result.pr_count == 0
         assert result.portfolio_efficiency == 0.0

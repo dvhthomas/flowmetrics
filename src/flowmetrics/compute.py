@@ -9,8 +9,13 @@ from .cluster import cluster_activity
 
 
 @dataclass(frozen=True)
-class PullRequestEvents:
-    number: int
+class WorkItem:
+    """One completed unit of work — a merged PR (GitHub), a resolved
+    issue (Jira), etc. `item_id` is the source's display form:
+    `"#42"` for GitHub PRs, `"BIGTOP-4525"` for Jira issues.
+    """
+
+    item_id: str
     title: str
     created_at: datetime
     merged_at: datetime | None
@@ -19,9 +24,13 @@ class PullRequestEvents:
     author_login: str | None = None
 
 
+# Backwards-compat alias — was named for the GitHub-only era.
+PullRequestEvents = WorkItem
+
+
 @dataclass(frozen=True)
 class FlowEfficiency:
-    pr_number: int
+    item_id: str
     title: str
     created_at: datetime
     merged_at: datetime
@@ -55,7 +64,7 @@ def compute_pr_flow(
     min_cluster: timedelta,
 ) -> FlowEfficiency:
     if pr.merged_at is None:
-        raise ValueError(f"PR #{pr.number} is not merged; cannot compute flow")
+        raise ValueError(f"Item {pr.item_id} is not merged; cannot compute flow")
 
     cycle = pr.merged_at - pr.created_at
 
@@ -76,7 +85,7 @@ def compute_pr_flow(
     )
 
     return FlowEfficiency(
-        pr_number=pr.number,
+        item_id=pr.item_id,
         title=pr.title,
         created_at=pr.created_at,
         merged_at=pr.merged_at,

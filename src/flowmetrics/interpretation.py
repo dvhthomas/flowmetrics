@@ -49,7 +49,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
         bot_suffix = f" ({result.human_pr_count} human, {result.bot_pr_count} bot)"
     headline = (
         f"Portfolio flow efficiency for {input.repo} {input.start}→{input.stop}: "
-        f"{_pct(portfolio)} across {result.pr_count} merged PRs{bot_suffix}."
+        f"{_pct(portfolio)} across {result.pr_count} completed items{bot_suffix}."
     )
 
     slowest = max(result.per_pr, key=lambda p: p.cycle_time)
@@ -57,7 +57,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
     if portfolio < 0.10:
         key_insight = (
             f"This is in Vacanti's typical 5-15% range for knowledge work — most clock time "
-            f"is wait, not active. Slowest PR (#{slowest.pr_number}) ran "
+            f"is wait, not active. Slowest PR ({slowest.item_id})  ran "
             f"{slowest.cycle_time.total_seconds() / 86400:.1f}d and dominates the ratio."
         )
     elif portfolio < 0.25:
@@ -81,7 +81,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
         reverse=True,
     )[:3]
     if long_runners:
-        ids = ", ".join(f"#{p.pr_number}" for p in long_runners)
+        ids = ", ".join(f"{p.item_id}" for p in long_runners)
         next_actions.append(
             f"Inspect the three slowest PRs ({ids}) — they likely sat in review queue."
         )
@@ -147,7 +147,7 @@ def interpret_when_done(
     caveats = [
         "Assumes the next weeks will look like the recent past — no regime change.",
         "Zero-merge days are included as real samples; bad days happen in the simulator.",
-        "Throughput unit is 'merged PRs', not 'features' — works only if PR size is stable.",
+        "Throughput unit is 'completed items', not 'features' — works only if item size is stable.",
     ]
 
     return Interpretation(
@@ -198,7 +198,7 @@ def interpret_how_many(
 
     caveats = [
         "Confidence reads BACKWARD: higher % means FEWER items, not more.",
-        "Throughput unit is 'merged PRs' — assumes PR size is stable across windows.",
+        "Throughput unit is 'completed items' — assumes item size is stable across windows.",
         "No accounting for known disruptions (holidays, on-call rotations, launches).",
     ]
 

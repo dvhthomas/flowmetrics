@@ -45,7 +45,7 @@ def _interp():
 
 def _efficiency_report() -> EfficiencyReport:
     pr = FlowEfficiency(
-        pr_number=42,
+        item_id="#42",
         title="Fix bug",
         created_at=datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
         merged_at=datetime(2026, 5, 5, 17, 0, tzinfo=UTC),
@@ -219,7 +219,7 @@ class TestEfficiencyJson:
     def test_chart_data_has_per_pr_efficiency(self):
         payload = json.loads(json_renderer.render(_efficiency_report()))
         assert "per_pr_efficiency" in payload["chart_data"]
-        assert payload["chart_data"]["per_pr_efficiency"][0]["pr_number"] == 42
+        assert payload["chart_data"]["per_pr_efficiency"][0]["item_id"] == "#42"
 
     def test_interpretation_promoted_to_top_level(self):
         """Headline + insight + actions are now top-level for agent access."""

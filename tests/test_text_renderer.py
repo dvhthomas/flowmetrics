@@ -35,7 +35,7 @@ def _interp():
 
 def _efficiency_report() -> EfficiencyReport:
     pr = FlowEfficiency(
-        pr_number=99,
+        item_id="#99",
         title="Slow PR",
         created_at=datetime(2026, 5, 4, 9, 0, tzinfo=UTC),
         merged_at=datetime(2026, 5, 10, 9, 0, tzinfo=UTC),

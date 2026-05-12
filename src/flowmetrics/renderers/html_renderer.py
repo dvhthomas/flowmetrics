@@ -113,7 +113,7 @@ def _chart_per_pr(report: EfficiencyReport) -> str:
 
     per = sorted(report.result.per_pr, key=lambda p: p.efficiency)
     fig, ax = plt.subplots(figsize=(9, max(2.5, len(per) * 0.25)))
-    labels = [f"#{p.pr_number}" for p in per]
+    labels = [f"{p.item_id}" for p in per]
     values = [p.efficiency * 100 for p in per]
 
     def _color(v: float, is_bot: bool) -> str:

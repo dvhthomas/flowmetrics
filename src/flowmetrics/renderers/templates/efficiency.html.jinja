@@ -73,7 +73,7 @@ what a typical PR looks like in isolation but doesn't reflect the system.
 <tbody>
 {% for p in per_pr_sorted %}
   <tr>
-    <td>#{{ p.pr_number }}</td>
+    <td>{{ p.item_id }}</td>
     <td class="num">{{ fmt_duration(p.cycle_time) }}</td>
     <td class="num">{{ fmt_duration(p.active_time) }}</td>
     <td class="num">{{ "%.1f"|format(p.efficiency * 100) }}%</td>

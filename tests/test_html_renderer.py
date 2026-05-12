@@ -43,7 +43,7 @@ def _interp():
 
 def _efficiency_report() -> EfficiencyReport:
     pr = FlowEfficiency(
-        pr_number=42,
+        item_id="#42",
         title="Test PR",
         created_at=datetime(2026, 5, 4, 9, 0, tzinfo=UTC),
         merged_at=datetime(2026, 5, 10, 9, 0, tzinfo=UTC),

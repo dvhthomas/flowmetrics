@@ -79,9 +79,9 @@ class TestBotDetection:
         )
         client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
         prs = fetch_prs_merged_in_window(client, "x/y", start, stop)
-        by_number = {p.number: p for p in prs}
-        assert by_number[1].is_bot is False
-        assert by_number[2].is_bot is True
+        by_number = {p.item_id: p for p in prs}
+        assert by_number["#1"].is_bot is False
+        assert by_number["#2"].is_bot is True
 
     def test_login_ending_in_bot_marks_pr_as_bot(self, tmp_path):
         cache = FileCache(tmp_path)
@@ -238,7 +238,7 @@ class TestFetchPrsMergedInWindow:
 
         assert len(prs) == 1
         pr = prs[0]
-        assert pr.number == 5500
+        assert pr.item_id == "#5500"
         assert pr.title == "Fix something"
         assert pr.created_at == dt(2026, 5, 5, 9, 0)
         assert pr.merged_at == dt(2026, 5, 5, 17, 0)

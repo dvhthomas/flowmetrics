@@ -114,14 +114,14 @@ def _render_efficiency(report: EfficiencyReport) -> dict[str, Any]:
         # ── Detail ──────────────────────────────────────────────────────
         "chart_data": {
             "per_pr_efficiency": [
-                {"pr_number": p.pr_number, "efficiency": p.efficiency} for p in r.per_pr
+                {"item_id": p.item_id, "efficiency": p.efficiency} for p in r.per_pr
             ],
         },
         "input": _encode(asdict(report.input)),
         "result": {
             "per_pr": [
                 {
-                    "pr_number": p.pr_number,
+                    "item_id": p.item_id,
                     "title": p.title,
                     "created_at": p.created_at.isoformat(),
                     "merged_at": p.merged_at.isoformat(),

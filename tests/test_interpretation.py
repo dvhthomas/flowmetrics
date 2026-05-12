@@ -49,7 +49,7 @@ def _eff_input(repo="acme/widget"):
 
 def _pr(n: int, cycle_hours: float, eff: float) -> FlowEfficiency:
     return FlowEfficiency(
-        pr_number=n,
+        item_id=f"#{n}",
         title=f"PR {n}",
         created_at=datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
         merged_at=datetime(2026, 5, 5, 9, 0, tzinfo=UTC) + timedelta(hours=cycle_hours),

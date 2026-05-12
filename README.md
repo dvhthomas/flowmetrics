@@ -1,10 +1,20 @@
 # flowmetrics
 
-Vacanti-style flow metrics from GitHub PR data: portfolio flow efficiency,
-plus Monte Carlo forecasting for both *"when will it be done?"* and
-*"how many items by this date?"*. Output is renderable as agent-readable
-JSON, human-readable terminal text (rich tables), or single-file HTML
-reports with embedded charts.
+Vacanti-style flow metrics from **GitHub PR data or Jira issue data**:
+portfolio flow efficiency, plus Monte Carlo forecasting for both
+*"when will it be done?"* and *"how many items by this date?"*. Output
+is renderable as agent-readable JSON, human-readable terminal text
+(rich tables), or single-file HTML reports with embedded charts.
+
+```
+# GitHub (default)
+uv run flow efficiency week --repo astral-sh/uv
+
+# Jira (Apache ASF Jira works anonymously)
+uv run flow efficiency week --source jira \
+    --jira-url https://issues.apache.org/jira --jira-project BIGTOP \
+    --start 2026-05-01 --stop 2026-05-10
+```
 
 ## What it measures
 
