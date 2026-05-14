@@ -1,14 +1,40 @@
 {% extends "base.html.jinja" %}
 
-{# ── Above the fold: actionable slowest-PR list + chart ───────────────── #}
+{% block subtitle %}
+<p class="subtitle">
+  for
+  {%- if repo_url %} <a href="{{ repo_url }}">{{ report.input.repo }}</a>
+  {%- else %} {{ report.input.repo }}
+  {%- endif %} ·
+  {{ report.input.start }} → {{ report.input.stop }} ·
+  <span class="stamp">generated {{ generated_at.strftime("%Y-%m-%d %H:%M %Z").strip() }}</span>
+</p>
+{% endblock %}
+
+{# Suppress auto-rendered base sections — they fold into collapsibles below. #}
+{% block key_insight %}{% endblock %}
+{% block next_actions %}{% endblock %}
+{% block caveats %}{% endblock %}
+{% block reproduce %}{% endblock %}
+{% block vocabulary %}{% endblock %}
+
 {% block content %}
 {% if report.result.pr_count == 0 %}
 <p>No PRs merged in this window.</p>
 {% else %}
 
-{# Top slowest PRs — Vacanti's "long-running PRs dominate the portfolio
-   FE" made actionable: name the ones the team should look at first.
-   Linked to the underlying PR when a URL is constructible. #}
+{# Headline numbers (plain prose, no colored box). #}
+<p style="font-size:1.05rem;">
+<strong>Portfolio FE: {{ "%.1f"|format(report.result.portfolio_efficiency * 100) }}%</strong>
+across {{ report.result.pr_count }} PRs
+{%- if report.result.bot_pr_count %}
+ ({{ report.result.human_pr_count }} human, {{ report.result.bot_pr_count }} bot)
+{%- endif -%}.
+{{ fmt_duration(report.result.total_cycle) }} cycle,
+{{ fmt_duration(report.result.total_active) }} active.
+</p>
+
+{# Top slowest PRs — the system bottleneck. #}
 <h2>Top slowest PRs</h2>
 <p style="font-size:0.9rem; color:#666; max-width:60ch">
 These PRs drove the portfolio's cycle-time tail. Improving any one of
@@ -25,22 +51,13 @@ them moves the portfolio number more than improving a typical PR.
       {%- endif -%}
     </span>
     <span class="age">{{ fmt_duration(p.cycle_time) }}</span>
-    <span class="state">FE {{ "%.1f"|format(p.efficiency * 100) }}%</span>
+    <span class="state"><span class="pill">FE {{ "%.1f"|format(p.efficiency * 100) }}%</span></span>
     <span class="title">{{ p.title[:90] }}</span>
   </div>
 {% endfor %}
 </div>
 
 <img alt="Per-PR flow efficiency" src="data:image/png;base64,{{ chart_per_pr_b64 }}" />
-
-<p style="font-size:0.85rem; color:#666">
-Totals: {{ fmt_duration(report.result.total_cycle) }} cycle,
-{{ fmt_duration(report.result.total_active) }} active across
-{{ report.result.pr_count }} PRs
-{%- if report.result.bot_pr_count %}
- ({{ report.result.human_pr_count }} human, {{ report.result.bot_pr_count }} bot)
-{%- endif -%}.
-</p>
 
 <p style="font-size:0.9rem; color:#666; max-width:60ch">
 <strong>Why are so many PRs at 100%?</strong>
@@ -54,38 +71,8 @@ above, not in the 100%-bar tail.
 {% endif %}
 {% endblock %}
 
-{# ── Below the fold: input parameters + per-PR detail ─────────────────── #}
 {% block detail %}
-<h2>Input parameters</h2>
-<table>
-  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
-  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }}</td></tr>
-</table>
-
-<p style="font-size:0.95rem; color:#444">
-<strong>How active time was calculated.</strong>
-We grouped each PR's events (commits, reviews, comments) into work sessions:
-events more than <strong>{{ report.input.gap_hours }} hours</strong> apart start a new
-session, and a single isolated event counts as at least
-<strong>{{ report.input.min_cluster_minutes }} minutes</strong> of active time (so a
-lone comment isn't counted as zero work).
-</p>
-
 {% if report.result.pr_count > 0 %}
-<details>
-<summary>Per-PR distribution (median / mean)</summary>
-<p>
-These are reported because people ask for them, but the
-<strong>portfolio</strong> number above is the right one. Mean of per-PR
-ratios is inflated by a long tail of tiny fast PRs; median tells you
-what a typical PR looks like in isolation but doesn't reflect the system.
-</p>
-<table>
-  <tr><th>Median per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.median_efficiency * 100) }}%</td></tr>
-  <tr><th>Mean per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.mean_efficiency * 100) }}%</td></tr>
-</table>
-</details>
-
 <details>
 <summary>Show all {{ per_pr_sorted|length }} PRs (slowest first)</summary>
 <table>
@@ -110,4 +97,69 @@ what a typical PR looks like in isolation but doesn't reflect the system.
 </table>
 </details>
 {% endif %}
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
+  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }}</td></tr>
+  <tr><th>Active-time gap</th><td>{{ report.input.gap_hours }}h</td></tr>
+  <tr><th>Min cluster</th><td>{{ report.input.min_cluster_minutes }}min</td></tr>
+</table>
+<div class="invocation">{{ invocation }}</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> {{ definition }}</p>
+
+<p><strong>How active time was calculated.</strong>
+We grouped each PR's events (commits, reviews, comments) into work sessions:
+events more than <strong>{{ report.input.gap_hours }} hours</strong> apart start a new
+session, and a single isolated event counts as at least
+<strong>{{ report.input.min_cluster_minutes }} minutes</strong> of active time (so a
+lone comment isn't counted as zero work).</p>
+
+{% if report.result.pr_count > 0 %}
+<p><strong>Per-PR distribution (median / mean).</strong>
+Reported because people ask for them, but the <strong>portfolio</strong>
+number above is the right one. Mean of per-PR ratios is inflated by a
+long tail of tiny fast PRs; median tells you what a typical PR looks
+like in isolation but doesn't reflect the system.</p>
+<table>
+  <tr><th>Median per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.median_efficiency * 100) }}%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">{{ "%.1f"|format(report.result.mean_efficiency * 100) }}%</td></tr>
+</table>
+{% endif %}
+
+{% if interpretation.key_insight %}
+<p><strong>Key insight.</strong> {{ interpretation.key_insight }}</p>
+{% endif %}
+
+{% if interpretation.next_actions %}
+<p><strong>Next actions</strong></p>
+<ol style="font-size:0.95rem;">
+{% for action in interpretation.next_actions %}
+  <li>{{ action }}</li>
+{% endfor %}
+</ol>
+{% endif %}
+
+{% if interpretation.caveats %}
+<p><strong>Caveats</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+{% for c in interpretation.caveats %}
+  <li>{{ c }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+{% for term, defn in vocabulary.items() %}
+  <dt><strong>{{ term }}</strong></dt>
+  <dd>{{ defn }}</dd>
+{% endfor %}
+</dl>
+</details>
 {% endblock %}

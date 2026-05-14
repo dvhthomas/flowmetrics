@@ -164,21 +164,17 @@ class TestEfficiencyHtml:
         assert "--repo acme/widget" in out
 
     def test_actionable_content_comes_before_detail(self):
-        """Top-of-page: answer + key insight + chart + next actions.
-        Bottom-of-page: input params, reproduce command, caveats, per-PR list."""
+        """Top-of-page: portfolio number + slowest PRs + chart.
+        Bottom-of-page (collapsed): per-PR list, reproduce, about."""
         out = html_renderer.render(_efficiency_report())
-        i_key_insight = out.index("Key insight")
-        i_next_actions = out.index("Next actions") if "Next actions" in out else len(out)
-        i_input = out.index("Input")
-        i_reproduce = out.index("Reproduce")
-        i_caveats = out.index("Caveats")
-        # The actionable block sits above the detail block
-        assert i_key_insight < i_input
-        assert i_key_insight < i_reproduce
-        assert i_key_insight < i_caveats
-        # The chart and next actions also sit above detail
-        if i_next_actions < len(out):
-            assert i_next_actions < i_input
+        i_portfolio = out.index("Portfolio FE")
+        i_slowest = out.index("Top slowest")
+        i_reproduce = out.index("Reproduce this report")
+        i_about = out.index("About this report")
+        # Actionable content sits above the bottom collapsibles.
+        assert i_portfolio < i_reproduce
+        assert i_slowest < i_reproduce
+        assert i_slowest < i_about
 
     def test_has_definition_explaining_what_the_chart_shows(self):
         """Every report includes a short 'what this shows' line so the
@@ -218,10 +214,41 @@ def _cfd_report(*, start_wip: int = 5, end_wip: int = 15) -> CfdReport:
 
 
 class TestCfdHtmlRedesign:
-    """Tufte cleanup: 'Headline numbers' table removed (workflow + window
-    + arrivals/departures are already on the chart and in the headline).
-    A WIP-trend indicator is added — the actionable read: is the queue
-    growing or shrinking over the window?"""
+    """Tufte cleanup brought to Aging-redesign parity:
+    - Title is "Cumulative Flow Diagram" (the metric); repo subtitled.
+    - 'Headline numbers' table removed.
+    - WIP-trend banner remains (conditional, the actionable signal).
+    - Auto-rendered Key insight / Next actions / Caveats / Reproduce /
+      Vocabulary are folded into Reproduce + About collapsibles."""
+
+    def test_title_is_the_metric_not_the_program_label(self):
+        out = html_renderer.render(_cfd_report())
+        h1 = re.search(r"<h1>([^<]+)</h1>", out)
+        assert h1 is not None
+        assert "Cumulative Flow" in h1.group(1)
+        assert "flowmetrics" not in h1.group(1).lower()
+
+    def test_no_key_insight_section_at_top_level(self):
+        out = html_renderer.render(_cfd_report())
+        assert "<h2>Key insight</h2>" not in out
+
+    def test_no_top_level_caveats_section(self):
+        out = html_renderer.render(_cfd_report())
+        assert "<h2>Caveats</h2>" not in out
+
+    def test_reproduce_in_its_own_collapsible(self):
+        out = html_renderer.render(_cfd_report())
+        assert "<summary>Reproduce this report</summary>" in out
+        assert "<h2>Reproduce this report</h2>" not in out
+
+    def test_about_collapsible_present(self):
+        out = html_renderer.render(_cfd_report())
+        assert "<summary>About this report</summary>" in out
+
+    def test_workflow_states_render_as_pills_in_reproduce_block(self):
+        out = html_renderer.render(_cfd_report())
+        # Workflow states surfaced as pill spans, like Aging.
+        assert 'class="pill">A<' in out or 'class="pill">Done<' in out
 
     def test_headline_numbers_table_removed(self):
         out = html_renderer.render(_cfd_report())
@@ -229,19 +256,68 @@ class TestCfdHtmlRedesign:
 
     def test_wip_trend_indicator_present(self):
         out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
-        # Trend is "widening" when end > start.
         assert "widening" in out.lower() or "growing" in out.lower()
 
     def test_wip_trend_indicator_shows_narrowing_when_wip_drops(self):
         out = html_renderer.render(_cfd_report(start_wip=20, end_wip=5))
-        # Wider start, narrower end → narrowing/shrinking.
         assert "narrow" in out.lower() or "shrink" in out.lower()
 
 
 class TestEfficiencyHtmlRedesign:
-    """Tufte cleanup: redundant 'Headline numbers' table removed (FE %
-    is already in the headline). Slowest-PRs actionable panel added —
-    the system bottleneck PRs the team should look at."""
+    """Tufte cleanup, brought to parity with the Aging redesign:
+    - Title is the metric name ("Flow Efficiency"), not the system
+      label "flowmetrics — efficiency …".
+    - Subtitle carries repo + window + generated stamp on one line.
+    - The auto-rendered "Key insight" yellow box, top-level "Next
+      actions" list, top-level "Caveats" grey box, and standalone
+      "Reproduce this report" header are all suppressed — folded into
+      a Reproduce-collapsible and an About-collapsible at the bottom.
+    - "Top slowest PRs" panel stays (the actionable list).
+    """
+
+    def test_title_is_the_metric_not_the_program_label(self):
+        out = html_renderer.render(_efficiency_report())
+        m = re.search(r"<title>([^<]+)</title>", out)
+        assert m is not None
+        assert "flowmetrics" not in m.group(1).lower()
+        h1 = re.search(r"<h1>([^<]+)</h1>", out)
+        assert h1 is not None
+        assert "Flow efficiency" in h1.group(1)
+
+    def test_repo_appears_as_subtitle_link(self):
+        out = html_renderer.render(_efficiency_report())
+        # GitHub-style repo → clickable subtitle.
+        assert 'href="https://github.com/acme/widget"' in out
+        # Window dates surface in the subtitle context too.
+        assert "2026-05-04" in out or "May 4" in out
+
+    def test_no_key_insight_section_at_top_level(self):
+        """The yellow Key insight box is suppressed; the slowest-PRs
+        panel + portfolio FE in the headline carry the signal."""
+        out = html_renderer.render(_efficiency_report())
+        assert "<h2>Key insight</h2>" not in out
+
+    def test_no_top_level_caveats_section(self):
+        """Caveats fold into the About details collapsible at the
+        bottom — not a top-level H2."""
+        out = html_renderer.render(_efficiency_report())
+        assert "<h2>Caveats</h2>" not in out
+
+    def test_reproduce_in_its_own_collapsible(self):
+        out = html_renderer.render(_efficiency_report())
+        assert "<summary>Reproduce this report</summary>" in out
+        # And no longer at top level.
+        assert "<h2>Reproduce this report</h2>" not in out
+
+    def test_about_collapsible_carries_definition_and_vocabulary(self):
+        out = html_renderer.render(_efficiency_report())
+        assert "<summary>About this report</summary>" in out
+        about_idx = out.index("<summary>About this report</summary>")
+        about_end = out.index("</details>", about_idx)
+        about = out[about_idx:about_end]
+        assert "What this shows" in about
+        # Vocab terms live here too (lowercase per the vocabulary dict).
+        assert "Cycle time" in about or "Active time" in about or "Flow efficiency" in about
 
     def test_headline_numbers_table_removed(self):
         out = html_renderer.render(_efficiency_report())
@@ -250,19 +326,58 @@ class TestEfficiencyHtmlRedesign:
     def test_slowest_prs_panel_present_with_named_items(self):
         """The slowest PRs are the system-level bottleneck per Vacanti's
         'long-running PRs dominate the portfolio FE' — naming them is
-        the actionable signal. Distinct from the collapsed full-PR
-        table; this panel sits above the fold with named items."""
+        the actionable signal."""
         out = html_renderer.render(_efficiency_report())
-        # New section header — distinct from "Show all PRs (slowest first)".
         assert "Top slowest" in out
-        # The specific PR ID from the fixture must appear.
         assert "#42" in out
 
-    def test_slowest_prs_panel_appears_before_detail_section(self):
-        out = html_renderer.render(_efficiency_report())
-        i_panel = out.index("Top slowest")
-        i_detail = out.index("Input parameters")
-        assert i_panel < i_detail
+
+class TestForecastHtmlRedesign:
+    """Tufte parity for when-done + how-many forecast reports:
+    - Title is the question, not the program label.
+    - Subtitle is one line with repo + window + stamp.
+    - Horizon traffic-light banner stays (conditional, the actionable
+      signal-quality indicator).
+    - Auto-rendered Key insight / Next actions / Caveats / Reproduce /
+      Vocabulary fold into collapsed details at the bottom."""
+
+    def test_when_done_title_is_the_question_not_the_program_label(self):
+        out = html_renderer.render(_when_done_report())
+        h1 = re.search(r"<h1>([^<]+)</h1>", out)
+        assert h1 is not None
+        assert "flowmetrics" not in h1.group(1).lower()
+        # Title reads as a question.
+        assert "When will it be done" in h1.group(1)
+
+    def test_how_many_title_is_the_question(self):
+        out = html_renderer.render(_how_many_report())
+        h1 = re.search(r"<h1>([^<]+)</h1>", out)
+        assert h1 is not None
+        assert "flowmetrics" not in h1.group(1).lower()
+        assert "How many" in h1.group(1)
+
+    def test_when_done_no_key_insight_section_at_top_level(self):
+        out = html_renderer.render(_when_done_report())
+        assert "<h2>Key insight</h2>" not in out
+
+    def test_how_many_no_top_level_caveats_section(self):
+        out = html_renderer.render(_how_many_report())
+        assert "<h2>Caveats</h2>" not in out
+
+    def test_when_done_reproduce_in_collapsible(self):
+        out = html_renderer.render(_when_done_report())
+        assert "<summary>Reproduce this report</summary>" in out
+        assert "<h2>Reproduce this report</h2>" not in out
+
+    def test_when_done_about_collapsible_present(self):
+        out = html_renderer.render(_when_done_report())
+        assert "<summary>About this report</summary>" in out
+
+    def test_horizon_traffic_light_banner_still_present(self):
+        """The horizon banner is the actionable signal-quality indicator
+        for forecasts — it must NOT be suppressed by the chrome cleanup."""
+        out = html_renderer.render(_when_done_report())
+        assert 'class="horizon' in out
 
 
 class TestWhenDoneHtml:

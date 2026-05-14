@@ -295,13 +295,18 @@ def _chart_training(report: WhenDoneReport | HowManyReport) -> str:
 
 def _render_efficiency(report: EfficiencyReport) -> str:
     template = _env.get_template("efficiency.html.jinja")
-    # By cycle time descending — Top slowest list. Different sort than
-    # per_pr_sorted (which sorts by efficiency for the full detail table).
     per_pr_by_cycle = sorted(
         report.result.per_pr, key=lambda p: p.cycle_time, reverse=True
     )
+    repo = report.input.repo
+    repo_url = (
+        f"https://github.com/{repo}"
+        if "/" in repo and not repo.startswith("jira:")
+        else None
+    )
     return template.render(
-        title=f"flowmetrics — efficiency {report.input.repo}",
+        title="Flow efficiency",
+        repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
         definition=report_definition(report),
@@ -329,8 +334,15 @@ def _github_pr_urls(repo: str, item_ids: list[str]) -> dict[str, str]:
 
 def _render_when_done(report: WhenDoneReport) -> str:
     template = _env.get_template("when_done.html.jinja")
+    repo = report.input.repo
+    repo_url = (
+        f"https://github.com/{repo}"
+        if "/" in repo and not repo.startswith("jira:")
+        else None
+    )
     return template.render(
-        title=f"flowmetrics — when-done {report.input.repo}",
+        title="When will it be done?",
+        repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
         definition=report_definition(report),
@@ -397,8 +409,15 @@ def _render_cfd(report: CfdReport) -> str:
     end_counts: dict[str, int] = (
         dict(report.points[-1].counts_by_state) if report.points else {}
     )
+    repo = report.input.repo
+    repo_url = (
+        f"https://github.com/{repo}"
+        if "/" in repo and not repo.startswith("jira:")
+        else None
+    )
     return template.render(
-        title=f"flowmetrics — cfd {report.input.repo}",
+        title="Cumulative Flow Diagram",
+        repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
         definition=report_definition(report),
@@ -606,8 +625,15 @@ def _render_aging(report: AgingReport) -> str:
 
 def _render_how_many(report: HowManyReport) -> str:
     template = _env.get_template("how_many.html.jinja")
+    repo = report.input.repo
+    repo_url = (
+        f"https://github.com/{repo}"
+        if "/" in repo and not repo.startswith("jira:")
+        else None
+    )
     return template.render(
-        title=f"flowmetrics — how-many {report.input.repo}",
+        title="How many items?",
+        repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
         definition=report_definition(report),

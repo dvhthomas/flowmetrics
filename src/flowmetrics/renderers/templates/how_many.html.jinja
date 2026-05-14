@@ -1,6 +1,22 @@
 {% extends "base.html.jinja" %}
 
-{# ── Above the fold: percentile table + chart ─────────────────────────── #}
+{% block subtitle %}
+<p class="subtitle">
+  for
+  {%- if repo_url %} <a href="{{ repo_url }}">{{ report.input.repo }}</a>
+  {%- else %} {{ report.input.repo }}
+  {%- endif %} ·
+  {{ report.input.start_date }} → {{ report.input.target_date }} ·
+  <span class="stamp">generated {{ generated_at.strftime("%Y-%m-%d %H:%M %Z").strip() }}</span>
+</p>
+{% endblock %}
+
+{% block key_insight %}{% endblock %}
+{% block next_actions %}{% endblock %}
+{% block caveats %}{% endblock %}
+{% block reproduce %}{% endblock %}
+{% block vocabulary %}{% endblock %}
+
 {% block content %}
 <div class="horizon {% if horizon.ratio <= 1.0 %}green{% elif horizon.ratio <= 2.0 %}yellow{% else %}red{% endif %}">
 <strong>Forecast horizon:</strong>
@@ -23,17 +39,22 @@
 <img alt="How-many histogram" src="data:image/png;base64,{{ chart_histogram_b64 }}" />
 {% endblock %}
 
-{# ── Below the fold: input + training detail ──────────────────────────── #}
 {% block detail %}
-<h2>Input parameters</h2>
+<details>
+<summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
   <tr><th>Forecast window</th><td>{{ report.input.start_date }} → {{ report.input.target_date }}</td></tr>
+  <tr><th>Training window</th><td>{{ training.window_start }} → {{ training.window_end }}
+      ({{ training.daily_samples|length }} days, {{ training.total_merges }} items)</td></tr>
   <tr><th>Monte Carlo runs</th><td>{{ "{:,}".format(report.simulation.runs) }}</td></tr>
   <tr><th>RNG seed</th><td>{{ report.simulation.seed if report.simulation.seed is not none else 'random' }}</td></tr>
 </table>
+<div class="invocation">{{ invocation }}</div>
+</details>
 
-<h2>Training window — historical throughput we sampled from</h2>
+<details>
+<summary>Training window detail</summary>
 <table>
   <tr><th>Window</th><td>{{ training.window_start }} → {{ training.window_end }}
       ({{ training.daily_samples|length }} days)</td></tr>
@@ -42,4 +63,40 @@
   <tr><th>Zero-throughput days</th><td class="num">{{ training.zero_days }} of {{ training.daily_samples|length }}</td></tr>
 </table>
 <img alt="Daily throughput in training window" src="data:image/png;base64,{{ chart_training_b64 }}" />
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> {{ definition }}</p>
+
+{% if interpretation.key_insight %}
+<p><strong>Key insight.</strong> {{ interpretation.key_insight }}</p>
+{% endif %}
+
+{% if interpretation.next_actions %}
+<p><strong>Next actions</strong></p>
+<ol style="font-size:0.95rem;">
+{% for action in interpretation.next_actions %}
+  <li>{{ action }}</li>
+{% endfor %}
+</ol>
+{% endif %}
+
+{% if interpretation.caveats %}
+<p><strong>Caveats</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+{% for c in interpretation.caveats %}
+  <li>{{ c }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+{% for term, defn in vocabulary.items() %}
+  <dt><strong>{{ term }}</strong></dt>
+  <dd>{{ defn }}</dd>
+{% endfor %}
+</dl>
+</details>
 {% endblock %}

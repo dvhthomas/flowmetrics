@@ -1,12 +1,29 @@
 {% extends "base.html.jinja" %}
 
+{% block subtitle %}
+<p class="subtitle">
+  for
+  {%- if repo_url %} <a href="{{ repo_url }}">{{ report.input.repo }}</a>
+  {%- else %} {{ report.input.repo }}
+  {%- endif %} ·
+  {{ report.input.start }} → {{ report.input.stop }} ·
+  <span class="stamp">generated {{ generated_at.strftime("%Y-%m-%d %H:%M %Z").strip() }}</span>
+</p>
+{% endblock %}
+
+{% block key_insight %}{% endblock %}
+{% block next_actions %}{% endblock %}
+{% block caveats %}{% endblock %}
+{% block reproduce %}{% endblock %}
+{% block vocabulary %}{% endblock %}
+
 {% block content %}
 {% if not report.points %}
 <p>No CFD samples for this window.</p>
 {% else %}
 
-{# WIP trend banner: the actionable read on a CFD. Is the queue
-   widening (arrivals > departures) or narrowing? #}
+{# WIP trend banner: the actionable read. Only conditional coloured
+   chrome on the page. #}
 {% if wip_trend.direction != "flat" %}
 <div class="banner" style="background:
     {%- if wip_trend.direction == 'widening' %} #fef2f2; border-left-color: #cc3333; color: #7f1d1d
@@ -30,29 +47,67 @@
 {{ end_counts[report.input.workflow[0]] }} arrivals,
 {{ end_counts[report.input.workflow[-1]] }} departures,
 <strong>{{ wip_trend.end_wip }}</strong> WIP at end of window
-({{ report.input.start }} → {{ report.input.stop }},
-{{ report.points|length }} samples).
+({{ report.points|length }} samples).
 </p>
 
-<p style="font-size:0.9rem; color:#666; max-width:60ch">
-<strong>Reading the chart.</strong> Each band's vertical thickness at a
-sample date is the WIP in that workflow state (property #3). The slope
-of any line measures the rate at which items entered that state-or-later
-over time (property #6). The horizontal distance between two adjacent
-lines at a given y-level is the approximate average cycle time through
-the bands between them (property #4).
-</p>
 {% endif %}
 {% endblock %}
 
 {% block detail %}
-<h2>Input parameters</h2>
+<details>
+<summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
-  <tr><th>Workflow</th><td>{{ report.input.workflow | join(", ") }}</td></tr>
+  <tr><th>Workflow</th><td>
+    {% for s in report.input.workflow %}<span class="pill">{{ s }}</span>{% if not loop.last %} → {% endif %}{% endfor %}
+  </td></tr>
   <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }}</td></tr>
   <tr><th>Sample interval</th><td>{{ report.input.interval_days }} day(s)</td></tr>
 </table>
+<div class="invocation">{{ invocation }}</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> {{ definition }}</p>
+
+<p><strong>Reading the chart.</strong> Each band's vertical thickness at
+a sample date is the WIP in that workflow state (Vacanti's property #3).
+The slope of any line measures the rate at which items entered that
+state-or-later over time (property #6). The horizontal distance between
+two adjacent lines at a given y-level is the approximate average cycle
+time through the bands between them (property #4).</p>
+
+{% if interpretation.key_insight %}
+<p><strong>Key insight.</strong> {{ interpretation.key_insight }}</p>
+{% endif %}
+
+{% if interpretation.next_actions %}
+<p><strong>Next actions</strong></p>
+<ol style="font-size:0.95rem;">
+{% for action in interpretation.next_actions %}
+  <li>{{ action }}</li>
+{% endfor %}
+</ol>
+{% endif %}
+
+{% if interpretation.caveats %}
+<p><strong>Caveats</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+{% for c in interpretation.caveats %}
+  <li>{{ c }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+{% for term, defn in vocabulary.items() %}
+  <dt><strong>{{ term }}</strong></dt>
+  <dd>{{ defn }}</dd>
+{% endfor %}
+</dl>
+</details>
 
 <details>
 <summary>Show all {{ report.points|length }} sample points</summary>
