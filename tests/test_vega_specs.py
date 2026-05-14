@@ -317,6 +317,41 @@ class TestAgingSpec:
         assert view.get("fill") is None
         assert "stroke" in view  # explicit stroke (even if subtle)
 
+    def test_alternating_column_shade_helps_the_eye_locate_stages(self):
+        """Every other workflow column gets a very faint background
+        tint so the eye can find the right category quickly. The
+        shade layer sits behind ALL data and rules so it's an
+        unobtrusive zebra-stripe under the chart."""
+        workflow = ("A", "B", "C", "D", "E")
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=workflow,
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=[_item("#1", "A", 50)],
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        spec = vega_specs.aging_spec(report)
+        # First layer should be the shade — paints behind everything.
+        first_layer = spec["layer"][0]
+        mark = first_layer["mark"]
+        mark_type = mark.get("type") if isinstance(mark, dict) else mark
+        assert mark_type == "rect"
+        # Low opacity — must not dominate.
+        assert isinstance(mark, dict) and 0 < mark.get("opacity", 1) <= 0.1
+        # Shaded states are every-other in workflow order. Convention:
+        # shade the EVEN-indexed columns (0, 2, 4) so the leftmost is
+        # gently emphasized; either convention is fine — pin one.
+        shaded_states = {row["state"] for row in first_layer["data"]["values"]}
+        assert shaded_states == {"A", "C", "E"}
+
     def test_percentile_thresholds_above_data_range_are_dropped(self):
         """If the highest in-flight item is at 100d but P95 of recent
         completers is 600d, drawing P95 forces the Y axis out to 600
@@ -381,43 +416,28 @@ class TestAgingSpec:
         assert 110.0 in ys  # just above max — kept
         assert 250.0 not in ys  # >2x max — dropped
 
-    def test_no_background_rect_for_p95_band(self):
+    def test_no_red_danger_zone_rect_above_p95(self):
         """Earlier iterations painted the area above P95 with a light-red
-        tint. Removed: per Tufte 'just show the lines, not paint half
-        the chart a different color'. The threshold encoding is the
-        line + label, not the background."""
+        tint encoded by a `y` field. The shade-rect for stage columns
+        is different — it encodes `x` only and uses a subtle grey, not
+        a y-based red band."""
         spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         rect_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "rect"
         ]
-        assert rect_layers == []
-
-    def test_no_danger_rect_when_p95_is_zero(self):
-        """No percentile data → no rect (nothing to tint)."""
-        report = AgingReport(
-            input=AgingInput(
-                repo="acme/widget",
-                asof=date(2026, 5, 14),
-                workflow=("Awaiting Review",),
-                history_start=date(2026, 4, 14),
-                history_end=date(2026, 5, 13),
-                offline=False,
-            ),
-            items=[_item("#1", "Awaiting Review", 3)],
-            cycle_time_percentiles={50: 0.0, 70: 0.0, 85: 0.0, 95: 0.0},
-            completed_count=0,
-            interpretation=_interp(),
-            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
-        )
-        spec = vega_specs.aging_spec(report)
-        rect_layers = [
-            layer for layer in spec["layer"]
-            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
-                else layer["mark"]) == "rect"
-        ]
-        assert rect_layers == []
+        for rect in rect_layers:
+            enc = rect.get("encoding", {})
+            # Danger-zone rect was identifiable by a `y` encoding on
+            # a `y` field — that pattern must be gone.
+            assert "y" not in enc, "y-anchored rect (old danger tint) reintroduced"
+            mark = rect["mark"]
+            if isinstance(mark, dict):
+                color = (mark.get("color") or "").lower()
+                # No red tint.
+                assert not color.startswith("#fee") and not color.startswith("#fdd"), \
+                    "red-ish danger color reintroduced on a rect layer"
 
     def test_percentile_lines_have_direct_text_labels(self):
         """Each percentile rule has a matching text mark printing

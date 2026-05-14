@@ -129,6 +129,24 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
         if 0 < v <= y_cap
     ]
 
+    # Faint alternating background shade per workflow column — every
+    # other column tinted so the eye can locate stages. Even-indexed
+    # columns (0, 2, 4...) are shaded; leftmost is gently emphasized.
+    workflow_list = list(report.input.workflow)
+    shaded_states = workflow_list[::2]
+    shade_layer = {
+        "mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04},
+        "data": {"values": [{"state": s} for s in shaded_states]},
+        "encoding": {
+            "x": {
+                "field": "state",
+                "type": "nominal",
+                "sort": workflow_list,
+                "scale": {"domain": workflow_list},
+            },
+        },
+    }
+
     rule_layers: list[dict[str, Any]] = []
     if percentile_rows:
         rule_layers.append(
@@ -237,9 +255,8 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
         "config": {
             "view": {"fill": None, "stroke": "#e5e5e5", "strokeWidth": 1},
         },
-        # Layer order: percentile rules → circles → per-state header
-        # labels. Rules paint BEFORE circles so dots overlay thresholds;
-        # thresholds remain visible in empty regions of the chart and
-        # circles obscure them where data exists.
-        "layer": [*rule_layers, circle_layer, header_layer],
+        # Layer order: column shade → percentile rules → circles →
+        # per-state header labels. Shade paints first (behind
+        # everything); rules paint behind dots; dots on top.
+        "layer": [shade_layer, *rule_layers, circle_layer, header_layer],
     }
