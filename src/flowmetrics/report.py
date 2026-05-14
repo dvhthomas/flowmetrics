@@ -179,6 +179,10 @@ class AgingInput:
     # from the chart and from past-P85/P95 counts. None means "show
     # everything" per Vacanti.
     max_age_days: int | None = None
+    # When the report came from a Jira source, the base URL is needed
+    # to reconstruct a runnable reproducer command. The `repo` field
+    # carries "jira:PROJECT" but not the URL; we store it here.
+    jira_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -504,10 +508,22 @@ def cli_invocation(report: Report) -> str:
         return " ".join(parts)
 
     if isinstance(report, AgingReport):
+        # Jira sources store `repo` as "jira:PROJECT"; the reproducer
+        # needs `--jira-url URL --jira-project PROJECT`. GitHub sources
+        # keep the simple `--repo OWNER/NAME` form.
         flag = "--wip-labels" if report.input.from_wip_labels else "--workflow"
+        if report.input.repo.startswith("jira:"):
+            project = report.input.repo[len("jira:"):]
+            jira_url = report.input.jira_url or "<JIRA_URL>"
+            source_parts = [
+                f"--jira-url {jira_url}",
+                f"--jira-project {project}",
+            ]
+        else:
+            source_parts = [f"--repo {report.input.repo}"]
         parts = [
             "uv run flow aging",
-            f"--repo {report.input.repo}",
+            *source_parts,
             f"--asof {report.input.asof.isoformat()}",
             f"{flag} '{','.join(report.input.workflow)}'",
             f"--history-start {report.input.history_start.isoformat()}",

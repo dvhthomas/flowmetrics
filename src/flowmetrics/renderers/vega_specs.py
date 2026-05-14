@@ -116,10 +116,17 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
     # rule layer can carry a single color/text encoding across them.
     # Yellow→red sequential palette: P50 reads as "still ok", P95 reads
     # as "danger". Matches the headline's "past P85/P95" risk framing.
+    #
+    # Thresholds above ~1.5x the highest in-flight age are dropped so
+    # the chart fits the actual data. Otherwise a P95 that's far above
+    # the in-flight range (common in long-tail backlogs) stretches the
+    # Y axis 5x and wastes most of the canvas.
+    max_age = max((it.age_days for it in report.items), default=0)
+    y_cap = max_age * 1.5 if max_age > 0 else float("inf")
     percentile_rows = [
         {"pct": f"P{p}", "y": v, "label": f"P{p} ({v:.1f}d)"}
         for p, v in sorted(report.cycle_time_percentiles.items())
-        if v > 0
+        if 0 < v <= y_cap
     ]
 
     rule_layers: list[dict[str, Any]] = []
@@ -222,6 +229,14 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
         "width": "container",
         "height": 360,
         "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8},
+        # Explicit background + view config so the chart sits on plain
+        # white regardless of Vega's default theme. Without this the
+        # color scheme on the rules can bleed a subtle tint through
+        # the view background — clean Tufte chart needs neither.
+        "background": "transparent",
+        "config": {
+            "view": {"fill": None, "stroke": "#e5e5e5", "strokeWidth": 1},
+        },
         # Layer order: percentile rules → circles → per-state header
         # labels. Rules paint BEFORE circles so dots overlay thresholds;
         # thresholds remain visible in empty regions of the chart and

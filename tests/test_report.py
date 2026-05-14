@@ -505,3 +505,42 @@ class TestCliInvocation:
     def test_aging_invocation_omits_max_age_days_when_unset(self):
         cmd = cli_invocation(self._aging_report_with_max_age(None))
         assert "--max-age-days" not in cmd
+
+    @staticmethod
+    def _aging_report_jira(jira_url: str | None = "https://issues.apache.org/jira"):
+        """Aging fixture for the Jira reproducer round-trip test."""
+        return AgingReport(
+            input=AgingInput(
+                repo="jira:BIGTOP",
+                asof=date(2026, 5, 14),
+                workflow=("Open", "In Progress", "Patch Available"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+                jira_url=jira_url,
+            ),
+            items=[],
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+        )
+
+    def test_aging_jira_invocation_emits_jira_url_and_project_not_repo(self):
+        """Pre-existing bug: when the source is Jira, the reproducer
+        emitted `--repo jira:BIGTOP` which is not a runnable command.
+        Fix: emit `--jira-url ... --jira-project ...` instead."""
+        cmd = cli_invocation(self._aging_report_jira())
+        assert "--jira-url https://issues.apache.org/jira" in cmd
+        assert "--jira-project BIGTOP" in cmd
+        # And the broken `--repo jira:BIGTOP` form is GONE.
+        assert "--repo jira:" not in cmd
+        assert "--repo BIGTOP" not in cmd
+
+    def test_aging_jira_invocation_falls_back_when_url_missing(self):
+        """Defensive: a Jira-prefixed repo without a stored URL still
+        emits a runnable-looking command rather than crashing. The user
+        will have to fill in --jira-url manually."""
+        cmd = cli_invocation(self._aging_report_jira(jira_url=None))
+        # Project still extracted; URL is a placeholder the user fixes.
+        assert "--jira-project BIGTOP" in cmd
+        assert "--jira-url" in cmd

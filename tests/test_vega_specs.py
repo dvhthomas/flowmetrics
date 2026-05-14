@@ -64,7 +64,7 @@ def _item(item_id: str, state: str, age: int, pr_url: str | None = None) -> Agin
 
 class TestAgingSpec:
     def test_top_level_shape_is_vega_lite_v5(self):
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         assert spec["$schema"].startswith("https://vega.github.io/schema/vega-lite/")
 
     def test_data_values_carry_items_with_required_fields(self):
@@ -92,7 +92,7 @@ class TestAgingSpec:
         assert v1["title"] == "PR #1"
 
     def test_circles_have_tooltip_and_href_channels(self):
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         circle_layer = next(
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
@@ -248,7 +248,7 @@ class TestAgingSpec:
         """All four percentile thresholds share one rule layer so a
         single color scale (yellow-low-risk → red-high-risk) can encode
         them. Four separate layers can't share a color legend."""
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         rule_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
@@ -273,7 +273,7 @@ class TestAgingSpec:
         """P85 is the forecast line in Vacanti's framing — make it stand
         out: solid + thicker. P50/P70/P95 stay dashed/lighter so the
         forecast threshold reads at a glance."""
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         rule_layer = next(
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
@@ -297,7 +297,7 @@ class TestAgingSpec:
         dots overlay the thresholds. Threshold lines remain visible in
         empty regions (where there are no items) and circles sit on
         top elsewhere — keeps the chart legible."""
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         layer_kinds = [
             (lyr["mark"].get("type") if isinstance(lyr["mark"], dict) else lyr["mark"])
             for lyr in spec["layer"]
@@ -306,12 +306,87 @@ class TestAgingSpec:
         i_circle = layer_kinds.index("circle")
         assert i_first_rule < i_circle, "rules must paint before circles"
 
+    def test_chart_has_transparent_background_and_no_view_fill(self):
+        """Vega-Lite defaults render the view (chart plot area) with a
+        subtle fill that can show through and look like a tint. Make
+        background + view.fill explicit (transparent / null) so the
+        chart is on plain white regardless of theme defaults."""
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
+        assert spec.get("background") == "transparent"
+        view = spec.get("config", {}).get("view", {})
+        assert view.get("fill") is None
+        assert "stroke" in view  # explicit stroke (even if subtle)
+
+    def test_percentile_thresholds_above_data_range_are_dropped(self):
+        """If the highest in-flight item is at 100d but P95 of recent
+        completers is 600d, drawing P95 forces the Y axis out to 600
+        — wasting ~5x of vertical canvas. Drop thresholds well above
+        the actual data so the chart fits what's there."""
+        # P50=2, P70=5, P85=20, P95=200; data maxes at 30d so P95 is
+        # well above the data range and should be filtered out.
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("State A",),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=[_item("#1", "State A", 30), _item("#2", "State A", 10)],
+            cycle_time_percentiles={50: 2.0, 70: 5.0, 85: 20.0, 95: 200.0},
+            completed_count=100,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        spec = vega_specs.aging_spec(report)
+        rule_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "rule"
+        )
+        ys = {row["y"] for row in rule_layer["data"]["values"]}
+        # P50/P70/P85 are within or near the data range; P95 is way out.
+        assert 2.0 in ys and 5.0 in ys and 20.0 in ys
+        assert 200.0 not in ys
+
+    def test_percentile_thresholds_just_above_data_are_kept(self):
+        """Some headroom — a threshold sitting just above the highest
+        data point IS useful (shows what you're approaching). Drop only
+        thresholds that exceed ~1.5x the max age."""
+        # Max age 100; P85 at 110 (just above) should stay; P95 at 250
+        # (way above) should drop.
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("State A",),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=[_item("#1", "State A", 100)],
+            cycle_time_percentiles={50: 10.0, 70: 50.0, 85: 110.0, 95: 250.0},
+            completed_count=100,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        spec = vega_specs.aging_spec(report)
+        rule_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "rule"
+        )
+        ys = {row["y"] for row in rule_layer["data"]["values"]}
+        assert 110.0 in ys  # just above max — kept
+        assert 250.0 not in ys  # >2x max — dropped
+
     def test_no_background_rect_for_p95_band(self):
         """Earlier iterations painted the area above P95 with a light-red
         tint. Removed: per Tufte 'just show the lines, not paint half
         the chart a different color'. The threshold encoding is the
         line + label, not the background."""
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         rect_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
@@ -348,7 +423,7 @@ class TestAgingSpec:
         """Each percentile rule has a matching text mark printing
         `P85 (17.8d)` directly on the chart, so the reader doesn't have
         to chase a legend."""
-        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
+        spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         # Find the percentile-label text layer specifically (by content,
         # not by being the only text layer — there's also a per-state
         # header layer now).

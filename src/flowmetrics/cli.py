@@ -616,6 +616,7 @@ def aging(
             offline=offline,
             from_wip_labels=wip is not None,
             max_age_days=max_age_days,
+            jira_url=jira_url,
         )
         return AgingReport(
             input=input_,
