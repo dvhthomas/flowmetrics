@@ -122,24 +122,6 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
         if v > 0
     ]
 
-    threshold_layers: list[dict[str, Any]] = []
-
-    # Light-red tint above P95: the "danger zone" reads pre-attentively
-    # before the user parses the threshold labels.
-    p95 = report.cycle_time_percentiles.get(95, 0.0)
-    if p95 > 0:
-        threshold_layers.append(
-            {
-                "mark": {"type": "rect", "color": "#fee5d9", "opacity": 0.15},
-                "data": {"values": [{"y": p95}]},
-                "encoding": {
-                    "y": {"field": "y", "type": "quantitative"},
-                    # y2 omitted: defaults to the top of the y-domain,
-                    # which is exactly what we want here.
-                },
-            }
-        )
-
     rule_layers: list[dict[str, Any]] = []
     if percentile_rows:
         rule_layers.append(
@@ -240,9 +222,9 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
         "width": "container",
         "height": 360,
         "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8},
-        # Layer order: rect tint → percentile rules → circles → per-state
-        # header labels. Rules paint BEFORE circles so the dots overlay
-        # the thresholds; thresholds remain visible in empty regions of
-        # the chart and circles obscure them where data exists.
-        "layer": [*threshold_layers, *rule_layers, circle_layer, header_layer],
+        # Layer order: percentile rules → circles → per-state header
+        # labels. Rules paint BEFORE circles so dots overlay thresholds;
+        # thresholds remain visible in empty regions of the chart and
+        # circles obscure them where data exists.
+        "layer": [*rule_layers, circle_layer, header_layer],
     }

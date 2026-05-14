@@ -306,33 +306,21 @@ class TestAgingSpec:
         i_circle = layer_kinds.index("circle")
         assert i_first_rule < i_circle, "rules must paint before circles"
 
-    def test_p95_danger_zone_has_tinted_rect_layer(self):
-        """A light-red rect from P95 to chart top tints the danger zone
-        so the eye lands on it pre-attentively, before reading labels.
-        The rect uses `y2` to span from P95 upward to infinity."""
+    def test_no_background_rect_for_p95_band(self):
+        """Earlier iterations painted the area above P95 with a light-red
+        tint. Removed: per Tufte 'just show the lines, not paint half
+        the chart a different color'. The threshold encoding is the
+        line + label, not the background."""
         spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 3)]))
         rect_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "rect"
         ]
-        assert len(rect_layers) == 1
-        rect = rect_layers[0]
-        # Rect data: the bottom is P95, top is unbounded (encoded as
-        # very large y2 so the band fills to the top of the y-domain).
-        values = rect["data"]["values"]
-        assert len(values) == 1
-        assert values[0]["y"] == 57.4  # P95
-        # Light-red color signals risk without dominating.
-        mark = rect["mark"]
-        assert isinstance(mark, dict)
-        assert mark.get("color", "").startswith("#") or mark.get("fill", "").startswith("#")
-        # Low opacity — the dots remain readable through the tint.
-        opacity = mark.get("opacity", 1)
-        assert 0 < opacity < 0.3
+        assert rect_layers == []
 
     def test_no_danger_rect_when_p95_is_zero(self):
-        """No percentile data → no rect (nothing meaningful to tint)."""
+        """No percentile data → no rect (nothing to tint)."""
         report = AgingReport(
             input=AgingInput(
                 repo="acme/widget",
