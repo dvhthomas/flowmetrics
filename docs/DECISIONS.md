@@ -239,6 +239,15 @@ interchangeable; either covers some teams' reality and not others'.
   honestly (it must be configured, because conventions vary). We point
   users there from the in-line `flow aging` help.
 
+  **Update 2026-05-14:** PR-label-driven Aging *is* now supported via
+  `flow aging --wip-labels "a,b,c"` (GitHub only). The caller names
+  which labels constitute WIP per invocation; the materializer in
+  `src/flowmetrics/github_labels.py` walks `LabeledEvent` /
+  `UnlabeledEvent` timeline events into `status_intervals`. CFD on
+  GitHub PRs is still degenerate — that's the next milestone. Issues
+  remain out of scope (see §10 below). Design notes:
+  [docs/SPEC-github-labels.md](SPEC-github-labels.md).
+
 **What we accept.**
 
 1. GitHub Aging surfaces review-cycle phase only. Teams that track
@@ -302,6 +311,12 @@ remediation is a new `GitHubIssuesSource` with explicit per-repo
 label-to-state mapping passed in config. It would sit alongside the
 existing PR source as a separate source, not replace it. The two
 answer different questions; both should be available.
+
+**Update 2026-05-14:** The label-mode work landed for PRs only —
+`flow aging --wip-labels` against `--repo OWNER/NAME`. Issues are
+still untouched; a future `GitHubIssuesSource` would re-use the same
+materializer in `src/flowmetrics/github_labels.py`. Design notes:
+[docs/SPEC-github-labels.md](SPEC-github-labels.md).
 
 [gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
 

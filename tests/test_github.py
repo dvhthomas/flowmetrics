@@ -1,13 +1,15 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import httpx
 import pytest
 
 from flowmetrics.cache import CacheMiss, FileCache
 from flowmetrics.github import (
+    PR_CYCLE_TIME_QUERY,
     PR_SEARCH_QUERY,
     GitHubClient,
     extract_activity,
+    fetch_prs_for_cycle_times,
     fetch_prs_merged_in_window,
 )
 
@@ -59,6 +61,101 @@ def _seed_search(cache: FileCache, repo: str, start: date, stop: date, prs: list
         }
     }
     cache.put(FileCache.make_key(PR_SEARCH_QUERY, variables), response)
+
+
+class TestFetchPrsForCycleTimes:
+    """Lightweight fetcher used by the Aging command's percentile-
+    training subroutine. We only need cycle_time = mergedAt - createdAt
+    — the 100 timeline events per PR that PR_SEARCH_QUERY carries are
+    over-fetch here, expensive on large repos (e.g. rust-lang/rust).
+    """
+
+    @staticmethod
+    def _seed_cycle_time(
+        cache: FileCache, repo: str, start: date, stop: date, prs: list[dict]
+    ) -> None:
+        variables = {
+            "q": f"repo:{repo} is:pr is:merged "
+            f"merged:{start.isoformat()}..{stop.isoformat()}",
+            "first": 100,
+            "after": None,
+        }
+        response = {
+            "data": {
+                "search": {
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                    "issueCount": len(prs),
+                    "nodes": prs,
+                }
+            }
+        }
+        cache.put(FileCache.make_key(PR_CYCLE_TIME_QUERY, variables), response)
+
+    def test_returns_workitems_with_cycle_time_only(self, tmp_path):
+        cache = FileCache(tmp_path)
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
+        self._seed_cycle_time(
+            cache,
+            "x/y",
+            start,
+            stop,
+            [
+                {
+                    "number": 1,
+                    "title": "first",
+                    "createdAt": "2026-05-05T09:00:00Z",
+                    "mergedAt": "2026-05-06T09:00:00Z",
+                    "author": {"__typename": "User", "login": "alice"},
+                },
+                {
+                    "number": 2,
+                    "title": "bot pr",
+                    "createdAt": "2026-05-05T08:00:00Z",
+                    "mergedAt": "2026-05-05T08:30:00Z",
+                    "author": {"__typename": "Bot", "login": "renovate[bot]"},
+                },
+            ],
+        )
+        client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
+
+        prs = fetch_prs_for_cycle_times(client, "x/y", start, stop)
+
+        assert {p.item_id for p in prs} == {"#1", "#2"}
+        by_id = {p.item_id: p for p in prs}
+        # Cycle time is computable from created/merged.
+        assert by_id["#1"].merged_at - by_id["#1"].created_at == timedelta(days=1)
+        assert by_id["#2"].merged_at - by_id["#2"].created_at == timedelta(minutes=30)
+        # No timeline → activity must be empty (the whole point of the fetcher).
+        assert by_id["#1"].activity == []
+        assert by_id["#2"].activity == []
+        # Bot detection still works.
+        assert by_id["#1"].is_bot is False
+        assert by_id["#2"].is_bot is True
+
+    def test_skips_unmerged_prs(self, tmp_path):
+        """The `is:merged` filter on the GraphQL side should keep
+        unmerged PRs out, but defend in depth at the fetcher level too —
+        a PR with no mergedAt has no cycle time and must be dropped."""
+        cache = FileCache(tmp_path)
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
+        self._seed_cycle_time(
+            cache,
+            "x/y",
+            start,
+            stop,
+            [
+                {
+                    "number": 5,
+                    "title": "closed-not-merged",
+                    "createdAt": "2026-05-05T09:00:00Z",
+                    "mergedAt": None,
+                    "author": {"__typename": "User", "login": "alice"},
+                },
+            ],
+        )
+        client = GitHubClient(cache, read_only=True, http_client=_no_network_client())
+        prs = fetch_prs_for_cycle_times(client, "x/y", start, stop)
+        assert prs == []
 
 
 class TestBotDetection:

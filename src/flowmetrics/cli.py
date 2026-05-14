@@ -34,6 +34,7 @@ from .forecast import (
     monte_carlo_how_many,
     monte_carlo_when_done,
 )
+from .github_labels import WipLabels
 from .interpretation import (
     interpret_aging,
     interpret_cfd,
@@ -130,11 +131,15 @@ def _build_source(
     jira_project: str | None,
     cache_dir: Path,
     offline: bool,
+    wip_labels: WipLabels | None = None,
 ) -> Source:
     """Pick the source backend from whichever flag set the user provided.
 
     `--repo` ⇒ GitHub. `--jira-url` + `--jira-project` ⇒ Jira. Mutually
     exclusive; exactly one set must be present.
+
+    `wip_labels` is GitHub-only — Jira workflows come from issue
+    changelogs, so passing it with a Jira source is an error.
     """
     have_github = bool(repo)
     have_jira = bool(jira_url or jira_project)
@@ -142,8 +147,15 @@ def _build_source(
         raise click.UsageError(
             "Pass either --repo (GitHub) or --jira-url + --jira-project (Jira), not both."
         )
+    if wip_labels is not None and not have_github:
+        raise click.UsageError(
+            "--wip-labels is GitHub-only. Jira workflows come from issue changelogs; "
+            "use --workflow instead."
+        )
     if have_github:
-        return make_github_source(repo, cache_dir=cache_dir, read_only=offline)
+        return make_github_source(
+            repo, cache_dir=cache_dir, read_only=offline, wip_labels=wip_labels
+        )
     if have_jira:
         if not (jira_url and jira_project):
             raise click.UsageError(
@@ -439,10 +451,36 @@ def cfd(
 @click.option(
     "--workflow",
     type=str,
-    required=True,
+    default=None,
     help=(
         "Comma-separated workflow states, earliest → latest. "
-        "Example: 'Open,In Progress,Patch Available,Resolved'."
+        "Example: 'Open,In Progress,Patch Available,Resolved'. "
+        "Required unless --wip-labels is supplied."
+    ),
+)
+@click.option(
+    "--wip-labels",
+    "wip_labels_raw",
+    type=str,
+    default=None,
+    help=(
+        "GitHub-only: comma-separated PR labels that count as WIP, "
+        "ordered with most progress on the right. When set, PR aging is "
+        "driven by the timestamps of LabeledEvent/UnlabeledEvent on PRs "
+        "instead of the default isDraft/reviewDecision review cycle. "
+        "Example: 'shaping,in-progress,in-review'."
+    ),
+)
+@click.option(
+    "--max-age-days",
+    type=int,
+    default=None,
+    help=(
+        "Opt-in: exclude in-flight items older than this many days from "
+        "the chart and from past-P85/P95 counts. Default (unset) shows "
+        "every in-flight item per Vacanti — the right choice when you "
+        "want full visibility on stalled work. Use this when long-tail "
+        "stalled items dwarf actionable WIP. Example: --max-age-days=180."
     ),
 )
 @click.option(
@@ -473,7 +511,9 @@ def aging(
     jira_url: str | None,
     jira_project: str | None,
     asof: str | None,
-    workflow: str,
+    workflow: str | None,
+    wip_labels_raw: str | None,
+    max_age_days: int | None,
     history_start: str | None,
     history_end: str | None,
     cache_dir: Path,
@@ -482,18 +522,41 @@ def aging(
     output: Path | None,
     verbose: bool,
 ) -> None:
-    """Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51).
+    """Aging Work In Progress chart per Vacanti.
 
     Each in-flight item is plotted in the column of its current workflow
     state at a height equal to its age in days. Percentile lines come
     from the cycle times of recently completed items (the "Scatterplot"
     distribution) and serve as risk checkpoints.
 
-    GitHub is not yet supported (PRs only have one "Open" state). Use
-    --jira-url + --jira-project.
+    GitHub has two modes. Default (review-cycle): pass --workflow with
+    the four phases Draft → Awaiting Review → Changes Requested →
+    Approved; state comes from isDraft + reviewDecision. Label-driven:
+    pass --wip-labels with your PR labels in order, most progress on
+    the right; state is materialized from timeline LabeledEvent /
+    UnlabeledEvent timestamps. See docs/SPEC-github-labels.md.
+
+    Jira always uses --workflow against changelog statuses.
     """
     asof_d = _parse_date(asof) if asof else date.today()
-    workflow_tuple = tuple(s.strip() for s in workflow.split(",") if s.strip())
+
+    try:
+        wip = WipLabels.parse(wip_labels_raw) if wip_labels_raw else None
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+    # In label mode the workflow tuple comes from --wip-labels; users
+    # don't need to repeat themselves. --workflow is still honored if
+    # explicitly passed (e.g. to add a "Triage" column heading), but
+    # defaults to the WIP labels list.
+    if workflow:
+        workflow_tuple = tuple(s.strip() for s in workflow.split(",") if s.strip())
+    elif wip is not None:
+        workflow_tuple = wip.ordered
+    else:
+        raise click.UsageError(
+            "Pass --workflow (review-cycle / Jira) or --wip-labels (GitHub label mode)."
+        )
     if not workflow_tuple:
         raise click.UsageError("--workflow needs at least one state")
 
@@ -503,6 +566,7 @@ def aging(
         jira_project=jira_project,
         cache_dir=cache_dir,
         offline=offline,
+        wip_labels=wip,
     )
 
     def build() -> AgingReport:
@@ -514,8 +578,9 @@ def aging(
             _parse_date(history_start) if history_start
             else hist_end - timedelta(days=DEFAULT_TRAINING_DAYS - 1)
         )
-        completed_items = src.fetch_completed_in_window(hist_start, hist_end)
-        # Convert WorkItem → FlowEfficiency (only cycle_time matters for percentiles)
+        # Lightweight fetch — Aging only needs cycle_time, not activity
+        # events. See Source.fetch_for_percentile_training docstring.
+        completed_items = src.fetch_for_percentile_training(hist_start, hist_end)
         completed_flows = [
             compute_pr_flow(item, gap=DEFAULT_GAP, min_cluster=DEFAULT_MIN_CLUSTER)
             for item in completed_items
@@ -523,7 +588,25 @@ def aging(
         ]
         pct = cycle_time_percentiles(completed_flows)
 
-        aging_items = compute_aging(in_flight, asof=asof_d)
+        # GitHub source → build a clickable PR URL per item.
+        # Jira → leave as None (different URL scheme; out of scope here).
+        url_for: Callable[[str], str | None] | None = None
+        if repo:
+            owner_name = repo
+            url_for = lambda item_id: (  # noqa: E731
+                f"https://github.com/{owner_name}/pull/{item_id.lstrip('#')}"
+                if item_id.startswith("#")
+                else None
+            )
+
+        aging_items = compute_aging(
+            in_flight,
+            asof=asof_d,
+            url_for=url_for,
+            max_age_days=max_age_days,
+        )
+        excluded = len(in_flight) - len(aging_items)
+        in_flight_total = len(in_flight)
         input_ = AgingInput(
             repo=src.label,
             asof=asof_d,
@@ -531,13 +614,23 @@ def aging(
             history_start=hist_start,
             history_end=hist_end,
             offline=offline,
+            from_wip_labels=wip is not None,
+            max_age_days=max_age_days,
         )
         return AgingReport(
             input=input_,
             items=aging_items,
             cycle_time_percentiles=pct,
             completed_count=len(completed_flows),
-            interpretation=interpret_aging(input_, aging_items, pct, len(completed_flows)),
+            interpretation=interpret_aging(
+                input_,
+                aging_items,
+                pct,
+                len(completed_flows),
+                excluded_above_max_age=excluded,
+            ),
+            in_flight_total=in_flight_total,
+            excluded_above_max_age=excluded,
         )
 
     _dispatch(fmt, output, build, verbose=verbose)

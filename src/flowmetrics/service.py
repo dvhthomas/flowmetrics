@@ -5,7 +5,14 @@ from pathlib import Path
 
 from .cache import FileCache
 from .compute import WindowResult, aggregate, compute_pr_flow
-from .github import GitHubClient, fetch_open_prs, fetch_prs_merged_in_window
+from .github import (
+    GitHubClient,
+    fetch_open_prs,
+    fetch_open_prs_with_label_snapshot,
+    fetch_prs_for_cycle_times,
+    fetch_prs_merged_in_window,
+)
+from .github_labels import WipLabels, is_aging_wip
 from .sources import Source
 from .sources.jira import JiraSource
 from .throughput import daily_throughput
@@ -53,11 +60,25 @@ class _GitHubSourceAdapter:
 
     Keeps `github.py` and its tests/fixtures untouched while exposing a
     uniform interface alongside JiraSource.
+
+    When ``wip_labels`` is set, ``fetch_in_flight`` switches to the
+    label-driven materializer (see docs/SPEC-github-labels.md) and
+    filters the result to items whose current status is one of the
+    user's WIP labels. Absent ``wip_labels``, the existing review-cycle
+    lifecycle is used.
     """
 
-    def __init__(self, repo: str, cache: FileCache, read_only: bool = False):
+    def __init__(
+        self,
+        repo: str,
+        cache: FileCache,
+        read_only: bool = False,
+        *,
+        wip_labels: WipLabels | None = None,
+    ):
         self._repo = repo
         self._client = GitHubClient(cache, read_only=read_only)
+        self._wip_labels = wip_labels
 
     @property
     def label(self) -> str:
@@ -69,16 +90,34 @@ class _GitHubSourceAdapter:
         finally:
             self._client.close()
 
+    def fetch_for_percentile_training(self, start: date, stop: date):
+        """Lightweight fetch for Aging's percentile lines — no timeline
+        events. Saves ~95% of payload on high-volume repos."""
+        try:
+            return fetch_prs_for_cycle_times(self._client, self._repo, start, stop)
+        finally:
+            self._client.close()
+
     def fetch_in_flight(self, asof: date):
         """Open PRs as in-flight work items.
 
-        Phase derivation uses `isDraft` + `reviewDecision` — a four-state
-        review lifecycle (Draft → Awaiting Review → Changes Requested →
-        Approved). This is a deliberately simple lens on PR review flow;
-        for full WIP-state tracking on a GitHub project that uses issue
-        labels, see gh-velocity. See docs/DECISIONS.md #9.
+        Default mode (no ``wip_labels``): a four-state review lifecycle
+        derived from `isDraft` + `reviewDecision` (Draft → Awaiting Review
+        → Changes Requested → Approved). See docs/DECISIONS.md #9.
+
+        Label mode (``wip_labels`` set): the user's named WIP labels drive
+        per-PR ``status_intervals`` via timeline events; items not currently
+        in a WIP column are filtered out. See docs/SPEC-github-labels.md.
         """
         try:
+            if self._wip_labels is not None:
+                items = fetch_open_prs_with_label_snapshot(
+                    self._client,
+                    self._repo,
+                    asof=asof,
+                    wip=self._wip_labels,
+                )
+                return [item for item in items if is_aging_wip(item)]
             return fetch_open_prs(self._client, self._repo, asof=asof)
         finally:
             self._client.close()
@@ -89,8 +128,11 @@ def make_github_source(
     *,
     cache_dir: Path | str = DEFAULT_CACHE_DIR,
     read_only: bool = False,
+    wip_labels: WipLabels | None = None,
 ) -> Source:
-    return _GitHubSourceAdapter(repo, FileCache(cache_dir), read_only=read_only)
+    return _GitHubSourceAdapter(
+        repo, FileCache(cache_dir), read_only=read_only, wip_labels=wip_labels
+    )
 
 
 def make_jira_source(

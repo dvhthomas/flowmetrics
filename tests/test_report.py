@@ -17,6 +17,8 @@ from flowmetrics.cfd import CfdPoint
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.report import (
+    AgingInput,
+    AgingReport,
     CfdInput,
     CfdReport,
     EfficiencyInput,
@@ -445,3 +447,61 @@ class TestCliInvocation:
         assert "--start-date 2026-05-11" in cmd
         assert "--history-start 2026-04-11" in cmd
         assert "--history-end 2026-05-10" in cmd
+
+    @staticmethod
+    def _aging_report(*, from_wip_labels: bool = False):
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("shaping", "in-progress", "in-review"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+                from_wip_labels=from_wip_labels,
+            ),
+            items=[],
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+        )
+
+    def test_aging_invocation_review_cycle_mode_uses_workflow(self):
+        cmd = cli_invocation(self._aging_report(from_wip_labels=False))
+        assert cmd.startswith("uv run flow aging")
+        assert "--repo acme/widget" in cmd
+        assert "--workflow 'shaping,in-progress,in-review'" in cmd
+        assert "--wip-labels" not in cmd
+
+    def test_aging_invocation_label_mode_uses_wip_labels(self):
+        cmd = cli_invocation(self._aging_report(from_wip_labels=True))
+        # The labels ARE the workflow in label mode — same tuple, just
+        # surfaced under the flag the user actually typed.
+        assert "--wip-labels 'shaping,in-progress,in-review'" in cmd
+        assert "--workflow" not in cmd
+
+    @staticmethod
+    def _aging_report_with_max_age(max_age_days: int | None) -> AgingReport:
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Awaiting Review", "Approved"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+                max_age_days=max_age_days,
+            ),
+            items=[],
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+        )
+
+    def test_aging_invocation_includes_max_age_days_when_set(self):
+        cmd = cli_invocation(self._aging_report_with_max_age(180))
+        assert "--max-age-days 180" in cmd
+
+    def test_aging_invocation_omits_max_age_days_when_unset(self):
+        cmd = cli_invocation(self._aging_report_with_max_age(None))
+        assert "--max-age-days" not in cmd

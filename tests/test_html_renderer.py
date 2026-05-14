@@ -16,10 +16,16 @@ from __future__ import annotations
 import re
 from datetime import UTC, date, datetime, timedelta
 
+from flowmetrics.aging import AgingItem
+from flowmetrics.cfd import CfdPoint
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.renderers import html_renderer
 from flowmetrics.report import (
+    AgingInput,
+    AgingReport,
+    CfdInput,
+    CfdReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -188,6 +194,77 @@ class TestEfficiencyHtml:
         assert "<hr" in out.lower() or "detail" in out.lower()
 
 
+def _cfd_report(*, start_wip: int = 5, end_wip: int = 15) -> CfdReport:
+    """A CFD with a deliberately-growing WIP gap to exercise the trend
+    indicator. State A counts as arrivals (leftmost), Done as departures."""
+    points = [
+        CfdPoint(date(2026, 5, 1), {"A": start_wip + 0, "Done": 0}),
+        CfdPoint(date(2026, 5, 7), {"A": start_wip + 5, "Done": 0}),
+        CfdPoint(date(2026, 5, 14), {"A": end_wip, "Done": 0}),
+    ]
+    return CfdReport(
+        input=CfdInput(
+            repo="acme/widget",
+            start=date(2026, 5, 1),
+            stop=date(2026, 5, 14),
+            workflow=("A", "Done"),
+            interval_days=7,
+            offline=False,
+        ),
+        points=points,
+        interpretation=_interp(),
+        generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+    )
+
+
+class TestCfdHtmlRedesign:
+    """Tufte cleanup: 'Headline numbers' table removed (workflow + window
+    + arrivals/departures are already on the chart and in the headline).
+    A WIP-trend indicator is added — the actionable read: is the queue
+    growing or shrinking over the window?"""
+
+    def test_headline_numbers_table_removed(self):
+        out = html_renderer.render(_cfd_report())
+        assert "Headline numbers" not in out
+
+    def test_wip_trend_indicator_present(self):
+        out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
+        # Trend is "widening" when end > start.
+        assert "widening" in out.lower() or "growing" in out.lower()
+
+    def test_wip_trend_indicator_shows_narrowing_when_wip_drops(self):
+        out = html_renderer.render(_cfd_report(start_wip=20, end_wip=5))
+        # Wider start, narrower end → narrowing/shrinking.
+        assert "narrow" in out.lower() or "shrink" in out.lower()
+
+
+class TestEfficiencyHtmlRedesign:
+    """Tufte cleanup: redundant 'Headline numbers' table removed (FE %
+    is already in the headline). Slowest-PRs actionable panel added —
+    the system bottleneck PRs the team should look at."""
+
+    def test_headline_numbers_table_removed(self):
+        out = html_renderer.render(_efficiency_report())
+        assert "Headline numbers" not in out
+
+    def test_slowest_prs_panel_present_with_named_items(self):
+        """The slowest PRs are the system-level bottleneck per Vacanti's
+        'long-running PRs dominate the portfolio FE' — naming them is
+        the actionable signal. Distinct from the collapsed full-PR
+        table; this panel sits above the fold with named items."""
+        out = html_renderer.render(_efficiency_report())
+        # New section header — distinct from "Show all PRs (slowest first)".
+        assert "Top slowest" in out
+        # The specific PR ID from the fixture must appear.
+        assert "#42" in out
+
+    def test_slowest_prs_panel_appears_before_detail_section(self):
+        out = html_renderer.render(_efficiency_report())
+        i_panel = out.index("Top slowest")
+        i_detail = out.index("Input parameters")
+        assert i_panel < i_detail
+
+
 class TestWhenDoneHtml:
     def test_contains_percentile_dates(self):
         out = html_renderer.render(_when_done_report())
@@ -222,6 +299,473 @@ class TestHowManyHtml:
         out = html_renderer.render(_how_many_report())
         text = out.upper()
         assert "BACKWARD" in text or "FEWER" in text
+
+
+def _aging_report_with_distribution() -> AgingReport:
+    # Six items spread across all five distribution bands.
+    # P50=1.7, P70=5.4, P85=17.8, P95=57.4
+    items = [
+        AgingItem(item_id="#1", title="t1", current_state="Awaiting Review", age_days=0),
+        AgingItem(item_id="#2", title="t2", current_state="Awaiting Review", age_days=3),
+        AgingItem(item_id="#3", title="t3", current_state="Awaiting Review", age_days=10),
+        AgingItem(item_id="#4", title="t4", current_state="Awaiting Review", age_days=30),
+        AgingItem(item_id="#5", title="t5", current_state="Awaiting Review", age_days=100),
+        AgingItem(item_id="#6", title="t6", current_state="Awaiting Review", age_days=200),
+    ]
+    return AgingReport(
+        input=AgingInput(
+            repo="acme/widget",
+            asof=date(2026, 5, 14),
+            workflow=("Awaiting Review", "Approved"),
+            history_start=date(2026, 4, 14),
+            history_end=date(2026, 5, 13),
+            offline=False,
+        ),
+        items=items,
+        cycle_time_percentiles={50: 1.7, 70: 5.4, 85: 17.8, 95: 57.4},
+        completed_count=100,
+        interpretation=_interp(),
+        generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+    )
+
+
+def _aging_report_with_divergence() -> AgingReport:
+    """Distribution forces above-P95 share well above the 10% caveat
+    threshold so the divergence banner fires.
+
+    Uses the real `interpret_aging` so the divergence caveat actually
+    fires; the banner extractor looks for the word "diverge" in the
+    caveats list."""
+    from flowmetrics.interpretation import interpret_aging
+
+    # P95 = 50d; 6 of 10 items past P95 → 60% above-P95 share.
+    items = [
+        AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                  current_state="State A", age_days=100)
+        for i in range(6)
+    ] + [
+        AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                  current_state="State A", age_days=1)
+        for i in range(6, 10)
+    ]
+    input_ = AgingInput(
+        repo="acme/widget",
+        asof=date(2026, 5, 14),
+        workflow=("State A", "State B"),
+        history_start=date(2026, 4, 14),
+        history_end=date(2026, 5, 13),
+        offline=False,
+    )
+    pct = {50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0}
+    return AgingReport(
+        input=input_,
+        items=items,
+        cycle_time_percentiles=pct,
+        completed_count=100,
+        interpretation=interpret_aging(input_, items, pct, completed_count=100),
+        generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+    )
+
+
+class TestAgingHtmlRedesign:
+    """The Tufte redesign: title = the answer, banner promotes the
+    divergence caveat, per-state diagnostic + interventions list are
+    the actionable signals, redundant tables removed.
+    """
+
+    def test_html_title_is_the_headline_not_a_program_label(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The <title> tag should carry the headline, not 'flowmetrics —
+        # aging <repo>'. Agents and humans both read this in tabs.
+        title_match = re.search(r"<title>([^<]+)</title>", out)
+        assert title_match is not None
+        assert "flowmetrics" not in title_match.group(1).lower()
+
+    def test_no_red_banner_at_top_of_page_even_when_distribution_diverges(self):
+        """The divergence is information, not an alarm. Stripped from
+        the top per Tufte 'less is more' pass; the caveat still lives
+        in the footer's caveats list for the reader who wants context."""
+        out = html_renderer.render(_aging_report_with_divergence())
+        # No `class="banner"` div anywhere on the page.
+        assert 'class="banner"' not in out
+
+    def test_divergence_caveat_still_appears_in_footer_caveats(self):
+        """The signal-quality information must not be lost — it moves
+        from the banner to the 'About this report' footer where the
+        other caveats live."""
+        out = html_renderer.render(_aging_report_with_divergence())
+        # Divergence text still on the page (just not in a banner).
+        assert "diverge" in out.lower()
+        # And it sits after the chart, not above it.
+        i_div = out.lower().index("diverge")
+        i_chart = out.index('id="aging-chart"')
+        assert i_div > i_chart
+
+    def test_no_divergence_banner_when_distribution_is_healthy(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Healthy fixture has ~17% above P95 (1 of 6); over threshold
+        # actually. Need a healthier fixture.
+        # Instead inspect that the banner shows when it should — that
+        # behaviour is exercised in the divergence test above. Here we
+        # assert the report without divergence does NOT carry the
+        # banner. Use a custom fixture:
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget", asof=date(2026, 5, 14),
+                workflow=("A",), history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13), offline=False,
+            ),
+            items=[
+                AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                          current_state="A", age_days=1)
+                for i in range(20)
+            ],  # all under P50 = "healthy"
+            cycle_time_percentiles={50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0},
+            completed_count=100,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        out = html_renderer.render(report)
+        assert 'class="banner"' not in out
+
+    def test_top_interventions_list_renders(self):
+        out = html_renderer.render(_aging_report_with_divergence())
+        # Items past P85 are surfaced under the Next actions section.
+        assert "Next actions" in out
+
+    def test_per_state_diagnostic_table_renders(self):
+        out = html_renderer.render(_aging_report_with_divergence())
+        # Bottleneck diagnostic by workflow state.
+        assert "median age" in out.lower() or "oldest" in out.lower()
+
+    def test_redundant_tables_removed(self):
+        """Four tables duplicated the chart and the new diagnostic
+        table; they are gone."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        # "Headline numbers" repeats the headline (and the workflow).
+        assert "Headline numbers" not in out
+        # "WIP per workflow state" = the chart's column densities.
+        assert "WIP per workflow state" not in out
+        # "Cycle-time percentiles (from completed items)" = chart lines.
+        assert "Cycle-time percentiles (from completed items)" not in out
+        # "In-flight age distribution" is now folded into the diagnostic.
+        assert "In-flight age distribution" not in out
+
+
+class TestAgingHtmlV2Restructure:
+    """The Tufte-v2 restructure: H1 is the term not the headline, repo
+    is a subtitle link, chart moves above interventions, Next Actions
+    absorbs the interventions list, helper-text paragraph deleted,
+    Vacanti page numbers gone, vocabulary becomes a footnote."""
+
+    def test_h1_is_the_term_not_the_full_headline(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        h1 = re.search(r"<h1>([^<]+)</h1>", out)
+        assert h1 is not None
+        # H1 is the report's metric, not the long headline sentence.
+        assert h1.group(1).strip() == "Aging Work In Progress"
+
+    def test_repo_appears_as_a_subtitle_link(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The repo is a clickable link to GitHub right under the H1.
+        assert 'href="https://github.com/acme/widget"' in out
+        assert "acme/widget" in out
+
+    def test_chart_appears_before_next_actions_block(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        i_chart = out.index('id="aging-chart"')
+        i_next = out.index("Next actions") if "Next actions" in out else \
+                 out.index("Next Actions")
+        assert i_chart < i_next
+
+    def test_chart_helper_text_paragraph_removed(self):
+        """The 'Hover any circle / drag to pan / scroll-wheel to zoom'
+        helper text is gone — affordances should be self-evident."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        assert "Hover any circle" not in out
+        assert "scroll-wheel" not in out
+        assert "Drag to pan" not in out
+
+    def test_no_vacanti_page_numbers(self):
+        """Page numbers were wrong. Citations stripped to book only."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        assert "pp. 50" not in out
+        assert "p. 50" not in out
+        assert "Figure 3.2" not in out
+
+    def test_vocabulary_contains_wip_definition(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # WIP is the term most likely to need defining; must be there.
+        assert "WIP" in out
+        assert "Work In Progress" in out
+
+    def test_next_actions_section_includes_multiple_items_per_state(self):
+        """Old behaviour: 1 per state, capped at 5 — gave 2 items for
+        rust. New: 3 per state — gives a useful action list."""
+        # Fixture has 6 items in State A past P95, all candidates.
+        out = html_renderer.render(_aging_report_with_divergence())
+        # Count item-id chips inside the Next Actions section.
+        # Find the section and count `<div class="intervention">` rows.
+        i_actions = out.index("Next actions") if "Next actions" in out \
+                    else out.index("Next Actions")
+        i_next_section = out.index("<h2", i_actions + 1) if "<h2" in out[i_actions + 1:] \
+                         else len(out)
+        section = out[i_actions:i_next_section]
+        rows = section.count('class="intervention"')
+        # 6 candidates past P85, all in State A → capped at 3 (per-state).
+        assert rows == 3
+
+
+class TestAgingHtmlVegaChart:
+    """HTML output includes a fully-inlined Vega-Lite interactive chart
+    alongside the existing PNG. No CDN — the report must render with
+    no network connection."""
+
+    def test_inlines_vega_vega_lite_and_embed_scripts(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Three vendored bundles, each inlined verbatim (truncated check
+        # — first bytes of the UMD wrapper are distinctive).
+        assert out.count('!function(') >= 3
+        # No CDN <script src="..."> tags — we ship the JS inline.
+        assert 'src="https://' not in out
+        assert 'src="//cdn' not in out
+
+    def test_inlines_a_vega_lite_spec_for_the_chart(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Spec is embedded as a JSON literal. Distinctive Vega-Lite v5
+        # schema URL must be present.
+        assert "vega-lite/v5.json" in out
+
+    def test_chart_container_div_present(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # A div the JS can target. Name is stable so the JS can find it.
+        assert 'id="aging-chart"' in out
+
+    def test_invokes_vega_embed_on_the_container(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # vegaEmbed call wires the spec into the div.
+        assert "vegaEmbed" in out
+        # The spec is passed inline (not fetched from a URL).
+        assert "fetch(" not in out  # belt-and-braces: no runtime spec load
+
+    def test_png_chart_is_no_longer_present(self):
+        """The PNG fallback was removed — the interactive chart is the
+        canonical surface. This test inverts the earlier assertion."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        assert not re.search(r'src="data:image/png;base64,[A-Za-z0-9+/=]{100,}"', out)
+
+
+class TestAgingPolishV3:
+    """Final pass: H2 for the chart section, accessibility hardening
+    of the stacked bar, static PNG removed entirely, reproduce +
+    parameters split into their own collapsible (separate from
+    'About this report')."""
+
+    def test_chart_section_has_h2_titled_wip_aging(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Specific H2 immediately announces the chart for screen-reader
+        # navigation by heading.
+        assert "<h2>WIP Aging</h2>" in out
+
+    def test_static_png_fallback_removed_entirely(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # No PNG <img> data-uri anywhere — the interactive chart is the
+        # canonical surface; PNG fallback was unused archival cruft.
+        import re as _re
+        assert not _re.search(r'src="data:image/png;base64,', out)
+        assert "PNG fallback" not in out
+        assert "PNG (archival)" not in out
+
+    def test_reproduce_and_parameters_in_their_own_collapsible(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Standalone <details> summary named for reproducing the report.
+        assert "<summary>Reproduce this report</summary>" in out
+        # And the parameters live with it (workflow/training-window row).
+        i_summary = out.index("<summary>Reproduce this report</summary>")
+        i_next_h2 = out.index("<h2", i_summary + 1) if "<h2" in out[i_summary + 1:] else len(out)
+        # Look for the parameter rows within that section.
+        section = out[i_summary:i_next_h2]
+        assert "Percentile training window" in section
+        # And the invocation command is in the same block.
+        assert "uv run flow aging" in section
+
+    def test_about_section_does_not_carry_the_reproducer_anymore(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The About block keeps definition + vocabulary; the reproducer
+        # is now siblings, not folded in.
+        about_idx = out.index("<summary>About this report</summary>")
+        about_end = out.index("</details>", about_idx)
+        about_section = out[about_idx:about_end]
+        assert "uv run flow aging" not in about_section
+        # But About still has the math + definition.
+        assert "observed cycle times" in about_section.lower() or \
+               "empirical" in about_section.lower()
+
+    def test_stacked_bar_has_aria_label_with_distribution_summary(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The bar element carries role + aria-label so screen readers
+        # announce the distribution as text rather than ignoring it.
+        assert 'role="img"' in out
+        assert 'aria-label="Aging distribution' in out
+
+
+class TestAgingReadability:
+    """An engineer/manager/TPM reading the page must be able to
+    understand what the percentile lines mean and act on them. This
+    suite pins the existence and intelligibility of the explanation.
+    """
+
+    def test_per_state_table_includes_at_risk_column(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # New column header — surfaces the "needs a conversation now"
+        # cohort (items past P50, not yet past P85).
+        assert "At risk" in out
+
+    def test_about_section_contains_vacanti_doubling_explanation(self):
+        """The 'doubling math' (Vacanti, WWIBD) must be on the page so
+        a manager reading the chart understands why the lines matter."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The 100-PR worked example is the way an engineer grasps it.
+        # Surface the key phrasing.
+        text = out.lower()
+        assert "conditional" in text or "doubled" in text or "doubles" in text
+        # And the bottom-line action message.
+        assert "85" in out and "50" in out
+
+    def test_about_section_says_thresholds_are_observed_not_simulated(self):
+        """After a month of confusion, the page must explicitly say the
+        lines are observed cycle times, not Monte Carlo / forecasted."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        text = out.lower()
+        assert "observed" in text or "empirical" in text
+        # The page is allowed to MENTION Monte Carlo (e.g. "no Monte
+        # Carlo here") — but must not claim the lines are derived from
+        # it. Sanity-check by looking for "no monte carlo" or similar
+        # disclaimer when the phrase appears at all.
+        if "monte carlo" in text:
+            assert (
+                "no monte carlo" in text
+                or "no simulation" in text
+                or "not monte carlo" in text
+            ), "if MCS is mentioned, the page must clarify it is NOT used"
+
+
+class TestAgingMinimalChrome:
+    """Holistic 'less is more' pass on the Aging report:
+    - No headline sentence — its prefix duplicates the title/subtitle,
+      and its numbers duplicate the distribution table + per-state table.
+    - No "Key insight" yellow block — redundant with the chart +
+      interventions list.
+    - No auto "Next actions" list from interpretation — the
+      interventions list is the actionable next-actions surface.
+    - Subtitle carries the as-of date so it doesn't need its own line.
+    - 'All N in-flight items' dump replaced with 'Top 50 past P85'
+      since 500+ rows is reference data, not actionable.
+    - Generation stamp moves to the bottom (archival use only).
+    """
+
+    def test_headline_sentence_not_rendered_at_top(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The old prefix "WIP Aging for X as of Y" duplicated title +
+        # subtitle. Should not appear anywhere on the page.
+        assert "WIP Aging for" not in out
+
+    def test_subtitle_includes_asof_date(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # The asof date is essential context; carry it in the subtitle.
+        # Prose date format used elsewhere: "May 14, 2026".
+        assert "May 14, 2026" in out
+
+    def test_no_key_insight_section_in_aging(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        assert "Key insight" not in out
+
+    def test_no_auto_next_actions_list_from_interpretation(self):
+        """The interventions list IS the Next actions surface. The base
+        template's auto-rendered ordered list of interpretation.next_actions
+        is suppressed — those text strings duplicated or contradicted
+        the interventions list above them."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Old jargon line about pull policy / capacity should be gone.
+        assert "pull policy" not in out
+        assert "capacity." not in out
+
+    def test_full_per_pr_dump_replaced_with_top_50_past_p85(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        # Old summary text: "All N in-flight items (oldest first)".
+        assert "All " not in out or "in-flight items (oldest first)" not in out
+        # The replacement: "Oldest items past P85" — or similar.
+        # (Empty in this fixture since few items past P85.)
+        # Soft check: the new section header phrasing exists somewhere
+        # OR the section is omitted entirely when nothing is past P85.
+
+    def test_definition_moved_to_footer_not_above_chart(self):
+        """'What this shows' was the third stacked colored block. It's
+        either moved to a footer (after the detail divider) or removed."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        if "What this shows" in out:
+            i_def = out.index("What this shows")
+            i_chart = out.index('id="aging-chart"')
+            # If still present, it lives AFTER the chart.
+            assert i_def > i_chart
+
+
+class TestNoStackedDecorativeBlocks:
+    """Tufte: don't stack colored boxes. The headline and definition
+    were each a decorative colored block, so headline + banner +
+    definition rendered as three vertical highlight stripes — high
+    visual noise, low information hierarchy. Only the conditional
+    banner/horizon classes are allowed to carry decorative chrome.
+    """
+
+    def test_headline_class_is_not_a_colored_block(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        m = re.search(r"\.headline\s*\{([^}]*)\}", out)
+        assert m is not None, "headline CSS rule should exist (for hierarchy)"
+        rule = m.group(1)
+        assert "#f0f8ff" not in rule, "no blue tint"
+        assert "border-left" not in rule, "no colored left stripe"
+
+    def test_definition_class_is_not_a_colored_block(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        m = re.search(r"\.definition\s*\{([^}]*)\}", out)
+        if m is None:
+            # Acceptable: definition removed entirely from the page.
+            return
+        rule = m.group(1)
+        assert "#f0f4f8" not in rule, "no grey tint"
+        assert "border-left" not in rule, "no colored left stripe"
+
+
+class TestAgingHtmlDistributionAtTop:
+    """The 5-band aging distribution is the page's situation-snapshot
+    "big number" — it answers "what does the in-flight pile look like
+    against recent cycle times" without involving a trend. Surfaced
+    prominently above the chart; the chart provides the per-item view
+    of the same distribution.
+    """
+
+    def test_distribution_table_rendered_with_all_five_bands(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        assert "Below P50" in out
+        assert "P50–P70" in out
+        assert "P70–P85" in out
+        assert "P85–P95" in out
+        assert "Above P95" in out
+
+    def test_distribution_table_appears_before_the_chart(self):
+        """The situation snapshot goes at the top — above the chart."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        i_dist = out.index("Above P95")
+        i_chart = out.index('id="aging-chart"')
+        assert i_dist < i_chart
+
+    def test_per_state_table_appears_after_the_chart(self):
+        """Drilldown comes after the chart, not before it."""
+        out = html_renderer.render(_aging_report_with_distribution())
+        i_chart = out.index('id="aging-chart"')
+        i_per_state = out.index("Per-state aging")
+        assert i_chart < i_per_state
 
 
 class TestHumanDateLabel:

@@ -155,6 +155,14 @@ class JiraSource:
         )
         return self._paginated_fetch(jql, in_flight_asof=None)
 
+    def fetch_for_percentile_training(
+        self, start: date, stop: date
+    ) -> list[WorkItem]:
+        # Jira's changelog query carries no inline timeline payload that
+        # could be over-fetched, so the lightweight variant is just the
+        # same query. This stub exists so the Source protocol stays uniform.
+        return self.fetch_completed_in_window(start, stop)
+
     def fetch_in_flight(self, asof: date) -> list[WorkItem]:
         """Unresolved issues for this project, with their current status
         appended as a final synthetic interval ending at `asof`."""

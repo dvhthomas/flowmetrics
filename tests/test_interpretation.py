@@ -16,17 +16,21 @@ Contract:
 from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
+from typing import ClassVar
 
+from flowmetrics.aging import AgingItem
 from flowmetrics.cfd import CfdPoint
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.interpretation import (
+    interpret_aging,
     interpret_cfd,
     interpret_efficiency,
     interpret_how_many,
     interpret_when_done,
 )
 from flowmetrics.report import (
+    AgingInput,
     CfdInput,
     EfficiencyInput,
     HowManyInput,
@@ -454,3 +458,153 @@ class TestInterpretCfd:
         i = interpret_cfd(_cfd_input(), points)
         text = (i.key_insight + " " + " ".join(i.next_actions)).lower()
         assert "0" in i.headline or "no" in text or "zero" in text
+
+
+class TestInterpretAgingMaxAge:
+    """Headline + caveats reflect the --max-age-days filter when set."""
+
+    @staticmethod
+    def _input(max_age_days: int | None = None) -> AgingInput:
+        return AgingInput(
+            repo="acme/widget",
+            asof=date(2026, 5, 14),
+            workflow=("Awaiting Review", "Approved"),
+            history_start=date(2026, 4, 14),
+            history_end=date(2026, 5, 13),
+            offline=False,
+            max_age_days=max_age_days,
+        )
+
+    @staticmethod
+    def _items(count: int) -> list[AgingItem]:
+        return [
+            AgingItem(
+                item_id=f"#{i}",
+                title=f"PR {i}",
+                current_state="Awaiting Review",
+                age_days=5,
+            )
+            for i in range(count)
+        ]
+
+    def test_headline_omits_filter_phrase_when_max_age_unset(self):
+        i = interpret_aging(
+            self._input(max_age_days=None),
+            self._items(10),
+            {50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=20,
+        )
+        assert "showing" not in i.headline.lower()
+        assert "excluded" not in i.headline.lower()
+
+    def test_headline_includes_filter_phrase_when_items_excluded(self):
+        i = interpret_aging(
+            self._input(max_age_days=180),
+            self._items(7),
+            {50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=20,
+            excluded_above_max_age=3,
+        )
+        # Surface both the shown count and the excluded count.
+        assert "7" in i.headline
+        assert "3" in i.headline
+        assert "180" in i.headline
+
+    def test_caveat_warns_about_excluded_items(self):
+        i = interpret_aging(
+            self._input(max_age_days=180),
+            self._items(7),
+            {50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=20,
+            excluded_above_max_age=3,
+        )
+        text = " ".join(i.caveats).lower()
+        assert "excluded" in text or "max-age" in text or "180" in text
+
+    def test_filter_set_but_nothing_excluded_no_caveat(self):
+        """User set --max-age-days but nothing was actually filtered.
+        Don't warn — there's nothing hidden from view."""
+        i = interpret_aging(
+            self._input(max_age_days=180),
+            self._items(10),
+            {50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=20,
+            excluded_above_max_age=0,
+        )
+        for caveat in i.caveats:
+            assert "excluded" not in caveat.lower()
+
+
+class TestInterpretAgingDistributionDivergence:
+    """When more than 10% of the in-flight set is past P95 of completers,
+    surface a caveat explaining the in-flight distribution diverges
+    from recent completion times — the survivorship-bias diagnostic
+    we discussed for the rust result.
+    """
+
+    @staticmethod
+    def _input() -> AgingInput:
+        return AgingInput(
+            repo="acme/widget",
+            asof=date(2026, 5, 14),
+            workflow=("Awaiting Review", "Approved"),
+            history_start=date(2026, 4, 14),
+            history_end=date(2026, 5, 13),
+            offline=False,
+        )
+
+    @staticmethod
+    def _items_with_above_p95_share(total: int, above_p95_count: int) -> list[AgingItem]:
+        """Build `total` items, `above_p95_count` of them past P95.
+
+        P95 is set to 50d in the percentiles below, so items at age=100
+        sit past P95 and items at age=1 sit below P50.
+        """
+        return [
+            AgingItem(
+                item_id=f"#{i}",
+                title=f"PR {i}",
+                current_state="Awaiting Review",
+                age_days=100 if i < above_p95_count else 1,
+            )
+            for i in range(total)
+        ]
+
+    PCT: ClassVar[dict[int, float]] = {50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0}
+
+    def test_caveat_fires_when_above_p95_share_exceeds_threshold(self):
+        # 20% past P95 — well above the 10% threshold.
+        i = interpret_aging(
+            self._input(),
+            self._items_with_above_p95_share(total=100, above_p95_count=20),
+            self.PCT,
+            completed_count=50,
+        )
+        text = " ".join(i.caveats).lower()
+        assert "diverge" in text or "diverges" in text or "doesn't resemble" in text
+        # Must reference P95 specifically so the reader can locate the band.
+        assert "p95" in text
+
+    def test_caveat_quiet_when_above_p95_share_below_threshold(self):
+        # 5% past P95 — under threshold; this is the steady-state expectation.
+        i = interpret_aging(
+            self._input(),
+            self._items_with_above_p95_share(total=100, above_p95_count=5),
+            self.PCT,
+            completed_count=50,
+        )
+        text = " ".join(i.caveats).lower()
+        assert "diverge" not in text
+        assert "doesn't resemble" not in text
+
+    def test_caveat_quiet_at_exactly_10_percent_threshold(self):
+        """The threshold is `> 10%`, not `>= 10%`. Exactly 10% is the
+        edge of the steady-state expectation — quiet."""
+        i = interpret_aging(
+            self._input(),
+            self._items_with_above_p95_share(total=100, above_p95_count=10),
+            self.PCT,
+            completed_count=50,
+        )
+        text = " ".join(i.caveats).lower()
+        assert "diverge" not in text

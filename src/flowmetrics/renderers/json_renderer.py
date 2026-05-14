@@ -7,6 +7,7 @@ from dataclasses import asdict
 from datetime import date, datetime, timedelta
 from typing import Any
 
+from ..aging import compute_aging_distribution, per_state_diagnostic, top_interventions
 from ..report import (
     AgingReport,
     CfdReport,
@@ -255,11 +256,27 @@ def _render_aging(report: AgingReport) -> dict[str, Any]:
         "definition": report_definition(report),
         "summary": {
             "in_flight_count": len(report.items),
+            "in_flight_total": report.in_flight_total,
+            "in_flight_shown": len(report.items),
+            "excluded_above_max_age": report.excluded_above_max_age,
             "wip_by_state": wip_by_state,
             "cycle_time_percentiles_days": {
                 str(p): v for p, v in report.cycle_time_percentiles.items()
             },
             "completed_count_for_percentiles": report.completed_count,
+            "aging_distribution": compute_aging_distribution(
+                report.items, report.cycle_time_percentiles
+            ),
+            "per_state_diagnostic": per_state_diagnostic(
+                items=report.items,
+                workflow=report.input.workflow,
+                percentiles=report.cycle_time_percentiles,
+            ),
+            "top_interventions": top_interventions(
+                items=report.items,
+                workflow=report.input.workflow,
+                percentiles=report.cycle_time_percentiles,
+            ),
         },
         "key_insight": report.interpretation.key_insight,
         "next_actions": list(report.interpretation.next_actions),
@@ -272,6 +289,7 @@ def _render_aging(report: AgingReport) -> dict[str, Any]:
                     "title": it.title,
                     "current_state": it.current_state,
                     "age_days": it.age_days,
+                    "pr_url": it.pr_url,
                 }
                 for it in report.items
             ],
@@ -283,6 +301,7 @@ def _render_aging(report: AgingReport) -> dict[str, Any]:
             "history_start": report.input.history_start.isoformat(),
             "history_end": report.input.history_end.isoformat(),
             "offline": report.input.offline,
+            "max_age_days": report.input.max_age_days,
         },
         "docs": _DOCS,
     }

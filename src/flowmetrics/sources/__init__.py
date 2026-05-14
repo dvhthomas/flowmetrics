@@ -20,6 +20,17 @@ class Source(Protocol):
     def fetch_completed_in_window(self, start: date, stop: date) -> list[WorkItem]:
         ...
 
+    def fetch_for_percentile_training(
+        self, start: date, stop: date
+    ) -> list[WorkItem]:
+        """Lightweight variant of `fetch_completed_in_window` for
+        callers that only need ``cycle_time`` (Aging's percentile-line
+        subroutine). Sources may return WorkItems without `activity`
+        events populated. The flow-efficiency path must continue to use
+        the full `fetch_completed_in_window`.
+        """
+        ...
+
     def fetch_in_flight(self, asof: date) -> list[WorkItem]:
         """Items that have entered but not yet exited the workflow as of `asof`.
 

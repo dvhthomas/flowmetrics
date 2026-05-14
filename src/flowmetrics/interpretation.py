@@ -369,11 +369,16 @@ def interpret_aging(
     items: list[AgingItem],
     cycle_time_percentiles: dict[int, float],
     completed_count: int,
+    excluded_above_max_age: int = 0,
 ) -> Interpretation:
     """Narrate a WIP-Aging snapshot per Vacanti.
 
     Calls out items already past P85 (likely to miss forecast) and the
     state column with the most accumulated WIP.
+
+    `excluded_above_max_age` is the count of in-flight items dropped by
+    the opt-in `--max-age-days` filter. When > 0, the headline names the
+    threshold and a caveat warns the reader that hidden WIP exists.
     """
     caveats = [
         "Aging is a snapshot as of "
@@ -386,6 +391,31 @@ def interpret_aging(
         "OSS — that's queue, not work. Treat the chart as a queue-depth "
         "indicator first, a productivity signal second.",
     ]
+    if excluded_above_max_age > 0 and input.max_age_days is not None:
+        caveats.append(
+            f"{excluded_above_max_age} in-flight item(s) were excluded from "
+            f"the chart and the past-P85/P95 counts because their age "
+            f"exceeded --max-age-days={input.max_age_days}. They may still "
+            "represent real WIP that needs review."
+        )
+
+    # Survivorship-bias diagnostic. If >10% of in-flight items are
+    # past P95 of recent completers, the recent-completer distribution
+    # almost certainly doesn't represent the in-flight backlog —
+    # percentile thresholds are likely understated. The 10% threshold
+    # is "twice the steady-state 5% expectation", a useful warning band.
+    if items:
+        p95 = cycle_time_percentiles.get(95, 0.0)
+        if p95 > 0:
+            above_p95_share = sum(1 for it in items if it.age_days >= p95) / len(items)
+            if above_p95_share > 0.10:
+                caveats.append(
+                    f"{above_p95_share:.0%} of in-flight items are past P95 of "
+                    "recent completers — well above the ~5% steady-state "
+                    "expectation. The in-flight age distribution diverges from "
+                    "the recent-completer distribution, so the percentile "
+                    "thresholds (P85/P95) are likely understated for this WIP."
+                )
 
     if not items:
         return Interpretation(
@@ -420,9 +450,18 @@ def interpret_aging(
         wip_per_state[it.current_state] = wip_per_state.get(it.current_state, 0) + 1
     biggest_state, biggest_count = max(wip_per_state.items(), key=lambda kv: kv[1])
 
+    if excluded_above_max_age > 0 and input.max_age_days is not None:
+        total = len(items) + excluded_above_max_age
+        showing_phrase = (
+            f" (showing {len(items)} of {total}; "
+            f"{excluded_above_max_age} excluded with age > {input.max_age_days}d)"
+        )
+    else:
+        showing_phrase = ""
     headline = (
         f"WIP Aging for {input.repo} as of {_prose_date(input.asof)}: "
-        f"{len(items)} in-flight items, {len(past_p85)} already past P85 "
+        f"{len(items)} in-flight items{showing_phrase}, "
+        f"{len(past_p85)} already past P85 "
         f"({p85:.1f}d), {len(past_p95)} past P95 ({p95:.1f}d)."
     )
 

@@ -351,6 +351,326 @@ def fetch_open_prs(
     return items
 
 
+# ---------------------------------------------------------------------------
+# Lightweight fetch for percentile-training (Aging only)
+# ---------------------------------------------------------------------------
+#
+# Aging's percentile-line subroutine needs cycle_time = mergedAt -
+# createdAt and nothing else. PR_SEARCH_QUERY carries 100 timeline
+# events per merged PR for flow efficiency's active/wait clustering —
+# pure over-fetch here, and it times out GitHub's GraphQL endpoint on
+# large repos (504 on rust-lang/rust).
+
+PR_CYCLE_TIME_QUERY = """
+query($q: String!, $first: Int!, $after: String) {
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    issueCount
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        createdAt
+        mergedAt
+        author {
+          __typename
+          login
+        }
+      }
+    }
+  }
+  rateLimit { remaining limit resetAt cost }
+}
+""".strip()
+
+
+def fetch_prs_for_cycle_times(
+    client: GitHubClient,
+    repo: str,
+    start: date,
+    stop: date,
+    *,
+    page_size: int = 100,
+) -> list[WorkItem]:
+    """Fetch every PR merged in [start, stop] with just createdAt /
+    mergedAt / author. Activity is empty — only cycle_time is meaningful
+    on the returned WorkItems. Used by `flow aging`'s percentile training.
+    """
+    q = f"repo:{repo} is:pr is:merged merged:{start.isoformat()}..{stop.isoformat()}"
+    prs: list[WorkItem] = []
+    after: str | None = None
+    while True:
+        payload = client.graphql(
+            PR_CYCLE_TIME_QUERY,
+            {"q": q, "first": page_size, "after": after},
+        )
+        search = payload["data"]["search"]
+        for node in search.get("nodes") or []:
+            if not node or "number" not in node:
+                continue
+            if not node.get("mergedAt"):
+                # Defensive: is:merged filter should keep these out,
+                # but a missing mergedAt has no cycle time anyway.
+                continue
+            author = node.get("author")
+            prs.append(
+                WorkItem(
+                    item_id=f"#{node['number']}",
+                    title=node.get("title", ""),
+                    created_at=_parse_dt(node["createdAt"]),
+                    merged_at=_parse_dt(node["mergedAt"]),
+                    activity=[],
+                    is_bot=_is_bot(author),
+                    author_login=(author or {}).get("login"),
+                )
+            )
+        page_info = search["pageInfo"]
+        if not page_info["hasNextPage"]:
+            break
+        after = page_info["endCursor"]
+    return prs
+
+
+# ---------------------------------------------------------------------------
+# Label-driven open-PR fetch for label-mode Aging
+# ---------------------------------------------------------------------------
+#
+# Separate query from OPEN_PR_QUERY so the existing review-cycle fetcher
+# keeps its cache key stable. See docs/SPEC-github-labels.md §7 for the
+# rationale. The query pulls LabeledEvent/UnlabeledEvent + lifecycle
+# events; the materializer in github_labels.py walks them into the
+# StatusInterval sequence the rest of the pipeline consumes.
+
+# Snapshot-only Aging query. The full timeline is only needed for CFD —
+# Aging reads `status_intervals[-1].status` and `created_at` and nothing
+# else, so the current label snapshot is enough. Eliminates ~95% of
+# per-PR payload that the timeline query carried.
+OPEN_PR_LABEL_SNAPSHOT_QUERY = """
+query($q: String!, $first: Int!, $after: String) {
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    issueCount
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        createdAt
+        author {
+          __typename
+          login
+        }
+        labels(first: 20) { nodes { name } }
+      }
+    }
+  }
+  rateLimit { remaining limit resetAt cost }
+}
+""".strip()
+
+
+def fetch_open_prs_with_label_snapshot(
+    client: GitHubClient,
+    repo: str,
+    *,
+    asof: date,
+    wip,  # WipLabels — imported lazily below
+    page_size: int = 100,
+) -> list[WorkItem]:
+    """Aging-only fetcher. Reads each PR's current label snapshot and
+    builds ONE synthetic StatusInterval whose status is the rightmost-
+    in-WIP of those labels (or Pre-WIP if none match).
+
+    No timeline walk — that's CFD's concern. See module docstring in
+    ``github_labels.py`` for the split.
+    """
+    from .github_labels import PRE_WIP_STATUS, _rightmost
+
+    q = f"repo:{repo} is:pr is:open archived:false"
+    asof_dt = datetime.combine(asof, datetime.min.time()).replace(tzinfo=UTC)
+    items: list[WorkItem] = []
+    after: str | None = None
+    while True:
+        payload = client.graphql(
+            OPEN_PR_LABEL_SNAPSHOT_QUERY,
+            {"q": q, "first": page_size, "after": after},
+        )
+        search = payload["data"]["search"]
+        for node in search.get("nodes") or []:
+            if not node or "number" not in node:
+                continue
+            created = _parse_dt(node["createdAt"])
+            current_labels = {
+                (lbl or {}).get("name", "").lower()
+                for lbl in (node.get("labels") or {}).get("nodes") or []
+                if lbl and lbl.get("name")
+            }
+            status = _rightmost(current_labels, wip) or PRE_WIP_STATUS
+            end = asof_dt if asof_dt > created else created
+            author = node.get("author")
+            items.append(
+                WorkItem(
+                    item_id=f"#{node['number']}",
+                    title=node.get("title", ""),
+                    created_at=created,
+                    merged_at=None,
+                    activity=[],
+                    is_bot=_is_bot(author),
+                    author_login=(author or {}).get("login"),
+                    status_intervals=[StatusInterval(created, end, status)],
+                )
+            )
+        page_info = search["pageInfo"]
+        if not page_info["hasNextPage"]:
+            break
+        after = page_info["endCursor"]
+    return items
+
+
+OPEN_PR_LABEL_QUERY = """
+query($q: String!, $first: Int!, $after: String) {
+  search(query: $q, type: ISSUE, first: $first, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    issueCount
+    nodes {
+      ... on PullRequest {
+        number
+        title
+        createdAt
+        mergedAt
+        closedAt
+        author {
+          __typename
+          login
+        }
+        labels(first: 50) { nodes { name } }
+        timelineItems(
+          first: 100,
+          itemTypes: [
+            LABELED_EVENT, UNLABELED_EVENT,
+            MERGED_EVENT, CLOSED_EVENT, REOPENED_EVENT
+          ]
+        ) {
+          pageInfo { hasNextPage }
+          nodes {
+            __typename
+            ... on LabeledEvent   { createdAt label { name } }
+            ... on UnlabeledEvent { createdAt label { name } }
+            ... on MergedEvent    { createdAt }
+            ... on ClosedEvent    { createdAt }
+            ... on ReopenedEvent  { createdAt }
+          }
+        }
+      }
+    }
+  }
+  rateLimit { remaining limit resetAt cost }
+}
+""".strip()
+
+
+# GraphQL __typename → tagged-union kind. Two dispatch maps replace
+# what was a chain of if/elif branches.
+_LABEL_KINDS = {"LabeledEvent": "added", "UnlabeledEvent": "removed"}
+_LIFECYCLE_KINDS = {
+    "MergedEvent": "merged",
+    "ClosedEvent": "closed",
+    "ReopenedEvent": "reopened",
+}
+
+
+def _parse_label_events(pr_node: dict[str, Any]) -> tuple[list, list]:
+    """Pull LabelEvent + LifecycleEvent lists out of a PR timeline.
+
+    Label names are lowercased — GitHub enforces case-insensitive
+    uniqueness per repo, so matching user input must be case-insensitive
+    too. (Imported lazily to keep github.py free of a hard dependency on
+    github_labels.)
+    """
+    from .github_labels import LabelEvent, LifecycleEvent
+
+    label_events: list[LabelEvent] = []
+    lifecycle_events: list[LifecycleEvent] = []
+    for item in (pr_node.get("timelineItems") or {}).get("nodes") or []:
+        typename = item.get("__typename")
+        created = item.get("createdAt")
+        if not created:
+            continue
+        if typename in _LABEL_KINDS:
+            name = (item.get("label") or {}).get("name")
+            if name:
+                label_events.append(
+                    LabelEvent(
+                        at=_parse_dt(created),
+                        label=name.lower(),
+                        kind=_LABEL_KINDS[typename],
+                    )
+                )
+        elif typename in _LIFECYCLE_KINDS:
+            lifecycle_events.append(
+                LifecycleEvent(at=_parse_dt(created), kind=_LIFECYCLE_KINDS[typename])
+            )
+    return label_events, lifecycle_events
+
+
+def fetch_open_prs_with_labels(
+    client: GitHubClient,
+    repo: str,
+    *,
+    asof: date,
+    wip,  # WipLabels — imported lazily below for the same reason as above
+    page_size: int = 100,
+) -> list[WorkItem]:
+    """Fetch every open PR in `repo` and materialize its status_intervals
+    by walking LabeledEvent/UnlabeledEvent + lifecycle events through the
+    label-mode resolution rule.
+
+    The returned WorkItems have ``merged_at=None`` (only OPEN PRs are
+    queried — see SPEC §1 "Out of scope" on merged-but-not-shipped).
+    """
+    from .github_labels import materialize_status_intervals
+
+    q = f"repo:{repo} is:pr is:open archived:false"
+    asof_dt = datetime.combine(asof, datetime.min.time()).replace(tzinfo=UTC)
+    items: list[WorkItem] = []
+    after: str | None = None
+    while True:
+        payload = client.graphql(
+            OPEN_PR_LABEL_QUERY,
+            {"q": q, "first": page_size, "after": after},
+        )
+        search = payload["data"]["search"]
+        for node in search.get("nodes") or []:
+            if not node or "number" not in node:
+                continue
+            created = _parse_dt(node["createdAt"])
+            label_events, lifecycle_events = _parse_label_events(node)
+            status_intervals = materialize_status_intervals(
+                created_at=created,
+                asof=asof_dt,
+                label_events=label_events,
+                lifecycle_events=lifecycle_events,
+                wip=wip,
+            )
+            author = node.get("author")
+            items.append(
+                WorkItem(
+                    item_id=f"#{node['number']}",
+                    title=node.get("title", ""),
+                    created_at=created,
+                    merged_at=None,
+                    activity=[],
+                    is_bot=_is_bot(author),
+                    author_login=(author or {}).get("login"),
+                    status_intervals=status_intervals,
+                )
+            )
+        page_info = search["pageInfo"]
+        if not page_info["hasNextPage"]:
+            break
+        after = page_info["endCursor"]
+    return items
+
+
 def fetch_prs_merged_in_window(
     client: GitHubClient,
     repo: str,

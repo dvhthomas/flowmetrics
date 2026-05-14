@@ -8,10 +8,14 @@ from __future__ import annotations
 
 from datetime import UTC, date, datetime, timedelta
 
+from flowmetrics.aging import AgingItem
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
+from flowmetrics.interpretation import interpret_aging
 from flowmetrics.renderers import text_renderer
 from flowmetrics.report import (
+    AgingInput,
+    AgingReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -228,3 +232,91 @@ class TestNoEmptyOutput:
     def test_when_done_render_is_substantial(self):
         out = text_renderer.render(_when_done_report(), verbose=True)
         assert len(out) > 200
+
+
+def _aging_report(*, divergent: bool = True) -> AgingReport:
+    """Aging fixture. divergent=True: 60% past P95 — survivorship-bias
+    banner should fire. divergent=False: a healthy distribution."""
+    if divergent:
+        items = (
+            [AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                       current_state="State A", age_days=100)
+             for i in range(6)]
+            + [AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                         current_state="State A", age_days=1)
+               for i in range(6, 10)]
+        )
+    else:
+        items = [
+            AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                      current_state="State A", age_days=1)
+            for i in range(10)
+        ]
+    input_ = AgingInput(
+        repo="acme/widget",
+        asof=date(2026, 5, 14),
+        workflow=("State A", "State B"),
+        history_start=date(2026, 4, 14),
+        history_end=date(2026, 5, 13),
+        offline=False,
+    )
+    pct = {50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0}
+    return AgingReport(
+        input=input_,
+        items=items,
+        cycle_time_percentiles=pct,
+        completed_count=100,
+        interpretation=interpret_aging(input_, items, pct, completed_count=100),
+        generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+    )
+
+
+class TestAgingTextMinimal:
+    """Text output for Aging is trimmed to highest-value signals:
+    headline + divergence warning + interventions + per-state diagnostic
+    + reproducer. No more redundant percentile-only table, no separate
+    WIP-per-state table, no per-PR dump, no vocabulary block.
+    """
+
+    def test_headline_present(self):
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "WIP Aging" in out
+
+    def test_divergence_warning_present_when_triggered(self):
+        out = text_renderer.render(_aging_report(divergent=True), verbose=True)
+        assert "diverge" in out.lower()
+
+    def test_per_state_diagnostic_table_present(self):
+        out = text_renderer.render(_aging_report(), verbose=True)
+        # The table has Past P85 / Past P95 columns — those headings
+        # are distinctive to the new diagnostic.
+        assert "Past P85" in out or "P85" in out
+        assert "State A" in out
+
+    def test_removed_separate_wip_per_state_table(self):
+        """The old WIP-per-state table is now subsumed by the
+        per-state diagnostic. The standalone title shouldn't appear."""
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "WIP per workflow state" not in out
+
+    def test_removed_separate_cycle_time_percentile_table(self):
+        """Percentile values are inside the diagnostic table now;
+        the separate 'Cycle-time percentile checkpoints' header is gone."""
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "Cycle-time percentile checkpoints" not in out
+
+    def test_removed_per_pr_dump_table(self):
+        """`In-flight items (oldest first)` was a 20-row dump that
+        competed with the interventions list. Removed from text."""
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "In-flight items (oldest first)" not in out
+
+    def test_removed_vocabulary_block(self):
+        """Vacanti glossary is reference, not signal — removed from
+        the verbose text output."""
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "Vocabulary used" not in out
+
+    def test_reproduce_command_present(self):
+        out = text_renderer.render(_aging_report(), verbose=True)
+        assert "uv run flow aging" in out

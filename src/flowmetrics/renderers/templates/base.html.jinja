@@ -11,12 +11,16 @@
   h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
        margin-top: 2.5rem; }
   .stamp { color: #777; font-size: 0.85rem; }
-  .headline { background: #f0f8ff; border-left: 4px solid #2b7cff;
-              padding: 0.7rem 1rem; font-size: 1.05rem; margin: 1rem 0; }
-  .insight { background: #fffbea; border-left: 4px solid #d4a72c;
-             padding: 0.7rem 1rem; margin: 1rem 0; }
-  .caveats { color: #555; font-size: 0.9rem; background: #f7f7f7;
-             padding: 0.7rem 1rem; border-left: 4px solid #bbb; margin: 1rem 0; }
+  .subtitle { color: #555; font-size: 1rem; margin: 0 0 0.6rem; }
+  .subtitle a { color: #555; text-decoration: underline; }
+  /* Tufte: non-conditional headline / definition / insight / caveats
+     used to carry decorative colored backgrounds. Three stacked colored
+     blocks at the top of the page (headline + banner + definition)
+     looked like chartjunk. Plain typographic hierarchy now; only the
+     conditional `.banner` and `.horizon` classes get colored chrome. */
+  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .insight { font-size: 1rem; margin: 0.7rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
   details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
                       color: #2b7cff; }
   details[open] > summary { margin-bottom: 0.5rem; }
@@ -24,13 +28,44 @@
                 font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
                 font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
                 overflow-x: auto; white-space: pre; }
-  .definition { background: #f0f4f8; border-left: 4px solid #6b7c93;
-                padding: 0.7rem 1rem; margin: 1rem 0; color: #333; }
+  .definition { font-size: 0.95rem; margin: 0.7rem 0; color: #444;
+                font-style: italic; }
+  /* State pill: workflow-stage labels rendered consistently across
+     the page (interventions list, per-state table, per-PR detail).
+     Visual marker says "this is a stage name." */
+  .pill { display: inline-block; padding: 0.1rem 0.55rem;
+          background: #eef1f5; color: #2b3a4a; border-radius: 999px;
+          font-size: 0.85rem; font-family: ui-monospace, "SF Mono",
+          Menlo, Consolas, monospace; white-space: nowrap; }
+  /* Single horizontal stacked bar for distribution. Each segment is
+     one aging band; width = share; color = yellow→red sequential.
+     Inline label inside the segment when wide enough. */
+  .dist-bar { display: flex; width: 100%; height: 42px;
+              border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+  .dist-bar .seg { display: flex; align-items: center; justify-content: center;
+                   color: #2b2b2b; font-size: 0.85rem; padding: 0 0.3rem;
+                   overflow: hidden; white-space: nowrap;
+                   text-overflow: ellipsis; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 0.8rem;
+                 font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+  .dist-legend .swatch { display: inline-block; width: 0.9rem;
+                         height: 0.9rem; vertical-align: middle;
+                         margin-right: 0.3rem; border-radius: 2px; }
   .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
              font-size: 0.95rem; }
   .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
   .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
   .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .banner { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d;
+            padding: 0.9rem 1.1rem; margin: 1rem 0; font-size: 1rem;
+            font-weight: 500; }
+  .intervention { display: flex; gap: 1rem; padding: 0.4rem 0;
+                  border-bottom: 1px solid #eee; align-items: center;
+                  font-variant-numeric: tabular-nums; }
+  .intervention .state { min-width: 22ch; font-size: 0.9rem; }
+  .intervention .id { min-width: 9ch; }
+  .intervention .age { min-width: 8ch; color: #cc3333; font-weight: 600; }
+  .intervention .title { flex: 1; color: #333; }
   .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
                     text-align: center; height: 0; position: relative; }
   .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
@@ -49,17 +84,30 @@
 </head>
 <body>
 <h1>{{ title }}</h1>
+{% block subtitle %}
 <p class="stamp">Generated {{ generated_at.strftime("%Y-%m-%d %H:%M:%S %Z").strip() }}</p>
+{% endblock %}
+{% block headline %}
 <div class="headline">{{ interpretation.headline }}</div>
+{% endblock %}
 
+{# Optional prominent warning banner — promotes a signal-quality alert
+   above the fold so it doesn't get filed away as a caveat. #}
+{% block banner %}{% endblock %}
+
+{% block definition %}
 <div class="definition"><strong>What this shows.</strong> {{ definition }}</div>
+{% endblock %}
 
 {# Per-report block: should output the key numbers + chart only. #}
 {% block content %}{% endblock %}
 
+{% block key_insight %}
 <h2>Key insight</h2>
 <div class="insight">{{ interpretation.key_insight }}</div>
+{% endblock %}
 
+{% block next_actions %}
 {% if interpretation.next_actions %}
 <h2>Next actions</h2>
 <ol>
@@ -68,12 +116,14 @@
 {% endfor %}
 </ol>
 {% endif %}
+{% endblock %}
 
 <hr class="detail-divider">
 
 {# Per-report detail block: input parameters, training, per-PR, etc. #}
 {% block detail %}{% endblock %}
 
+{% block caveats %}
 {% if interpretation.caveats %}
 <h2>Caveats</h2>
 <div class="caveats">
@@ -84,10 +134,14 @@
 </ul>
 </div>
 {% endif %}
+{% endblock %}
 
+{% block reproduce %}
 <h2>Reproduce this report</h2>
 <div class="invocation">{{ invocation }}</div>
+{% endblock %}
 
+{% block vocabulary %}
 <details>
 <summary>Vacanti vocabulary used in this report</summary>
 <dl>
@@ -97,5 +151,6 @@
 {% endfor %}
 </dl>
 </details>
+{% endblock %}
 </body>
 </html>

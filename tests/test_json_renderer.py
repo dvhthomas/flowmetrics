@@ -19,10 +19,13 @@ import json
 import re
 from datetime import UTC, date, datetime, timedelta
 
+from flowmetrics.aging import AgingItem
 from flowmetrics.compute import FlowEfficiency, WindowResult
 from flowmetrics.forecast import build_histogram
 from flowmetrics.renderers import json_renderer
 from flowmetrics.report import (
+    AgingInput,
+    AgingReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -337,6 +340,246 @@ class TestHowManyJson:
 # ---------------------------------------------------------------------------
 # Logs + errors
 # ---------------------------------------------------------------------------
+
+
+class TestAgingJson:
+    """Aging JSON includes per-item pr_url when populated so the
+    interactive HTML chart can wire click-to-PR; absent on Jira."""
+
+    @staticmethod
+    def _report(items: list[AgingItem]) -> AgingReport:
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Awaiting Review", "Approved"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=items,
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+        )
+
+    def test_chart_items_include_pr_url_when_set(self):
+        report = self._report(
+            [
+                AgingItem(
+                    item_id="#42",
+                    title="Fix bug",
+                    current_state="Awaiting Review",
+                    age_days=3,
+                    pr_url="https://github.com/acme/widget/pull/42",
+                ),
+                AgingItem(
+                    item_id="#7",
+                    title="Add feature",
+                    current_state="Approved",
+                    age_days=1,
+                    pr_url=None,
+                ),
+            ]
+        )
+        payload = json.loads(json_renderer.render(report))
+        items = payload["chart_data"]["items"]
+        by_id = {it["item_id"]: it for it in items}
+        assert by_id["#42"]["pr_url"] == "https://github.com/acme/widget/pull/42"
+        # None must round-trip as JSON null, not be omitted (consistent
+        # schema means downstream readers can rely on the key existing).
+        assert by_id["#7"]["pr_url"] is None
+
+
+class TestAgingMaxAgeJson:
+    """The opt-in --max-age-days filter is reflected in the JSON
+    envelope: input.max_age_days carries the threshold; summary
+    surfaces in_flight_total + in_flight_shown + excluded_above_max_age.
+    """
+
+    @staticmethod
+    def _report(
+        *,
+        items: list[AgingItem],
+        in_flight_total: int,
+        excluded: int,
+        max_age_days: int | None,
+    ) -> AgingReport:
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Awaiting Review", "Approved"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+                max_age_days=max_age_days,
+            ),
+            items=items,
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+            in_flight_total=in_flight_total,
+            excluded_above_max_age=excluded,
+        )
+
+    def _item(self, n: int, age: int) -> AgingItem:
+        return AgingItem(
+            item_id=f"#{n}",
+            title=f"PR {n}",
+            current_state="Awaiting Review",
+            age_days=age,
+        )
+
+    def test_max_age_days_round_trips_in_input(self):
+        report = self._report(
+            items=[self._item(1, 30)],
+            in_flight_total=10,
+            excluded=9,
+            max_age_days=60,
+        )
+        payload = json.loads(json_renderer.render(report))
+        assert payload["input"]["max_age_days"] == 60
+
+    def test_input_max_age_is_null_when_unset(self):
+        report = self._report(
+            items=[self._item(1, 30)],
+            in_flight_total=1,
+            excluded=0,
+            max_age_days=None,
+        )
+        payload = json.loads(json_renderer.render(report))
+        assert payload["input"]["max_age_days"] is None
+
+    def test_summary_carries_total_shown_excluded(self):
+        report = self._report(
+            items=[self._item(1, 30), self._item(2, 50)],
+            in_flight_total=10,
+            excluded=8,
+            max_age_days=60,
+        )
+        payload = json.loads(json_renderer.render(report))
+        assert payload["summary"]["in_flight_total"] == 10
+        assert payload["summary"]["in_flight_shown"] == 2
+        assert payload["summary"]["excluded_above_max_age"] == 8
+
+
+class TestAgingDistributionJson:
+    """The aging-band distribution is surfaced as a structured summary
+    field so JSON consumers can read it without re-banding the items.
+    """
+
+    @staticmethod
+    def _report(items: list[AgingItem]) -> AgingReport:
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Awaiting Review", "Approved"),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=items,
+            cycle_time_percentiles={50: 1.7, 70: 5.4, 85: 17.8, 95: 57.4},
+            completed_count=100,
+            interpretation=_interp(),
+        )
+
+    @staticmethod
+    def _item(n: int, age: int) -> AgingItem:
+        return AgingItem(
+            item_id=f"#{n}",
+            title=f"PR {n}",
+            current_state="Awaiting Review",
+            age_days=age,
+        )
+
+    def test_summary_aging_distribution_is_present(self):
+        report = self._report([self._item(1, 0), self._item(2, 100)])
+        payload = json.loads(json_renderer.render(report))
+        assert "aging_distribution" in payload["summary"]
+
+    def test_distribution_has_five_bands_with_counts_and_shares(self):
+        items = [
+            self._item(1, 0),     # Below P50
+            self._item(2, 3),     # P50–P70
+            self._item(3, 10),    # P70–P85
+            self._item(4, 30),    # P85–P95
+            self._item(5, 100),   # Above P95
+        ]
+        payload = json.loads(json_renderer.render(self._report(items)))
+        dist = payload["summary"]["aging_distribution"]
+        labels = [b["label"] for b in dist]
+        assert labels == [
+            "Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"
+        ]
+        for b in dist:
+            assert b["count"] == 1
+            assert b["share"] == 0.2
+
+
+class TestAgingJsonDiagnostics:
+    """Per-state diagnostic + top-interventions are the actionable
+    signals the HTML surfaces. They must also live in the JSON envelope
+    so agents read the same data, not re-derive it."""
+
+    @staticmethod
+    def _report(items: list[AgingItem], workflow=("State A", "State B")) -> AgingReport:
+        return AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=workflow,
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=items,
+            cycle_time_percentiles={50: 1.7, 70: 5.4, 85: 17.8, 95: 57.4},
+            completed_count=100,
+            interpretation=_interp(),
+        )
+
+    @staticmethod
+    def _item(n: int, state: str, age: int, url: str | None = None) -> AgingItem:
+        return AgingItem(
+            item_id=f"#{n}",
+            title=f"PR {n}",
+            current_state=state,
+            age_days=age,
+            pr_url=url,
+        )
+
+    def test_per_state_diagnostic_in_summary(self):
+        report = self._report(
+            [
+                self._item(1, "State A", 5),
+                self._item(2, "State A", 100),
+                self._item(3, "State B", 50),
+            ]
+        )
+        payload = json.loads(json_renderer.render(report))
+        rows = payload["summary"]["per_state_diagnostic"]
+        states = [r["state"] for r in rows]
+        assert states == ["State A", "State B"]
+        a = rows[0]
+        assert a["count"] == 2
+        assert a["oldest_age_days"] == 100
+
+    def test_top_interventions_in_summary(self):
+        report = self._report(
+            [
+                self._item(1, "State A", 100, url="https://x/1"),
+                self._item(2, "State B", 50, url="https://x/2"),
+            ]
+        )
+        payload = json.loads(json_renderer.render(report))
+        ivs = payload["summary"]["top_interventions"]
+        # Rightmost-first ordering: State B first.
+        assert ivs[0]["current_state"] == "State B"
+        assert ivs[0]["pr_url"] == "https://x/2"
+        assert ivs[1]["current_state"] == "State A"
 
 
 class TestLogs:

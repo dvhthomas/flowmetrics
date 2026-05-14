@@ -280,65 +280,88 @@ def _render_cfd(report: CfdReport, console: Console) -> None:
 
 
 def _render_aging(report: AgingReport, console: Console) -> None:
+    from ..aging import per_state_diagnostic, top_interventions
+
     _top(console, report)
 
     if not report.items:
-        _insight_and_actions(console, report)
         _detail_divider(console)
         _reproduce(console, report)
         return
 
-    wip_by_state: dict[str, int] = {}
-    for it in report.items:
-        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
+    # Promote the divergence caveat — the most important signal-quality
+    # warning — out of the caveat list and into a prominent banner.
+    other_caveats: list[str] = []
+    for c in report.interpretation.caveats:
+        low = c.lower()
+        if "diverge" in low or "doesn't resemble" in low:
+            console.print(Panel(c, title="⚠ Signal quality", style="red"))
+        else:
+            other_caveats.append(c)
 
-    summary = Table(title="WIP per workflow state")
-    summary.add_column("State")
-    summary.add_column("Items", justify="right")
-    for state in report.input.workflow:
-        summary.add_row(state, str(wip_by_state.get(state, 0)))
-    console.print(summary)
-
-    pct = Table(title="Cycle-time percentile checkpoints (from completed items)")
-    pct.add_column("Percentile")
-    pct.add_column("Days", justify="right")
-    for p, v in report.cycle_time_percentiles.items():
-        pct.add_row(f"P{p}", f"{v:.1f}")
-    console.print(pct)
-    console.print(
-        f"(Percentiles built from {report.completed_count} items completed "
-        f"between {report.input.history_start} and {report.input.history_end}.)",
-        style="dim",
+    # Interventions — the actionable list. One PR per stuck workflow
+    # stage, rightmost-first, capped at 5.
+    interventions = top_interventions(
+        items=report.items,
+        workflow=report.input.workflow,
+        percentiles=report.cycle_time_percentiles,
     )
-    console.print("(For the scatter chart, use --format html.)", style="dim")
+    if interventions:
+        iv_table = Table(title="Highest-leverage interventions")
+        iv_table.add_column("State")
+        iv_table.add_column("#")
+        iv_table.add_column("Age", justify="right")
+        iv_table.add_column("Title")
+        for iv in interventions:
+            iv_table.add_row(
+                iv["current_state"],
+                iv["item_id"],
+                f"{iv['age_days']}d",
+                iv["title"][:60],
+            )
+        console.print(iv_table)
+    else:
+        console.print("[green]✓ No items past P85 — pipeline on track.[/green]")
 
-    _insight_and_actions(console, report)
-    _detail_divider(console)
-
-    rows = [
-        ("Repo", report.input.repo),
-        ("As of", report.input.asof.isoformat()),
-        ("Workflow", " → ".join(report.input.workflow)),
-        ("In-flight items", str(len(report.items))),
-    ]
-    console.print(_input_table(report, rows))
-
-    items_sorted = sorted(report.items, key=lambda i: i.age_days, reverse=True)
-    age_table = Table(title="In-flight items (oldest first)")
-    age_table.add_column("#")
-    age_table.add_column("Age (d)", justify="right")
-    age_table.add_column("State")
-    age_table.add_column("Title")
-    for it in items_sorted[:20]:
-        age_table.add_row(it.item_id, str(it.age_days), it.current_state, it.title[:50])
-    console.print(age_table)
-    if len(items_sorted) > 20:
-        console.print(
-            f"[dim]…and {len(items_sorted) - 20} more (see --format html for the full list).[/dim]"
+    # Per-state diagnostic — bottleneck where age is accumulating.
+    diag_rows = per_state_diagnostic(
+        items=report.items,
+        workflow=report.input.workflow,
+        percentiles=report.cycle_time_percentiles,
+    )
+    diag = Table(title="Per-state aging")
+    diag.add_column("State")
+    diag.add_column("Count", justify="right")
+    diag.add_column("Age P50", justify="right")
+    diag.add_column("Oldest", justify="right")
+    diag.add_column("Past P85", justify="right")
+    diag.add_column("Past P95", justify="right")
+    for row in diag_rows:
+        diag.add_row(
+            row["state"],
+            str(row["count"]),
+            "—" if row["median_age_days"] is None else f"{row['median_age_days']}d",
+            "—" if row["oldest_age_days"] is None else f"{row['oldest_age_days']}d",
+            str(row["past_p85"]),
+            str(row["past_p95"]),
         )
+    console.print(diag)
+    console.print(
+        f"[dim](Percentile thresholds from {report.completed_count} PRs completed "
+        f"{report.input.history_start} → {report.input.history_end}; "
+        f"P85={report.cycle_time_percentiles.get(85, 0):.1f}d, "
+        f"P95={report.cycle_time_percentiles.get(95, 0):.1f}d.)[/dim]"
+    )
+    console.print("[dim](Interactive chart: use --format html.)[/dim]")
 
+    # Remaining caveats (max-age exclusion notes, etc.) — kept terse.
+    if other_caveats:
+        console.print("[dim]Caveats[/dim]")
+        for caveat in other_caveats:
+            console.print(f"  - {caveat}", style="dim")
+
+    _detail_divider(console)
     _reproduce(console, report)
-    _vocabulary(console, report)
 
 
 def _render_how_many(report: HowManyReport, console: Console) -> None:

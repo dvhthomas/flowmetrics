@@ -1,10 +1,18 @@
-"""Single-file HTML report built with jinja2 + matplotlib charts."""
+"""Single-file HTML report built with jinja2 + matplotlib charts.
+
+Aging additionally renders an interactive Vega-Lite chart from the
+report data. The Vega + Vega-Lite + Vega-Embed JS bundles are vendored
+under ``static/`` and inlined into the document so the HTML renders
+with no network connection.
+"""
 
 from __future__ import annotations
 
 import base64
 import io
+import json
 from datetime import date, timedelta
+from functools import lru_cache
 from pathlib import Path
 
 import matplotlib
@@ -25,6 +33,22 @@ from ..report import (
     report_definition,
     report_vocabulary,
 )
+
+_STATIC_DIR = Path(__file__).parent / "static"
+
+
+@lru_cache(maxsize=1)
+def _vega_bundle() -> str:
+    """Concatenated Vega + Vega-Lite + Vega-Embed minified JS.
+
+    Cached because reading 830KB off disk on every report render is
+    wasteful. The bundle is identical for every report — the spec
+    that uses it is what changes.
+    """
+    return "\n".join(
+        (_STATIC_DIR / name).read_text()
+        for name in ("vega.min.js", "vega-lite.min.js", "vega-embed.min.js")
+    )
 
 
 def _fmt_duration(td: timedelta) -> str:
@@ -271,6 +295,11 @@ def _chart_training(report: WhenDoneReport | HowManyReport) -> str:
 
 def _render_efficiency(report: EfficiencyReport) -> str:
     template = _env.get_template("efficiency.html.jinja")
+    # By cycle time descending — Top slowest list. Different sort than
+    # per_pr_sorted (which sorts by efficiency for the full detail table).
+    per_pr_by_cycle = sorted(
+        report.result.per_pr, key=lambda p: p.cycle_time, reverse=True
+    )
     return template.render(
         title=f"flowmetrics — efficiency {report.input.repo}",
         generated_at=report.generated_at,
@@ -280,8 +309,22 @@ def _render_efficiency(report: EfficiencyReport) -> str:
         vocabulary=report_vocabulary(report),
         report=report,
         per_pr_sorted=sorted(report.result.per_pr, key=lambda p: p.efficiency),
+        per_pr_by_cycle=per_pr_by_cycle,
+        pr_urls=_github_pr_urls(report.input.repo, [p.item_id for p in report.result.per_pr]),
         chart_per_pr_b64=_chart_per_pr(report) if report.result.pr_count else "",
     )
+
+
+def _github_pr_urls(repo: str, item_ids: list[str]) -> dict[str, str]:
+    """Best-effort URL builder. Returns {} for non-GitHub sources;
+    template falls through to plain text in that case."""
+    if not repo or "/" not in repo:
+        return {}
+    out: dict[str, str] = {}
+    for item_id in item_ids:
+        if item_id.startswith("#"):
+            out[item_id] = f"https://github.com/{repo}/pull/{item_id.lstrip('#')}"
+    return out
 
 
 def _render_when_done(report: WhenDoneReport) -> str:
@@ -363,8 +406,36 @@ def _render_cfd(report: CfdReport) -> str:
         vocabulary=report_vocabulary(report),
         report=report,
         end_counts=end_counts,
+        wip_trend=_cfd_wip_trend(report),
         chart_cfd_b64=_chart_cfd(report) if report.points else "",
     )
+
+
+def _cfd_wip_trend(report: CfdReport) -> dict:
+    """WIP gap (arrivals minus departures) at the start vs end of the window.
+    The actionable read on a CFD: is the queue growing or shrinking?"""
+    if not report.points:
+        return {"direction": "flat", "start_wip": 0, "end_wip": 0, "delta": 0}
+    workflow = report.input.workflow
+    arrivals_state = workflow[0]
+    departures_state = workflow[-1]
+    first = report.points[0].counts_by_state
+    last = report.points[-1].counts_by_state
+    start_wip = first.get(arrivals_state, 0) - first.get(departures_state, 0)
+    end_wip = last.get(arrivals_state, 0) - last.get(departures_state, 0)
+    delta = end_wip - start_wip
+    if delta > 0:
+        direction = "widening"
+    elif delta < 0:
+        direction = "narrowing"
+    else:
+        direction = "flat"
+    return {
+        "direction": direction,
+        "start_wip": start_wip,
+        "end_wip": end_wip,
+        "delta": delta,
+    }
 
 
 def _chart_aging(report: AgingReport) -> str:
@@ -445,22 +516,91 @@ def _chart_aging(report: AgingReport) -> str:
 
 
 def _render_aging(report: AgingReport) -> str:
+    from ..aging import (
+        compute_aging_distribution,
+        per_state_diagnostic,
+        top_interventions,
+    )
+    from ..interpretation import _prose_date
+    from . import vega_specs
+
     template = _env.get_template("aging.html.jinja")
-    wip_by_state: dict[str, int] = {}
-    for it in report.items:
-        wip_by_state[it.current_state] = wip_by_state.get(it.current_state, 0) + 1
-    items_sorted = sorted(report.items, key=lambda i: i.age_days, reverse=True)
+
+    # All caveats — including the divergence one — render together in
+    # the "About this report" footer. No top-of-page red banner: the
+    # information lives, the alarm doesn't.
+    other_caveats: list[str] = list(report.interpretation.caveats)
+
+    repo = report.input.repo
+    repo_url = f"https://github.com/{repo}" if "/" in repo else None
+
+    # Aging-distribution colors — ColorBrewer YlOrRd, color-blind-safe
+    # sequential. The P85–P95 background is darkened from #f03b20 to
+    # #d6361a so white text on it clears the WCAG AA contrast ratio
+    # (4.5:1 for normal text) instead of only AA-large.
+    band_colors = [
+        ("Below P50", "#ffeda0", "#2b2b2b"),  # (band label, bg, text)
+        ("P50–P70",   "#fed976", "#2b2b2b"),
+        ("P70–P85",   "#fd8d3c", "#2b2b2b"),
+        ("P85–P95",   "#d6361a", "#ffffff"),
+        ("Above P95", "#a30019", "#ffffff"),
+    ]
+    dist = compute_aging_distribution(report.items, report.cycle_time_percentiles)
+    aging_distribution_styled = [
+        {
+            **band,
+            "bg": bg,
+            "fg": fg,
+        }
+        for band, (_label, bg, fg) in zip(dist, band_colors, strict=False)
+    ]
+
+    # Top N (50) items past P85, sorted by age descending. Useful subset
+    # of the in-flight list — a flat dump of 500+ items isn't helpful.
+    p85 = report.cycle_time_percentiles.get(85, 0.0)
+    past_p85_top: list = []
+    if p85 > 0:
+        candidates = [it for it in report.items if it.age_days >= p85]
+        past_p85_top = sorted(
+            candidates, key=lambda i: i.age_days, reverse=True
+        )[:50]
+    past_p85_total = sum(1 for it in report.items if p85 > 0 and it.age_days >= p85)
+
+    # Short prose summary of the distribution, used as the bar's
+    # aria-label so screen readers announce the shape textually.
+    bar_aria = "Aging distribution by percentile band: " + "; ".join(
+        f"{band['label']} {band['count']} ({round(band['share'] * 100)}%)"
+        for band in aging_distribution_styled
+        if band["count"] > 0
+    )
+
     return template.render(
-        title=f"flowmetrics — aging {report.input.repo}",
+        title="Aging Work In Progress",
+        repo_url=repo_url,
+        prose_asof=_prose_date(report.input.asof),
         generated_at=report.generated_at,
         interpretation=report.interpretation,
         definition=report_definition(report),
         invocation=cli_invocation(report),
         vocabulary=report_vocabulary(report),
         report=report,
-        wip_by_state=wip_by_state,
-        items_sorted=items_sorted,
-        chart_aging_b64=_chart_aging(report) if report.items else "",
+        aging_distribution=aging_distribution_styled,
+        bar_aria=bar_aria,
+        per_state_diagnostic=per_state_diagnostic(
+            items=report.items,
+            workflow=report.input.workflow,
+            percentiles=report.cycle_time_percentiles,
+        ),
+        top_interventions=top_interventions(
+            items=report.items,
+            workflow=report.input.workflow,
+            percentiles=report.cycle_time_percentiles,
+        ),
+        past_p85_top=past_p85_top,
+        past_p85_total=past_p85_total,
+        other_caveats=other_caveats,
+        vega_bundle=_vega_bundle() if report.items else "",
+        vega_spec_json=json.dumps(vega_specs.aging_spec(report)) if report.items else "",
     )
 
 

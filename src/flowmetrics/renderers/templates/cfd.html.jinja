@@ -5,18 +5,34 @@
 <p>No CFD samples for this window.</p>
 {% else %}
 
-<h2>Headline numbers</h2>
-<table>
-  <tr><th>Workflow</th><td>{{ report.input.workflow | join(" → ") }}</td></tr>
-  <tr><th>Window</th><td>{{ report.input.start }} → {{ report.input.stop }} ({{ report.points|length }} samples)</td></tr>
-  <tr><th>Arrivals at end</th><td class="num">{{ end_counts[report.input.workflow[0]] }}</td></tr>
-  <tr><th>Departures at end</th><td class="num">{{ end_counts[report.input.workflow[-1]] }}</td></tr>
-  <tr><th>Total WIP at end</th><td class="num">
-    <strong>{{ end_counts[report.input.workflow[0]] - end_counts[report.input.workflow[-1]] }}</strong>
-  </td></tr>
-</table>
+{# WIP trend banner: the actionable read on a CFD. Is the queue
+   widening (arrivals > departures) or narrowing? #}
+{% if wip_trend.direction != "flat" %}
+<div class="banner" style="background:
+    {%- if wip_trend.direction == 'widening' %} #fef2f2; border-left-color: #cc3333; color: #7f1d1d
+    {%- else %} #ecfdf5; border-left-color: #10b981; color: #064e3b
+    {%- endif %};">
+  {% if wip_trend.direction == "widening" -%}
+  ⚠ WIP gap is <strong>widening</strong>: started at {{ wip_trend.start_wip }} items,
+  ended at {{ wip_trend.end_wip }} (+{{ wip_trend.delta }} over the window).
+  Arrivals are outpacing departures — the queue is growing.
+  {%- else -%}
+  ✓ WIP gap is <strong>narrowing</strong>: started at {{ wip_trend.start_wip }} items,
+  ended at {{ wip_trend.end_wip }} ({{ wip_trend.delta }} over the window).
+  Departures are outpacing arrivals — the queue is shrinking.
+  {%- endif %}
+</div>
+{% endif %}
 
 <img alt="Cumulative Flow Diagram" src="data:image/png;base64,{{ chart_cfd_b64 }}" />
+
+<p style="font-size:0.85rem; color:#666">
+{{ end_counts[report.input.workflow[0]] }} arrivals,
+{{ end_counts[report.input.workflow[-1]] }} departures,
+<strong>{{ wip_trend.end_wip }}</strong> WIP at end of window
+({{ report.input.start }} → {{ report.input.stop }},
+{{ report.points|length }} samples).
+</p>
 
 <p style="font-size:0.9rem; color:#666; max-width:60ch">
 <strong>Reading the chart.</strong> Each band's vertical thickness at a

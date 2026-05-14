@@ -67,8 +67,18 @@ uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP 
 ### Aging Work In Progress
 
 ```
+# GitHub — review-cycle mode (default).
+# Columns come from isDraft + reviewDecision.
 uv run flow aging --repo astral-sh/uv \
     --workflow "Draft,Awaiting Review,Changes Requested,Approved"
+
+# GitHub — label-driven mode.
+# You name the labels that count as WIP, in order with most progress
+# on the right. PR state is materialized from LabeledEvent /
+# UnlabeledEvent timestamps; PRs not currently in a WIP column are
+# excluded. See docs/SPEC-github-labels.md for the resolution rules.
+uv run flow aging --repo dvhthomas/kno \
+    --wip-labels "shaping,in-progress,in-review"
 
 # Jira
 uv run flow aging --jira-url https://issues.apache.org/jira --jira-project BIGTOP \

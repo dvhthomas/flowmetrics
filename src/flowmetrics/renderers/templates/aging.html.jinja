@@ -1,76 +1,183 @@
 {% extends "base.html.jinja" %}
 
+{# Subtitle on one line: linked repo + asof + generation stamp.
+   No separate stamp paragraph; no headline sentence repeating the data. #}
+{% block subtitle %}
+<p class="subtitle">
+  for
+  {%- if repo_url %} <a href="{{ repo_url }}">{{ report.input.repo }}</a>
+  {%- else %} {{ report.input.repo }}
+  {%- endif %} ·
+  as of {{ prose_asof }} ·
+  <span class="stamp">generated {{ generated_at.strftime("%Y-%m-%d %H:%M %Z").strip() }}</span>
+</p>
+{% endblock %}
+
+{# Drop the long headline sentence — its prefix duplicated the title +
+   subtitle, and its numbers (counts past P85/P95) duplicate the
+   distribution bar + per-state table. #}
+{% block headline %}{% endblock %}
+
+{# Definition moves to the "About this report" footer (collapsed). #}
+{% block definition %}{% endblock %}
+
+{# Banner suppressed for Aging — the divergence caveat (when it fires)
+   appears in the "About this report" footer with the other caveats. #}
+{% block banner %}{% endblock %}
+
 {% block content %}
 {% if not report.items %}
 <p>No in-flight items as of {{ report.input.asof }}.</p>
 {% else %}
 
-<h2>Headline numbers</h2>
-<table>
-  <tr><th>In-flight items</th><td class="num">{{ report.items|length }}</td></tr>
-  <tr><th>As of</th><td>{{ report.input.asof }}</td></tr>
-  <tr><th>Workflow</th><td>{{ report.input.workflow | join(" → ") }}</td></tr>
-</table>
+{# ── Distribution stacked bar: situation snapshot. The shape — left-
+       light / right-heavy — IS the signal. Color-blind safe palette
+       (ColorBrewer YlOrRd, monotonic luminance) + inline count/% text
+       so the bar reads in grayscale and via screen readers. ── #}
+<div class="dist-bar" role="img" aria-label="{{ bar_aria }}">
+  {% for band in aging_distribution %}
+  {% if band.count > 0 %}
+  <div class="seg"
+       style="width: {{ (band.share * 100) | round(2) }}%;
+              background: {{ band.bg }}; color: {{ band.fg }};"
+       title="{{ band.label }}: {{ band.count }} ({{ (band.share * 100) | round(0, 'common') | int }}%)">
+    {{ band.count }} · {{ (band.share * 100) | round(0, 'common') | int }}%
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+<div class="dist-legend">
+  {% for band in aging_distribution %}
+    <span><span class="swatch" style="background: {{ band.bg }}"></span>{{ band.label }}
+      {%- if band.lower is none %} (&lt; {{ "%.1f"|format(band.upper) }}d)
+      {%- elif band.upper is none %} (≥ {{ "%.1f"|format(band.lower) }}d)
+      {%- else %} ({{ "%.1f"|format(band.lower) }}–{{ "%.1f"|format(band.upper) }}d)
+      {%- endif -%}
+    </span>
+  {% endfor %}
+</div>
+<p style="font-size:0.85rem; color:#666; margin: 0.3rem 0 1rem;">
+{{ report.items|length }} in flight
+{%- if report.in_flight_total != report.items|length %}
+ (excluded {{ report.excluded_above_max_age }} with age > {{ report.input.max_age_days }}d
+  from a pool of {{ report.in_flight_total }})
+{%- endif -%}
+. Thresholds: observed cycle times of {{ report.completed_count }} PRs that
+merged {{ report.input.history_start }} → {{ report.input.history_end }}.
+</p>
 
-<h2>WIP per workflow state</h2>
-<table>
-{% for state in report.input.workflow %}
-  <tr><th>{{ state }}</th><td class="num">{{ wip_by_state.get(state, 0) }}</td></tr>
+{# ── Interactive chart, named for navigation by heading. ──────────── #}
+<h2>WIP Aging</h2>
+<div id="aging-chart" style="width:100%; min-height:380px;"></div>
+<script>{{ vega_bundle | safe }}</script>
+<script>
+  vegaEmbed("#aging-chart", {{ vega_spec_json | safe }}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("aging-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
+{# ── Next actions: oldest past-P85 per state, rightmost-first. ────── #}
+{% if top_interventions %}
+<h2>Next actions</h2>
+<div>
+{% for iv in top_interventions %}
+  <div class="intervention">
+    <span class="state"><span class="pill">{{ iv.current_state }}</span></span>
+    <span class="id">
+      {%- if iv.pr_url -%}
+        <a href="{{ iv.pr_url }}">{{ iv.item_id }}</a>
+      {%- else -%}
+        {{ iv.item_id }}
+      {%- endif -%}
+    </span>
+    <span class="age">{{ iv.age_days }}d</span>
+    <span class="title">{{ iv.title[:100] }}</span>
+  </div>
 {% endfor %}
-</table>
+</div>
+{% else %}
+<h2>Next actions</h2>
+<p style="font-size:0.95rem; color:#137333">
+✓ No items past P85 — pipeline is on track relative to recent history.
+</p>
+{% endif %}
 
-<h2>Cycle-time percentiles (from completed items)</h2>
+{# ── Per-state bottleneck table. ───────────────────────────────────── #}
+<h2>Per-state aging</h2>
 <table>
-  <tr>
-  {% for p, v in report.cycle_time_percentiles.items() %}
-    <th>P{{ p }}</th>
+  <thead>
+    <tr>
+      <th>Stage</th>
+      <th class="num">Count</th>
+      <th class="num">Age P50</th>
+      <th class="num">Oldest</th>
+      <th class="num">At risk (P50–P85)</th>
+      <th class="num">Past P85</th>
+      <th class="num">Past P95</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in per_state_diagnostic %}
+    <tr>
+      <td><span class="pill">{{ row.state }}</span></td>
+      <td class="num">{{ row.count }}</td>
+      <td class="num">
+        {%- if row.median_age_days is none -%}—{%- else -%}{{ row.median_age_days }}d{%- endif -%}
+      </td>
+      <td class="num">
+        {%- if row.oldest_age_days is none -%}—{%- else -%}{{ row.oldest_age_days }}d{%- endif -%}
+      </td>
+      <td class="num">{{ row.at_risk_p50_to_p85 }}</td>
+      <td class="num">{{ row.past_p85 }}</td>
+      <td class="num">{{ row.past_p95 }}</td>
+    </tr>
   {% endfor %}
-  </tr>
-  <tr>
-  {% for p, v in report.cycle_time_percentiles.items() %}
-    <td class="num">{{ "%.1f"|format(v) }}d</td>
-  {% endfor %}
-  </tr>
+  </tbody>
 </table>
-<p style="font-size:0.9rem; color:#666">
-Computed from {{ report.completed_count }} items completed between
-{{ report.input.history_start }} and {{ report.input.history_end }}.
+<p style="font-size:0.85rem; color:#666; max-width:65ch">
+<strong>At risk</strong> = items past the 50th-percentile cycle time
+but not yet past the 85th. By conditional probability, an item past
+P50 has at least double the starting chance of also missing the 85th-
+percentile forecast (≥30% versus 15% at age 0). Per Vacanti's
+<em>WWIBD</em> recipe, this is the cohort that needs a conversation
+NOW — while there's time to swarm, split, or escalate.
 </p>
 
-<img alt="Aging Work In Progress" src="data:image/png;base64,{{ chart_aging_b64 }}" />
-
-<p style="font-size:0.9rem; color:#666; max-width:60ch">
-<strong>Reading the chart.</strong> Each dot is one in-flight item.
-X-axis columns are workflow states (earliest left, latest right). Y-axis
-is Age in days. The dashed horizontal lines are 50/70/85/95 percentiles
-of cycle time from recently completed items — Vacanti's checkpoints. An
-item that has aged past P85 is likely to miss the next forecast.
-</p>
 {% endif %}
 {% endblock %}
 
-{% block detail %}
-<h2>Input parameters</h2>
-<table>
-  <tr><th>Repo</th><td>{{ report.input.repo }}</td></tr>
-  <tr><th>As of</th><td>{{ report.input.asof }}</td></tr>
-  <tr><th>Workflow</th><td>{{ report.input.workflow | join(", ") }}</td></tr>
-  <tr><th>Percentile training window</th>
-      <td>{{ report.input.history_start }} → {{ report.input.history_end }}
-          ({{ report.completed_count }} completed items)</td></tr>
-</table>
+{# Suppress base's auto-rendered sections. #}
+{% block key_insight %}{% endblock %}
+{% block next_actions %}{% endblock %}
+{% block caveats %}{% endblock %}
+{% block reproduce %}{% endblock %}
+{% block vocabulary %}{% endblock %}
 
-{% if report.items %}
+{% block detail %}
+{% if past_p85_top %}
 <details>
-<summary>All {{ report.items|length }} in-flight items (oldest first)</summary>
+<summary>
+  Oldest items past P85
+  {%- if past_p85_total > 50 %} (showing 50 of {{ past_p85_total }}){% endif %}
+</summary>
 <table>
-<thead><tr><th>#</th><th>Age (days)</th><th>Current state</th><th>Title</th></tr></thead>
+<thead><tr><th>#</th><th class="num">Age</th><th>Stage</th><th>Title</th></tr></thead>
 <tbody>
-{% for it in items_sorted %}
+{% for it in past_p85_top %}
   <tr>
-    <td>{{ it.item_id }}</td>
-    <td class="num">{{ it.age_days }}</td>
-    <td>{{ it.current_state }}</td>
+    <td>
+      {%- if it.pr_url -%}
+        <a href="{{ it.pr_url }}">{{ it.item_id }}</a>
+      {%- else -%}
+        {{ it.item_id }}
+      {%- endif -%}
+    </td>
+    <td class="num">{{ it.age_days }}d</td>
+    <td><span class="pill">{{ it.current_state }}</span></td>
     <td>{{ it.title[:80] }}</td>
   </tr>
 {% endfor %}
@@ -78,4 +185,94 @@ item that has aged past P85 is likely to miss the next forecast.
 </table>
 </details>
 {% endif %}
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Workflow</th><td>
+    {% for s in report.input.workflow %}<span class="pill">{{ s }}</span>{% if not loop.last %} {% endif %}{% endfor %}
+  </td></tr>
+  <tr>
+    <th>Percentile training window</th>
+    <td>
+      {{ report.input.history_start }} → {{ report.input.history_end }}
+      ({{ report.completed_count }} completed PRs)
+    </td>
+  </tr>
+  {% if report.input.max_age_days is not none %}
+  <tr>
+    <th>Max-age filter</th>
+    <td>{{ report.input.max_age_days }} days
+        ({{ report.excluded_above_max_age }} of {{ report.in_flight_total }} excluded)
+    </td>
+  </tr>
+  {% endif %}
+</table>
+<div class="invocation">{{ invocation }}</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> {{ definition }}</p>
+
+<h3>How to read the percentile lines</h3>
+<p>
+The four threshold lines on the chart are <strong>observed cycle
+times</strong> of PRs that actually merged in the training window —
+exactly the same percentile values as Vacanti's Scatterplot. No
+simulation, no Monte Carlo: take the {{ report.completed_count }} PRs that
+merged in this window, sort their actual cycle times, pick the values
+at rank 50%, 70%, 85%, and 95%.
+</p>
+<p>
+The actionable framing — Vacanti's recipe in <em>When Will It Be
+Done?</em> — is to read each line as a conditional-probability
+checkpoint. (The math is standard; Vacanti's contribution is applying
+it to the Aging chart.) Pick the 85th percentile as your forecast: a
+new PR starts with a 15% chance of violating it (by definition of the
+85th-percentile rule). When that PR's age crosses the 50th percentile
+<em>without</em> finishing, it has self-selected out of the fast half —
+its remaining chance of also exceeding the 85th-percentile threshold
+has doubled to 30%.
+</p>
+<p>
+The arithmetic, with the population framed as 100 PRs:
+</p>
+<ul style="font-size:0.95rem; max-width:62ch">
+  <li>At <strong>P50</strong>: 50 PRs survived past the 50th. Of those,
+      15 historically also went past P85. <strong>30%</strong> chance
+      of missing the forecast.</li>
+  <li>At <strong>P70</strong>: 30 PRs survived. Of those, 15 missed
+      P85. <strong>50%</strong> chance.</li>
+  <li>At <strong>P85</strong>: 15 PRs survived. All 15 missed P85 by
+      definition. <strong>100%</strong> — the forecast has already
+      been violated.</li>
+  <li>At <strong>P95</strong>: 5 PRs survived. Deep tail — these are
+      decisions about expedite, split, or drop.</li>
+</ul>
+<p style="font-size:0.95rem;">
+The math comes from the survival function of the empirical
+distribution:
+<code>P(cycle &gt; P85 | cycle &gt; P50) = P(cycle &gt; P85) / P(cycle
+&gt; P50) = 0.15 / 0.50 = 0.30</code>. Nothing about it is
+forecast-derived or simulated.
+</p>
+
+{% if other_caveats %}
+<p><strong>Other notes</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+{% for c in other_caveats %}
+  <li>{{ c }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+{% for term, defn in vocabulary.items() %}
+  <dt><strong>{{ term }}</strong></dt>
+  <dd>{{ defn }}</dd>
+{% endfor %}
+</dl>
+</details>
 {% endblock %}

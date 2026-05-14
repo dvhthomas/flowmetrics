@@ -166,10 +166,19 @@ class CfdReport:
 class AgingInput:
     repo: str
     asof: date
-    workflow: tuple[str, ...]
+    workflow: tuple[str, ...]  # column order for the chart; same tuple in both modes
     history_start: date  # window of completed items used for percentile lines
     history_end: date
     offline: bool
+    # True when the user came in via --wip-labels (label mode) rather
+    # than --workflow. The workflow tuple itself is identical either way
+    # in label mode — this discriminator only changes which flag the
+    # reproducer command emits.
+    from_wip_labels: bool = False
+    # Opt-in: when set, in-flight items older than this are excluded
+    # from the chart and from past-P85/P95 counts. None means "show
+    # everything" per Vacanti.
+    max_age_days: int | None = None
 
 
 @dataclass(frozen=True)
@@ -179,9 +188,22 @@ class AgingReport:
     cycle_time_percentiles: dict[int, float]  # days
     completed_count: int  # how many completed items fed the percentiles
     interpretation: Interpretation
+    # Defaults preserve the pre-max-age behaviour: when the caller
+    # doesn't fill these in, total == len(items) and nothing was
+    # excluded. The CLI/service path sets them explicitly.
+    in_flight_total: int = -1
+    excluded_above_max_age: int = 0
     generated_at: datetime = field(default_factory=lambda: datetime.now().astimezone())
     schema: str = "flowmetrics.aging.v1"
     command: str = "aging"
+
+    def __post_init__(self) -> None:
+        # If caller didn't pass in_flight_total, infer it (post-init
+        # write into a frozen dataclass needs object.__setattr__).
+        if self.in_flight_total == -1:
+            object.__setattr__(
+                self, "in_flight_total", len(self.items) + self.excluded_above_max_age
+            )
 
 
 Report = (
@@ -296,10 +318,19 @@ _CFD_VOCABULARY = {
 
 
 _AGING_VOCABULARY = {
+    "WIP (Work In Progress)": (
+        "Items currently in any state the team treats as in-progress — for "
+        "this report, items whose current GitHub label is one of "
+        "--wip-labels, or whose current Jira status is in --workflow."
+    ),
+    "Aging Work In Progress": (
+        "How long each in-flight item has been open without exiting the "
+        "workflow. Aging only applies to items that haven't completed; a "
+        "completed item has a Cycle Time instead."
+    ),
     "Work Item Age": (
-        "Elapsed time since an item entered the workflow. Applies only to "
-        "in-flight items — once an item exits, that elapsed time becomes "
-        "the item's Cycle Time. Vacanti, WWIBD pp. 50."
+        "Elapsed days since an item entered the workflow. Computed as "
+        "today − createdAt for a PR; for Jira, today − issue creation."
     ),
     "In-flight items": (
         "Items that have entered but not exited the workflow. Each in-flight "
@@ -312,8 +343,10 @@ _AGING_VOCABULARY = {
     ),
     "Aging chart": (
         "Plots in-flight items by current workflow state (x) and Age in days "
-        "(y). Vacanti, WWIBD Figure 3.2."
+        "(y), with horizontal percentile lines drawn from recent completers' "
+        "cycle times."
     ),
+    "Source": "Vacanti, _When Will It Be Done?_ (Leanpub).",
 }
 
 
@@ -396,12 +429,12 @@ def report_definition(report: Report) -> str:
         )
     if isinstance(report, AgingReport):
         return (
-            "Aging Work In Progress chart per Vacanti (WWIBD pp. 50-51). "
             "Each dot is one in-flight item, placed in the column of its "
             "current workflow state at a height equal to its Age (days since "
             "entering the workflow). Percentile lines come from the cycle "
             "times of recently completed items — read horizontally as risk "
-            "thresholds: an item aging past P85 likely misses its forecast."
+            "thresholds: an item aging past P85 likely misses its forecast. "
+            "See *When Will It Be Done?* by Daniel Vacanti."
         )
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
@@ -471,14 +504,17 @@ def cli_invocation(report: Report) -> str:
         return " ".join(parts)
 
     if isinstance(report, AgingReport):
+        flag = "--wip-labels" if report.input.from_wip_labels else "--workflow"
         parts = [
             "uv run flow aging",
             f"--repo {report.input.repo}",
             f"--asof {report.input.asof.isoformat()}",
-            f"--workflow '{','.join(report.input.workflow)}'",
+            f"{flag} '{','.join(report.input.workflow)}'",
             f"--history-start {report.input.history_start.isoformat()}",
             f"--history-end {report.input.history_end.isoformat()}",
         ]
+        if report.input.max_age_days is not None:
+            parts.append(f"--max-age-days {report.input.max_age_days}")
         if report.input.offline:
             parts.append("--offline")
         return " ".join(parts)

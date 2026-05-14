@@ -1,25 +1,46 @@
 {% extends "base.html.jinja" %}
 
-{# ── Above the fold: headline numbers + chart ────────────────────────── #}
+{# ── Above the fold: actionable slowest-PR list + chart ───────────────── #}
 {% block content %}
 {% if report.result.pr_count == 0 %}
 <p>No PRs merged in this window.</p>
 {% else %}
 
-<h2>Headline numbers</h2>
-<table>
-  <tr><th>PRs merged</th><td class="num">{{ report.result.pr_count }}
-      {% if report.result.bot_pr_count -%}
-      <em style="color:#888">({{ report.result.human_pr_count }} human, {{ report.result.bot_pr_count }} bot)</em>
-      {%- endif %}
-  </td></tr>
-  <tr><th>Portfolio flow efficiency</th>
-      <td class="num"><strong>{{ "%.1f"|format(report.result.portfolio_efficiency * 100) }}%</strong></td></tr>
-  <tr><th>Total cycle time</th><td class="num">{{ fmt_duration(report.result.total_cycle) }}</td></tr>
-  <tr><th>Total active time</th><td class="num">{{ fmt_duration(report.result.total_active) }}</td></tr>
-</table>
+{# Top slowest PRs — Vacanti's "long-running PRs dominate the portfolio
+   FE" made actionable: name the ones the team should look at first.
+   Linked to the underlying PR when a URL is constructible. #}
+<h2>Top slowest PRs</h2>
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+These PRs drove the portfolio's cycle-time tail. Improving any one of
+them moves the portfolio number more than improving a typical PR.
+</p>
+<div>
+{% for p in per_pr_by_cycle[:5] %}
+  <div class="intervention">
+    <span class="id">
+      {%- if pr_urls.get(p.item_id) -%}
+        <a href="{{ pr_urls[p.item_id] }}">{{ p.item_id }}</a>
+      {%- else -%}
+        {{ p.item_id }}
+      {%- endif -%}
+    </span>
+    <span class="age">{{ fmt_duration(p.cycle_time) }}</span>
+    <span class="state">FE {{ "%.1f"|format(p.efficiency * 100) }}%</span>
+    <span class="title">{{ p.title[:90] }}</span>
+  </div>
+{% endfor %}
+</div>
 
 <img alt="Per-PR flow efficiency" src="data:image/png;base64,{{ chart_per_pr_b64 }}" />
+
+<p style="font-size:0.85rem; color:#666">
+Totals: {{ fmt_duration(report.result.total_cycle) }} cycle,
+{{ fmt_duration(report.result.total_active) }} active across
+{{ report.result.pr_count }} PRs
+{%- if report.result.bot_pr_count %}
+ ({{ report.result.human_pr_count }} human, {{ report.result.bot_pr_count }} bot)
+{%- endif -%}.
+</p>
 
 <p style="font-size:0.9rem; color:#666; max-width:60ch">
 <strong>Why are so many PRs at 100%?</strong>
@@ -27,9 +48,8 @@ A PR scores 100% when its entire cycle fits inside one activity cluster
 (default: 4-hour quiet-period threshold). Short PRs — automated version
 bumps, fast community fixes, dependabot updates — trivially fit inside
 one cluster because there's no time for a queue to form. The signal is
-in the <strong>portfolio number</strong> at the top and the
-<strong>long-running PRs</strong> at the head of this chart, not in the
-100%-bar tail.
+in the <strong>portfolio number</strong> in the headline and the PRs
+above, not in the 100%-bar tail.
 </p>
 {% endif %}
 {% endblock %}
@@ -73,7 +93,13 @@ what a typical PR looks like in isolation but doesn't reflect the system.
 <tbody>
 {% for p in per_pr_sorted %}
   <tr>
-    <td>{{ p.item_id }}</td>
+    <td>
+      {%- if pr_urls.get(p.item_id) -%}
+        <a href="{{ pr_urls[p.item_id] }}">{{ p.item_id }}</a>
+      {%- else -%}
+        {{ p.item_id }}
+      {%- endif -%}
+    </td>
     <td class="num">{{ fmt_duration(p.cycle_time) }}</td>
     <td class="num">{{ fmt_duration(p.active_time) }}</td>
     <td class="num">{{ "%.1f"|format(p.efficiency * 100) }}%</td>
