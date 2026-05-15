@@ -962,6 +962,50 @@ class TestCfdSpec:
             for t in tooltip
         ), "Tooltip must include a 'WIP' row (top-state minus bottom-state)."
 
+    def test_area_uses_centered_step_interpolation(self):
+        """With `step-after` the sample point at date T sits at the
+        LEFT edge of the column representing T's snapshot, which puts
+        the x-axis tick for T at the column's left edge — the eye
+        reads the column as 'belonging' to T but the tick visually
+        labels the previous column's right edge.
+
+        `step` (centered) places the value transition at the midpoint
+        between samples, so the tick for T lands at the centre of T's
+        column and the hover rule (which snaps to T's timestamp)
+        sits where the reader expects."""
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 5, "Done": 0}),
+            (date(2026, 5, 2), {"Open": 6, "Done": 1}),
+        ], workflow=("Open", "Done")))
+        area_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "area"
+        )
+        assert area_layer["mark"]["interpolate"] == "step"
+
+    def test_x_axis_forces_daily_tick_count(self):
+        """For a daily-sampled CFD over a ~30-day window, Vega's
+        auto-thinning shows labels every other day. That makes the
+        chart feel weekly even though every column is one day. Force
+        a tick per sample so the granularity is visually obvious; let
+        Vega thin LABELS automatically if they crowd, but ticks
+        themselves stay at every sample."""
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 5, "Done": 0}),
+            (date(2026, 5, 2), {"Open": 6, "Done": 0}),
+            (date(2026, 5, 3), {"Open": 7, "Done": 1}),
+        ], workflow=("Open", "Done")))
+        area_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "area"
+        )
+        x_axis = area_layer["encoding"]["x"]["axis"]
+        # `tickCount` set to a day-granular value drives Vega to emit
+        # one tick per day rather than auto-thinning to ~5 ticks.
+        assert "tickCount" in x_axis
+
     def test_no_corner_text_annotation_on_the_chart(self):
         """The earlier 'WIP X → Y ▲' label sat in the chart's top-
         right corner. It was visually weak (small green text on a

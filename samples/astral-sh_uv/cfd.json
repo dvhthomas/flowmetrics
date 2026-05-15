@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T16:13:17.692594-06:00",
+  "generated_at": "2026-05-15T16:39:01.942607-06:00",
   "headline": "CFD for astral-sh/uv Apr 15, 2026 \u2192 May 14, 2026: 202 items arrived, 202 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {

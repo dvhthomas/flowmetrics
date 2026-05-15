@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T16:13:25.362170-06:00",
+  "generated_at": "2026-05-15T16:39:09.564757-06:00",
   "headline": "CFD for pre-commit/pre-commit Apr 15, 2026 \u2192 May 14, 2026: 5 items arrived, 5 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {

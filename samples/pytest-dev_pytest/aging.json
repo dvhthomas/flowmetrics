@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T16:13:20.201831-06:00",
+  "generated_at": "2026-05-15T16:39:04.428238-06:00",
   "headline": "WIP Aging for pytest-dev/pytest as of May 15, 2026: 128 in-flight items, 114 already past P85 (19.6d), 108 past P95 (56.8d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {

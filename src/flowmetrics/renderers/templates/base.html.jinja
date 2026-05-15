@@ -48,6 +48,32 @@
   .ok-note { font-size: 0.95rem; color: #137333; }
   /* Walkthrough list inside an About-style details section */
   .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
+  /* CFD workflow bookends: the user-supplied --workflow order
+     rendered as a pill chain with the entry/exit pills emphasised.
+     The pair tells the reader where new items arrive and where they
+     leave, which is exactly what the chart's top/bottom lines
+     measure. */
+  .workflow-bookends { display: flex; align-items: center;
+                       flex-wrap: wrap; gap: 0.6rem;
+                       padding: 0.7rem 0.9rem; margin: 0.6rem 0 1rem;
+                       background: #fafafa;
+                       border: 1px solid #eee; border-radius: 4px;
+                       font-size: 0.9rem; }
+  .workflow-bookends .bookend-label { color: #555;
+                                      font-variant: small-caps;
+                                      letter-spacing: 0.05em; }
+  .workflow-bookends .bookend-label.entry { font-weight: 600; }
+  .workflow-bookends .bookend-label.exit { font-weight: 600;
+                                            margin-left: auto; }
+  .workflow-bookends .workflow-chain { display: flex; flex-wrap: wrap;
+                                       align-items: center; gap: 0.35rem; }
+  .workflow-bookends .arrow { color: #999; }
+  /* Entry / exit pills carry a tint so the eye finds the
+     bookends amid the rest of the workflow. */
+  .pill.pill-entry { background: #e8f0fc; color: #1f3a5f;
+                     border: 1px solid #c7dafc; }
+  .pill.pill-exit  { background: #ecfdf5; color: #064e3b;
+                     border: 1px solid #b9e7d3; }
   details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
                       color: #2b7cff; }
   details[open] > summary { margin-bottom: 0.5rem; }

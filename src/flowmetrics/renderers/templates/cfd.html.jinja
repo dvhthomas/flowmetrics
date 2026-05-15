@@ -22,6 +22,26 @@
 <p>No CFD samples for this window.</p>
 {% else %}
 
+{# Workflow bookends — the entry (intake) and exit (terminal) states
+   are the two ends of the system. They're supposed to balance over
+   time: cumulative arrivals ≈ cumulative departures keeps WIP
+   roughly flat. Show the whole flow as a pill chain so readers see
+   the assumed order before reading the chart. Order is supplied by
+   the user via --workflow; the system trusts it. #}
+<div class="workflow-bookends">
+  <div class="bookend-label entry">Entering →</div>
+  <div class="workflow-chain">
+    {% for s in report.input.workflow -%}
+      <span class="pill
+        {%- if loop.first %} pill-entry
+        {%- elif loop.last %} pill-exit
+        {%- endif %}">{{ s }}</span>
+      {%- if not loop.last %} <span class="arrow">→</span> {% endif %}
+    {%- endfor %}
+  </div>
+  <div class="bookend-label exit">→ Exiting</div>
+</div>
+
 <div id="cfd-chart" class="chart tall"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
