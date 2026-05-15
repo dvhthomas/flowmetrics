@@ -573,8 +573,10 @@ class TestCliInvocation:
         aging = self._aging_report(from_wip_labels=False)
         assert report_title(eff) == "Flow efficiency"
         assert report_title(cfd) == "Cumulative Flow Diagram"
-        assert report_title(wd) == "When will it be done?"
-        assert report_title(hm) == "How many items?"
+        # Forecast titles incorporate the input N / target date so the
+        # page heading answers the specific question being asked.
+        assert report_title(wd) == "Forecast when 50 items will be done"
+        assert report_title(hm) == "Forecast how many items finish by 2026-05-25"
         assert report_title(aging) == "Aging Work In Progress"
 
     def test_efficiency_jira_invocation_emits_jira_url(self):

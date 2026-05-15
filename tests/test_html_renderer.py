@@ -383,29 +383,57 @@ class TestEfficiencyHtmlRedesign:
         out = html_renderer.render(_efficiency_report())
         assert "Headline numbers" not in out
 
-    def test_activity_inference_assumptions_visible_above_the_fold(self):
-        """For GitHub PRs we don't have direct 'active' state — active
-        time is INFERRED from the timing of commits/reviews/comments.
-        The two parameters that drive that inference (gap-hours and
-        min-cluster-minutes) can swing the FE number dramatically, so
-        they need to be visible BEFORE the reader treats the number as
-        a precise measurement — not buried in the About collapsible.
-
-        Concretely: a callout block in the main content (before the
-        chart and before any <details> collapsible) names both values
-        and the assumption pattern."""
+    def test_template_does_not_duplicate_headline_data(self):
+        """The inline 'Portfolio FE: X% across N PRs. C cycle, A
+        active.' paragraph restated the headline. Drop it — the
+        headline sentence + the per-PR table carry the same numbers.
+        (The Vega chart's portfolio-line label legitimately uses
+        'Portfolio FE: X%'; we look only at HTML body text, not at
+        the inlined Vega spec.)"""
         out = html_renderer.render(_efficiency_report())
-        # Locate the first <details> tag — anything ABOVE that is the
-        # visible-by-default region.
+        # The headline (from the interpretation) still surfaces…
+        assert "Headline appears verbatim." in out  # from fixture _interp()
+        # …and the old duplicate template paragraph signature
+        # ("<strong>Portfolio FE: …</strong>") is gone from the body.
+        assert "<strong>Portfolio FE:" not in out
+
+    def test_inference_note_above_the_fold_is_terse(self):
+        """The headline FE stays the dominant signal up top. The
+        active-time inference deserves a flag for trust but not a
+        block of explanation: a one-line note linking to the worked
+        example below is enough. The wall of text earlier broke the
+        chart-first feel of the page."""
+        out = html_renderer.render(_efficiency_report())
         first_details = out.find("<details")
-        assert first_details > 0
         above_fold = out[:first_details]
-        # Both load-bearing parameters must be named in the visible
-        # region, alongside language clarifying they're assumptions.
-        assert "4.0" in above_fold or "gap" in above_fold.lower()
-        assert ("assumption" in above_fold.lower()
-                or "inferred" in above_fold.lower()
+        # The note must say the number is inferred…
+        assert ("inferred" in above_fold.lower()
                 or "estimate" in above_fold.lower())
+        # …but the old yellow callout's worked-example prose must not
+        # appear above the fold any more.
+        assert "raising the gap usually" not in above_fold
+        assert "Both numbers are assumptions" not in above_fold
+
+    def test_worked_example_lives_in_a_details_section(self):
+        """The full inference explanation moves into a `<details>`
+        block (open or closed) with a concrete worked example — an
+        Alice-and-PR-4 narrative beats the abstract 'gap-hours
+        clusters events' framing."""
+        out = html_renderer.render(_efficiency_report())
+        # The summary text names the section.
+        assert "How active time is estimated" in out
+        # The body of that section uses a concrete worked example —
+        # specific names + a timeline beat the abstract phrasing.
+        assert "Alice" in out
+        # Both load-bearing params are still named in the details block.
+        # (test_about_collapsible_carries_definition_and_vocabulary
+        # asserts the broader About block; this confirms the new
+        # focused section has the assumption parameters present.)
+        details_start = out.index("How active time is estimated")
+        details_end = out.index("</details>", details_start)
+        section = out[details_start:details_end]
+        assert "4.0" in section  # gap-hours default
+        assert "30" in section   # min-cluster-minutes default
 
     def test_slowest_prs_panel_present_with_named_items(self):
         """The slowest PRs are the system-level bottleneck per Vacanti's
@@ -425,20 +453,22 @@ class TestForecastHtmlRedesign:
     - Auto-rendered Key insight / Next actions / Caveats / Reproduce /
       Vocabulary fold into collapsed details at the bottom."""
 
-    def test_when_done_title_is_the_question_not_the_program_label(self):
+    def test_when_done_title_states_the_specific_forecast(self):
         out = html_renderer.render(_when_done_report())
         h1 = re.search(r"<h1>([^<]+)</h1>", out)
         assert h1 is not None
         assert "flowmetrics" not in h1.group(1).lower()
-        # Title reads as a question.
-        assert "When will it be done" in h1.group(1)
+        # Title incorporates the input N so the page heading itself
+        # carries the question being asked.
+        assert "Forecast when" in h1.group(1)
+        assert "items" in h1.group(1)
 
-    def test_how_many_title_is_the_question(self):
+    def test_how_many_title_states_the_specific_forecast(self):
         out = html_renderer.render(_how_many_report())
         h1 = re.search(r"<h1>([^<]+)</h1>", out)
         assert h1 is not None
         assert "flowmetrics" not in h1.group(1).lower()
-        assert "How many" in h1.group(1)
+        assert "Forecast how many" in h1.group(1)
 
     def test_when_done_no_key_insight_section_at_top_level(self):
         out = html_renderer.render(_when_done_report())

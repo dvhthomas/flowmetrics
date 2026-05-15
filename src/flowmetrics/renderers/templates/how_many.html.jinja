@@ -37,7 +37,7 @@
 </table>
 
 {% if vega_spec_json %}
-<div id="howmany-chart" style="width:100%; min-height:340px;"
+<div id="howmany-chart" class="chart medium"
      role="img" aria-label="How-many forecast histogram with P50, P70, P85, P95 percentile lines"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -89,7 +89,7 @@
 
 {% if interpretation.next_actions %}
 <p><strong>Next actions</strong></p>
-<ol style="font-size:0.95rem;">
+<ol class="compact-prose">
 {% for action in interpretation.next_actions %}
   <li>{{ action }}</li>
 {% endfor %}
@@ -98,7 +98,7 @@
 
 {% if interpretation.caveats %}
 <p><strong>Caveats</strong></p>
-<ul style="font-size:0.9rem; color:#555">
+<ul class="footnote-wider">
 {% for c in interpretation.caveats %}
   <li>{{ c }}</li>
 {% endfor %}

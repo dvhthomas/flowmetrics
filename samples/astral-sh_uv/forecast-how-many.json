@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-15T13:14:33.874192-06:00",
-  "headline": "Forecast for astral-sh/uv: 85% confidence we deliver at least 75 items by May 29, 2026 (window: 15 days).",
+  "generated_at": "2026-05-15T13:30:10.626460-06:00",
+  "headline": "85% confident at least 75 items finish in the next 15 days (by May 29, 2026).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {

@@ -40,10 +40,14 @@ def _prose_date(d: date) -> str:
 
 def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interpretation:
     caveats_common = [
-        "Never use this metric per engineer — it reflects the system, not individuals.",
-        "Per-PR FE is a directional indicator, not a precise measurement.",
+        "Do not compare this number across engineers — wait time on a single "
+        "PR is shared between author, reviewer, and CI, and one slow reviewer "
+        "can drop an author's per-PR FE to single digits regardless of how "
+        "fast the author actually worked.",
         f"Active time uses gap={input.gap_hours}h and "
-        f"min_cluster={input.min_cluster_minutes}min — tuning these moves the number.",
+        f"min_cluster={input.min_cluster_minutes}min — raising the gap "
+        "credits longer idle stretches as active, which raises FE; "
+        "lowering it does the opposite.",
     ]
 
     if result.pr_count == 0:
@@ -52,7 +56,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
                 f"No PRs merged in {input.repo} between "
                 f"{_prose_date(input.start)} and {_prose_date(input.stop)}."
             ),
-            key_insight="An empty window means nothing to measure — not a bad signal.",
+            key_insight="An empty window has nothing to measure — that does not mean anything is wrong.",
             next_actions=[
                 "Widen the date window with --start/--stop.",
                 "Confirm the repo name is correct.",
@@ -64,10 +68,12 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
     bot_suffix = ""
     if result.bot_pr_count:
         bot_suffix = f" ({result.human_pr_count} human, {result.bot_pr_count} bot)"
+    window_days = (input.stop - input.start).days + 1
+    day_word = "day" if window_days == 1 else "days"
     headline = (
-        f"Portfolio flow efficiency for {input.repo} "
-        f"{_prose_date(input.start)} → {_prose_date(input.stop)}: "
-        f"{_pct(portfolio)} across {result.pr_count} completed items{bot_suffix}."
+        f"{_pct(portfolio)} flow efficiency across {result.pr_count} "
+        f"completed items{bot_suffix} over {window_days} {day_word}, "
+        f"{_prose_date(input.start)} → {_prose_date(input.stop)}."
     )
 
     slowest = max(result.per_pr, key=lambda p: p.cycle_time)
@@ -154,8 +160,8 @@ def interpret_when_done(
     p95 = percentiles[95]
 
     headline = (
-        f"Forecast for {input.repo}: 85% confidence {input.items} items are done "
-        f"by {_prose_date(p85)}, starting {_prose_date(input.start_date)}."
+        f"85% confident the next {input.items} items finish by "
+        f"{_prose_date(p85)} (starting {_prose_date(input.start_date)})."
     )
 
     key_insight = (
@@ -215,9 +221,10 @@ def interpret_how_many(
     p95 = percentiles[95]
 
     days = (input.target_date - input.start_date).days + 1
+    day_word = "day" if days == 1 else "days"
     headline = (
-        f"Forecast for {input.repo}: 85% confidence we deliver at least {p85} items by "
-        f"{_prose_date(input.target_date)} (window: {days} days)."
+        f"85% confident at least {p85} items finish in the next {days} {day_word} "
+        f"(by {_prose_date(input.target_date)})."
     )
 
     key_insight = (
@@ -310,16 +317,18 @@ def interpret_cfd(input: CfdInput, points: list[CfdPoint]) -> Interpretation:
         widest = max(bands, key=lambda b: b[1])
         if widest[1] > 0:
             key_insight = (
-                f"Largest WIP band is '{widest[0]}' with {widest[1]} items at "
-                f"{_prose_date(end_point.sampled_on)}. The widest band "
-                "#3 (vertical distance = WIP in that band), the widest band "
-                "is where work piles up — look there for the bottleneck. "
-                "Property #6 (slope = average arrival rate) tells you the "
-                "rate that band is filling."
+                f"The largest WIP band at {_prose_date(end_point.sampled_on)} "
+                f"is '{widest[0]}' with {widest[1]} items in flight. The "
+                "thicker that band is on the chart, the more work is "
+                "queued or in-progress at that stage; the steeper the "
+                "line bordering it, the faster items are arriving into "
+                "the stage."
             )
             next_actions.append(
-                f"Investigate why items accumulate in '{widest[0]}' — that's "
-                "the system's current constraint."
+                f"Investigate why items accumulate in '{widest[0]}'. "
+                "Either items are arriving faster than this stage can "
+                "process, or they're waiting on a downstream resource "
+                "(reviewers, environments, decisions)."
             )
         else:
             key_insight = (
@@ -388,8 +397,10 @@ def interpret_aging(
         f"({completed_count} items). If recent throughput has changed, "
         "those checkpoints may have drifted.",
         "Items in early workflow states (Open, To Do) often age longest in "
-        "OSS — that's queue, not work. Treat the chart as a queue-depth "
-        "indicator first, a productivity signal second.",
+        "open-source repos because they're sitting in an intake queue, not "
+        "being actively worked. An aged item in 'Open' usually means no "
+        "maintainer has picked it up; an aged item in 'In Progress' or "
+        "'In Review' is more likely a real bottleneck.",
     ]
     if excluded_above_max_age > 0 and input.max_age_days is not None:
         caveats.append(

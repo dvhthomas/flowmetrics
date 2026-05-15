@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T13:14:42.211729-06:00",
+  "generated_at": "2026-05-15T13:30:19.105755-06:00",
   "headline": "WIP Aging for pre-commit/pre-commit as of May 15, 2026: 6 in-flight items, 6 already past P85 (1.1d), 6 past P95 (1.1d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
@@ -135,7 +135,7 @@
   "caveats": [
     "Aging is a snapshot as of May 15, 2026 \u2014 not a trend over time.",
     "Percentile lines reflect the completed-item distribution from Apr 15, 2026 \u2192 May 14, 2026 (5 items). If recent throughput has changed, those checkpoints may have drifted.",
-    "Items in early workflow states (Open, To Do) often age longest in OSS \u2014 that's queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second.",
+    "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "100% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
   "vocabulary": {
@@ -143,7 +143,7 @@
     "Aging Work In Progress": "How long each in-flight item has been open without exiting the workflow. Aging only applies to items that haven't completed; a completed item has a Cycle Time instead.",
     "Work item age": "Elapsed days since an item entered the workflow. Computed as today \u2212 createdAt for a PR; for Jira, today \u2212 issue creation.",
     "In-flight items": "Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.",
-    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it's likely to miss its forecast \u2014 actionable evidence to intervene.",
+    "Cycle time percentile lines": "Reference checkpoints drawn from the cycle times of recently completed items. An item still in flight past the P85 line has already taken longer than 85% of the recently-completed items \u2014 the team should expect to either expedite it or revise the forecast it was committed under.",
     "Aging chart": "Plots in-flight items by current workflow state (x) and Age in days (y), with horizontal percentile lines drawn from recent completers' cycle times.",
     "Source": "Vacanti, _When Will It Be Done?_ (Leanpub)."
   },

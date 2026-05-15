@@ -18,9 +18,36 @@
      blocks at the top of the page (headline + banner + definition)
      looked like chartjunk. Plain typographic hierarchy now; only the
      conditional `.banner` and `.horizon` classes get colored chrome. */
-  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .headline { font-size: 1.35rem; font-weight: 500; color: #0d2440;
+              line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 60ch; }
   .insight { font-size: 1rem; margin: 0.7rem 0; }
   .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  /* Trust notes — small, italic, used for "see how it's estimated" */
+  .trust-note { font-size: 0.88rem; color: #666; margin: 0.3rem 0 1rem; }
+  /* Boxed callouts for orientation / standup framing */
+  .standup-callout { background: #eef4ff; border-left: 4px solid #3b6fb8;
+                     padding: 0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+                     font-size: 0.92rem; color: #1f3a5f; max-width: 70ch; }
+  /* Compact prose blocks within details sections */
+  .walkthrough { font-size: 0.95rem; margin-left: 0.5rem; }
+  .compact-prose { font-size: 0.95rem; }
+  .footnote { font-size: 0.85rem; color: #666; max-width: 65ch; }
+  .footnote-tight { font-size: 0.85rem; color: #666; margin: 0.3rem 0 1rem; }
+  .footnote-wider { font-size: 0.9rem; color: #666; max-width: 60ch; }
+  /* Chart caption that hangs immediately under a chart */
+  .chart-caption { font-size: 0.85rem; color: #666;
+                   margin: 0.4rem 0 1.2rem; max-width: 65ch; }
+  /* About-section subhead (h3 within details) */
+  details h3 { margin-top: 1rem; font-size: 1rem; }
+  /* Vega chart containers — fluid width, fixed minimum height */
+  .chart { width: 100%; }
+  .chart.tall { min-height: 380px; }
+  .chart.medium { min-height: 340px; }
+  .chart.short { min-height: 200px; }
+  /* Success note (e.g. "no items past P85 — pipeline on track") */
+  .ok-note { font-size: 0.95rem; color: #137333; }
+  /* Walkthrough list inside an About-style details section */
+  .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
   details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
                       color: #2b7cff; }
   details[open] > summary { margin-bottom: 0.5rem; }
@@ -87,15 +114,13 @@
 <p class="subtitle">
   for jira:CASSANDRA ·
   as of May 15, 2026 ·
-  <span class="stamp">generated 2026-05-15 13:14 MDT</span>
+  <span class="stamp">generated 2026-05-15 13:30 MDT</span>
 </p>
 
 
 
 
-<div style="background:#eef4ff; border-left:4px solid #3b6fb8;
-            padding:0.7rem 1rem; margin: 0.4rem 0 1.2rem;
-            font-size:0.92rem; color:#1f3a5f; max-width:70ch;">
+<div class="standup-callout">
   <strong>How to use this in a standup.</strong> Walk the chart with
   the team, not the individual. An item past P85 means the
   <em>team</em> is about to miss its forecast — swarm, split,
@@ -106,7 +131,7 @@
 
 <h2>Distribution by percentile band</h2>
 <div id="aging-dist-chart" role="img" aria-label="Aging distribution by percentile band: Below P50 34 (1%); P50–P70 112 (4%); P70–P85 818 (26%); P85–P95 643 (20%); Above P95 1584 (50%)"
-     style="width:100%; min-height:200px;"></div>
+     class="chart short"></div>
 <script>
   vegaEmbed("#aging-dist-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": {"step": 32}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar"}, "data": {"values": [{"band": "Below P50", "count": 34, "share": 0.01065496709495456}, {"band": "P50–P70", "count": 112, "share": 0.0350987151363209}, {"band": "P70–P85", "count": 818, "share": 0.25634597304920087}, {"band": "P85–P95", "count": 643, "share": 0.20150423064869946}, {"band": "Above P95", "count": 1584, "share": 0.4963961140708242}]}, "encoding": {"y": {"field": "band", "type": "ordinal", "sort": ["Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"], "axis": {"title": "Percentile band", "titleFontWeight": "bold"}}, "x": {"field": "count", "type": "quantitative", "axis": {"title": "In-flight items", "titleFontWeight": "bold"}}, "color": {"field": "band", "type": "ordinal", "sort": ["Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}, "tooltip": [{"field": "band", "title": "Band"}, {"field": "count", "title": "Items"}, {"field": "share", "title": "Share", "format": ".0%"}]}}]}, {
     actions: false,
@@ -116,7 +141,7 @@
       "Interactive chart failed to render: " + err;
   });
 </script>
-<p style="font-size:0.85rem; color:#666; max-width:65ch; margin: 0.6rem 0 1.2rem;">
+<p class="chart-caption">
 Each bar counts in-flight PRs whose age sits inside that band's
 cycle-time range. Thresholds come from the
 44 PRs that merged
@@ -124,7 +149,7 @@ cycle-time range. Thresholds come from the
 </p>
 
 <h2>WIP Aging</h2>
-<div id="aging-chart" style="width:100%; min-height:380px;"></div>
+<div id="aging-chart" class="chart tall"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -302,7 +327,7 @@ cycle-time range. Thresholds come from the
     </tr>
   </tbody>
 </table>
-<p style="font-size:0.85rem; color:#666; max-width:65ch">
+<p class="footnote">
 <strong>At risk</strong> = items past the 50th-percentile cycle time
 but not yet past the 85th. By conditional probability, an item past
 P50 has at least double the starting chance of also missing the 85th-
@@ -665,7 +690,7 @@ exceeding the 85th-percentile threshold has doubled to 30%.
 <p>
 The arithmetic, with the population framed as 100 PRs:
 </p>
-<ul style="font-size:0.95rem; max-width:62ch">
+<ul class="walkthrough-list">
   <li>At <strong>P50</strong>: 50 PRs survived past the 50th. Of those,
       15 historically also went past P85. <strong>30%</strong> chance
       of missing the forecast.</li>
@@ -677,7 +702,7 @@ The arithmetic, with the population framed as 100 PRs:
   <li>At <strong>P95</strong>: 5 PRs survived. Deep tail — these are
       decisions about expedite, split, or drop.</li>
 </ul>
-<p style="font-size:0.95rem;">
+<p class="compact-prose">
 The math comes from the survival function of the empirical
 distribution:
 <code>P(cycle &gt; P85 | cycle &gt; P50) = P(cycle &gt; P85) / P(cycle
@@ -686,10 +711,10 @@ forecast-derived or simulated.
 </p>
 
 <p><strong>Other notes</strong></p>
-<ul style="font-size:0.9rem; color:#555">
+<ul class="footnote-wider">
   <li>Aging is a snapshot as of May 15, 2026 — not a trend over time.</li>
   <li>Percentile lines reflect the completed-item distribution from Apr 15, 2026 → May 14, 2026 (44 items). If recent throughput has changed, those checkpoints may have drifted.</li>
-  <li>Items in early workflow states (Open, To Do) often age longest in OSS — that&#39;s queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second.</li>
+  <li>Items in early workflow states (Open, To Do) often age longest in open-source repos because they&#39;re sitting in an intake queue, not being actively worked. An aged item in &#39;Open&#39; usually means no maintainer has picked it up; an aged item in &#39;In Progress&#39; or &#39;In Review&#39; is more likely a real bottleneck.</li>
   <li>50% of in-flight items are past P95 of recent completers — much higher than the ~5% you&#39;d expect if today&#39;s WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren&#39;t in that sample. The thresholds therefore diverge from — and likely under-represent — true cycle time for this WIP.</li>
 </ul>
 
@@ -704,7 +729,7 @@ forecast-derived or simulated.
   <dt><strong>In-flight items</strong></dt>
   <dd>Items that have entered but not exited the workflow. Each in-flight item is one dot on the Aging chart, in the column of its current state.</dd>
   <dt><strong>Cycle time percentile lines</strong></dt>
-  <dd>Reference checkpoints drawn from the cycle times of recently completed items. If an in-flight item ages past P85, it&#39;s likely to miss its forecast — actionable evidence to intervene.</dd>
+  <dd>Reference checkpoints drawn from the cycle times of recently completed items. An item still in flight past the P85 line has already taken longer than 85% of the recently-completed items — the team should expect to either expedite it or revise the forecast it was committed under.</dd>
   <dt><strong>Aging chart</strong></dt>
   <dd>Plots in-flight items by current workflow state (x) and Age in days (y), with horizontal percentile lines drawn from recent completers&#39; cycle times.</dd>
   <dt><strong>Source</strong></dt>

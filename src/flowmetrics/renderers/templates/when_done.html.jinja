@@ -18,9 +18,9 @@
 {% block vocabulary %}{% endblock %}
 
 {% block content %}
-{# Forecast-horizon traffic light — the actionable signal-quality
-   read. Conditional colour is meaningful: green = trustworthy,
-   yellow = stretching, red = extrapolating beyond the training data. #}
+{# Forecast-horizon traffic light: how far the forecast reaches
+   beyond the training window. Conditional colour is meaningful —
+   green = trustworthy, yellow = stretching, red = extrapolating. #}
 <div class="horizon {% if horizon.ratio <= 1.0 %}green{% elif horizon.ratio <= 2.0 %}yellow{% else %}red{% endif %}">
 <strong>Forecast horizon:</strong>
 {{ horizon.days_ahead }} days ahead, training window is {{ horizon.training_window_days }} days
@@ -40,7 +40,7 @@
 </table>
 
 {% if vega_spec_json %}
-<div id="whendone-chart" style="width:100%; min-height:340px;"
+<div id="whendone-chart" class="chart medium"
      role="img" aria-label="When-done forecast histogram with P50, P70, P85, P95 percentile lines"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -93,7 +93,7 @@
 
 {% if interpretation.next_actions %}
 <p><strong>Next actions</strong></p>
-<ol style="font-size:0.95rem;">
+<ol class="compact-prose">
 {% for action in interpretation.next_actions %}
   <li>{{ action }}</li>
 {% endfor %}
@@ -102,7 +102,7 @@
 
 {% if interpretation.caveats %}
 <p><strong>Caveats</strong></p>
-<ul style="font-size:0.9rem; color:#555">
+<ul class="footnote-wider">
 {% for c in interpretation.caveats %}
   <li>{{ c }}</li>
 {% endfor %}

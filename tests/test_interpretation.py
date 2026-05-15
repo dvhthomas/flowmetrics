@@ -170,6 +170,26 @@ class TestProseDateFormat:
         assert "2026-05-04" not in i.headline
         assert "2026-05-10" not in i.headline
 
+    def test_efficiency_headline_is_a_clean_single_sentence(self):
+        """The critical line is the headline. It should carry exactly
+        the data not repeated by the subtitle: the FE percentage, the
+        item count, and the window span. Repo name lives in the
+        subtitle (clickable link), so drop it from the headline."""
+        prs = [_pr(1, cycle_hours=24, eff=0.5)]
+        i = interpret_efficiency(
+            _eff_input(repo="acme/widget"),
+            _window_result(prs),
+        )
+        # Repo name belongs in the subtitle, not the headline.
+        assert "acme/widget" not in i.headline
+        # The phrasing should be a single human-readable sentence
+        # naming the percentage, the item count, and the window span.
+        assert "%" in i.headline
+        assert "completed items" in i.headline or "items" in i.headline
+        # Should not start with the formal `Portfolio flow efficiency for`
+        # phrase — the cleaner form leads with the number.
+        assert not i.headline.startswith("Portfolio flow efficiency for")
+
     def test_when_done_headline_uses_prose_dates(self):
         input_ = WhenDoneInput(
             repo="acme/widget", items=50, start_date=date(2026, 5, 11),
@@ -243,7 +263,7 @@ class TestStatusMismatchDiagnostic:
 
 
 class TestInterpretWhenDone:
-    def test_headline_names_repo_85th_percentile_and_item_count(self):
+    def test_headline_names_85th_percentile_and_item_count(self):
         input_ = WhenDoneInput(
             repo="acme/widget",
             items=50,
@@ -261,7 +281,8 @@ class TestInterpretWhenDone:
             95: date(2026, 5, 25),
         }
         i = interpret_when_done(input_, training, hist, percentiles)
-        assert "acme/widget" in i.headline
+        # Repo name belongs in the subtitle, not the headline.
+        assert "acme/widget" not in i.headline
         assert "50" in i.headline  # number of items
         assert "May 23, 2026" in i.headline  # 85th percentile (prose format)
 
@@ -363,7 +384,8 @@ class TestInterpretHowMany:
         hist = build_histogram([60] * 10)
         percentiles = {50: 89, 70: 76, 85: 64, 95: 51}
         i = interpret_how_many(input_, training, hist, percentiles)
-        assert "acme/widget" in i.headline
+        # Repo name lives in the subtitle, not the headline.
+        assert "acme/widget" not in i.headline
         assert "64" in i.headline  # 85th percentile commitment
 
     def test_caveat_calls_out_backward_percentile_direction(self):

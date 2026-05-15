@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>When will it be done?</title>
+<title>Forecast when 25 items will be done</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
          max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
@@ -18,9 +18,36 @@
      blocks at the top of the page (headline + banner + definition)
      looked like chartjunk. Plain typographic hierarchy now; only the
      conditional `.banner` and `.horizon` classes get colored chrome. */
-  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .headline { font-size: 1.35rem; font-weight: 500; color: #0d2440;
+              line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 60ch; }
   .insight { font-size: 1rem; margin: 0.7rem 0; }
   .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  /* Trust notes — small, italic, used for "see how it's estimated" */
+  .trust-note { font-size: 0.88rem; color: #666; margin: 0.3rem 0 1rem; }
+  /* Boxed callouts for orientation / standup framing */
+  .standup-callout { background: #eef4ff; border-left: 4px solid #3b6fb8;
+                     padding: 0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+                     font-size: 0.92rem; color: #1f3a5f; max-width: 70ch; }
+  /* Compact prose blocks within details sections */
+  .walkthrough { font-size: 0.95rem; margin-left: 0.5rem; }
+  .compact-prose { font-size: 0.95rem; }
+  .footnote { font-size: 0.85rem; color: #666; max-width: 65ch; }
+  .footnote-tight { font-size: 0.85rem; color: #666; margin: 0.3rem 0 1rem; }
+  .footnote-wider { font-size: 0.9rem; color: #666; max-width: 60ch; }
+  /* Chart caption that hangs immediately under a chart */
+  .chart-caption { font-size: 0.85rem; color: #666;
+                   margin: 0.4rem 0 1.2rem; max-width: 65ch; }
+  /* About-section subhead (h3 within details) */
+  details h3 { margin-top: 1rem; font-size: 1rem; }
+  /* Vega chart containers — fluid width, fixed minimum height */
+  .chart { width: 100%; }
+  .chart.tall { min-height: 380px; }
+  .chart.medium { min-height: 340px; }
+  .chart.short { min-height: 200px; }
+  /* Success note (e.g. "no items past P85 — pipeline on track") */
+  .ok-note { font-size: 0.95rem; color: #137333; }
+  /* Walkthrough list inside an About-style details section */
+  .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
   details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
                       color: #2b7cff; }
   details[open] > summary { margin-bottom: 0.5rem; }
@@ -83,13 +110,13 @@
 </style>
 </head>
 <body>
-<h1>When will it be done?</h1>
+<h1>Forecast when 25 items will be done</h1>
 <p class="subtitle">
   for <a href="https://github.com/pre-commit/pre-commit">pre-commit/pre-commit</a> ·
   25 items from 2026-05-15 ·
-  <span class="stamp">generated 2026-05-15 13:14 MDT</span>
+  <span class="stamp">generated 2026-05-15 13:30 MDT</span>
 </p>
-<div class="headline">Forecast for pre-commit/pre-commit: 85% confidence 25 items are done by Nov 23, 2026, starting May 15, 2026.</div>
+<div class="headline">85% confident the next 25 items finish by Nov 23, 2026 (starting May 15, 2026).</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.</div>
@@ -112,7 +139,7 @@
 </tbody>
 </table>
 
-<div id="whendone-chart" style="width:100%; min-height:340px;"
+<div id="whendone-chart" class="chart medium"
      role="img" aria-label="When-done forecast histogram with P50, P70, P85, P95 percentile lines"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -163,7 +190,7 @@
 <p><strong>Key insight.</strong> Median outcome is Oct 10, 2026. 95% confidence is Dec 22, 2026. The gap between 50% and 85% is the wait-cost of being predictable — wider gap = more daily-throughput variance.</p>
 
 <p><strong>Next actions</strong></p>
-<ol style="font-size:0.95rem;">
+<ol class="compact-prose">
   <li>Commit externally on the 85% date (Nov 23, 2026), not the 50% date (Oct 10, 2026).</li>
   <li>Re-run weekly to track drift in the forecast.</li>
   <li>Items to complete (25) exceeds total recent throughput (5 merges in 30d). Forecast is extrapolating past the training horizon — treat the tail with skepticism.</li>
@@ -171,7 +198,7 @@
 </ol>
 
 <p><strong>Caveats</strong></p>
-<ul style="font-size:0.9rem; color:#555">
+<ul class="footnote-wider">
   <li>Assumes the next weeks will look like the recent past — no regime change.</li>
   <li>Zero-merge days are included as real samples; bad days happen in the simulator.</li>
   <li>Throughput unit is &#39;completed items&#39;, not &#39;features&#39; — works only if item size is stable.</li>

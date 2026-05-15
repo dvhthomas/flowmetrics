@@ -18,9 +18,36 @@
      blocks at the top of the page (headline + banner + definition)
      looked like chartjunk. Plain typographic hierarchy now; only the
      conditional `.banner` and `.horizon` classes get colored chrome. */
-  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .headline { font-size: 1.35rem; font-weight: 500; color: #0d2440;
+              line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 60ch; }
   .insight { font-size: 1rem; margin: 0.7rem 0; }
   .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  /* Trust notes — small, italic, used for "see how it's estimated" */
+  .trust-note { font-size: 0.88rem; color: #666; margin: 0.3rem 0 1rem; }
+  /* Boxed callouts for orientation / standup framing */
+  .standup-callout { background: #eef4ff; border-left: 4px solid #3b6fb8;
+                     padding: 0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+                     font-size: 0.92rem; color: #1f3a5f; max-width: 70ch; }
+  /* Compact prose blocks within details sections */
+  .walkthrough { font-size: 0.95rem; margin-left: 0.5rem; }
+  .compact-prose { font-size: 0.95rem; }
+  .footnote { font-size: 0.85rem; color: #666; max-width: 65ch; }
+  .footnote-tight { font-size: 0.85rem; color: #666; margin: 0.3rem 0 1rem; }
+  .footnote-wider { font-size: 0.9rem; color: #666; max-width: 60ch; }
+  /* Chart caption that hangs immediately under a chart */
+  .chart-caption { font-size: 0.85rem; color: #666;
+                   margin: 0.4rem 0 1.2rem; max-width: 65ch; }
+  /* About-section subhead (h3 within details) */
+  details h3 { margin-top: 1rem; font-size: 1rem; }
+  /* Vega chart containers — fluid width, fixed minimum height */
+  .chart { width: 100%; }
+  .chart.tall { min-height: 380px; }
+  .chart.medium { min-height: 340px; }
+  .chart.short { min-height: 200px; }
+  /* Success note (e.g. "no items past P85 — pipeline on track") */
+  .ok-note { font-size: 0.95rem; color: #137333; }
+  /* Walkthrough list inside an About-style details section */
+  .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
   details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
                       color: #2b7cff; }
   details[open] > summary { margin-bottom: 0.5rem; }
@@ -87,39 +114,23 @@
 <p class="subtitle">
   for <a href="https://github.com/pre-commit/pre-commit">pre-commit/pre-commit</a> ·
   2026-05-08 → 2026-05-14 ·
-  <span class="stamp">generated 2026-05-15 13:14 MDT</span>
+  <span class="stamp">generated 2026-05-15 13:30 MDT</span>
 </p>
-<div class="headline">Portfolio flow efficiency for pre-commit/pre-commit May 8, 2026 → May 14, 2026: 6.1% across 2 completed items (1 human, 1 bot).</div>
+<div class="headline">6.1% flow efficiency across 2 completed items (1 human, 1 bot) over 7 days, May 8, 2026 → May 14, 2026.</div>
 
 
-<div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — the recipe, the right number to act on.</div>
+<div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
 
 
-<p style="font-size:1.05rem;">
-<strong>Portfolio FE: 6.1%</strong>
-across 2 PRs (1 human, 1 bot).
-18.8h cycle,
-1.1h active.
+
+<p class="trust-note">
+  Active time is <em>inferred</em> from event timing on GitHub, not
+  measured directly. See <a href="#how-active-time-is-estimated">how
+  it's estimated</a> below before treating the number as precise.
 </p>
-
-<div style="background: #fff8e1; border-left: 4px solid #d4a72c;
-            padding: 0.7rem 1rem; margin: 0.8rem 0 1.2rem;
-            font-size: 0.92rem; color: #5a4313; max-width: 70ch;">
-  <strong>Active time here is an estimate, not a measurement.</strong>
-  GitHub does not record when a PR is being worked on vs. waiting in
-  review. We infer activity by clustering events (commits, reviews,
-  comments) into work sessions: events more than
-  <strong>4.0h</strong> apart start a new
-  session, and a lone event counts for at least
-  <strong>30.0 min</strong> so it
-  isn't zero. Both numbers are assumptions you can tune with
-  <code>--gap-hours</code> and <code>--min-cluster-minutes</code> —
-  raising the gap usually <em>raises</em> FE; lowering it usually
-  <em>lowers</em> FE. Treat the number as directional.
-</div>
 
 <h2>Top slowest PRs</h2>
-<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<p class="footnote-wider">
 These PRs drove the portfolio's cycle-time tail. Improving any one of
 them moves the portfolio number more than improving a typical PR.
 </p>
@@ -138,7 +149,7 @@ them moves the portfolio number more than improving a typical PR.
   </div>
 </div>
 
-<div id="efficiency-chart" style="width:100%;"></div>
+<div id="efficiency-chart" class="chart"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -152,14 +163,14 @@ them moves the portfolio number more than improving a typical PR.
   });
 </script>
 
-<p style="font-size:0.9rem; color:#666; max-width:60ch">
-<strong>Why are so many PRs at 100%?</strong>
-A PR scores 100% when its entire cycle fits inside one activity cluster
-(default: 4-hour quiet-period threshold). Short PRs — automated version
-bumps, fast community fixes, dependabot updates — trivially fit inside
-one cluster because there's no time for a queue to form. The signal is
-in the <strong>portfolio number</strong> in the headline and the PRs
-above, not in the 100%-bar tail.
+<p class="footnote-wider">
+<strong>Why does the 100% bar look so tall?</strong> A PR scores
+100% when every one of its events falls inside a single
+4.0-hour window — common for typo fixes,
+dependency bumps, and bot-authored PRs, where there's no time for a
+queue to form. The portfolio number in the headline weights each PR
+by its cycle time, so those short PRs don't drag the system number
+up the way they drag this bar's count up.
 </p>
 
 
@@ -189,6 +200,53 @@ above, not in the 100%-bar tail.
 </table>
 </details>
 
+<details id="how-active-time-is-estimated" open>
+<summary>How active time is estimated</summary>
+<p>GitHub does not record when a PR is being worked on versus waiting
+in review. We infer it from the timing of each PR's events
+(commits, reviews, comments, push events). A concrete walk-through:</p>
+
+<p class="walkthrough">
+Alice pushes a commit to PR #4 at 8:00 AM Tuesday. She pushes
+another to the same PR at 8:55 AM, then a third at 9:30 AM. All
+three events are within
+<strong>4.0 hours</strong> of each other,
+so they form a single <em>work session</em> on PR #4 — from 8:00 to
+9:30 AM, 1.5 hours of <em>active time</em> credited to that PR.
+</p>
+
+<p class="walkthrough">
+At 9:35 AM Alice switches to PR #3, pushes a commit, and works on
+it through the rest of the morning. Because more than
+<strong>4.0 hours</strong> later Alice has
+not touched PR #4 again, PR #4's work session is considered closed
+at 9:30 AM. The 4-plus hours of clock time between 9:30 AM and her
+next event on PR #4 count as <strong>wait time</strong> for PR #4,
+not active time — even though Alice was working, she was working on
+something else. (If a reviewer comments on PR #4 in that gap, that
+counts as a separate work session for PR #4.)
+</p>
+
+<p class="walkthrough">
+A lone isolated event (e.g. one comment with no surrounding
+activity) would otherwise count for zero seconds of active time.
+We credit it with at least
+<strong>30.0 minutes</strong> so a
+short review pass isn't recorded as having taken zero work.
+</p>
+
+<p class="compact-prose">
+Both numbers are tunable: <code>--gap-hours</code> and
+<code>--min-cluster-minutes</code>. The defaults
+(4.0h /
+30.0 min) are reasonable for
+solo-author-plus-async-review patterns; teams that pair-program or
+swarm a PR may want a higher gap; teams with very frequent commits
+may want a lower one. Raising the gap raises FE; lowering it lowers
+FE.
+</p>
+</details>
+
 <details>
 <summary>Reproduce this report</summary>
 <table>
@@ -202,20 +260,16 @@ above, not in the 100%-bar tail.
 
 <details>
 <summary>About this report</summary>
-<p><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — the recipe, the right number to act on.</p>
+<p><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</p>
 
-<p><strong>How active time was calculated.</strong>
-We grouped each PR's events (commits, reviews, comments) into work sessions:
-events more than <strong>4.0 hours</strong> apart start a new
-session, and a single isolated event counts as at least
-<strong>30.0 minutes</strong> of active time (so a
-lone comment isn't counted as zero work).</p>
 
-<p><strong>Per-PR distribution (median / mean).</strong>
-Reported because people ask for them, but the <strong>portfolio</strong>
-number above is the right one. Mean of per-PR ratios is inflated by a
-long tail of tiny fast PRs; median tells you what a typical PR looks
-like in isolation but doesn't reflect the system.</p>
+<p><strong>Median vs. mean per-PR FE.</strong> A simple average of
+each PR's FE is biased upward by the long tail of small fast PRs (a
+single 5-minute typo fix scores 100% and pulls the mean up). The
+median tells you what a typical PR looks like in isolation, which
+is a different question from "how efficient is our system overall".
+For decisions about where wait time is leaking, use the portfolio
+number in the headline; these two are listed for completeness.</p>
 <table>
   <tr><th>Median per-PR FE</th><td class="num">52.7%</td></tr>
   <tr><th>Mean per-PR FE</th><td class="num">52.7%</td></tr>
@@ -224,17 +278,16 @@ like in isolation but doesn't reflect the system.</p>
 <p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (#3681)  ran 0.8d and dominates the ratio.</p>
 
 <p><strong>Next actions</strong></p>
-<ol style="font-size:0.95rem;">
+<ol class="compact-prose">
   <li>Inspect the three slowest PRs (#3681) — they likely sat in review queue.</li>
   <li>Compare to the previous 2-4 weeks to spot a trend.</li>
   <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
 </ol>
 
 <p><strong>Caveats</strong></p>
-<ul style="font-size:0.9rem; color:#555">
-  <li>Never use this metric per engineer — it reflects the system, not individuals.</li>
-  <li>Per-PR FE is a directional indicator, not a precise measurement.</li>
-  <li>Active time uses gap=4.0h and min_cluster=30.0min — tuning these moves the number.</li>
+<ul class="footnote-wider">
+  <li>Do not compare this number across engineers — wait time on a single PR is shared between author, reviewer, and CI, and one slow reviewer can drop an author&#39;s per-PR FE to single digits regardless of how fast the author actually worked.</li>
+  <li>Active time uses gap=4.0h and min_cluster=30.0min — raising the gap credits longer idle stretches as active, which raises FE; lowering it does the opposite.</li>
 </ul>
 
 <p><strong>Vocabulary</strong></p>
@@ -244,11 +297,11 @@ like in isolation but doesn't reflect the system.</p>
   <dt><strong>Active time</strong></dt>
   <dd>The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.</dd>
   <dt><strong>Wait time</strong></dt>
-  <dd>cycle_time − active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). The actionable signal — queues are where the system bottlenecks live.</dd>
+  <dd>cycle_time − active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). This is where time leaks out of the system — long wait time on a few PRs drives the portfolio FE down more than slow individual work does.</dd>
   <dt><strong>Flow efficiency</strong></dt>
   <dd>active_time / cycle_time. Reported per-PR and as a portfolio.</dd>
   <dt><strong>Portfolio flow efficiency</strong></dt>
-  <dd>Σ active / Σ cycle across all merged PRs in this window. The system-level recipe — long-running PRs dominate, which is what you want. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, even though the latter is where your wait time actually lives. Portfolio = the system&#39;s number; mean per-PR = an aggregate of individual ratios that hides where the queue is.</dd>
+  <dd>Σ active ÷ Σ cycle across every merged PR in the window. Because totals are summed before dividing, long-running PRs dominate the number — exactly when you want them to. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% would drown out one 30-day PR at 5%, even though that 30-day PR is where your wait time actually lives.</dd>
   <dt><strong>Mean per-PR FE (and why not to act on it)</strong></dt>
   <dd>Simple average of each PR&#39;s individual flow efficiency. It tells you what a typical PR&#39;s ratio looks like in isolation, but it does not reflect the system — a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead.</dd>
 </dl>

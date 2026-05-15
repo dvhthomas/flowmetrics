@@ -278,18 +278,18 @@ _EFFICIENCY_VOCABULARY = {
     ),
     "Wait time": (
         "cycle_time − active_time. Time the PR spent waiting in queues "
-        "(awaiting review, blocked, etc.). The actionable signal — "
-        "queues are where the system bottlenecks live."
+        "(awaiting review, blocked, etc.). This is where time leaks out "
+        "of the system — long wait time on a few PRs drives the portfolio "
+        "FE down more than slow individual work does."
     ),
     "Flow efficiency": ("active_time / cycle_time. Reported per-PR and as a portfolio."),
     "Portfolio flow efficiency": (
-        "Σ active / Σ cycle across all merged PRs in this window. The "
-        "system-level recipe — long-running PRs dominate, which is what you "
-        "want. Contrast with mean(per-PR FE), which weights every PR equally: "
-        "fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, "
-        "even though the latter is where your wait time actually lives. "
-        "Portfolio = the system's number; mean per-PR = an aggregate of "
-        "individual ratios that hides where the queue is."
+        "Σ active ÷ Σ cycle across every merged PR in the window. Because "
+        "totals are summed before dividing, long-running PRs dominate the "
+        "number — exactly when you want them to. Contrast with mean(per-PR "
+        "FE), which weights every PR equally: fifty trivial 5-minute PRs "
+        "at 100% would drown out one 30-day PR at 5%, even though that 30-"
+        "day PR is where your wait time actually lives."
     ),
     "Mean per-PR FE (and why not to act on it)": (
         "Simple average of each PR's individual flow efficiency. It tells you "
@@ -348,8 +348,10 @@ _AGING_VOCABULARY = {
     ),
     "Cycle time percentile lines": (
         "Reference checkpoints drawn from the cycle times of recently "
-        "completed items. If an in-flight item ages past P85, it's likely to "
-        "miss its forecast — actionable evidence to intervene."
+        "completed items. An item still in flight past the P85 line has "
+        "already taken longer than 85% of the recently-completed items — "
+        "the team should expect to either expedite it or revise the "
+        "forecast it was committed under."
     ),
     "Aging chart": (
         "Plots in-flight items by current workflow state (x) and Age in days "
@@ -411,9 +413,9 @@ def report_definition(report: Report) -> str:
     if isinstance(report, EfficiencyReport):
         return (
             "Portfolio flow efficiency: the share of cycle time that was actively "
-            "worked on, vs. waiting in review or other queues. Portfolio FE = "
-            "Σ active / Σ cycle across all merged PRs in this window — the "
-            "recipe, the right number to act on."
+            "worked on, versus waiting in review or other queues. Computed as "
+            "Σ active ÷ Σ cycle across every merged PR in the window — totals "
+            "first, so one short PR cannot inflate the system-level number."
         )
     if isinstance(report, WhenDoneReport):
         return (
@@ -454,7 +456,16 @@ _REPORT_TITLES: dict[type, str] = {}  # populated below to avoid forward refs
 def report_title(report: Report) -> str:
     """Human-readable metric / question name for a report — what shows
     up in `<title>` and as the H1 of the HTML output. Centralised so
-    renderers don't hardcode metric names in template-render calls."""
+    renderers don't hardcode metric names in template-render calls.
+
+    Forecast titles incorporate the report's actual inputs (the N
+    items, the target date) so the page heading itself answers the
+    question instead of just naming the report type. The other report
+    types use a static title lookup."""
+    if isinstance(report, WhenDoneReport):
+        return f"Forecast when {report.input.items} items will be done"
+    if isinstance(report, HowManyReport):
+        return f"Forecast how many items finish by {report.input.target_date}"
     return _REPORT_TITLES[type(report)]
 
 

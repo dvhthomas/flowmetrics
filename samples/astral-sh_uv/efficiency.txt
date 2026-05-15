@@ -1,2 +1,2 @@
-Portfolio flow efficiency for astral-sh/uv May 8, 2026 → May 14, 2026: 0.8% across 47 completed 
-items (36 human, 11 bot).
+0.8% flow efficiency across 47 completed items (36 human, 11 bot) over 7 days, May 8, 2026 → May 14,
+2026.

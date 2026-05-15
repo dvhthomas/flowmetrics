@@ -34,9 +34,7 @@
    numbers and starts judging individuals. The aging chart is a
    standup tool for the team; an item past forecast is a group
    problem to solve, not an individual to call out. #}
-<div style="background:#eef4ff; border-left:4px solid #3b6fb8;
-            padding:0.7rem 1rem; margin: 0.4rem 0 1.2rem;
-            font-size:0.92rem; color:#1f3a5f; max-width:70ch;">
+<div class="standup-callout">
   <strong>How to use this in a standup.</strong> Walk the chart with
   the team, not the individual. An item past P85 means the
   <em>team</em> is about to miss its forecast — swarm, split,
@@ -53,7 +51,7 @@
        and color-blind safe. ── #}
 <h2>Distribution by percentile band</h2>
 <div id="aging-dist-chart" role="img" aria-label="{{ bar_aria }}"
-     style="width:100%; min-height:200px;"></div>
+     class="chart short"></div>
 <script>
   vegaEmbed("#aging-dist-chart", {{ aging_distribution_spec_json | safe }}, {
     actions: false,
@@ -63,7 +61,7 @@
       "Interactive chart failed to render: " + err;
   });
 </script>
-<p style="font-size:0.85rem; color:#666; max-width:65ch; margin: 0.6rem 0 1.2rem;">
+<p class="chart-caption">
 Each bar counts in-flight PRs whose age sits inside that band's
 cycle-time range. Thresholds come from the
 {{ report.completed_count }} PRs that merged
@@ -83,7 +81,7 @@ cycle-time range. Thresholds come from the
 
 {# ── Interactive chart, named for navigation by heading. ──────────── #}
 <h2>WIP Aging</h2>
-<div id="aging-chart" style="width:100%; min-height:380px;"></div>
+<div id="aging-chart" class="chart tall"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -118,7 +116,7 @@ cycle-time range. Thresholds come from the
 </div>
 {% else %}
 <h2>Next actions</h2>
-<p style="font-size:0.95rem; color:#137333">
+<p class="ok-note">
 ✓ No items past P85 — pipeline is on track relative to recent history.
 </p>
 {% endif %}
@@ -155,7 +153,7 @@ cycle-time range. Thresholds come from the
   {% endfor %}
   </tbody>
 </table>
-<p style="font-size:0.85rem; color:#666; max-width:65ch">
+<p class="footnote">
 <strong>At risk</strong> = items past the 50th-percentile cycle time
 but not yet past the 85th. By conditional probability, an item past
 P50 has at least double the starting chance of also missing the 85th-
@@ -251,7 +249,7 @@ exceeding the 85th-percentile threshold has doubled to 30%.
 <p>
 The arithmetic, with the population framed as 100 PRs:
 </p>
-<ul style="font-size:0.95rem; max-width:62ch">
+<ul class="walkthrough-list">
   <li>At <strong>P50</strong>: 50 PRs survived past the 50th. Of those,
       15 historically also went past P85. <strong>30%</strong> chance
       of missing the forecast.</li>
@@ -263,7 +261,7 @@ The arithmetic, with the population framed as 100 PRs:
   <li>At <strong>P95</strong>: 5 PRs survived. Deep tail — these are
       decisions about expedite, split, or drop.</li>
 </ul>
-<p style="font-size:0.95rem;">
+<p class="compact-prose">
 The math comes from the survival function of the empirical
 distribution:
 <code>P(cycle &gt; P85 | cycle &gt; P50) = P(cycle &gt; P85) / P(cycle
@@ -273,7 +271,7 @@ forecast-derived or simulated.
 
 {% if other_caveats %}
 <p><strong>Other notes</strong></p>
-<ul style="font-size:0.9rem; color:#555">
+<ul class="footnote-wider">
 {% for c in other_caveats %}
   <li>{{ c }}</li>
 {% endfor %}

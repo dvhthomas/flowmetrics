@@ -1,2 +1,1 @@
-Forecast for huggingface/transformers: 85% confidence 25 items are done by May 19, 2026, starting 
-May 15, 2026.
+85% confident the next 25 items finish by May 19, 2026 (starting May 15, 2026).

@@ -1,9 +1,9 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T13:14:33.044111-06:00",
-  "headline": "Portfolio flow efficiency for astral-sh/uv May 8, 2026 \u2192 May 14, 2026: 0.8% across 47 completed items (36 human, 11 bot).",
-  "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 the recipe, the right number to act on.",
+  "generated_at": "2026-05-15T13:30:09.793161-06:00",
+  "headline": "0.8% flow efficiency across 47 completed items (36 human, 11 bot) over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
     "pr_count": 47,
     "human_pr_count": 36,
@@ -30,16 +30,15 @@
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
   "caveats": [
-    "Never use this metric per engineer \u2014 it reflects the system, not individuals.",
-    "Per-PR FE is a directional indicator, not a precise measurement.",
-    "Active time uses gap=4.0h and min_cluster=30.0min \u2014 tuning these moves the number."
+    "Do not compare this number across engineers \u2014 wait time on a single PR is shared between author, reviewer, and CI, and one slow reviewer can drop an author's per-PR FE to single digits regardless of how fast the author actually worked.",
+    "Active time uses gap=4.0h and min_cluster=30.0min \u2014 raising the gap credits longer idle stretches as active, which raises FE; lowering it does the opposite."
   ],
   "vocabulary": {
     "Cycle time": "Wall-clock time from when a PR was opened until it was merged. The clock starts at `created_at` and stops at `merged_at`.",
     "Active time": "The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.",
-    "Wait time": "cycle_time \u2212 active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). The actionable signal \u2014 queues are where the system bottlenecks live.",
+    "Wait time": "cycle_time \u2212 active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). This is where time leaks out of the system \u2014 long wait time on a few PRs drives the portfolio FE down more than slow individual work does.",
     "Flow efficiency": "active_time / cycle_time. Reported per-PR and as a portfolio.",
-    "Portfolio flow efficiency": "\u03a3 active / \u03a3 cycle across all merged PRs in this window. The system-level recipe \u2014 long-running PRs dominate, which is what you want. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, even though the latter is where your wait time actually lives. Portfolio = the system's number; mean per-PR = an aggregate of individual ratios that hides where the queue is.",
+    "Portfolio flow efficiency": "\u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window. Because totals are summed before dividing, long-running PRs dominate the number \u2014 exactly when you want them to. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% would drown out one 30-day PR at 5%, even though that 30-day PR is where your wait time actually lives.",
     "Mean per-PR FE (and why not to act on it)": "Simple average of each PR's individual flow efficiency. It tells you what a typical PR's ratio looks like in isolation, but it does not reflect the system \u2014 a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead."
   },
   "chart_data": {

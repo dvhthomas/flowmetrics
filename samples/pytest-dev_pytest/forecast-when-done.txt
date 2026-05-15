@@ -1,2 +1,1 @@
-Forecast for pytest-dev/pytest: 85% confidence 25 items are done by Jun 7, 2026, starting May 15, 
-2026.
+85% confident the next 25 items finish by Jun 7, 2026 (starting May 15, 2026).

@@ -75,8 +75,12 @@ class TestDefaultIsText:
         # Text output is not valid JSON
         with pytest.raises(json.JSONDecodeError):
             json.loads(result.output)
-        # Has expected human-readable content
-        assert "astral-sh/uv" in result.output
+        # The terse default is the headline sentence — must carry the FE
+        # number, item count, and date range. Repo lives in subtitle in
+        # HTML; in terse text we just want the answer.
+        assert "%" in result.output
+        assert "completed items" in result.output
+        assert "May" in result.output
 
 
 # ---------------------------------------------------------------------------

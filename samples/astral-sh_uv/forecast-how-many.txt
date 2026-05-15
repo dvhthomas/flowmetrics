@@ -1,2 +1,1 @@
-Forecast for astral-sh/uv: 85% confidence we deliver at least 75 items by May 29, 2026 (window: 15 
-days).
+85% confident at least 75 items finish in the next 15 days (by May 29, 2026).

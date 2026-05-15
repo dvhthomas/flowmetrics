@@ -1,2 +1,2 @@
-Portfolio flow efficiency for pytest-dev/pytest May 8, 2026 → May 14, 2026: 0.9% across 15 completed
-items (10 human, 5 bot).
+0.9% flow efficiency across 15 completed items (10 human, 5 bot) over 7 days, May 8, 2026 → May 14, 
+2026.

@@ -1,2 +1,1 @@
-Forecast for CalcMark/go-calcmark: 85% confidence 25 items are done by Jul 8, 2026, starting May 15,
-2026.
+85% confident the next 25 items finish by Jul 8, 2026 (starting May 15, 2026).
