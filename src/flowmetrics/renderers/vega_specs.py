@@ -253,10 +253,11 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
             })
 
     area_layer = {
-        # Centered `step` (not `step-after`): each sample's value is
-        # centred under its x-axis tick, so the hover rule and the
-        # tick label line up where the reader expects.
-        "mark": {"type": "area", "interpolate": "step", "opacity": 0.85},
+        # Linear interpolation: each sample is a single inflection on
+        # the line (no flat-column steps). Matches Vacanti's reference
+        # shape and removes any ambiguity about which day a hover rule
+        # belongs to — the tick at T lines up with the vertex at T.
+        "mark": {"type": "area", "interpolate": "linear", "opacity": 0.85},
         "data": {"values": rows},
         "encoding": {
             "x": {

@@ -433,11 +433,14 @@ def report_definition(report: Report) -> str:
         )
     if isinstance(report, CfdReport):
         return (
-            "Cumulative Flow Diagram: cumulative arrivals on top, "
-            "cumulative departures on bottom, intermediate workflow states "
-            "stacked between. Vertical distance at any sample date = WIP in "
-            "that band; slope = average arrival rate. Past data only — no "
-            "projections."
+            "Stacked-area chart of items by workflow step over time. "
+            "The top line counts every item that has ever entered the "
+            "system; the bottom line counts items finished. The "
+            "vertical gap at any sample date is items still in flight "
+            "(WIP). Includes carry-over items that were already open "
+            "at window start AND items still open at window end — so "
+            "the chart shows real WIP, not just items that both "
+            "arrived and finished inside the window."
         )
     if isinstance(report, AgingReport):
         return (

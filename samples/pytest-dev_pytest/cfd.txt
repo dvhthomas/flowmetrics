@@ -1,2 +1,2 @@
-CFD for pytest-dev/pytest Apr 15, 2026 → May 14, 2026: 42 items arrived, 42 completed, 0 still in 
+CFD for pytest-dev/pytest Apr 15, 2026 → May 14, 2026: 169 items arrived, 42 completed, 127 still in
 flight at end.

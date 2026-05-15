@@ -1,21 +1,24 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T16:39:06.070956-06:00",
-  "headline": "CFD for huggingface/transformers Apr 15, 2026 \u2192 May 14, 2026: 251 items arrived, 251 completed, 0 still in flight at end.",
-  "definition": "Cumulative Flow Diagram: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
+  "generated_at": "2026-05-15T16:51:26.272486-06:00",
+  "headline": "CFD for huggingface/transformers Apr 15, 2026 \u2192 May 14, 2026: 1246 items arrived, 251 completed, 995 still in flight at end.",
+  "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
       "Open",
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 251,
+    "arrivals_at_end": 1246,
     "departures_at_end": 251,
-    "wip_at_end": 0
+    "wip_at_start": 942,
+    "wip_at_end": 995,
+    "peak_wip": 997
   },
-  "key_insight": "Workflow has a single state \u2014 CFD collapses to one line of cumulative arrivals.",
+  "key_insight": "The largest WIP band at May 14, 2026 is 'Open' with 995 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
+    "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
     "Compare band widths to the previous window to spot accumulation trends."
   ],
@@ -36,210 +39,210 @@
       {
         "sampled_on": "2026-04-15",
         "counts_by_state": {
-          "Open": 70,
+          "Open": 955,
           "Merged": 13
         }
       },
       {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Open": 81,
+          "Open": 966,
           "Merged": 21
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Open": 85,
+          "Open": 974,
           "Merged": 29
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Open": 87,
+          "Open": 976,
           "Merged": 29
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Open": 90,
+          "Open": 980,
           "Merged": 29
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Open": 100,
+          "Open": 993,
           "Merged": 46
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Open": 109,
+          "Open": 1009,
           "Merged": 56
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Open": 123,
+          "Open": 1027,
           "Merged": 82
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Open": 138,
+          "Open": 1046,
           "Merged": 95
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Open": 150,
+          "Open": 1067,
           "Merged": 103
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Open": 151,
+          "Open": 1070,
           "Merged": 103
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Open": 151,
+          "Open": 1071,
           "Merged": 103
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Open": 161,
+          "Open": 1084,
           "Merged": 118
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Open": 173,
+          "Open": 1101,
           "Merged": 134
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Open": 176,
+          "Open": 1107,
           "Merged": 143
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Open": 183,
+          "Open": 1122,
           "Merged": 151
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Open": 184,
+          "Open": 1126,
           "Merged": 155
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Open": 187,
+          "Open": 1131,
           "Merged": 156
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Open": 188,
+          "Open": 1135,
           "Merged": 157
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Open": 192,
+          "Open": 1141,
           "Merged": 164
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Open": 198,
+          "Open": 1151,
           "Merged": 176
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Open": 207,
+          "Open": 1162,
           "Merged": 183
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Open": 212,
+          "Open": 1175,
           "Merged": 192
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Open": 217,
+          "Open": 1187,
           "Merged": 202
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Open": 218,
+          "Open": 1192,
           "Merged": 202
         }
       },
       {
         "sampled_on": "2026-05-10",
         "counts_by_state": {
-          "Open": 218,
+          "Open": 1193,
           "Merged": 202
         }
       },
       {
         "sampled_on": "2026-05-11",
         "counts_by_state": {
-          "Open": 230,
+          "Open": 1208,
           "Merged": 211
         }
       },
       {
         "sampled_on": "2026-05-12",
         "counts_by_state": {
-          "Open": 238,
+          "Open": 1220,
           "Merged": 225
         }
       },
       {
         "sampled_on": "2026-05-13",
         "counts_by_state": {
-          "Open": 245,
+          "Open": 1233,
           "Merged": 240
         }
       },
       {
         "sampled_on": "2026-05-14",
         "counts_by_state": {
-          "Open": 251,
+          "Open": 1246,
           "Merged": 251
         }
       }
@@ -248,8 +251,8 @@
       {
         "sampled_on": "2026-04-15",
         "state": "Open",
-        "wip_in_state": 57,
-        "entered_at_or_later": 70
+        "wip_in_state": 942,
+        "entered_at_or_later": 955
       },
       {
         "sampled_on": "2026-04-15",
@@ -260,8 +263,8 @@
       {
         "sampled_on": "2026-04-16",
         "state": "Open",
-        "wip_in_state": 60,
-        "entered_at_or_later": 81
+        "wip_in_state": 945,
+        "entered_at_or_later": 966
       },
       {
         "sampled_on": "2026-04-16",
@@ -272,8 +275,8 @@
       {
         "sampled_on": "2026-04-17",
         "state": "Open",
-        "wip_in_state": 56,
-        "entered_at_or_later": 85
+        "wip_in_state": 945,
+        "entered_at_or_later": 974
       },
       {
         "sampled_on": "2026-04-17",
@@ -284,8 +287,8 @@
       {
         "sampled_on": "2026-04-18",
         "state": "Open",
-        "wip_in_state": 58,
-        "entered_at_or_later": 87
+        "wip_in_state": 947,
+        "entered_at_or_later": 976
       },
       {
         "sampled_on": "2026-04-18",
@@ -296,8 +299,8 @@
       {
         "sampled_on": "2026-04-19",
         "state": "Open",
-        "wip_in_state": 61,
-        "entered_at_or_later": 90
+        "wip_in_state": 951,
+        "entered_at_or_later": 980
       },
       {
         "sampled_on": "2026-04-19",
@@ -308,8 +311,8 @@
       {
         "sampled_on": "2026-04-20",
         "state": "Open",
-        "wip_in_state": 54,
-        "entered_at_or_later": 100
+        "wip_in_state": 947,
+        "entered_at_or_later": 993
       },
       {
         "sampled_on": "2026-04-20",
@@ -320,8 +323,8 @@
       {
         "sampled_on": "2026-04-21",
         "state": "Open",
-        "wip_in_state": 53,
-        "entered_at_or_later": 109
+        "wip_in_state": 953,
+        "entered_at_or_later": 1009
       },
       {
         "sampled_on": "2026-04-21",
@@ -332,8 +335,8 @@
       {
         "sampled_on": "2026-04-22",
         "state": "Open",
-        "wip_in_state": 41,
-        "entered_at_or_later": 123
+        "wip_in_state": 945,
+        "entered_at_or_later": 1027
       },
       {
         "sampled_on": "2026-04-22",
@@ -344,8 +347,8 @@
       {
         "sampled_on": "2026-04-23",
         "state": "Open",
-        "wip_in_state": 43,
-        "entered_at_or_later": 138
+        "wip_in_state": 951,
+        "entered_at_or_later": 1046
       },
       {
         "sampled_on": "2026-04-23",
@@ -356,8 +359,8 @@
       {
         "sampled_on": "2026-04-24",
         "state": "Open",
-        "wip_in_state": 47,
-        "entered_at_or_later": 150
+        "wip_in_state": 964,
+        "entered_at_or_later": 1067
       },
       {
         "sampled_on": "2026-04-24",
@@ -368,8 +371,8 @@
       {
         "sampled_on": "2026-04-25",
         "state": "Open",
-        "wip_in_state": 48,
-        "entered_at_or_later": 151
+        "wip_in_state": 967,
+        "entered_at_or_later": 1070
       },
       {
         "sampled_on": "2026-04-25",
@@ -380,8 +383,8 @@
       {
         "sampled_on": "2026-04-26",
         "state": "Open",
-        "wip_in_state": 48,
-        "entered_at_or_later": 151
+        "wip_in_state": 968,
+        "entered_at_or_later": 1071
       },
       {
         "sampled_on": "2026-04-26",
@@ -392,8 +395,8 @@
       {
         "sampled_on": "2026-04-27",
         "state": "Open",
-        "wip_in_state": 43,
-        "entered_at_or_later": 161
+        "wip_in_state": 966,
+        "entered_at_or_later": 1084
       },
       {
         "sampled_on": "2026-04-27",
@@ -404,8 +407,8 @@
       {
         "sampled_on": "2026-04-28",
         "state": "Open",
-        "wip_in_state": 39,
-        "entered_at_or_later": 173
+        "wip_in_state": 967,
+        "entered_at_or_later": 1101
       },
       {
         "sampled_on": "2026-04-28",
@@ -416,8 +419,8 @@
       {
         "sampled_on": "2026-04-29",
         "state": "Open",
-        "wip_in_state": 33,
-        "entered_at_or_later": 176
+        "wip_in_state": 964,
+        "entered_at_or_later": 1107
       },
       {
         "sampled_on": "2026-04-29",
@@ -428,8 +431,8 @@
       {
         "sampled_on": "2026-04-30",
         "state": "Open",
-        "wip_in_state": 32,
-        "entered_at_or_later": 183
+        "wip_in_state": 971,
+        "entered_at_or_later": 1122
       },
       {
         "sampled_on": "2026-04-30",
@@ -440,8 +443,8 @@
       {
         "sampled_on": "2026-05-01",
         "state": "Open",
-        "wip_in_state": 29,
-        "entered_at_or_later": 184
+        "wip_in_state": 971,
+        "entered_at_or_later": 1126
       },
       {
         "sampled_on": "2026-05-01",
@@ -452,8 +455,8 @@
       {
         "sampled_on": "2026-05-02",
         "state": "Open",
-        "wip_in_state": 31,
-        "entered_at_or_later": 187
+        "wip_in_state": 975,
+        "entered_at_or_later": 1131
       },
       {
         "sampled_on": "2026-05-02",
@@ -464,8 +467,8 @@
       {
         "sampled_on": "2026-05-03",
         "state": "Open",
-        "wip_in_state": 31,
-        "entered_at_or_later": 188
+        "wip_in_state": 978,
+        "entered_at_or_later": 1135
       },
       {
         "sampled_on": "2026-05-03",
@@ -476,8 +479,8 @@
       {
         "sampled_on": "2026-05-04",
         "state": "Open",
-        "wip_in_state": 28,
-        "entered_at_or_later": 192
+        "wip_in_state": 977,
+        "entered_at_or_later": 1141
       },
       {
         "sampled_on": "2026-05-04",
@@ -488,8 +491,8 @@
       {
         "sampled_on": "2026-05-05",
         "state": "Open",
-        "wip_in_state": 22,
-        "entered_at_or_later": 198
+        "wip_in_state": 975,
+        "entered_at_or_later": 1151
       },
       {
         "sampled_on": "2026-05-05",
@@ -500,8 +503,8 @@
       {
         "sampled_on": "2026-05-06",
         "state": "Open",
-        "wip_in_state": 24,
-        "entered_at_or_later": 207
+        "wip_in_state": 979,
+        "entered_at_or_later": 1162
       },
       {
         "sampled_on": "2026-05-06",
@@ -512,8 +515,8 @@
       {
         "sampled_on": "2026-05-07",
         "state": "Open",
-        "wip_in_state": 20,
-        "entered_at_or_later": 212
+        "wip_in_state": 983,
+        "entered_at_or_later": 1175
       },
       {
         "sampled_on": "2026-05-07",
@@ -524,8 +527,8 @@
       {
         "sampled_on": "2026-05-08",
         "state": "Open",
-        "wip_in_state": 15,
-        "entered_at_or_later": 217
+        "wip_in_state": 985,
+        "entered_at_or_later": 1187
       },
       {
         "sampled_on": "2026-05-08",
@@ -536,8 +539,8 @@
       {
         "sampled_on": "2026-05-09",
         "state": "Open",
-        "wip_in_state": 16,
-        "entered_at_or_later": 218
+        "wip_in_state": 990,
+        "entered_at_or_later": 1192
       },
       {
         "sampled_on": "2026-05-09",
@@ -548,8 +551,8 @@
       {
         "sampled_on": "2026-05-10",
         "state": "Open",
-        "wip_in_state": 16,
-        "entered_at_or_later": 218
+        "wip_in_state": 991,
+        "entered_at_or_later": 1193
       },
       {
         "sampled_on": "2026-05-10",
@@ -560,8 +563,8 @@
       {
         "sampled_on": "2026-05-11",
         "state": "Open",
-        "wip_in_state": 19,
-        "entered_at_or_later": 230
+        "wip_in_state": 997,
+        "entered_at_or_later": 1208
       },
       {
         "sampled_on": "2026-05-11",
@@ -572,8 +575,8 @@
       {
         "sampled_on": "2026-05-12",
         "state": "Open",
-        "wip_in_state": 13,
-        "entered_at_or_later": 238
+        "wip_in_state": 995,
+        "entered_at_or_later": 1220
       },
       {
         "sampled_on": "2026-05-12",
@@ -584,8 +587,8 @@
       {
         "sampled_on": "2026-05-13",
         "state": "Open",
-        "wip_in_state": 5,
-        "entered_at_or_later": 245
+        "wip_in_state": 993,
+        "entered_at_or_later": 1233
       },
       {
         "sampled_on": "2026-05-13",
@@ -596,8 +599,8 @@
       {
         "sampled_on": "2026-05-14",
         "state": "Open",
-        "wip_in_state": 0,
-        "entered_at_or_later": 251
+        "wip_in_state": 995,
+        "entered_at_or_later": 1246
       },
       {
         "sampled_on": "2026-05-14",

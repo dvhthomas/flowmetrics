@@ -11,6 +11,13 @@
 </p>
 {% endblock %}
 
+{# Suppress the auto-rendered top-of-page blocks. The title (h1) +
+   subtitle already carry repo / window / stamp; the chart + bookends
+   carry the visual answer; everything else folds into the About
+   collapsible. Same minimal-head treatment as the Aging report. #}
+{% block headline %}{% endblock %}
+{% block definition %}{% endblock %}
+{% block banner %}{% endblock %}
 {% block key_insight %}{% endblock %}
 {% block next_actions %}{% endblock %}
 {% block caveats %}{% endblock %}

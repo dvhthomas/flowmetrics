@@ -206,6 +206,25 @@ def _render_cfd(report: CfdReport) -> dict[str, Any]:
     workflow = list(report.input.workflow)
     arrivals = end.counts_by_state.get(workflow[0], 0) if end else 0
     departures = end.counts_by_state.get(workflow[-1], 0) if end else 0
+    # WIP at start = top line minus bottom line at the first sample
+    # — i.e., the carry-over WIP we inherited from before the
+    # window. Peak WIP = max(top - bottom) across every sample.
+    # These two answer the question 'was the system already
+    # carrying inventory, and how high did the queue get?', which
+    # the (arrivals == departures, WIP = 0) summary masks.
+    start = report.points[0] if report.points else None
+    first_state, last_state = workflow[0], workflow[-1]
+    wip_at_start = (
+        start.counts_by_state.get(first_state, 0)
+        - start.counts_by_state.get(last_state, 0)
+    ) if start else 0
+    peak_wip = max(
+        (
+            p.counts_by_state.get(first_state, 0)
+            - p.counts_by_state.get(last_state, 0)
+        )
+        for p in report.points
+    ) if report.points else 0
 
     # `bands` is the band-width view: for each (date, step) it carries
     # `wip_in_state` (items currently in that step) alongside the
@@ -240,7 +259,9 @@ def _render_cfd(report: CfdReport) -> dict[str, Any]:
             "samples": len(report.points),
             "arrivals_at_end": arrivals,
             "departures_at_end": departures,
+            "wip_at_start": wip_at_start,
             "wip_at_end": arrivals - departures,
+            "peak_wip": peak_wip,
         },
         "key_insight": report.interpretation.key_insight,
         "next_actions": list(report.interpretation.next_actions),

@@ -83,12 +83,16 @@ def _entry_date(item: WorkItem, workflow: Sequence[str], idx: int) -> date | Non
       2. **merged_at** when `workflow[-1]` is in `workflow[idx:]` —
          the item reached the terminal state at merge time, even
          without an explicit Done interval.
-      3. **created_at** when `idx == 0` AND the item has no intervals
-         — for sources without workflow history (GitHub PRs), the
-         arrival date is implied by the item's existence. NOTE this
-         only applies to the first-state line; without it, source #2
-         would propagate merged_at backward and collapse the Open and
-         Merged lines onto each other.
+      3. **created_at** when `idx == 0` — the item exists in the
+         system from its creation date, so it's in the first
+         workflow step from that date forward. This applies whether
+         or not the item has `status_intervals`: GitHub PRs fetched
+         in default mode have review-decision intervals (Awaiting
+         Review, Approved, …) that DON'T match a simple
+         `--workflow Open,Merged` chart, but the item is still in
+         "Open" from creation. Without this rule, source #2 would
+         propagate merged_at backward to idx=0 and the Open and
+         Merged lines would collapse onto each other.
 
     The entry date is the *earliest* of all available evidence.
     """
@@ -98,7 +102,7 @@ def _entry_date(item: WorkItem, workflow: Sequence[str], idx: int) -> date | Non
     ]
     if workflow[-1] in later and item.merged_at is not None:
         candidates.append(item.merged_at)
-    if idx == 0 and not item.status_intervals:
+    if idx == 0:
         candidates.append(item.created_at)
     if not candidates:
         return None

@@ -411,7 +411,13 @@ def cfd(
     )
 
     def build() -> CfdReport:
-        items = src.fetch_completed_in_window(start_d, stop_d)
+        # Active-in-window = items merged in the window UNION items
+        # still open at window end. Restricting to
+        # fetch_completed_in_window dropped pre-window WIP and
+        # currently-open items, which made the CFD show a suspect
+        # perfect balance (every arrival also a departure).
+        from .service import fetch_items_active_in_window
+        items = fetch_items_active_in_window(src, start_d, stop_d)
         points = build_cfd(
             items,
             workflow=workflow_tuple,

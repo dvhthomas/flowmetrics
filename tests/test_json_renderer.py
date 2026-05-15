@@ -467,6 +467,22 @@ class TestCfdJson:
         assert payload["summary"]["departures_at_end"] == 3
         assert payload["summary"]["wip_at_end"] == 27
 
+    def test_summary_includes_wip_at_start_and_peak_wip(self):
+        """Diagnosing the suspect 'perfect balance' bug:
+        `arrivals_at_end == departures_at_end == 0 WIP at end` looks
+        balanced but tells you nothing about WIP at start (carry-
+        over from before the window) or peak WIP across the window
+        (the queue's high-water mark). Add both — they make it
+        immediately obvious when the chart is honestly reflecting
+        WIP that flowed through the system."""
+        payload = json.loads(json_renderer.render(_cfd_report()))
+        summary = payload["summary"]
+        # 2026-04-15: top=29, bottom=2 → WIP=27.
+        # 2026-04-16: top=30, bottom=3 → WIP=27.
+        # Peak across both samples = 27.
+        assert summary["wip_at_start"] == 27
+        assert summary["peak_wip"] == 27
+
 
 class TestAgingJson:
     """Aging JSON includes per-item pr_url when populated so the

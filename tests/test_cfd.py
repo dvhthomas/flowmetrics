@@ -252,6 +252,72 @@ class TestGithubLikeItems:
         assert points[0].counts_by_state["Merged"] == 1
 
 
+class TestGithubOpenPrWithReviewDecisionIntervals:
+    """fetch_in_flight on GitHub populates status_intervals from
+    review-decision states (Draft / Awaiting Review / Changes
+    Requested / Approved) — NOT from the user's --workflow. When the
+    user runs `flow cfd --workflow 'Open,Merged'`, those intervals
+    don't match the workflow at all. The chart must still place the
+    item correctly: an item that exists in the system on date T is
+    in the first workflow step (Open) at T regardless of whether
+    any of its intervals say so.
+
+    Regression scenario: an open PR with intervals=[Awaiting Review]
+    and merged_at=None used to render zero across the CFD because
+    `_entry_date` only fell back to created_at when intervals were
+    empty.
+    """
+
+    def test_open_pr_with_non_workflow_intervals_still_shows_in_first_state(self):
+        # PR opened 4/15, currently in 'Awaiting Review' (a review-
+        # decision state, not in the user's --workflow). Workflow is
+        # Open / Merged.
+        items = [
+            WorkItem(
+                item_id="#42",
+                title="open PR",
+                created_at=ts(2026, 4, 15),
+                merged_at=None,
+                status_intervals=[StatusInterval(
+                    ts(2026, 4, 15), None, "Awaiting Review"
+                )],
+            )
+        ]
+        # At 4/20 (between open and never-merged): should show in Open.
+        points = build_cfd(
+            items, workflow=["Open", "Merged"],
+            start=date(2026, 4, 20), stop=date(2026, 4, 20),
+            interval=timedelta(days=1),
+        )
+        assert points[0].counts_by_state["Open"] == 1
+        assert points[0].counts_by_state["Merged"] == 0
+
+    def test_merged_pr_with_review_decision_intervals_open_at_created_not_merged(self):
+        """Symmetric case: a merged PR that carried review-decision
+        intervals. The Open line should still rise on created_at, NOT
+        on merged_at."""
+        items = [
+            WorkItem(
+                item_id="#42",
+                title="merged PR",
+                created_at=ts(2026, 4, 15),
+                merged_at=ts(2026, 4, 20),
+                status_intervals=[
+                    StatusInterval(ts(2026, 4, 15), ts(2026, 4, 18), "Awaiting Review"),
+                    StatusInterval(ts(2026, 4, 18), ts(2026, 4, 20), "Approved"),
+                ],
+            )
+        ]
+        # At 4/17 (between creation and merge): Open=1, Merged=0.
+        points = build_cfd(
+            items, workflow=["Open", "Merged"],
+            start=date(2026, 4, 17), stop=date(2026, 4, 17),
+            interval=timedelta(days=1),
+        )
+        assert points[0].counts_by_state["Open"] == 1
+        assert points[0].counts_by_state["Merged"] == 0
+
+
 class TestEmptyInputs:
     def test_no_items_yields_all_zero_points(self):
         points = build_cfd(

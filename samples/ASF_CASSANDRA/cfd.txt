@@ -1,2 +1,2 @@
-CFD for jira:CASSANDRA Apr 15, 2026 → May 14, 2026: 44 items arrived, 44 completed, 0 still in 
+CFD for jira:CASSANDRA Apr 15, 2026 → May 14, 2026: 3231 items arrived, 113 completed, 3118 still in
 flight at end.

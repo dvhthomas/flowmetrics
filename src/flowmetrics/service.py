@@ -4,7 +4,7 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 from .cache import FileCache
-from .compute import WindowResult, aggregate, compute_pr_flow
+from .compute import WindowResult, WorkItem, aggregate, compute_pr_flow
 from .github import (
     GitHubClient,
     fetch_open_prs,
@@ -179,6 +179,37 @@ def flowmetrics_for_window(
         for item in items
     ]
     return aggregate(per_pr)
+
+
+def fetch_items_active_in_window(
+    source: Source, start: date, stop: date,
+) -> list[WorkItem]:
+    """Items that were active in `[start, stop]` at any point.
+
+    Three categories of items belong on a CFD over a window:
+
+      1. Merged inside the window. Already covered by
+         `source.fetch_completed_in_window(start, stop)`.
+      2. Still open at the window end. Already covered by
+         `source.fetch_in_flight(stop)`.
+      3. Carry-over: opened before window, merged inside it.
+         Subset of (1).
+
+    The union of (1) and (2) — deduped on `item_id` — covers every
+    item that should appear on the CFD without including items that
+    were already finished before the window started or are still
+    unborn at the window end.
+
+    Without this composition, a CFD restricted to
+    `fetch_completed_in_window` shows a suspect 'perfect balance'
+    where every arrival is also a departure, because the data set
+    is defined to contain only items that both arrived AND departed
+    inside the window.
+    """
+    completed = list(source.fetch_completed_in_window(start, stop))
+    in_flight = list(source.fetch_in_flight(stop))
+    seen_ids = {item.item_id for item in completed}
+    return completed + [item for item in in_flight if item.item_id not in seen_ids]
 
 
 def historical_throughput_samples(
