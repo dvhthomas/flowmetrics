@@ -69,7 +69,9 @@ merged {{ report.input.history_start }} → {{ report.input.history_end }}.
 {# ── Interactive chart, named for navigation by heading. ──────────── #}
 <h2>WIP Aging</h2>
 <div id="aging-chart" style="width:100%; min-height:380px;"></div>
-<script>{{ vega_bundle | safe }}</script>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
   vegaEmbed("#aging-chart", {{ vega_spec_json | safe }}, {
     actions: {export: true, source: false, compiled: false, editor: false},

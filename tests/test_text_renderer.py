@@ -157,7 +157,7 @@ class TestWhenDoneText:
     def test_does_not_include_ascii_histogram(self):
         """Text mode is for clean prose + tables. Charts belong in --format html.
         ASCII histogram art makes .txt files unreadable when opened in a browser.
-        (The term "Results Histogram" may still appear in the vocabulary block —
+        (The term "Results histogram" may still appear in the vocabulary block —
         that's fine; we're only banning the ASCII-art chart itself.)"""
         out = text_renderer.render(_when_done_report(), verbose=True)
         # No long runs of histogram '#' bars

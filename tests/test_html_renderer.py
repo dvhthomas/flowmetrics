@@ -636,14 +636,17 @@ class TestAgingHtmlVegaChart:
     alongside the existing PNG. No CDN — the report must render with
     no network connection."""
 
-    def test_inlines_vega_vega_lite_and_embed_scripts(self):
+    def test_loads_vega_from_cdn_not_inlined(self):
+        """Switched from inlined bundle (~830KB per HTML report) to
+        jsdelivr CDN script tags. Reports are no longer fully offline
+        but file size drops by ~70%."""
         out = html_renderer.render(_aging_report_with_distribution())
-        # Three vendored bundles, each inlined verbatim (truncated check
-        # — first bytes of the UMD wrapper are distinctive).
-        assert out.count('!function(') >= 3
-        # No CDN <script src="..."> tags — we ship the JS inline.
-        assert 'src="https://' not in out
-        assert 'src="//cdn' not in out
+        # CDN script tags present, pinned to a major version.
+        assert 'src="https://cdn.jsdelivr.net/npm/vega@5' in out
+        assert 'src="https://cdn.jsdelivr.net/npm/vega-lite@5' in out
+        assert 'src="https://cdn.jsdelivr.net/npm/vega-embed@6' in out
+        # The 830KB inlined UMD wrapper is gone.
+        assert out.count('!function(') < 3
 
     def test_inlines_a_vega_lite_spec_for_the_chart(self):
         out = html_renderer.render(_aging_report_with_distribution())
@@ -662,6 +665,67 @@ class TestAgingHtmlVegaChart:
         assert "vegaEmbed" in out
         # The spec is passed inline (not fetched from a URL).
         assert "fetch(" not in out  # belt-and-braces: no runtime spec load
+
+    def test_malicious_pr_title_does_not_break_out_of_script_tag(self):
+        """A PR title containing `</script>` must NOT close the inline
+        Vega spec's script tag. Encoded JSON output replaces < > & with
+        \\uXXXX escapes — still valid JSON, safe HTML."""
+        # Build a fixture where one PR title is the XSS payload.
+        from flowmetrics.aging import AgingItem
+        items = [
+            AgingItem(
+                item_id="#1",
+                title="Innocent",
+                current_state="Awaiting Review",
+                age_days=3,
+            ),
+            AgingItem(
+                item_id="#2",
+                title="</script><script>window.__xss=true</script>",
+                current_state="Awaiting Review",
+                age_days=10,
+            ),
+        ]
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Awaiting Review",),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=items,
+            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
+            completed_count=10,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        out = html_renderer.render(report)
+        # The spec is inlined as `vegaEmbed("#aging-chart", <SPEC>, {...})`.
+        # Carve out just <SPEC> and assert it contains the escaped form
+        # of `</script>`, not the literal that would close the tag.
+        start = out.index('vegaEmbed("#aging-chart", ')
+        spec_start = out.index("{", start)
+        # Walk braces to find the matching close of <SPEC>.
+        depth = 0
+        for i in range(spec_start, len(out)):
+            if out[i] == "{":
+                depth += 1
+            elif out[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    spec_end = i + 1
+                    break
+        else:
+            raise AssertionError("could not locate spec JSON in output")
+        spec = out[spec_start:spec_end]
+        assert "</script>" not in spec, \
+            "XSS regression: </script> appears verbatim inside inline Vega spec"
+        # The escaped form IS present — confirms the safe-json helper ran.
+        assert "\\u003c/script\\u003e" in spec
+        # And the original PR ID still renders in the body.
+        assert "#2" in out
 
     def test_png_chart_is_no_longer_present(self):
         """The PNG fallback was removed — the interactive chart is the

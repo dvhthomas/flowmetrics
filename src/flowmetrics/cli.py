@@ -341,6 +341,7 @@ def week(
             gap_hours=gap_hours,
             min_cluster_minutes=min_cluster_minutes,
             offline=offline,
+            jira_url=jira_url,
         )
         return EfficiencyReport(
             input=input_,
@@ -430,6 +431,7 @@ def cfd(
             workflow=workflow_tuple,
             interval_days=interval_days,
             offline=offline,
+            jira_url=jira_url,
         )
         return CfdReport(
             input=input_,
@@ -762,6 +764,7 @@ def forecast_when_done(
             history_start=train_start,
             history_end=train_end,
             offline=offline,
+            jira_url=jira_url,
         )
         training = build_training_summary(samples, train_start, train_end)
         return WhenDoneReport(
@@ -833,6 +836,7 @@ def forecast_how_many(
             history_start=train_start,
             history_end=train_end,
             offline=offline,
+            jira_url=jira_url,
         )
         training = build_training_summary(samples, train_start, train_end)
         return HowManyReport(

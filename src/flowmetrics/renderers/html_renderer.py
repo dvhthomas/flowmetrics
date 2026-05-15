@@ -1,9 +1,10 @@
 """Single-file HTML report built with jinja2 + matplotlib charts.
 
 Aging additionally renders an interactive Vega-Lite chart from the
-report data. The Vega + Vega-Lite + Vega-Embed JS bundles are vendored
-under ``static/`` and inlined into the document so the HTML renders
-with no network connection.
+report data. Vega + Vega-Lite + Vega-Embed are loaded from the
+jsdelivr CDN — pinned to major version so a future minor/patch upgrade
+on their side is automatic, but a major bump (which can break specs)
+requires us to flip the pin.
 """
 
 from __future__ import annotations
@@ -12,7 +13,6 @@ import base64
 import io
 import json
 from datetime import date, timedelta
-from functools import lru_cache
 from pathlib import Path
 
 import matplotlib
@@ -31,23 +31,36 @@ from ..report import (
     cli_invocation,
     forecast_horizon,
     report_definition,
+    report_title,
     report_vocabulary,
 )
 
-_STATIC_DIR = Path(__file__).parent / "static"
 
+def _repo_url(repo: str) -> str | None:
+    """GitHub URL for a `repo` label, or None for Jira / no-repo cases.
 
-@lru_cache(maxsize=1)
-def _vega_bundle() -> str:
-    """Concatenated Vega + Vega-Lite + Vega-Embed minified JS.
-
-    Cached because reading 830KB off disk on every report render is
-    wasteful. The bundle is identical for every report — the spec
-    that uses it is what changes.
+    Consolidates the duplicated guard scattered across `_render_*` —
+    same predicate, same fallback. Jira labels carry `jira:` prefix
+    and no slash, so the test is `/ in repo and not jira:`-prefixed.
     """
-    return "\n".join(
-        (_STATIC_DIR / name).read_text()
-        for name in ("vega.min.js", "vega-lite.min.js", "vega-embed.min.js")
+    if not repo or "/" not in repo or repo.startswith("jira:"):
+        return None
+    return f"https://github.com/{repo}"
+
+
+def _safe_json_for_script_tag(obj: object) -> str:
+    """JSON-serialize for inlining inside an HTML <script> tag.
+
+    `json.dumps()` does not escape `<` or `>`, so a string containing
+    `</script>` (e.g. a malicious PR title) would close the surrounding
+    script tag and inject arbitrary JS. Escape `<`, `>`, and `&` to
+    their `\\uXXXX` JSON escape sequences — valid JSON, safe HTML.
+    """
+    return (
+        json.dumps(obj)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
     )
 
 
@@ -298,14 +311,9 @@ def _render_efficiency(report: EfficiencyReport) -> str:
     per_pr_by_cycle = sorted(
         report.result.per_pr, key=lambda p: p.cycle_time, reverse=True
     )
-    repo = report.input.repo
-    repo_url = (
-        f"https://github.com/{repo}"
-        if "/" in repo and not repo.startswith("jira:")
-        else None
-    )
+    repo_url = _repo_url(report.input.repo)
     return template.render(
-        title="Flow efficiency",
+        title=report_title(report),
         repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
@@ -334,14 +342,9 @@ def _github_pr_urls(repo: str, item_ids: list[str]) -> dict[str, str]:
 
 def _render_when_done(report: WhenDoneReport) -> str:
     template = _env.get_template("when_done.html.jinja")
-    repo = report.input.repo
-    repo_url = (
-        f"https://github.com/{repo}"
-        if "/" in repo and not repo.startswith("jira:")
-        else None
-    )
+    repo_url = _repo_url(report.input.repo)
     return template.render(
-        title="When will it be done?",
+        title=report_title(report),
         repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
@@ -409,14 +412,9 @@ def _render_cfd(report: CfdReport) -> str:
     end_counts: dict[str, int] = (
         dict(report.points[-1].counts_by_state) if report.points else {}
     )
-    repo = report.input.repo
-    repo_url = (
-        f"https://github.com/{repo}"
-        if "/" in repo and not repo.startswith("jira:")
-        else None
-    )
+    repo_url = _repo_url(report.input.repo)
     return template.render(
-        title="Cumulative Flow Diagram",
+        title=report_title(report),
         repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,
@@ -550,8 +548,7 @@ def _render_aging(report: AgingReport) -> str:
     # information lives, the alarm doesn't.
     other_caveats: list[str] = list(report.interpretation.caveats)
 
-    repo = report.input.repo
-    repo_url = f"https://github.com/{repo}" if "/" in repo else None
+    repo_url = _repo_url(report.input.repo)
 
     # Aging-distribution colors — ColorBrewer YlOrRd, color-blind-safe
     # sequential. The P85–P95 background is darkened from #f03b20 to
@@ -594,7 +591,7 @@ def _render_aging(report: AgingReport) -> str:
     )
 
     return template.render(
-        title="Aging Work In Progress",
+        title=report_title(report),
         repo_url=repo_url,
         prose_asof=_prose_date(report.input.asof),
         generated_at=report.generated_at,
@@ -618,21 +615,18 @@ def _render_aging(report: AgingReport) -> str:
         past_p85_top=past_p85_top,
         past_p85_total=past_p85_total,
         other_caveats=other_caveats,
-        vega_bundle=_vega_bundle() if report.items else "",
-        vega_spec_json=json.dumps(vega_specs.aging_spec(report)) if report.items else "",
+        vega_spec_json=(
+            _safe_json_for_script_tag(vega_specs.aging_spec(report))
+            if report.items else ""
+        ),
     )
 
 
 def _render_how_many(report: HowManyReport) -> str:
     template = _env.get_template("how_many.html.jinja")
-    repo = report.input.repo
-    repo_url = (
-        f"https://github.com/{repo}"
-        if "/" in repo and not repo.startswith("jira:")
-        else None
-    )
+    repo_url = _repo_url(report.input.repo)
     return template.render(
-        title="How many items?",
+        title=report_title(report),
         repo_url=repo_url,
         generated_at=report.generated_at,
         interpretation=report.interpretation,

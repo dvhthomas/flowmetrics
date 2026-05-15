@@ -247,7 +247,7 @@ class TestReportVocabulary:
             "Throughput",
             "Training window",
             "Monte Carlo Simulation",
-            "Results Histogram",
+            "Results histogram",
             "Percentile",
         ]:
             assert term in vocab, f"missing term: {term}"
@@ -524,6 +524,154 @@ class TestCliInvocation:
             completed_count=10,
             interpretation=_interp(),
         )
+
+    def test_report_titles_are_centralised_and_consistent(self):
+        """A single `report_title(report)` helper returns the metric
+        title used by the HTML renderer. Centralising it means metric
+        names live in one place — same place as report_definition and
+        cli_invocation."""
+        from flowmetrics.report import report_title
+        eff = EfficiencyReport(
+            input=EfficiencyInput("acme/x", date(2026, 5, 4), date(2026, 5, 10),
+                                  4.0, 30.0, False),
+            result=_window_result(), interpretation=_interp(),
+        )
+        cfd = CfdReport(
+            input=CfdInput("acme/x", date(2026, 5, 4), date(2026, 5, 10),
+                           ("Open", "Done"), 1, False),
+            points=[CfdPoint(date(2026, 5, 4), {"Open": 1, "Done": 0})],
+            interpretation=_interp(),
+        )
+        wd = WhenDoneReport(
+            input=WhenDoneInput("acme/x", 50, date(2026, 5, 11),
+                                date(2026, 4, 11), date(2026, 5, 10), False),
+            training=TrainingSummary(
+                window_start=date(2026, 4, 11), window_end=date(2026, 5, 10),
+                daily_samples=[1], total_merges=1, avg_per_day=1.0,
+                min_per_day=1, max_per_day=1, zero_days=0,
+            ),
+            simulation=SimulationSummary(runs=1000, seed=None),
+            histogram=build_histogram([date(2026, 5, 19)]),
+            percentiles={50: date(2026, 5, 19)},
+            interpretation=_interp(),
+        )
+        hm = HowManyReport(
+            input=HowManyInput("acme/x", date(2026, 5, 11), date(2026, 5, 25),
+                               date(2026, 4, 11), date(2026, 5, 10), False),
+            training=TrainingSummary(
+                window_start=date(2026, 4, 11), window_end=date(2026, 5, 10),
+                daily_samples=[1], total_merges=1, avg_per_day=1.0,
+                min_per_day=1, max_per_day=1, zero_days=0,
+            ),
+            simulation=SimulationSummary(runs=1000, seed=None),
+            histogram=build_histogram([60]),
+            percentiles={50: 60},
+            interpretation=_interp(),
+        )
+        aging = self._aging_report(from_wip_labels=False)
+        assert report_title(eff) == "Flow efficiency"
+        assert report_title(cfd) == "Cumulative Flow Diagram"
+        assert report_title(wd) == "When will it be done?"
+        assert report_title(hm) == "How many items?"
+        assert report_title(aging) == "Aging Work In Progress"
+
+    def test_efficiency_jira_invocation_emits_jira_url(self):
+        """Pre-existing bug class: every report's cli_invocation must
+        emit --jira-url / --jira-project for Jira sources, not
+        --repo jira:PROJECT."""
+        report = EfficiencyReport(
+            input=EfficiencyInput(
+                repo="jira:BIGTOP",
+                start=date(2026, 5, 4),
+                stop=date(2026, 5, 10),
+                gap_hours=4.0,
+                min_cluster_minutes=30.0,
+                offline=False,
+                jira_url="https://issues.apache.org/jira",
+            ),
+            result=_window_result(),
+            interpretation=_interp(),
+        )
+        cmd = cli_invocation(report)
+        assert "--jira-url https://issues.apache.org/jira" in cmd
+        assert "--jira-project BIGTOP" in cmd
+        assert "--repo jira:" not in cmd
+
+    def test_cfd_jira_invocation_emits_jira_url(self):
+        report = CfdReport(
+            input=CfdInput(
+                repo="jira:BIGTOP",
+                start=date(2026, 5, 4),
+                stop=date(2026, 5, 10),
+                workflow=("Open", "Done"),
+                interval_days=1,
+                offline=False,
+                jira_url="https://issues.apache.org/jira",
+            ),
+            points=[
+                CfdPoint(date(2026, 5, 4), {"Open": 1, "Done": 0}),
+                CfdPoint(date(2026, 5, 10), {"Open": 2, "Done": 1}),
+            ],
+            interpretation=_interp(),
+        )
+        cmd = cli_invocation(report)
+        assert "--jira-url https://issues.apache.org/jira" in cmd
+        assert "--jira-project BIGTOP" in cmd
+        assert "--repo jira:" not in cmd
+
+    def test_when_done_jira_invocation_emits_jira_url(self):
+        report = WhenDoneReport(
+            input=WhenDoneInput(
+                "jira:BIGTOP", 50, date(2026, 5, 11),
+                date(2026, 4, 11), date(2026, 5, 10), False,
+                jira_url="https://issues.apache.org/jira",
+            ),
+            training=TrainingSummary(
+                window_start=date(2026, 4, 11),
+                window_end=date(2026, 5, 10),
+                daily_samples=[1],
+                total_merges=1,
+                avg_per_day=1.0,
+                min_per_day=1,
+                max_per_day=1,
+                zero_days=0,
+            ),
+            simulation=SimulationSummary(runs=1000, seed=None),
+            histogram=build_histogram([date(2026, 5, 19)]),
+            percentiles={50: date(2026, 5, 19)},
+            interpretation=_interp(),
+        )
+        cmd = cli_invocation(report)
+        assert "--jira-url https://issues.apache.org/jira" in cmd
+        assert "--jira-project BIGTOP" in cmd
+        assert "--repo jira:" not in cmd
+
+    def test_how_many_jira_invocation_emits_jira_url(self):
+        report = HowManyReport(
+            input=HowManyInput(
+                "jira:BIGTOP", date(2026, 5, 11), date(2026, 5, 25),
+                date(2026, 4, 11), date(2026, 5, 10), False,
+                jira_url="https://issues.apache.org/jira",
+            ),
+            training=TrainingSummary(
+                window_start=date(2026, 4, 11),
+                window_end=date(2026, 5, 10),
+                daily_samples=[1],
+                total_merges=1,
+                avg_per_day=1.0,
+                min_per_day=1,
+                max_per_day=1,
+                zero_days=0,
+            ),
+            simulation=SimulationSummary(runs=1000, seed=None),
+            histogram=build_histogram([60]),
+            percentiles={50: 60},
+            interpretation=_interp(),
+        )
+        cmd = cli_invocation(report)
+        assert "--jira-url https://issues.apache.org/jira" in cmd
+        assert "--jira-project BIGTOP" in cmd
+        assert "--repo jira:" not in cmd
 
     def test_aging_jira_invocation_emits_jira_url_and_project_not_repo(self):
         """Pre-existing bug: when the source is Jira, the reproducer

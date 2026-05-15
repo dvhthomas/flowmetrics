@@ -41,6 +41,9 @@ class EfficiencyInput:
     # interpretation layer can suggest a remap when observed statuses
     # don't overlap the configured set.
     active_statuses: tuple[str, ...] = ()
+    # Set when the source is Jira so the reproducer command can emit
+    # `--jira-url URL --jira-project PROJECT` instead of `--repo jira:X`.
+    jira_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -85,6 +88,7 @@ class WhenDoneInput:
     history_start: date
     history_end: date
     offline: bool
+    jira_url: str | None = None
 
     @property
     def history_days(self) -> int:
@@ -113,6 +117,7 @@ class HowManyInput:
     history_start: date
     history_end: date
     offline: bool
+    jira_url: str | None = None
 
     @property
     def history_days(self) -> int:
@@ -145,6 +150,7 @@ class CfdInput:
     workflow: tuple[str, ...]  # earliest → latest workflow state
     interval_days: int
     offline: bool
+    jira_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -332,7 +338,7 @@ _AGING_VOCABULARY = {
         "workflow. Aging only applies to items that haven't completed; a "
         "completed item has a Cycle Time instead."
     ),
-    "Work Item Age": (
+    "Work item age": (
         "Elapsed days since an item entered the workflow. Computed as "
         "today − createdAt for a PR; for Jira, today − issue creation."
     ),
@@ -369,7 +375,7 @@ _FORECAST_VOCABULARY = {
         "repeats (10,000 runs by default). The distribution of outcomes is "
         "the forecast."
     ),
-    "Results Histogram": (
+    "Results histogram": (
         "The empirical distribution produced by Monte Carlo. X-axis = "
         "outcome (date for when-done; item count for how-many); Y-axis = "
         "simulation-run frequency."
@@ -443,6 +449,33 @@ def report_definition(report: Report) -> str:
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
+_REPORT_TITLES: dict[type, str] = {}  # populated below to avoid forward refs
+
+
+def report_title(report: Report) -> str:
+    """Human-readable metric / question name for a report — what shows
+    up in `<title>` and as the H1 of the HTML output. Centralised so
+    renderers don't hardcode metric names in template-render calls."""
+    return _REPORT_TITLES[type(report)]
+
+
+def _source_args(input_obj) -> list[str]:
+    """Reconstruct the source flags for a reproducer command.
+
+    GitHub: ``--repo OWNER/NAME``. Jira: ``--jira-url URL --jira-project
+    PROJECT`` extracted from a `jira:PROJECT` repo and the input's
+    `jira_url` field. Falls back to a `<JIRA_URL>` placeholder if the
+    URL wasn't recorded — the user has to fill it in, but at least the
+    rest of the command is correct.
+    """
+    repo = input_obj.repo
+    if repo.startswith("jira:"):
+        project = repo[len("jira:"):]
+        jira_url = getattr(input_obj, "jira_url", None) or "<JIRA_URL>"
+        return [f"--jira-url {jira_url}", f"--jira-project {project}"]
+    return [f"--repo {repo}"]
+
+
 def cli_invocation(report: Report) -> str:
     """Reconstruct the CLI command that would produce this report.
 
@@ -452,7 +485,7 @@ def cli_invocation(report: Report) -> str:
     if isinstance(report, EfficiencyReport):
         parts = [
             "uv run flow efficiency week",
-            f"--repo {report.input.repo}",
+            *_source_args(report.input),
             f"--start {report.input.start.isoformat()}",
             f"--stop {report.input.stop.isoformat()}",
             f"--gap-hours {report.input.gap_hours}",
@@ -465,7 +498,7 @@ def cli_invocation(report: Report) -> str:
     if isinstance(report, WhenDoneReport):
         parts = [
             "uv run flow forecast when-done",
-            f"--repo {report.input.repo}",
+            *_source_args(report.input),
             f"--items {report.input.items}",
             f"--start-date {report.input.start_date.isoformat()}",
             f"--history-start {report.input.history_start.isoformat()}",
@@ -481,7 +514,7 @@ def cli_invocation(report: Report) -> str:
     if isinstance(report, HowManyReport):
         parts = [
             "uv run flow forecast how-many",
-            f"--repo {report.input.repo}",
+            *_source_args(report.input),
             f"--target-date {report.input.target_date.isoformat()}",
             f"--start-date {report.input.start_date.isoformat()}",
             f"--history-start {report.input.history_start.isoformat()}",
@@ -497,7 +530,7 @@ def cli_invocation(report: Report) -> str:
     if isinstance(report, CfdReport):
         parts = [
             "uv run flow cfd",
-            f"--repo {report.input.repo}",
+            *_source_args(report.input),
             f"--start {report.input.start.isoformat()}",
             f"--stop {report.input.stop.isoformat()}",
             f"--workflow '{','.join(report.input.workflow)}'",
@@ -508,19 +541,8 @@ def cli_invocation(report: Report) -> str:
         return " ".join(parts)
 
     if isinstance(report, AgingReport):
-        # Jira sources store `repo` as "jira:PROJECT"; the reproducer
-        # needs `--jira-url URL --jira-project PROJECT`. GitHub sources
-        # keep the simple `--repo OWNER/NAME` form.
         flag = "--wip-labels" if report.input.from_wip_labels else "--workflow"
-        if report.input.repo.startswith("jira:"):
-            project = report.input.repo[len("jira:"):]
-            jira_url = report.input.jira_url or "<JIRA_URL>"
-            source_parts = [
-                f"--jira-url {jira_url}",
-                f"--jira-project {project}",
-            ]
-        else:
-            source_parts = [f"--repo {report.input.repo}"]
+        source_parts = _source_args(report.input)
         parts = [
             "uv run flow aging",
             *source_parts,
@@ -549,3 +571,12 @@ def build_training_summary(daily_samples: list[int], start: date, end: date) -> 
         max_per_day=max(daily_samples) if daily_samples else 0,
         zero_days=sum(1 for s in daily_samples if s == 0),
     )
+
+
+_REPORT_TITLES.update({
+    EfficiencyReport: "Flow efficiency",
+    CfdReport: "Cumulative Flow Diagram",
+    WhenDoneReport: "When will it be done?",
+    HowManyReport: "How many items?",
+    AgingReport: "Aging Work In Progress",
+})

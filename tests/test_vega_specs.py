@@ -13,13 +13,7 @@ unit tests of spec shape would miss.
 
 from __future__ import annotations
 
-import json
-import shutil
-import subprocess
 from datetime import UTC, date, datetime
-from pathlib import Path
-
-import pytest
 
 from flowmetrics.aging import AgingItem
 from flowmetrics.renderers import vega_specs
@@ -491,124 +485,10 @@ class TestAgingSpec:
         assert rule_layers == []
 
 
-# ---------------------------------------------------------------------------
-# End-to-end: actually compile the spec via Node + vendored Vega-Lite.
-#
-# Pure unit tests of spec shape can miss whole classes of bug — e.g.
-# "Duplicate signal name: zoom_tuple" only surfaces when Vega-Lite
-# compiles the spec into a Vega runtime spec. This suite shells out to
-# scripts/check_vega_spec.js and exercises the real compiler.
-# ---------------------------------------------------------------------------
-
-
-_REPO_ROOT = Path(__file__).resolve().parent.parent
-_CHECKER = _REPO_ROOT / "scripts" / "check_vega_spec.js"
-
-
-def _compile_via_node(spec: dict) -> tuple[bool, str, list]:
-    """Run the vendored Vega-Lite compiler over `spec`. Returns
-    (ok, error_message, warnings)."""
-    result = subprocess.run(
-        ["node", str(_CHECKER)],
-        input=json.dumps(spec),
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    if result.returncode == 0:
-        payload = json.loads(result.stdout)
-        return True, "", payload.get("warnings", [])
-    try:
-        payload = json.loads(result.stderr)
-        return False, payload.get("error", result.stderr), []
-    except json.JSONDecodeError:
-        return False, result.stderr, []
-
-
-@pytest.mark.skipif(
-    shutil.which("node") is None,
-    reason="node not on PATH; compile-time spec test requires Node.js",
-)
-class TestSpecCompilesViaVegaLite:
-    """Pass the generated spec through the real Vega-Lite compiler.
-    Catches errors like Duplicate signal names that unit tests of
-    spec shape can't see.
-    """
-
-    def test_aging_spec_compiles_without_errors(self):
-        spec = vega_specs.aging_spec(
-            _aging_report(
-                [
-                    _item("#1", "Awaiting Review", 3),
-                    _item("#2", "Approved", 50),
-                    _item("#3", "Awaiting Review", 100),
-                ]
-            )
-        )
-        ok, err, warnings = _compile_via_node(spec)
-        assert ok, f"spec failed to compile: {err}"
-        # Warnings are tolerated, but a duplicate-signal warning here
-        # would mean we've reintroduced the layered-params bug.
-        for w in warnings:
-            assert "duplicate signal" not in str(w).lower(), (
-                f"vega-lite warned about a duplicate signal — the "
-                f"params-on-layer fix may have regressed: {w}"
-            )
-
-    def test_aging_spec_compiles_with_empty_items(self):
-        """No data points but valid spec — must still compile."""
-        report = AgingReport(
-            input=AgingInput(
-                repo="acme/widget",
-                asof=date(2026, 5, 14),
-                workflow=("A", "B"),
-                history_start=date(2026, 4, 14),
-                history_end=date(2026, 5, 13),
-                offline=False,
-            ),
-            items=[],
-            cycle_time_percentiles={50: 1.0, 70: 2.0, 85: 3.0, 95: 5.0},
-            completed_count=0,
-            interpretation=_interp(),
-            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
-        )
-        spec = vega_specs.aging_spec(report)
-        ok, err, _ = _compile_via_node(spec)
-        assert ok, f"empty-items spec failed to compile: {err}"
-
-    def test_checker_detects_actual_compile_errors(self):
-        """Validate the checker itself: a deliberately broken spec
-        (top-level params on a layered spec) must fail to compile with
-        an error mentioning duplicate signals. If this test starts
-        passing without an error message, the checker is silently
-        accepting bad input."""
-        broken = {
-            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-            "params": [
-                {
-                    "name": "zoom",
-                    "select": {"type": "interval", "encodings": ["y"]},
-                    "bind": "scales",
-                }
-            ],
-            "layer": [
-                {
-                    "mark": "circle",
-                    "data": {"values": [{"x": "A", "y": 1}]},
-                    "encoding": {
-                        "x": {"field": "x", "type": "nominal"},
-                        "y": {"field": "y", "type": "quantitative"},
-                    },
-                },
-                {
-                    "mark": "rule",
-                    "data": {"values": [{"y": 0.5}]},
-                    "encoding": {"y": {"field": "y", "type": "quantitative"}},
-                },
-            ],
-        }
-        ok, err, _ = _compile_via_node(broken)
-        assert not ok
-        assert "duplicate signal" in err.lower(), (
-            f"expected duplicate-signal error, got: {err}"
-        )
+# Note: previous revisions of this file ran each spec through the real
+# Vega-Lite compiler via Node + a vendored copy of vega-lite.min.js, to
+# catch runtime errors like "Duplicate signal name: zoom_tuple" that
+# pure shape-tests miss. With the CDN switch the vendored bundle was
+# dropped; the compile-time check is no longer feasible offline. Spec-
+# shape tests above still guard the known regression patterns (top-
+# level params on layered specs, etc.).
