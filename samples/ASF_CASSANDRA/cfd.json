@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T13:30:23.088288-06:00",
+  "generated_at": "2026-05-15T14:18:19.788716-06:00",
   "headline": "CFD for jira:CASSANDRA Apr 15, 2026 \u2192 May 14, 2026: 44 items arrived, 44 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
@@ -397,6 +397,1268 @@
           "Ready to Commit": 44,
           "Resolved": 44
         }
+      }
+    ],
+    "bands": [
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Triage Needed",
+        "wip_in_state": 5,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Open",
+        "wip_in_state": 4,
+        "entered_at_or_later": 24
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "In Progress",
+        "wip_in_state": 4,
+        "entered_at_or_later": 20
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Patch Available",
+        "wip_in_state": 11,
+        "entered_at_or_later": 16
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Review In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 5
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 3
+      },
+      {
+        "sampled_on": "2026-04-15",
+        "state": "Resolved",
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Triage Needed",
+        "wip_in_state": 5,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 24
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Patch Available",
+        "wip_in_state": 12,
+        "entered_at_or_later": 21
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Ready to Commit",
+        "wip_in_state": 2,
+        "entered_at_or_later": 6
+      },
+      {
+        "sampled_on": "2026-04-16",
+        "state": "Resolved",
+        "wip_in_state": 4,
+        "entered_at_or_later": 4
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Triage Needed",
+        "wip_in_state": 4,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 27
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 25
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Patch Available",
+        "wip_in_state": 11,
+        "entered_at_or_later": 23
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 12
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Ready to Commit",
+        "wip_in_state": 2,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-04-17",
+        "state": "Resolved",
+        "wip_in_state": 9,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Triage Needed",
+        "wip_in_state": 4,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 27
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 25
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Patch Available",
+        "wip_in_state": 10,
+        "entered_at_or_later": 23
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 13
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Ready to Commit",
+        "wip_in_state": 2,
+        "entered_at_or_later": 12
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Resolved",
+        "wip_in_state": 10,
+        "entered_at_or_later": 10
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Triage Needed",
+        "wip_in_state": 4,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Open",
+        "wip_in_state": 3,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Patch Available",
+        "wip_in_state": 11,
+        "entered_at_or_later": 24
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 13
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Ready to Commit",
+        "wip_in_state": 2,
+        "entered_at_or_later": 12
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Resolved",
+        "wip_in_state": 10,
+        "entered_at_or_later": 10
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Triage Needed",
+        "wip_in_state": 4,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 27
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Patch Available",
+        "wip_in_state": 7,
+        "entered_at_or_later": 24
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Review In Progress",
+        "wip_in_state": 4,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Ready to Commit",
+        "wip_in_state": 2,
+        "entered_at_or_later": 13
+      },
+      {
+        "sampled_on": "2026-04-20",
+        "state": "Resolved",
+        "wip_in_state": 11,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Triage Needed",
+        "wip_in_state": 3,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 30
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Patch Available",
+        "wip_in_state": 6,
+        "entered_at_or_later": 25
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 16
+      },
+      {
+        "sampled_on": "2026-04-21",
+        "state": "Resolved",
+        "wip_in_state": 15,
+        "entered_at_or_later": 15
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Triage Needed",
+        "wip_in_state": 3,
+        "entered_at_or_later": 34
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Open",
+        "wip_in_state": 3,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Patch Available",
+        "wip_in_state": 7,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 16
+      },
+      {
+        "sampled_on": "2026-04-22",
+        "state": "Resolved",
+        "wip_in_state": 15,
+        "entered_at_or_later": 15
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Triage Needed",
+        "wip_in_state": 3,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 30
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Patch Available",
+        "wip_in_state": 5,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Review In Progress",
+        "wip_in_state": 5,
+        "entered_at_or_later": 23
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 18
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Resolved",
+        "wip_in_state": 17,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Triage Needed",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Patch Available",
+        "wip_in_state": 3,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Review In Progress",
+        "wip_in_state": 6,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 20
+      },
+      {
+        "sampled_on": "2026-04-24",
+        "state": "Resolved",
+        "wip_in_state": 19,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Triage Needed",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Patch Available",
+        "wip_in_state": 3,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Review In Progress",
+        "wip_in_state": 6,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 20
+      },
+      {
+        "sampled_on": "2026-04-25",
+        "state": "Resolved",
+        "wip_in_state": 19,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Triage Needed",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Patch Available",
+        "wip_in_state": 3,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Review In Progress",
+        "wip_in_state": 5,
+        "entered_at_or_later": 26
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 21
+      },
+      {
+        "sampled_on": "2026-04-26",
+        "state": "Resolved",
+        "wip_in_state": 20,
+        "entered_at_or_later": 20
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 34
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Patch Available",
+        "wip_in_state": 2,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Review In Progress",
+        "wip_in_state": 4,
+        "entered_at_or_later": 29
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 25
+      },
+      {
+        "sampled_on": "2026-04-27",
+        "state": "Resolved",
+        "wip_in_state": 25,
+        "entered_at_or_later": 25
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Patch Available",
+        "wip_in_state": 2,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Resolved",
+        "wip_in_state": 27,
+        "entered_at_or_later": 27
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Patch Available",
+        "wip_in_state": 2,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 31
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Resolved",
+        "wip_in_state": 28,
+        "entered_at_or_later": 28
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 36
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Resolved",
+        "wip_in_state": 32,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 36
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Resolved",
+        "wip_in_state": 32,
+        "entered_at_or_later": 32
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 36
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Open",
+        "wip_in_state": 1,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 34
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 34
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 34
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Resolved",
+        "wip_in_state": 33,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 37
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Open",
+        "wip_in_state": 1,
+        "entered_at_or_later": 36
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Review In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Resolved",
+        "wip_in_state": 33,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 37
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Patch Available",
+        "wip_in_state": 2,
+        "entered_at_or_later": 37
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Review In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Resolved",
+        "wip_in_state": 33,
+        "entered_at_or_later": 33
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Open",
+        "wip_in_state": 1,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 38
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 38
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Review In Progress",
+        "wip_in_state": 3,
+        "entered_at_or_later": 38
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Resolved",
+        "wip_in_state": 35,
+        "entered_at_or_later": 35
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Review In Progress",
+        "wip_in_state": 2,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 38
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Resolved",
+        "wip_in_state": 38,
+        "entered_at_or_later": 38
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Resolved",
+        "wip_in_state": 39,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Triage Needed",
+        "wip_in_state": 1,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Resolved",
+        "wip_in_state": 39,
+        "entered_at_or_later": 39
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Resolved",
+        "wip_in_state": 40,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Resolved",
+        "wip_in_state": 40,
+        "entered_at_or_later": 40
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Review In Progress",
+        "wip_in_state": 1,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-11",
+        "state": "Resolved",
+        "wip_in_state": 41,
+        "entered_at_or_later": 41
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Patch Available",
+        "wip_in_state": 1,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Review In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 43
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Ready to Commit",
+        "wip_in_state": 1,
+        "entered_at_or_later": 43
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "state": "Resolved",
+        "wip_in_state": 42,
+        "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Review In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "state": "Resolved",
+        "wip_in_state": 44,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Triage Needed",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Open",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Patch Available",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Review In Progress",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Ready to Commit",
+        "wip_in_state": 0,
+        "entered_at_or_later": 44
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "state": "Resolved",
+        "wip_in_state": 44,
+        "entered_at_or_later": 44
       }
     ]
   },

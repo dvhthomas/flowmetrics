@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-15T13:30:20.098528-06:00",
+  "generated_at": "2026-05-15T14:18:16.797879-06:00",
   "headline": "85% confident the next 25 items finish by Jul 8, 2026 (starting May 15, 2026).",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {

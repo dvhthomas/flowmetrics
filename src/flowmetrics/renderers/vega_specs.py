@@ -214,24 +214,42 @@ def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:
 def cfd_spec(report: CfdReport) -> dict[str, Any]:
     """Stacked-area Cumulative Flow Diagram.
 
-    Each band's vertical thickness at a sample date is the cumulative
-    count of items that have reached that state-or-later by that date.
-    The gap between the top line (items that ever entered the system)
-    and the bottom line (items finished) is WIP — items still in
-    flight.
+    Each band's vertical thickness at a sample date is the number of
+    items currently in that workflow step (Vacanti's property #3 —
+    `wip_in_state` = line[step_i] − line[step_{i+1}], or just
+    line[terminal] for the bottom band). Stacked together, the bands
+    sum to the top line — the cumulative-arrivals count
+    (property #1).
 
-    Stacks earliest workflow state on top, latest on bottom (e.g.,
-    Open ⟶ In Progress ⟶ Done). Renders the GitHub-PR degenerate
-    two-state case (Open / Merged) without complaint.
+    Stacks the terminal workflow step at the visual bottom, the first
+    step at the top, matching Vacanti's reference figure. Renders the
+    GitHub-PR degenerate two-state case (Open / Merged) without
+    complaint.
     """
     workflow = list(report.input.workflow)
+
+    # Build per-step band-width rows. Smaller `stack_order` stacks at
+    # the visual bottom in Vega-Lite, so the terminal step gets 0.
+    # This is the same band-width view exposed in the JSON envelope as
+    # `chart_data.bands`; we compute it inline rather than re-routing
+    # so the spec function stays a pure transform of the report.
     rows: list[dict[str, Any]] = []
     for pt in report.points:
-        for state in workflow:
+        for i, state in enumerate(workflow):
+            line = pt.counts_by_state.get(state, 0)
+            if i + 1 < len(workflow):
+                next_line = pt.counts_by_state.get(workflow[i + 1], 0)
+                wip = line - next_line
+            else:
+                wip = line  # bottom band — no "later" state
             rows.append({
                 "sampled_on": pt.sampled_on.isoformat(),
                 "state": state,
-                "count": pt.counts_by_state.get(state, 0),
+                "wip_in_state": wip,
+                "entered_at_or_later": line,
+                # Reverse natural workflow index so the terminal state
+                # sinks to the bottom of the stack.
+                "stack_order": len(workflow) - 1 - i,
             })
 
     area_layer = {
@@ -245,7 +263,7 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
                          "format": "%b %d", "labelAngle": 0},
             },
             "y": {
-                "field": "count",
+                "field": "wip_in_state",
                 "type": "quantitative",
                 "aggregate": "sum",
                 "axis": {"title": "Cumulative items",
@@ -264,31 +282,27 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
                 "scale": {"scheme": "tableau10"},
                 "legend": {"title": "Workflow state", "orient": "right"},
             },
-            "order": {"field": "state_index", "type": "ordinal"},
+            "order": {"field": "stack_order", "type": "ordinal"},
         },
-        # Inject state_index for explicit stacking order matching
-        # workflow earliest→latest. Vega compiles the calculate string
-        # via `new Function()`, so it must be valid JS — a right-
-        # associative ternary `A ? 0 : B ? 1 : … : -1`.
-        "transform": [
-            {"calculate": "".join(
-                f"datum.state === '{s}' ? {i} : "
-                for i, s in enumerate(workflow)
-            ) + "-1", "as": "state_index"},
-        ],
     }
 
     # Hover layer — vertical rule on the date nearest the cursor that
-    # surfaces every workflow state's count in one tooltip plus the
-    # WIP gap (top-state minus bottom-state). Uses a wide-format pivot
-    # so the tooltip can name each state as its own field.
+    # surfaces each workflow step's WIP-in-state (band width) and a
+    # total WIP (items in flight) summary. A pivot widens the long-
+    # format `wip_in_state` so each state becomes its own column in
+    # the tooltip.
     first_state = workflow[0]
     last_state = workflow[-1]
-    wip_calc = f"datum['{first_state}'] - datum['{last_state}']" if len(workflow) >= 2 else "0"
+    # WIP-in-flight = top line - bottom line = (Σ band widths) - bottom band.
+    # Express as a sum of all non-terminal band widths.
+    if len(workflow) >= 2:
+        wip_calc = " + ".join(f"datum['{s}']" for s in workflow[:-1])
+    else:
+        wip_calc = "0"
     hover_layer = {
         "data": {"values": rows},
         "transform": [
-            {"pivot": "state", "value": "count", "groupby": ["sampled_on"]},
+            {"pivot": "state", "value": "wip_in_state", "groupby": ["sampled_on"]},
             {"calculate": wip_calc, "as": "wip"},
         ],
         "mark": {"type": "rule", "color": "#666", "strokeWidth": 1},
@@ -301,9 +315,11 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
             "tooltip": [
                 {"field": "sampled_on", "type": "temporal", "title": "Date",
                  "format": "%b %d, %Y"},
+                # Each state's band width — items currently in that step.
                 *[{"field": s, "type": "quantitative", "title": s}
                   for s in workflow],
-                {"field": "wip", "type": "quantitative", "title": "WIP (in flight)"},
+                {"field": "wip", "type": "quantitative",
+                 "title": "WIP (in flight)"},
             ],
         },
         "params": [

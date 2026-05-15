@@ -769,14 +769,19 @@ class TestCfdSpec:
         values = area_layer["data"]["values"]
         # 2 sample dates × 3 states = 6 rows.
         assert len(values) == 6
-        # Each row has the sampled_on date, state name, count.
+        # Each row carries the sampled_on date, state name, band width
+        # (wip_in_state) and the cumulative line value (for tooltips).
         v0 = values[0]
-        assert "sampled_on" in v0 and "state" in v0 and "count" in v0
+        assert {"sampled_on", "state", "wip_in_state",
+                "entered_at_or_later"} <= v0.keys()
 
-    def test_workflow_state_order_drives_band_stacking(self):
-        """Stacking order matters: leftmost workflow state = bottom band
-        (departures); rightmost = top band (arrivals). Vega-Lite's `sort`
-        on the color encoding controls this."""
+    def test_workflow_state_drives_legend_color_order(self):
+        """The color legend lists workflow states in flow order
+        (earliest → latest) so the legend reads top-to-bottom in the
+        order work moves through the system. (Stack order on the
+        chart is the *reverse* of this — terminal state at the visual
+        bottom, per Vacanti — but the legend is for navigation, not
+        for the chart geometry.)"""
         workflow = ("Open", "In Progress", "Done")
         spec = vega_specs.cfd_spec(_cfd_report([
             (date(2026, 5, 1), {"Open": 1, "In Progress": 0, "Done": 0}),
@@ -804,6 +809,114 @@ class TestCfdSpec:
                "WIP" in area_layer["encoding"]["y"]["axis"]["title"] or \
                "Count" in area_layer["encoding"]["y"]["axis"]["title"]
 
+    def test_area_layer_values_are_per_step_band_widths_not_cumulatives(self):
+        """The whole CFD bug: feeding cumulative-at-state-or-later
+        line values to a `stack: zero` area mark sums them on top of
+        each other, inflating the y-axis ~2-3x and making the band
+        widths nonsensical.
+
+        The fix: data values are per-step band widths
+        (`wip_in_state` = line[step_i] - line[step_{i+1}], or just
+        line[terminal] for the bottom band). Stacked, they sum to the
+        top line - the correct cumulative-arrivals value."""
+        # 3-state workflow with known cumulative line values:
+        #   Open=10, In Progress=6, Done=4  ⇒
+        #   band[Open] = 10-6 = 4  band[In Progress] = 6-4 = 2  band[Done] = 4
+        #   stacked total = 10 = top line. ✓
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 10, "In Progress": 6, "Done": 4}),
+        ], workflow=("Open", "In Progress", "Done")))
+        area_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "area"
+        )
+        values = area_layer["data"]["values"]
+        by_state = {v["state"]: v for v in values}
+        assert by_state["Open"]["wip_in_state"] == 4
+        assert by_state["In Progress"]["wip_in_state"] == 2
+        assert by_state["Done"]["wip_in_state"] == 4
+        # And the area mark's y channel must reference the band-width
+        # field, not the cumulative line value.
+        assert area_layer["encoding"]["y"]["field"] == "wip_in_state"
+
+    def test_terminal_state_stacks_at_the_visual_bottom(self):
+        """Per Vacanti's chart: the terminal workflow step (Done /
+        Merged / Resolved) is the bottom band, with the area from
+        y=0 up to line[terminal]. The first workflow step (Open /
+        Triage Needed) is the top band. With Vega-Lite's
+        `stack: "zero"`, the smaller `order` value stacks first (at
+        the bottom), so the terminal state must carry the smaller
+        order."""
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 10, "In Progress": 6, "Done": 4}),
+        ], workflow=("Open", "In Progress", "Done")))
+        area_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "area"
+        )
+        values = area_layer["data"]["values"]
+        by_state = {v["state"]: v["stack_order"] for v in values}
+        # Terminal (Done) → smallest stack_order; first (Open) → largest.
+        assert by_state["Done"] < by_state["In Progress"] < by_state["Open"]
+
+    def test_stacked_band_widths_sum_to_top_line_value(self):
+        """Property #1 + #3 invariant: at every sample date, the sum
+        of every band width equals the cumulative-arrivals line
+        value (= count of the first workflow step). Render correctly
+        in Vega-Lite by feeding the band widths and letting
+        `stack: "zero"` add them — total height at the date = top
+        line. The cumulative-arrivals number is NOT inflated."""
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 10, "In Progress": 6, "Done": 4}),
+            (date(2026, 5, 2), {"Open": 15, "In Progress": 10, "Done": 7}),
+        ], workflow=("Open", "In Progress", "Done")))
+        area_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "area"
+        )
+        rows = area_layer["data"]["values"]
+        by_date: dict[str, list[dict]] = {}
+        for v in rows:
+            by_date.setdefault(v["sampled_on"], []).append(v)
+        # 2026-05-01: bands sum to 10 (= top line "Open")
+        assert sum(b["wip_in_state"] for b in by_date["2026-05-01"]) == 10
+        # 2026-05-02: bands sum to 15
+        assert sum(b["wip_in_state"] for b in by_date["2026-05-02"]) == 15
+
+    def test_hover_tooltip_surfaces_band_width_and_cumulative_per_state(self):
+        """Hover tooltip lists every workflow step at the cursor's
+        date with BOTH numbers: items currently in that step (the
+        band width) AND the cumulative line value (items at-step-
+        or-later). Lay readers want the band width; CFD-savvy readers
+        want the line value; both are in one place."""
+        spec = vega_specs.cfd_spec(_cfd_report([
+            (date(2026, 5, 1), {"Open": 10, "In Progress": 6, "Done": 4}),
+        ], workflow=("Open", "In Progress", "Done")))
+        hover_layer = next(
+            layer for layer in spec["layer"]
+            if any(
+                isinstance(t, dict) and "pivot" in t
+                for t in layer.get("transform", [])
+            )
+        )
+        tooltip_fields = {t["field"]: t.get("title", t["field"])
+                          for t in hover_layer["encoding"]["tooltip"]
+                          if "field" in t}
+        # Every state appears as a band-width field…
+        for state in ("Open", "In Progress", "Done"):
+            assert state in tooltip_fields, (
+                f"Tooltip must include the {state!r} band width; "
+                f"got fields {list(tooltip_fields)}"
+            )
+        # And total WIP is computed as top-line − bottom-line.
+        assert "wip" in tooltip_fields, (
+            f"Tooltip must include the WIP-in-flight summary field; "
+            f"got fields {list(tooltip_fields)}"
+        )
+
     def test_hover_layer_shows_all_state_counts_for_the_hovered_date(self):
         """Hovering on the CFD must surface every workflow state's
         cumulative count at the hovered date in a single tooltip — not
@@ -829,10 +942,11 @@ class TestCfdSpec:
             "the long-format data so every state appears in one tooltip."
         )
         hover = hover_layers[0]
-        # The pivot must produce one column per workflow state.
+        # The pivot widens the per-state band widths so each workflow
+        # state becomes a column carrying its `wip_in_state` value.
         pivot = next(t for t in hover["transform"] if "pivot" in t)
         assert pivot["pivot"] == "state"
-        assert pivot["value"] == "count"
+        assert pivot["value"] == "wip_in_state"
         # The tooltip must reference each state name as a field.
         tooltip = hover["encoding"]["tooltip"]
         tooltip_fields = {t["field"] for t in tooltip if "field" in t}
@@ -870,27 +984,34 @@ class TestCfdSpec:
             "annotations at the left and right edges of the window."
         )
 
-    def test_state_index_calculate_is_valid_javascript_ternary(self):
-        """Vega evaluates `calculate` strings with `new Function()`. A
-        chain like `A ? 0 || B ? 1 : -1` is missing a colon after `A`
-        — JS throws 'Unexpected end of input' and Vega's promise
-        rejects with that message. The correct shape is a nested
-        ternary: `A ? 0 : B ? 1 : -1`. This test parses the expression
-        through node to confirm it's syntactically valid JS."""
+    def test_hover_wip_calculate_is_valid_javascript(self):
+        """Vega compiles `calculate` strings via `new Function()`, so
+        any expression we emit must be valid JS. The hover layer's
+        `wip` calc sums the non-terminal band widths via field access
+        on the pivoted columns — single-quoted state names embedded
+        in a JS string mean we have to be careful that quoting,
+        spacing, and operator precedence all hold.
+
+        Regression guard: an earlier `state_index` calc was emitted as
+        `A ? 0 || B ? 1 : -1` (missing the `:` after A) and Vega's
+        promise rejected with 'Unexpected end of input' at render
+        time."""
         import subprocess
 
         spec = vega_specs.cfd_spec(_cfd_report(
             [(date(2026, 5, 1), {"Open": 1, "In Progress": 0, "Done": 0})],
             workflow=("Open", "In Progress", "Done"),
         ))
-        area_layer = next(
+        hover_layer = next(
             layer for layer in spec["layer"]
-            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
-                else layer["mark"]) == "area"
+            if any(
+                isinstance(t, dict) and "pivot" in t
+                for t in layer.get("transform", [])
+            )
         )
         calc = next(
-            t["calculate"] for t in area_layer["transform"]
-            if t.get("as") == "state_index"
+            t["calculate"] for t in hover_layer["transform"]
+            if t.get("as") == "wip"
         )
         # Compile through node to validate JS syntax — this is what
         # Vega does internally via new Function() when it evaluates the
