@@ -44,7 +44,12 @@ def _forecast_histogram_spec(
     rule lines yellow→red with P85 solid + heavier, matching the
     Aging convention."""
     bar_layer = {
-        "mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65},
+        # `size` gives the bars an explicit pixel width — without it,
+        # Vega-Lite's default bar width on a wide quantitative x range
+        # (e.g. 0–42 item counts) is a thin line surrounded by
+        # whitespace; the distribution shape is hard to read.
+        "mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65,
+                 "size": 18},
         "data": {"values": histogram_rows},
         "encoding": {
             "x": {
@@ -406,8 +411,12 @@ def efficiency_spec(report: EfficiencyReport) -> dict[str, Any]:
                 "field": "item_id",
                 "type": "nominal",
                 "axis": {"title": None, "labelLimit": 80, "labelFontSize": 10},
-                # Slowest at top — biggest cycle_hours value first.
-                "sort": {"field": "cycle_hours", "order": "descending"},
+                # Sort by efficiency ascending: lowest FE at top, 100%
+                # at bottom. A long PR that happens to score 100% (e.g.
+                # automated dependency bump that fit one work session)
+                # belongs BELOW all sub-100% bars, not wedged into the
+                # middle of them.
+                "sort": {"field": "efficiency_pct", "order": "ascending"},
             },
             "x": {
                 "field": "efficiency_pct",
@@ -581,12 +590,18 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
     # columns (0, 2, 4...) are shaded; leftmost is gently emphasized.
     workflow_list = list(report.input.workflow)
     shaded_states = workflow_list[::2]
+    # NB: the field name must match the other layers' x.field
+    # (`current_state`), not the more-obvious `state`. Vega-Lite
+    # unifies the x scale across layered marks by field name; a
+    # mismatch silently breaks scale resolution and the whole chart
+    # fails to render at runtime ("Cannot set properties of
+    # undefined …" in the catch handler).
     shade_layer = {
         "mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04},
-        "data": {"values": [{"state": s} for s in shaded_states]},
+        "data": {"values": [{"current_state": s} for s in shaded_states]},
         "encoding": {
             "x": {
-                "field": "state",
+                "field": "current_state",
                 "type": "nominal",
                 "sort": workflow_list,
                 "scale": {"domain": workflow_list},

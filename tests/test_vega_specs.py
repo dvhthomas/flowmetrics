@@ -125,6 +125,39 @@ class TestAgingDistributionSpec:
         )
 
 
+class TestAgingChartShadeLayerFieldMatch:
+    """The alternating-column shade rect layer uses an `x` encoding
+    that has to share a Vega-Lite scale with every other layer's `x`
+    encoding (circle, percentile rule labels, per-state counts). All
+    those other layers encode `current_state`. If the shade layer
+    encodes a DIFFERENT field name (e.g. `state`), Vega-Lite cannot
+    unify the x scale across layers and the whole chart fails to
+    render — silent at compile time, only manifesting as an error
+    in vegaEmbed's `.catch` handler at browser load."""
+
+    def test_shade_layer_uses_current_state_field_name_like_other_layers(self):
+        spec = vega_specs.aging_spec(_aging_report([
+            _item("#1", "Awaiting Review", 100),
+        ]))
+        rect_layers = [
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "rect"
+        ]
+        assert rect_layers, "Expected at least one rect (shade) layer."
+        for rect in rect_layers:
+            assert rect["encoding"]["x"]["field"] == "current_state", (
+                f"Shade layer x.field must match the other layers' "
+                f"x.field ('current_state'); got "
+                f"{rect['encoding']['x'].get('field')!r}"
+            )
+            values = rect["data"]["values"]
+            assert all("current_state" in v for v in values), (
+                f"Shade data rows must use 'current_state' as the key, "
+                f"got rows {values[:2]}"
+            )
+
+
 class TestAgingSpec:
     def test_top_level_shape_is_vega_lite_v5(self):
         spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
@@ -412,7 +445,9 @@ class TestAgingSpec:
         # Shaded states are every-other in workflow order. Convention:
         # shade the EVEN-indexed columns (0, 2, 4) so the leftmost is
         # gently emphasized; either convention is fine — pin one.
-        shaded_states = {row["state"] for row in first_layer["data"]["values"]}
+        # Field name must match the other layers' x.field
+        # (current_state) so Vega-Lite can unify the x scale.
+        shaded_states = {row["current_state"] for row in first_layer["data"]["values"]}
         assert shaded_states == {"A", "C", "E"}
 
     def test_percentile_thresholds_above_data_range_are_dropped(self):
@@ -647,7 +682,14 @@ class TestEfficiencySpec:
         v2 = next(v for v in values if v["item_id"] == "#2")
         assert "title" in v2 and "cycle_hours" in v2 and "efficiency_pct" in v2
 
-    def test_bars_sorted_by_cycle_time_descending(self):
+    def test_bars_sorted_by_efficiency_ascending(self):
+        """Lowest FE at the top, 100% at the bottom — so a 100% bar
+        (e.g. a one-shot typo fix that scored a perfect ratio) sits
+        BELOW any imperfect bar like the system bottlenecks. The
+        earlier sort by cycle-time-descending mostly produced this
+        order incidentally, but a long PR that happened to score
+        100% would wedge itself between sub-100% bars and break the
+        eye's read."""
         spec = vega_specs.efficiency_spec(_efficiency_report([
             _pr("#fast", 1, 1.0),
             _pr("#slow", 200, 0.01),
@@ -658,12 +700,20 @@ class TestEfficiencySpec:
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "bar"
         )
-        # Y-axis sort: slowest cycle time at top.
         y = bar_layer["encoding"]["y"]
-        # Vega-Lite "sort" can be -field, by another field desc, or an
-        # explicit array. Either signals descending by cycle.
         sort = y.get("sort")
-        assert sort is not None
+        # Must sort by efficiency, ascending. Vega-Lite accepts an
+        # object with field + order, a "-field" shorthand, or an
+        # explicit value array — accept any encoding that pins the
+        # sort key to efficiency_pct.
+        if isinstance(sort, dict):
+            assert sort.get("field") == "efficiency_pct"
+            assert sort.get("order", "ascending") == "ascending"
+        elif isinstance(sort, str):
+            # "-x" = descending of x; "x" = ascending.
+            assert sort == "efficiency_pct" or sort == "x"
+        else:
+            raise AssertionError(f"unexpected sort encoding: {sort!r}")
 
     def test_color_encodes_efficiency_band(self):
         """Three FE bands matching the matplotlib chart: red < 10%,
@@ -1271,3 +1321,24 @@ class TestHowManySpec:
         )
         ys = {row["x"] for row in rule_layer["data"]["values"]}
         assert ys == {18, 22, 25, 28}
+
+    def test_bars_have_substantial_width_for_quantitative_x(self):
+        """With a quantitative x and a wide range (e.g. 0-42 items)
+        Vega-Lite's default bar width is a thin line — most of the
+        chart becomes whitespace and the distribution shape is hard
+        to read. Force a chunkier minimum so each bar fills its
+        column's slot."""
+        spec = vega_specs.how_many_spec(_how_many_fixture())
+        bar_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "bar"
+        )
+        mark = bar_layer["mark"]
+        # Either explicit width via `mark.size` OR a width binding that
+        # widens automatically (e.g. `binSpacing: 0` + `bin`); we use
+        # the explicit-size pattern.
+        assert "size" in mark or "width" in mark, (
+            f"Forecast bars need an explicit minimum width to be "
+            f"readable; got mark={mark}"
+        )

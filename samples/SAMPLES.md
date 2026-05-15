@@ -1,6 +1,6 @@
 # Sample reports
 
-_Generated 2026-05-15 22:51:20 UTC_
+_Generated 2026-05-15 23:04:27 UTC_
 
 Open the `.html` files directly in a browser — no server needed; Vega-Lite loads from CDN via plain `<script>` tags.
 
