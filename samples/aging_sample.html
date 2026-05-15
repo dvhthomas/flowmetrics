@@ -87,7 +87,7 @@
 <p class="subtitle">
   for <a href="https://github.com/rust-lang/rust">rust-lang/rust</a> ·
   as of May 15, 2026 ·
-  <span class="stamp">generated 2026-05-15 09:06 MDT</span>
+  <span class="stamp">generated 2026-05-15 09:37 MDT</span>
 </p>
 
 
@@ -635,7 +635,7 @@ forecast-derived or simulated.
   <li>Percentile lines reflect the completed-item distribution from Apr 30, 2026 → May 13, 2026 (294 items). If recent throughput has changed, those checkpoints may have drifted.</li>
   <li>Items in early workflow states (Open, To Do) often age longest in OSS — that&#39;s queue, not work. Treat the chart as a queue-depth indicator first, a productivity signal second.</li>
   <li>287 in-flight item(s) were excluded from the chart and the past-P85/P95 counts because their age exceeded --max-age-days=180. They may still represent real WIP that needs review.</li>
-  <li>46% of in-flight items are past P95 of recent completers — well above the ~5% steady-state expectation. The in-flight age distribution diverges from the recent-completer distribution, so the percentile thresholds (P85/P95) are likely understated for this WIP.</li>
+  <li>46% of in-flight items are past P95 of recent completers — much higher than the ~5% you&#39;d expect if today&#39;s WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren&#39;t in that sample. The thresholds therefore diverge from — and likely under-represent — true cycle time for this WIP.</li>
 </ul>
 
 <p><strong>Vocabulary</strong></p>

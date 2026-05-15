@@ -608,3 +608,78 @@ class TestInterpretAgingDistributionDivergence:
         )
         text = " ".join(i.caveats).lower()
         assert "diverge" not in text
+
+    def test_caveat_explains_why_in_plain_language(self):
+        """The user explicitly flagged the old phrasing ('thresholds
+        are likely understated for this WIP') as unclear. The rewrite
+        must connect WIP staleness to the survivorship-bias mechanism
+        in plain words — recent completers don't include slow items
+        that are still in flight, so the thresholds under-represent
+        actual cycle time."""
+        i = interpret_aging(
+            self._input(),
+            self._items_with_above_p95_share(total=100, above_p95_count=20),
+            self.PCT,
+            completed_count=50,
+        )
+        text = " ".join(i.caveats).lower()
+        # Old jargon phrase must be gone — it was the unclear bit.
+        assert "understated for this wip" not in text
+        # New phrasing must mention WHY: long-running items aren't yet
+        # in the completed sample.
+        assert "haven't finished" in text or "still in flight" in text
+
+
+class TestAgingBiggestWipNextAction:
+    """The auto-generated 'Biggest WIP column' next-action used jargon
+    the user found impenetrable: '… If that band is upstream (queue),
+    pull policy. If downstream (review/test), capacity.' The rewrite
+    has to keep the diagnostic ('which stage is fattest') but explain
+    the two possible causes in plain English."""
+
+    @staticmethod
+    def _input() -> AgingInput:
+        return AgingInput(
+            repo="acme/widget",
+            asof=date(2026, 5, 14),
+            workflow=("Awaiting Review", "Approved"),
+            history_start=date(2026, 4, 14),
+            history_end=date(2026, 5, 13),
+            offline=False,
+        )
+
+    def test_next_action_omits_jargon_phrases(self):
+        items = [
+            AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                      current_state="Awaiting Review", age_days=3)
+            for i in range(5)
+        ]
+        i = interpret_aging(
+            self._input(), items,
+            {50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0},
+            completed_count=20,
+        )
+        text = " ".join(i.next_actions).lower()
+        assert "pull policy" not in text
+        assert "upstream (queue)" not in text
+        assert "downstream (review/test)" not in text
+
+    def test_next_action_names_biggest_state_and_explains_two_causes(self):
+        items = [
+            AgingItem(item_id=f"#{i}", title=f"PR {i}",
+                      current_state="Awaiting Review", age_days=3)
+            for i in range(7)
+        ]
+        i = interpret_aging(
+            self._input(), items,
+            {50: 5.0, 70: 10.0, 85: 25.0, 95: 50.0},
+            completed_count=20,
+        )
+        text = " ".join(i.next_actions)
+        assert "Awaiting Review" in text
+        assert "7" in text  # the count
+        low = text.lower()
+        # Plain-language explanation of the two failure modes:
+        # arrivals exceeding capacity, OR items waiting on resources.
+        assert "arriv" in low or "intake" in low
+        assert "wait" in low or "capacity" in low or "resource" in low

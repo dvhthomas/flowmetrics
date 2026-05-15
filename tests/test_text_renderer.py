@@ -16,6 +16,9 @@ from flowmetrics.renderers import text_renderer
 from flowmetrics.report import (
     AgingInput,
     AgingReport,
+    CfdInput,
+    CfdPoint,
+    CfdReport,
     EfficiencyInput,
     EfficiencyReport,
     HowManyInput,
@@ -107,6 +110,10 @@ def _how_many_report() -> HowManyReport:
 
 
 class TestEfficiencyText:
+    """Verbose efficiency mirrors the Aging text contract: headline +
+    actionable numbers + slowest-PR table + reproduce. No more Key
+    insight panel, no numbered Next actions list, no Vocabulary."""
+
     def test_contains_headline(self):
         out = text_renderer.render(_efficiency_report(), verbose=True)
         assert "Portfolio FE is 12.3%" in out
@@ -126,15 +133,25 @@ class TestEfficiencyText:
         assert "#99" in out
         assert "Slow PR" in out
 
-    def test_contains_next_actions_section(self):
+    def test_no_key_insight_panel(self):
         out = text_renderer.render(_efficiency_report(), verbose=True)
-        assert "Next actions" in out
-        assert "Inspect PR #99" in out
+        assert "Key insight" not in out
 
-    def test_contains_caveats_section(self):
+    def test_no_next_actions_header(self):
         out = text_renderer.render(_efficiency_report(), verbose=True)
-        assert "Caveats" in out
-        assert "Per-engineer" in out
+        assert "Next actions" not in out
+
+    def test_no_vocabulary_block(self):
+        out = text_renderer.render(_efficiency_report(), verbose=True)
+        assert "Vocabulary used" not in out
+
+    def test_no_what_this_shows_panel(self):
+        out = text_renderer.render(_efficiency_report(), verbose=True)
+        assert "What this shows" not in out
+
+    def test_reproduce_command_present(self):
+        out = text_renderer.render(_efficiency_report(), verbose=True)
+        assert "uv run flow efficiency" in out
 
 
 class TestWhenDoneText:
@@ -155,13 +172,67 @@ class TestWhenDoneText:
         assert "20" in out
 
     def test_does_not_include_ascii_histogram(self):
-        """Text mode is for clean prose + tables. Charts belong in --format html.
-        ASCII histogram art makes .txt files unreadable when opened in a browser.
-        (The term "Results histogram" may still appear in the vocabulary block —
-        that's fine; we're only banning the ASCII-art chart itself.)"""
         out = text_renderer.render(_when_done_report(), verbose=True)
-        # No long runs of histogram '#' bars
         assert "########" not in out
+
+    def test_no_key_insight_panel(self):
+        out = text_renderer.render(_when_done_report(), verbose=True)
+        assert "Key insight" not in out
+
+    def test_no_next_actions_header(self):
+        out = text_renderer.render(_when_done_report(), verbose=True)
+        assert "Next actions" not in out
+
+    def test_no_vocabulary_block(self):
+        out = text_renderer.render(_when_done_report(), verbose=True)
+        assert "Vocabulary used" not in out
+
+
+def _cfd_report() -> CfdReport:
+    points = [
+        CfdPoint(date(2026, 5, 1), {"A": 5, "Done": 0}),
+        CfdPoint(date(2026, 5, 14), {"A": 15, "Done": 0}),
+    ]
+    return CfdReport(
+        input=CfdInput(
+            repo="acme/widget",
+            start=date(2026, 5, 1),
+            stop=date(2026, 5, 14),
+            workflow=("A", "Done"),
+            interval_days=7,
+            offline=False,
+        ),
+        points=points,
+        interpretation=_interp(),
+        generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+    )
+
+
+class TestCfdText:
+    def test_headline_present(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "Portfolio FE" in out  # the placeholder headline
+
+    def test_end_of_window_wip_visible(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "A" in out
+        assert "15" in out  # end WIP for A
+
+    def test_no_key_insight_panel(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "Key insight" not in out
+
+    def test_no_next_actions_header(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "Next actions" not in out
+
+    def test_no_vocabulary_block(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "Vocabulary used" not in out
+
+    def test_reproduce_command_present(self):
+        out = text_renderer.render(_cfd_report(), verbose=True)
+        assert "uv run flow cfd" in out
 
 
 class TestHowManyText:
@@ -170,6 +241,18 @@ class TestHowManyText:
         # 85% confidence should show 51 items (backward percentile)
         assert "51" in out
         assert "50" in out
+
+    def test_no_key_insight_panel(self):
+        out = text_renderer.render(_how_many_report(), verbose=True)
+        assert "Key insight" not in out
+
+    def test_no_next_actions_header(self):
+        out = text_renderer.render(_how_many_report(), verbose=True)
+        assert "Next actions" not in out
+
+    def test_no_vocabulary_block(self):
+        out = text_renderer.render(_how_many_report(), verbose=True)
+        assert "Vocabulary used" not in out
 
 
 class TestTerseDefault:
@@ -192,7 +275,9 @@ class TestTerseDefault:
         out = text_renderer.render(_efficiency_report(), verbose=True)
         assert "Repo" in out
         assert "Reproduce" in out
-        assert "Key insight" in out
+        # Key insight is now carried by the headline panel — no separate
+        # "Key insight" sub-panel any more.
+        assert "Portfolio FE" in out
 
     def test_terse_when_done_is_one_line(self):
         out = text_renderer.render(_when_done_report())
@@ -217,11 +302,13 @@ class TestAnswerFirstOrdering:
         i_repo = out.index("Repo")
         assert i_def < i_repo
 
-    def test_key_insight_appears_before_input(self):
+    def test_headline_appears_before_input(self):
+        # The headline carries the insight — it must come before the
+        # detail block. (No more separate "Key insight" panel.)
         out = text_renderer.render(_efficiency_report(), verbose=True)
-        i_insight = out.index("Key insight")
+        i_headline = out.index("Portfolio FE")
         i_repo = out.index("Repo")
-        assert i_insight < i_repo
+        assert i_headline < i_repo
 
 
 class TestNoEmptyOutput:

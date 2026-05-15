@@ -411,10 +411,12 @@ def interpret_aging(
             if above_p95_share > 0.10:
                 caveats.append(
                     f"{above_p95_share:.0%} of in-flight items are past P95 of "
-                    "recent completers — well above the ~5% steady-state "
-                    "expectation. The in-flight age distribution diverges from "
-                    "the recent-completer distribution, so the percentile "
-                    "thresholds (P85/P95) are likely understated for this WIP."
+                    "recent completers — much higher than the ~5% you'd expect "
+                    "if today's WIP looked like recent history. The P85/P95 "
+                    "thresholds are derived only from items that have already "
+                    "finished, so long-running items still in flight aren't in "
+                    "that sample. The thresholds therefore diverge from — and "
+                    "likely under-represent — true cycle time for this WIP."
                 )
 
     if not items:
@@ -496,8 +498,9 @@ def interpret_aging(
 
     next_actions.append(
         f"Biggest WIP column is '{biggest_state}' with {biggest_count} "
-        "item(s). If that band is upstream (queue), pull policy. If "
-        "downstream (review/test), capacity."
+        "item(s). Investigate this stage — either work is arriving faster "
+        "than it can leave, or items are waiting on a downstream resource "
+        "(reviewers, environments, decisions)."
     )
     next_actions.append(
         "Re-check daily; Aging is a leading indicator of forecast slip."

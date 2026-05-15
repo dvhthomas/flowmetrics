@@ -32,8 +32,6 @@ from ..report import (
     Report,
     WhenDoneReport,
     cli_invocation,
-    report_definition,
-    report_vocabulary,
 )
 
 
@@ -85,21 +83,25 @@ def render(
 
 
 def _top(console: Console, report: Report) -> None:
-    """Headline + definition — every report starts here."""
+    """Headline panel — the answer in one sentence."""
     console.print(Panel.fit(report.interpretation.headline, style="bold cyan"))
-    console.print(Panel(report_definition(report), title="What this shows", style="blue"))
 
 
-def _insight_and_actions(console: Console, report: Report) -> None:
-    console.print(Panel(report.interpretation.key_insight, title="Key insight", style="yellow"))
-    if report.interpretation.next_actions:
-        console.print("[bold]Next actions[/bold]")
-        for i, action in enumerate(report.interpretation.next_actions, 1):
-            console.print(f"  {i}. {action}")
-    if report.interpretation.caveats:
-        console.print("[dim]Caveats[/dim]")
-        for caveat in report.interpretation.caveats:
-            console.print(f"  - {caveat}")
+def _caveats(console: Console, report: Report) -> None:
+    """Aging-style caveat block: divergence + signal-quality warnings
+    get a red banner; everything else lists dim and unheadered. Drop
+    silently when there's nothing to surface."""
+    if not report.interpretation.caveats:
+        return
+    other: list[str] = []
+    for c in report.interpretation.caveats:
+        low = c.lower()
+        if "diverge" in low or "doesn't resemble" in low:
+            console.print(Panel(c, title="⚠ Signal quality", style="red"))
+        else:
+            other.append(c)
+    for c in other:
+        console.print(f"  - {c}", style="dim")
 
 
 def _detail_divider(console: Console) -> None:
@@ -120,12 +122,6 @@ def _reproduce(console: Console, report: Report) -> None:
     console.print(f"  {cli_invocation(report)}", style="cyan")
 
 
-def _vocabulary(console: Console, report: Report) -> None:
-    console.print("[dim]Vocabulary used in this report (Vacanti's terms)[/dim]")
-    for term, defn in report_vocabulary(report).items():
-        console.print(f"  [bold]{term}[/bold] — {defn}", style="dim")
-
-
 # ---------------------------------------------------------------------------
 # Efficiency
 # ---------------------------------------------------------------------------
@@ -136,50 +132,12 @@ def _render_efficiency(report: EfficiencyReport, console: Console) -> None:
     r = report.result
 
     if r.pr_count == 0:
-        _insight_and_actions(console, report)
         _detail_divider(console)
         _reproduce(console, report)
         return
 
-    # ── Key numbers ──────────────────────────────────────────────
-    summary = Table(title="Headline numbers")
-    summary.add_column("Metric")
-    summary.add_column("Value", justify="right")
-    summary.add_row("PRs merged", str(r.pr_count))
-    summary.add_row("Portfolio flow efficiency", f"{r.portfolio_efficiency * 100:.1f}%")
-    summary.add_row("Total cycle time", _fmt_duration(r.total_cycle))
-    summary.add_row("Total active time", _fmt_duration(r.total_active))
-    console.print(summary)
-
-    _insight_and_actions(console, report)
-    _detail_divider(console)
-
-    # ── Detail block ─────────────────────────────────────────────
-    rows = [
-        ("Repo", report.input.repo),
-        ("Window", f"{report.input.start} → {report.input.stop}"),
-    ]
-    console.print(_input_table(report, rows))
-    console.print(
-        f"How active time was calculated: events more than "
-        f"[bold]{report.input.gap_hours}h[/bold] apart start a new work session; "
-        f"a single isolated event counts as at least "
-        f"[bold]{report.input.min_cluster_minutes}min[/bold] of active time.",
-        style="dim",
-    )
-    _reproduce(console, report)
-    _vocabulary(console, report)
-
-    # ── Appendix: per-PR distribution + slowest list ─────────────
-    console.print("[dim]Per-PR distribution (the portfolio number above is the right one)[/dim]")
-    appendix = Table(show_header=False, box=None)
-    appendix.add_column("k", style="dim")
-    appendix.add_column("v")
-    appendix.add_row("Median per-PR FE", f"{r.median_efficiency * 100:.1f}%")
-    appendix.add_row("Mean per-PR FE", f"{r.mean_efficiency * 100:.1f}%  (noisy — see docs)")
-    console.print(appendix)
-
-    pr_table = Table(title="Per-PR breakdown (slowest first)")
+    # ── Slowest-first breakdown — the actionable data ───────────
+    pr_table = Table(title=f"Per-PR breakdown — portfolio FE {r.portfolio_efficiency * 100:.1f}%")
     pr_table.add_column("#")
     pr_table.add_column("Cycle", justify="right")
     pr_table.add_column("Active", justify="right")
@@ -194,6 +152,20 @@ def _render_efficiency(report: EfficiencyReport, console: Console) -> None:
             p.title[:60],
         )
     console.print(pr_table)
+
+    _caveats(console, report)
+    _detail_divider(console)
+
+    # ── Compact context ─────────────────────────────────────────
+    rows = [
+        ("Repo", report.input.repo),
+        ("Window", f"{report.input.start} → {report.input.stop}"),
+        ("PRs merged", str(r.pr_count)),
+        ("Total cycle time", _fmt_duration(r.total_cycle)),
+        ("Total active time", _fmt_duration(r.total_active)),
+    ]
+    console.print(_input_table(report, rows))
+    _reproduce(console, report)
 
 
 # ---------------------------------------------------------------------------
@@ -210,32 +182,27 @@ def _render_when_done(report: WhenDoneReport, console: Console) -> None:
     for p in [50, 70, 85, 95]:
         pct.add_row(f"{p}%", str(report.percentiles[p]))
     console.print(pct)
-    console.print("(For the full distribution chart, use --format html.)", style="dim")
 
-    _insight_and_actions(console, report)
+    _caveats(console, report)
     _detail_divider(console)
 
+    t = report.training
     rows = [
         ("Repo", report.input.repo),
         ("Items to complete", str(report.input.items)),
         ("Forecast start", report.input.start_date.isoformat()),
+        (
+            "Training window",
+            f"{t.window_start} → {t.window_end}  "
+            f"({len(t.daily_samples)} days, {t.total_merges} items, "
+            f"{t.avg_per_day:.2f}/day)",
+        ),
         ("Runs", f"{report.simulation.runs:,}"),
         ("Seed", str(report.simulation.seed) if report.simulation.seed is not None else "random"),
     ]
     console.print(_input_table(report, rows))
-
-    t = report.training
-    train = Table(title="Training window — historical throughput we sampled from")
-    train.add_column("Metric")
-    train.add_column("Value", justify="right")
-    train.add_row("Window", f"{t.window_start} → {t.window_end} ({len(t.daily_samples)} days)")
-    train.add_row("Total throughput (items)", str(t.total_merges))
-    train.add_row("Average throughput / day", f"{t.avg_per_day:.2f}")
-    train.add_row("Zero-throughput days", f"{t.zero_days} of {len(t.daily_samples)}")
-    console.print(train)
-
+    console.print("[dim](Distribution chart: use --format html.)[/dim]")
     _reproduce(console, report)
-    _vocabulary(console, report)
 
 
 # ---------------------------------------------------------------------------
@@ -247,36 +214,32 @@ def _render_cfd(report: CfdReport, console: Console) -> None:
     _top(console, report)
 
     if not report.points:
-        _insight_and_actions(console, report)
         _detail_divider(console)
         _reproduce(console, report)
         return
 
     end = report.points[-1]
-    summary = Table(title="Headline numbers")
-    summary.add_column("Metric")
-    summary.add_column("Value", justify="right")
-    for state in report.input.workflow:
-        summary.add_row(f"At end — {state}", str(end.counts_by_state.get(state, 0)))
     arrivals = end.counts_by_state.get(report.input.workflow[0], 0)
     departures = end.counts_by_state.get(report.input.workflow[-1], 0)
-    summary.add_row("WIP at end", str(arrivals - departures))
+    summary = Table(title=f"End-of-window WIP — {arrivals - departures} items")
+    summary.add_column("State")
+    summary.add_column("Count", justify="right")
+    for state in report.input.workflow:
+        summary.add_row(state, str(end.counts_by_state.get(state, 0)))
     console.print(summary)
-    console.print("(For the stacked-area chart, use --format html.)", style="dim")
 
-    _insight_and_actions(console, report)
+    _caveats(console, report)
     _detail_divider(console)
 
     rows = [
         ("Repo", report.input.repo),
         ("Workflow", " → ".join(report.input.workflow)),
         ("Window", f"{report.input.start} → {report.input.stop}"),
-        ("Sample interval (days)", str(report.input.interval_days)),
-        ("Samples", str(len(report.points))),
+        ("Samples", f"{len(report.points)} (every {report.input.interval_days}d)"),
     ]
     console.print(_input_table(report, rows))
+    console.print("[dim](Stacked-area chart: use --format html.)[/dim]")
     _reproduce(console, report)
-    _vocabulary(console, report)
 
 
 def _render_aging(report: AgingReport, console: Console) -> None:
@@ -373,11 +336,11 @@ def _render_how_many(report: HowManyReport, console: Console) -> None:
     for p in [50, 70, 85, 95]:
         pct.add_row(f"{p}%", str(report.percentiles[p]))
     console.print(pct)
-    console.print("(For the full distribution chart, use --format html.)", style="dim")
 
-    _insight_and_actions(console, report)
+    _caveats(console, report)
     _detail_divider(console)
 
+    t = report.training
     days = (report.input.target_date - report.input.start_date).days + 1
     rows = [
         ("Repo", report.input.repo),
@@ -385,20 +348,15 @@ def _render_how_many(report: HowManyReport, console: Console) -> None:
             "Forecast window",
             f"{report.input.start_date} → {report.input.target_date}  ({days} days)",
         ),
+        (
+            "Training window",
+            f"{t.window_start} → {t.window_end}  "
+            f"({len(t.daily_samples)} days, {t.total_merges} items, "
+            f"{t.avg_per_day:.2f}/day)",
+        ),
         ("Runs", f"{report.simulation.runs:,}"),
         ("Seed", str(report.simulation.seed) if report.simulation.seed is not None else "random"),
     ]
     console.print(_input_table(report, rows))
-
-    t = report.training
-    train = Table(title="Training window — historical throughput we sampled from")
-    train.add_column("Metric")
-    train.add_column("Value", justify="right")
-    train.add_row("Window", f"{t.window_start} → {t.window_end} ({len(t.daily_samples)} days)")
-    train.add_row("Total throughput (items)", str(t.total_merges))
-    train.add_row("Average throughput / day", f"{t.avg_per_day:.2f}")
-    train.add_row("Zero-throughput days", f"{t.zero_days} of {len(t.daily_samples)}")
-    console.print(train)
-
+    console.print("[dim](Distribution chart: use --format html.)[/dim]")
     _reproduce(console, report)
-    _vocabulary(console, report)
