@@ -22,25 +22,6 @@
 <p>No CFD samples for this window.</p>
 {% else %}
 
-{# WIP trend banner: the actionable read. Only conditional coloured
-   chrome on the page. #}
-{% if wip_trend.direction != "flat" %}
-<div class="banner" style="background:
-    {%- if wip_trend.direction == 'widening' %} #fef2f2; border-left-color: #cc3333; color: #7f1d1d
-    {%- else %} #ecfdf5; border-left-color: #10b981; color: #064e3b
-    {%- endif %};">
-  {% if wip_trend.direction == "widening" -%}
-  ⚠ WIP gap is <strong>widening</strong>: started at {{ wip_trend.start_wip }} items,
-  ended at {{ wip_trend.end_wip }} (+{{ wip_trend.delta }} over the window).
-  Arrivals are outpacing departures — the queue is growing.
-  {%- else -%}
-  ✓ WIP gap is <strong>narrowing</strong>: started at {{ wip_trend.start_wip }} items,
-  ended at {{ wip_trend.end_wip }} ({{ wip_trend.delta }} over the window).
-  Departures are outpacing arrivals — the queue is shrinking.
-  {%- endif %}
-</div>
-{% endif %}
-
 <div id="cfd-chart" style="width:100%; min-height:380px;"></div>
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -56,10 +37,9 @@
 </script>
 
 <p style="font-size:0.85rem; color:#666">
-{{ end_counts[report.input.workflow[0]] }} arrivals,
-{{ end_counts[report.input.workflow[-1]] }} departures,
-<strong>{{ wip_trend.end_wip }}</strong> WIP at end of window
-({{ report.points|length }} samples).
+Hover anywhere on the chart to see every state's cumulative count
+and WIP (items in flight) for that date. The annotation in the top
+corner tracks WIP from the start to the end of the window.
 </p>
 
 {% endif %}
@@ -83,12 +63,19 @@
 <summary>About this report</summary>
 <p><strong>What this shows.</strong> {{ definition }}</p>
 
-<p><strong>Reading the chart.</strong> Each band's vertical thickness at
-a sample date is the WIP in that workflow state (Vacanti's property #3).
-The slope of any line measures the rate at which items entered that
-state-or-later over time (property #6). The horizontal distance between
-two adjacent lines at a given y-level is the approximate average cycle
-time through the bands between them (property #4).</p>
+<p><strong>How to read the chart.</strong></p>
+<ul style="font-size:0.95rem;">
+  <li>Each line is a running total. The top line is everything that's
+      ever entered the system; the bottom line is everything that's
+      reached "done".</li>
+  <li>The <em>vertical gap</em> between top and bottom at any date is
+      WIP — items in flight at that moment.</li>
+  <li>The <em>steeper</em> a line, the faster items are arriving into
+      that stage.</li>
+  <li>The <em>horizontal gap</em> between two adjacent lines at the same
+      height tells you roughly how long items spent in the stages
+      between them.</li>
+</ul>
 
 {% if interpretation.key_insight %}
 <p><strong>Key insight.</strong> {{ interpretation.key_insight }}</p>

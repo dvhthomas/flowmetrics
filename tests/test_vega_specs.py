@@ -58,6 +58,73 @@ def _item(item_id: str, state: str, age: int, pr_url: str | None = None) -> Agin
     )
 
 
+class TestAgingDistributionSpec:
+    """Horizontal histogram showing count of in-flight items per
+    percentile band — replaces the stacked-100% bar that became
+    illegible when one band dominated (e.g. 94% past P95 collapses
+    the four other bands into tiny slivers)."""
+
+    def _report(self, items_by_age: list[int]) -> AgingReport:
+        return _aging_report([
+            _item(f"#{i}", "Awaiting Review", age)
+            for i, age in enumerate(items_by_age)
+        ])
+
+    def test_top_level_shape_is_vega_lite_v5(self):
+        spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
+        assert spec["$schema"].startswith("https://vega.github.io/schema/vega-lite/")
+
+    def test_one_bar_per_band(self):
+        """Five rows of data — one per percentile band — preserved in
+        the data values even when a band is empty so the axis stays
+        readable."""
+        spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
+        bar_layer = spec["layer"][0] if "layer" in spec else spec
+        values = bar_layer["data"]["values"]
+        bands = [v["band"] for v in values]
+        assert bands == ["Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"]
+
+    def test_band_counts_match_percentile_thresholds(self):
+        """P50=1.7, P70=5.4, P85=17.8, P95=57.4 (from _aging_report).
+        Items: ages 1, 5, 60 - one in each of Below P50, P50-P70,
+        Above P95. The histogram should show those counts."""
+        spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
+        bar_layer = spec["layer"][0] if "layer" in spec else spec
+        values = bar_layer["data"]["values"]
+        by_band = {v["band"]: v["count"] for v in values}
+        assert by_band["Below P50"] == 1
+        assert by_band["P50–P70"] == 1
+        assert by_band["P70–P85"] == 0
+        assert by_band["P85–P95"] == 0
+        assert by_band["Above P95"] == 1
+
+    def test_horizontal_bars_with_band_on_y_count_on_x(self):
+        """Y carries the band name (ordinal, sorted by severity),
+        X carries the count (quantitative). Axes are labeled."""
+        spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
+        bar_layer = spec["layer"][0] if "layer" in spec else spec
+        encoding = bar_layer["encoding"]
+        assert encoding["y"]["field"] == "band"
+        assert encoding["x"]["field"] == "count"
+        assert encoding["x"]["type"] == "quantitative"
+        assert "items" in encoding["x"]["axis"]["title"].lower() or \
+               "count" in encoding["x"]["axis"]["title"].lower()
+
+    def test_color_uses_single_sequential_scheme(self):
+        """Single color scheme (sequential YlOrRd) — the percentile
+        gradient is intrinsic, severity rises with darker shade. Not
+        five different unrelated colors."""
+        spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
+        bar_layer = spec["layer"][0] if "layer" in spec else spec
+        color = bar_layer["encoding"]["color"]
+        scale = color.get("scale", {})
+        # Either a sequential `scheme` or an explicit ordered range
+        # that walks one hue family — both satisfy "single scheme".
+        assert "scheme" in scale, (
+            f"Expected a single sequential color scheme, got {scale}"
+        )
+
+
 class TestAgingSpec:
     def test_top_level_shape_is_vega_lite_v5(self):
         spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
@@ -736,6 +803,72 @@ class TestCfdSpec:
         assert "items" in area_layer["encoding"]["y"]["axis"]["title"].lower() or \
                "WIP" in area_layer["encoding"]["y"]["axis"]["title"] or \
                "Count" in area_layer["encoding"]["y"]["axis"]["title"]
+
+    def test_hover_layer_shows_all_state_counts_for_the_hovered_date(self):
+        """Hovering on the CFD must surface every workflow state's
+        cumulative count at the hovered date in a single tooltip — not
+        just the count for the band under the cursor. Implementation:
+        a separate hover layer (rule or point) carrying a wide-format
+        pivot transform so its tooltip can list one row per state plus
+        the WIP gap."""
+        workflow = ("Open", "In Progress", "Done")
+        spec = vega_specs.cfd_spec(_cfd_report(
+            [(date(2026, 5, 1), {"Open": 5, "In Progress": 2, "Done": 1}),
+             (date(2026, 5, 8), {"Open": 9, "In Progress": 3, "Done": 4})],
+            workflow=workflow,
+        ))
+        hover_layers = [
+            layer for layer in spec["layer"]
+            if any(
+                isinstance(t, dict) and "pivot" in t
+                for t in layer.get("transform", [])
+            )
+        ]
+        assert hover_layers, (
+            "Expected a hover layer with a pivot transform that widens "
+            "the long-format data so every state appears in one tooltip."
+        )
+        hover = hover_layers[0]
+        # The pivot must produce one column per workflow state.
+        pivot = next(t for t in hover["transform"] if "pivot" in t)
+        assert pivot["pivot"] == "state"
+        assert pivot["value"] == "count"
+        # The tooltip must reference each state name as a field.
+        tooltip = hover["encoding"]["tooltip"]
+        tooltip_fields = {t["field"] for t in tooltip if "field" in t}
+        for state in workflow:
+            assert state in tooltip_fields, (
+                f"Multi-row tooltip must include state {state!r}; "
+                f"got fields {tooltip_fields}"
+            )
+        # And the WIP gap (top minus bottom) belongs in the tooltip too —
+        # the actionable signal the prose banner used to carry.
+        assert any(
+            "WIP" in (t.get("title", "") or "")
+            for t in tooltip
+        ), "Tooltip must include a 'WIP' row (top-state minus bottom-state)."
+
+    def test_wip_gap_annotation_marks_start_and_end_of_window(self):
+        """The WIP-trend signal (gap at start vs end) used to live in a
+        prose banner whose connection to the chart was invisible. Move
+        the signal onto the chart: a labeled vertical span at the right
+        edge showing end-WIP and a comparable label at the left edge
+        showing start-WIP."""
+        spec = vega_specs.cfd_spec(_cfd_report(
+            [(date(2026, 5, 1), {"Open": 5, "Done": 0}),
+             (date(2026, 5, 14), {"Open": 10, "Done": 10})],
+            workflow=("Open", "Done"),
+        ))
+        # An annotation layer carries text marks with the gap values.
+        text_layers = [
+            layer for layer in spec["layer"]
+            if (layer["mark"]["type"] if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "text"
+        ]
+        assert text_layers, (
+            "Expected a text-mark layer carrying labeled WIP-gap "
+            "annotations at the left and right edges of the window."
+        )
 
     def test_state_index_calculate_is_valid_javascript_ternary(self):
         """Vega evaluates `calculate` strings with `new Function()`. A

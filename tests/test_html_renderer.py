@@ -259,13 +259,68 @@ class TestCfdHtmlRedesign:
         out = html_renderer.render(_cfd_report())
         assert "Headline numbers" not in out
 
-    def test_wip_trend_indicator_present(self):
+    def test_wip_trend_visible_on_chart_when_widening(self):
+        """The WIP trend signal lives ON the chart as a labeled
+        annotation (e.g. "WIP 5 → 15 ▲"), not in a prose banner above
+        it. The triangle arrow encodes direction; the start → end
+        numbers carry the magnitude."""
         out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
-        assert "widening" in out.lower() or "growing" in out.lower()
+        assert "5 → 15" in out
+        assert "▲" in out  # ▲ growth marker
 
-    def test_wip_trend_indicator_shows_narrowing_when_wip_drops(self):
+    def test_wip_trend_visible_on_chart_when_narrowing(self):
         out = html_renderer.render(_cfd_report(start_wip=20, end_wip=5))
-        assert "narrow" in out.lower() or "shrink" in out.lower()
+        assert "20 → 5" in out
+        assert "▼" in out  # ▼ shrink marker
+
+    def test_no_prose_wip_trend_banner(self):
+        """The old conditional banner ('WIP gap is widening / narrowing
+        ... arrivals are outpacing departures') is gone — its
+        connection to the chart wasn't visible. Signal now lives in
+        the chart annotation + hover tooltip."""
+        out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
+        assert "outpacing" not in out.lower()
+        assert "queue is growing" not in out.lower()
+        assert "queue is shrinking" not in out.lower()
+
+
+class TestVacantiMentionsLimited:
+    """The CFD/Aging/forecast methods aren't Vacanti's inventions —
+    they're standard kanban/percentile/Monte-Carlo techniques he
+    happened to write a popular book about. Keep a single citation
+    per report; strip 'per Vacanti', 'Vacanti's recipe / framing /
+    property #N', etc. from every other surface (headlines, key
+    insights, next-actions, caveats, inline prose)."""
+
+    def _count_vacanti(self, html: str) -> int:
+        # Case-insensitive count
+        import re as _re
+        return len(_re.findall(r"vacanti", html, _re.IGNORECASE))
+
+    def test_efficiency_report_has_at_most_one_vacanti_mention(self):
+        out = html_renderer.render(_efficiency_report())
+        n = self._count_vacanti(out)
+        assert n <= 1, f"efficiency report has {n} Vacanti mentions, expected ≤ 1"
+
+    def test_aging_report_has_at_most_one_vacanti_mention(self):
+        out = html_renderer.render(_aging_report_with_distribution())
+        n = self._count_vacanti(out)
+        assert n <= 1, f"aging report has {n} Vacanti mentions, expected ≤ 1"
+
+    def test_cfd_report_has_at_most_one_vacanti_mention(self):
+        out = html_renderer.render(_cfd_report())
+        n = self._count_vacanti(out)
+        assert n <= 1, f"cfd report has {n} Vacanti mentions, expected ≤ 1"
+
+    def test_when_done_report_has_at_most_one_vacanti_mention(self):
+        out = html_renderer.render(_when_done_report())
+        n = self._count_vacanti(out)
+        assert n <= 1, f"when-done report has {n} Vacanti mentions, expected ≤ 1"
+
+    def test_how_many_report_has_at_most_one_vacanti_mention(self):
+        out = html_renderer.render(_how_many_report())
+        n = self._count_vacanti(out)
+        assert n <= 1, f"how-many report has {n} Vacanti mentions, expected ≤ 1"
 
 
 class TestEfficiencyHtmlRedesign:
@@ -327,6 +382,30 @@ class TestEfficiencyHtmlRedesign:
     def test_headline_numbers_table_removed(self):
         out = html_renderer.render(_efficiency_report())
         assert "Headline numbers" not in out
+
+    def test_activity_inference_assumptions_visible_above_the_fold(self):
+        """For GitHub PRs we don't have direct 'active' state — active
+        time is INFERRED from the timing of commits/reviews/comments.
+        The two parameters that drive that inference (gap-hours and
+        min-cluster-minutes) can swing the FE number dramatically, so
+        they need to be visible BEFORE the reader treats the number as
+        a precise measurement — not buried in the About collapsible.
+
+        Concretely: a callout block in the main content (before the
+        chart and before any <details> collapsible) names both values
+        and the assumption pattern."""
+        out = html_renderer.render(_efficiency_report())
+        # Locate the first <details> tag — anything ABOVE that is the
+        # visible-by-default region.
+        first_details = out.find("<details")
+        assert first_details > 0
+        above_fold = out[:first_details]
+        # Both load-bearing parameters must be named in the visible
+        # region, alongside language clarifying they're assumptions.
+        assert "4.0" in above_fold or "gap" in above_fold.lower()
+        assert ("assumption" in above_fold.lower()
+                or "inferred" in above_fold.lower()
+                or "estimate" in above_fold.lower())
 
     def test_slowest_prs_panel_present_with_named_items(self):
         """The slowest PRs are the system-level bottleneck per Vacanti's

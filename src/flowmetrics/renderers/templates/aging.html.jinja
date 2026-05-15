@@ -30,40 +30,55 @@
 <p>No in-flight items as of {{ report.input.asof }}.</p>
 {% else %}
 
-{# ── Distribution stacked bar: situation snapshot. The shape — left-
-       light / right-heavy — IS the signal. Color-blind safe palette
-       (ColorBrewer YlOrRd, monotonic luminance) + inline count/% text
-       so the bar reads in grayscale and via screen readers. ── #}
-<div class="dist-bar" role="img" aria-label="{{ bar_aria }}">
-  {% for band in aging_distribution %}
-  {% if band.count > 0 %}
-  <div class="seg"
-       style="width: {{ (band.share * 100) | round(2) }}%;
-              background: {{ band.bg }}; color: {{ band.fg }};"
-       title="{{ band.label }}: {{ band.count }} ({{ (band.share * 100) | round(0, 'common') | int }}%)">
-    {{ band.count }} · {{ (band.share * 100) | round(0, 'common') | int }}%
-  </div>
-  {% endif %}
-  {% endfor %}
+{# Framing callout — sets expectations before the reader sees PR
+   numbers and starts judging individuals. The aging chart is a
+   standup tool for the team; an item past forecast is a group
+   problem to solve, not an individual to call out. #}
+<div style="background:#eef4ff; border-left:4px solid #3b6fb8;
+            padding:0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+            font-size:0.92rem; color:#1f3a5f; max-width:70ch;">
+  <strong>How to use this in a standup.</strong> Walk the chart with
+  the team, not the individual. An item past P85 means the
+  <em>team</em> is about to miss its forecast — swarm, split,
+  expedite, or drop. Resist the temptation to attribute an aging
+  item to whoever happens to be assigned: the chart measures the
+  system, not the person.
 </div>
-<div class="dist-legend">
-  {% for band in aging_distribution %}
-    <span><span class="swatch" style="background: {{ band.bg }}"></span>{{ band.label }}
-      {%- if band.lower is none %} (&lt; {{ "%.1f"|format(band.upper) }}d)
-      {%- elif band.upper is none %} (≥ {{ "%.1f"|format(band.lower) }}d)
-      {%- else %} ({{ "%.1f"|format(band.lower) }}–{{ "%.1f"|format(band.upper) }}d)
-      {%- endif -%}
-    </span>
-  {% endfor %}
-</div>
-<p style="font-size:0.85rem; color:#666; margin: 0.3rem 0 1rem;">
-{{ report.items|length }} in flight
-{%- if report.in_flight_total != report.items|length %}
- (excluded {{ report.excluded_above_max_age }} with age > {{ report.input.max_age_days }}d
-  from a pool of {{ report.in_flight_total }})
-{%- endif -%}
-. Thresholds: observed cycle times of {{ report.completed_count }} PRs that
-merged {{ report.input.history_start }} → {{ report.input.history_end }}.
+
+{# ── Distribution histogram: one horizontal bar per percentile band.
+       Replaces an earlier stacked-100% bar that collapsed badly when a
+       single band dominated. Length is proportional to count so a
+       5-item band stays visible next to a 365-item band. Sequential
+       YlOrRd palette keeps the severity gradient legible in grayscale
+       and color-blind safe. ── #}
+<h2>Distribution by percentile band</h2>
+<div id="aging-dist-chart" role="img" aria-label="{{ bar_aria }}"
+     style="width:100%; min-height:200px;"></div>
+<script>
+  vegaEmbed("#aging-dist-chart", {{ aging_distribution_spec_json | safe }}, {
+    actions: false,
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("aging-dist-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+<p style="font-size:0.85rem; color:#666; max-width:65ch; margin: 0.6rem 0 1.2rem;">
+Each bar counts in-flight PRs whose age sits inside that band's
+cycle-time range. Thresholds come from the
+{{ report.completed_count }} PRs that merged
+{{ report.input.history_start }} → {{ report.input.history_end }}:
+  {%- for band in aging_distribution %}
+    {%- if band.lower is none %} below {{ "%.1f"|format(band.upper) }}d
+    {%- elif band.upper is none %}; ≥ {{ "%.1f"|format(band.lower) }}d
+    {%- else %}; {{ "%.1f"|format(band.lower) }}–{{ "%.1f"|format(band.upper) }}d
+    {%- endif -%}
+  {%- endfor -%}.
+{% if report.in_flight_total != report.items|length %}
+{{ report.items|length }} of {{ report.in_flight_total }} items shown —
+{{ report.excluded_above_max_age }} excluded with age >
+{{ report.input.max_age_days }}d.
+{% endif %}
 </p>
 
 {# ── Interactive chart, named for navigation by heading. ──────────── #}
@@ -144,9 +159,9 @@ merged {{ report.input.history_start }} → {{ report.input.history_end }}.
 <strong>At risk</strong> = items past the 50th-percentile cycle time
 but not yet past the 85th. By conditional probability, an item past
 P50 has at least double the starting chance of also missing the 85th-
-percentile forecast (≥30% versus 15% at age 0). Per Vacanti's
-<em>WWIBD</em> recipe, this is the cohort that needs a conversation
-NOW — while there's time to swarm, split, or escalate.
+percentile forecast (≥30% versus 15% at age 0). This is the cohort
+that needs a conversation NOW — while there's time to swarm, split,
+or escalate.
 </p>
 
 {% endif %}
@@ -220,22 +235,18 @@ NOW — while there's time to swarm, split, or escalate.
 <h3>How to read the percentile lines</h3>
 <p>
 The four threshold lines on the chart are <strong>observed cycle
-times</strong> of PRs that actually merged in the training window —
-exactly the same percentile values as Vacanti's Scatterplot. No
+times</strong> of PRs that actually merged in the training window. No
 simulation, no Monte Carlo: take the {{ report.completed_count }} PRs that
 merged in this window, sort their actual cycle times, pick the values
 at rank 50%, 70%, 85%, and 95%.
 </p>
 <p>
-The actionable framing — Vacanti's recipe in <em>When Will It Be
-Done?</em> — is to read each line as a conditional-probability
-checkpoint. (The math is standard; Vacanti's contribution is applying
-it to the Aging chart.) Pick the 85th percentile as your forecast: a
-new PR starts with a 15% chance of violating it (by definition of the
-85th-percentile rule). When that PR's age crosses the 50th percentile
-<em>without</em> finishing, it has self-selected out of the fast half —
-its remaining chance of also exceeding the 85th-percentile threshold
-has doubled to 30%.
+Read each line as a conditional-probability checkpoint. Pick the
+85th percentile as your forecast: a new PR starts with a 15% chance
+of violating it (by definition of the 85th-percentile rule). When
+that PR's age crosses the 50th percentile <em>without</em> finishing,
+it has self-selected out of the fast half — its remaining chance of
+exceeding the 85th-percentile threshold has doubled to 30%.
 </p>
 <p>
 The arithmetic, with the population framed as 100 PRs:

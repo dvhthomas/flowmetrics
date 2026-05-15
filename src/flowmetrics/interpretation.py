@@ -74,7 +74,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
 
     if portfolio < 0.10:
         key_insight = (
-            f"This is in Vacanti's typical 5-15% range for knowledge work — most clock time "
+            f"This is in the typical 5-15% range for knowledge work — most clock time "
             f"is wait, not active. Slowest PR ({slowest.item_id})  ran "
             f"{slowest.cycle_time.total_seconds() / 86400:.1f}d and dominates the ratio."
         )
@@ -258,7 +258,7 @@ def interpret_how_many(
 
 def interpret_cfd(input: CfdInput, points: list[CfdPoint]) -> Interpretation:
     caveats = [
-        "Past data only — Vacanti's CFD property #5. The chart does not "
+        "Past data only — the chart does not "
         "project forward.",
         "Items still in flight may be under-represented when the source "
         "only fetches completed work. Wider bands today may grow tomorrow.",
@@ -311,7 +311,7 @@ def interpret_cfd(input: CfdInput, points: list[CfdPoint]) -> Interpretation:
         if widest[1] > 0:
             key_insight = (
                 f"Largest WIP band is '{widest[0]}' with {widest[1]} items at "
-                f"{_prose_date(end_point.sampled_on)}. Per Vacanti property "
+                f"{_prose_date(end_point.sampled_on)}. The widest band "
                 "#3 (vertical distance = WIP in that band), the widest band "
                 "is where work piles up — look there for the bottleneck. "
                 "Property #6 (slope = average arrival rate) tells you the "
@@ -472,7 +472,7 @@ def interpret_aging(
         ids = ", ".join(i.item_id for i in oldest)
         key_insight = (
             f"{len(past_p85)} item(s) have aged past the P85 cycle time "
-            f"({p85:.1f}d) — Vacanti's threshold for likely forecast miss. "
+            f"({p85:.1f}d) — items in this band have a high chance of missing the 85% forecast. "
             f"Oldest: {ids}. Concentrate decision-making here."
         )
     else:

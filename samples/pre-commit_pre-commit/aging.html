@@ -87,30 +87,40 @@
 <p class="subtitle">
   for <a href="https://github.com/pre-commit/pre-commit">pre-commit/pre-commit</a> ·
   as of May 15, 2026 ·
-  <span class="stamp">generated 2026-05-15 10:23 MDT</span>
+  <span class="stamp">generated 2026-05-15 13:14 MDT</span>
 </p>
 
 
 
 
-<div class="dist-bar" role="img" aria-label="Aging distribution by percentile band: Above P95 6 (100%)">
-  <div class="seg"
-       style="width: 100.0%;
-              background: #a30019; color: #ffffff;"
-       title="Above P95: 6 (100%)">
-    6 · 100%
-  </div>
+<div style="background:#eef4ff; border-left:4px solid #3b6fb8;
+            padding:0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+            font-size:0.92rem; color:#1f3a5f; max-width:70ch;">
+  <strong>How to use this in a standup.</strong> Walk the chart with
+  the team, not the individual. An item past P85 means the
+  <em>team</em> is about to miss its forecast — swarm, split,
+  expedite, or drop. Resist the temptation to attribute an aging
+  item to whoever happens to be assigned: the chart measures the
+  system, not the person.
 </div>
-<div class="dist-legend">
-    <span><span class="swatch" style="background: #ffeda0"></span>Below P50 (&lt; 0.0d)</span>
-    <span><span class="swatch" style="background: #fed976"></span>P50–P70 (0.0–0.8d)</span>
-    <span><span class="swatch" style="background: #fd8d3c"></span>P70–P85 (0.8–1.1d)</span>
-    <span><span class="swatch" style="background: #d6361a"></span>P85–P95 (1.1–1.1d)</span>
-    <span><span class="swatch" style="background: #a30019"></span>Above P95 (≥ 1.1d)</span>
-</div>
-<p style="font-size:0.85rem; color:#666; margin: 0.3rem 0 1rem;">
-6 in flight. Thresholds: observed cycle times of 5 PRs that
-merged 2026-04-15 → 2026-05-14.
+
+<h2>Distribution by percentile band</h2>
+<div id="aging-dist-chart" role="img" aria-label="Aging distribution by percentile band: Above P95 6 (100%)"
+     style="width:100%; min-height:200px;"></div>
+<script>
+  vegaEmbed("#aging-dist-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": {"step": 32}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar"}, "data": {"values": [{"band": "Below P50", "count": 0, "share": 0.0}, {"band": "P50–P70", "count": 0, "share": 0.0}, {"band": "P70–P85", "count": 0, "share": 0.0}, {"band": "P85–P95", "count": 0, "share": 0.0}, {"band": "Above P95", "count": 6, "share": 1.0}]}, "encoding": {"y": {"field": "band", "type": "ordinal", "sort": ["Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"], "axis": {"title": "Percentile band", "titleFontWeight": "bold"}}, "x": {"field": "count", "type": "quantitative", "axis": {"title": "In-flight items", "titleFontWeight": "bold"}}, "color": {"field": "band", "type": "ordinal", "sort": ["Below P50", "P50–P70", "P70–P85", "P85–P95", "Above P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}, "tooltip": [{"field": "band", "title": "Band"}, {"field": "count", "title": "Items"}, {"field": "share", "title": "Share", "format": ".0%"}]}}]}, {
+    actions: false,
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("aging-dist-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+<p style="font-size:0.85rem; color:#666; max-width:65ch; margin: 0.6rem 0 1.2rem;">
+Each bar counts in-flight PRs whose age sits inside that band's
+cycle-time range. Thresholds come from the
+5 PRs that merged
+2026-04-15 → 2026-05-14: below 0.0d; 0.0–0.8d; 0.8–1.1d; 1.1–1.1d; ≥ 1.1d.
 </p>
 
 <h2>WIP Aging</h2>
@@ -119,7 +129,7 @@ merged 2026-04-15 → 2026-05-14.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#aging-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 360, "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04}, "data": {"values": [{"state": "Draft"}, {"state": "Changes Requested"}]}, "encoding": {"x": {"field": "state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}, {"mark": {"type": "circle", "size": 60, "opacity": 0.5}, "data": {"values": [{"item_id": "#3617", "title": "feature: fetch tag pointing to HEAD in shallow clone", "current_state": "Awaiting Review", "age_days": 98, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3617"}, {"item_id": "#3605", "title": "use git cat-file -e instead of git rev-list in _rev_exists", "current_state": "Changes Requested", "age_days": 140, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3605"}, {"item_id": "#3498", "title": "Julia: support `language_version`", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3498"}, {"item_id": "#3497", "title": "Julia: copy src files", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3497"}, {"item_id": "#3460", "title": "fix: Proper way of finding `npm pack` `filename` output.", "current_state": "Awaiting Review", "age_days": 371, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3460"}, {"item_id": "#3427", "title": "Fix pre-push after rebase", "current_state": "Awaiting Review", "age_days": 427, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3427"}]}, "transform": [{"calculate": "random()", "as": "jitter"}], "params": [{"name": "zoom", "select": {"type": "interval", "encodings": ["y"]}, "bind": "scales"}], "encoding": {"x": {"field": "current_state", "type": "nominal", "axis": {"title": "WIP Stage", "labelAngle": 0, "titleFontWeight": "bold", "titlePadding": 8}, "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"field": "age_days", "type": "quantitative", "axis": {"title": "Age (days)"}}, "xOffset": {"field": "jitter", "type": "quantitative"}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "current_state", "title": "State"}, {"field": "age_days", "title": "Age (d)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "bottom", "fontWeight": "bold", "fontSize": 12, "dy": -6}, "data": {"values": [{"current_state": "Draft", "count": 0, "label": "0 \u00b7 0%"}, {"current_state": "Awaiting Review", "count": 5, "label": "5 \u00b7 83%"}, {"current_state": "Changes Requested", "count": 1, "label": "1 \u00b7 17%"}, {"current_state": "Approved", "count": 0, "label": "0 \u00b7 0%"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"value": 0}, "text": {"field": "label"}}}]}, {
+  vegaEmbed("#aging-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 360, "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04}, "data": {"values": [{"state": "Draft"}, {"state": "Changes Requested"}]}, "encoding": {"x": {"field": "state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}, {"mark": {"type": "circle", "size": 60, "opacity": 0.5}, "data": {"values": [{"item_id": "#3617", "title": "feature: fetch tag pointing to HEAD in shallow clone", "current_state": "Awaiting Review", "age_days": 98, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3617"}, {"item_id": "#3605", "title": "use git cat-file -e instead of git rev-list in _rev_exists", "current_state": "Changes Requested", "age_days": 140, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3605"}, {"item_id": "#3498", "title": "Julia: support `language_version`", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3498"}, {"item_id": "#3497", "title": "Julia: copy src files", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3497"}, {"item_id": "#3460", "title": "fix: Proper way of finding `npm pack` `filename` output.", "current_state": "Awaiting Review", "age_days": 371, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3460"}, {"item_id": "#3427", "title": "Fix pre-push after rebase", "current_state": "Awaiting Review", "age_days": 427, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3427"}]}, "transform": [{"calculate": "random()", "as": "jitter"}], "params": [{"name": "zoom", "select": {"type": "interval", "encodings": ["y"]}, "bind": "scales"}], "encoding": {"x": {"field": "current_state", "type": "nominal", "axis": {"title": "WIP Stage", "labelAngle": 0, "titleFontWeight": "bold", "titlePadding": 8}, "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"field": "age_days", "type": "quantitative", "axis": {"title": "Age (days)"}}, "xOffset": {"field": "jitter", "type": "quantitative"}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "current_state", "title": "State"}, {"field": "age_days", "title": "Age (d)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "bottom", "fontWeight": "bold", "fontSize": 12, "dy": -6}, "data": {"values": [{"current_state": "Draft", "count": 0, "label": "0 · 0%"}, {"current_state": "Awaiting Review", "count": 5, "label": "5 · 83%"}, {"current_state": "Changes Requested", "count": 1, "label": "1 · 17%"}, {"current_state": "Approved", "count": 0, "label": "0 · 0%"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"value": 0}, "text": {"field": "label"}}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -212,9 +222,9 @@ merged 2026-04-15 → 2026-05-14.
 <strong>At risk</strong> = items past the 50th-percentile cycle time
 but not yet past the 85th. By conditional probability, an item past
 P50 has at least double the starting chance of also missing the 85th-
-percentile forecast (≥30% versus 15% at age 0). Per Vacanti's
-<em>WWIBD</em> recipe, this is the cohort that needs a conversation
-NOW — while there's time to swarm, split, or escalate.
+percentile forecast (≥30% versus 15% at age 0). This is the cohort
+that needs a conversation NOW — while there's time to swarm, split,
+or escalate.
 </p>
 
 
@@ -286,27 +296,23 @@ NOW — while there's time to swarm, split, or escalate.
 
 <details>
 <summary>About this report</summary>
-<p><strong>What this shows.</strong> Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items — read horizontally as risk thresholds: an item aging past P85 likely misses its forecast. See *When Will It Be Done?* by Daniel Vacanti.</p>
+<p><strong>What this shows.</strong> Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items — read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.</p>
 
 <h3>How to read the percentile lines</h3>
 <p>
 The four threshold lines on the chart are <strong>observed cycle
-times</strong> of PRs that actually merged in the training window —
-exactly the same percentile values as Vacanti's Scatterplot. No
+times</strong> of PRs that actually merged in the training window. No
 simulation, no Monte Carlo: take the 5 PRs that
 merged in this window, sort their actual cycle times, pick the values
 at rank 50%, 70%, 85%, and 95%.
 </p>
 <p>
-The actionable framing — Vacanti's recipe in <em>When Will It Be
-Done?</em> — is to read each line as a conditional-probability
-checkpoint. (The math is standard; Vacanti's contribution is applying
-it to the Aging chart.) Pick the 85th percentile as your forecast: a
-new PR starts with a 15% chance of violating it (by definition of the
-85th-percentile rule). When that PR's age crosses the 50th percentile
-<em>without</em> finishing, it has self-selected out of the fast half —
-its remaining chance of also exceeding the 85th-percentile threshold
-has doubled to 30%.
+Read each line as a conditional-probability checkpoint. Pick the
+85th percentile as your forecast: a new PR starts with a 15% chance
+of violating it (by definition of the 85th-percentile rule). When
+that PR's age crosses the 50th percentile <em>without</em> finishing,
+it has self-selected out of the fast half — its remaining chance of
+exceeding the 85th-percentile threshold has doubled to 30%.
 </p>
 <p>
 The arithmetic, with the population framed as 100 PRs:

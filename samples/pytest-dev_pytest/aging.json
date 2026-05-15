@@ -1,9 +1,9 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T10:23:10.484178-06:00",
+  "generated_at": "2026-05-15T13:14:36.742553-06:00",
   "headline": "WIP Aging for pytest-dev/pytest as of May 15, 2026: 128 in-flight items, 114 already past P85 (19.6d), 108 past P95 (56.8d).",
-  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast. See *When Will It Be Done?* by Daniel Vacanti.",
+  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 128,
     "in_flight_total": 128,
@@ -184,7 +184,7 @@
       }
     ]
   },
-  "key_insight": "114 item(s) have aged past the P85 cycle time (19.6d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #7941, #8056, #8358. Concentrate decision-making here.",
+  "key_insight": "114 item(s) have aged past the P85 cycle time (19.6d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #7941, #8056, #8358. Concentrate decision-making here.",
   "next_actions": [
     "108 item(s) past P95 (56.8d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Awaiting Review' with 61 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",

@@ -1,9 +1,9 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T10:23:23.836787-06:00",
+  "generated_at": "2026-05-15T13:14:50.128067-06:00",
   "headline": "WIP Aging for jira:BIGTOP as of May 15, 2026: 726 in-flight items, 722 already past P85 (84.5d), 700 past P95 (581.9d).",
-  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast. See *When Will It Be Done?* by Daniel Vacanti.",
+  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 726,
     "in_flight_total": 726,
@@ -154,7 +154,7 @@
       }
     ]
   },
-  "key_insight": "722 item(s) have aged past the P85 cycle time (84.5d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: BIGTOP-22, BIGTOP-39, BIGTOP-41. Concentrate decision-making here.",
+  "key_insight": "722 item(s) have aged past the P85 cycle time (84.5d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: BIGTOP-22, BIGTOP-39, BIGTOP-41. Concentrate decision-making here.",
   "next_actions": [
     "700 item(s) past P95 (581.9d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Open' with 664 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",

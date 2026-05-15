@@ -51,7 +51,10 @@ def _safe_json_for_script_tag(obj: object) -> str:
     their `\\uXXXX` JSON escape sequences — valid JSON, safe HTML.
     """
     return (
-        json.dumps(obj)
+        # ensure_ascii=False keeps multibyte chars (arrows, glyphs)
+        # readable in the source HTML; we still escape the three chars
+        # that would break out of a script tag.
+        json.dumps(obj, ensure_ascii=False)
         .replace("<", "\\u003c")
         .replace(">", "\\u003e")
         .replace("&", "\\u0026")
@@ -179,9 +182,6 @@ def _render_cfd(report: CfdReport) -> str:
     from . import vega_specs
 
     template = _env.get_template("cfd.html.jinja")
-    end_counts: dict[str, int] = (
-        dict(report.points[-1].counts_by_state) if report.points else {}
-    )
     repo_url = _repo_url(report.input.repo)
     return template.render(
         title=report_title(report),
@@ -192,40 +192,11 @@ def _render_cfd(report: CfdReport) -> str:
         invocation=cli_invocation(report),
         vocabulary=report_vocabulary(report),
         report=report,
-        end_counts=end_counts,
-        wip_trend=_cfd_wip_trend(report),
         vega_spec_json=(
             _safe_json_for_script_tag(vega_specs.cfd_spec(report))
             if report.points else ""
         ),
     )
-
-
-def _cfd_wip_trend(report: CfdReport) -> dict:
-    """WIP gap (arrivals minus departures) at the start vs end of the window.
-    The actionable read on a CFD: is the queue growing or shrinking?"""
-    if not report.points:
-        return {"direction": "flat", "start_wip": 0, "end_wip": 0, "delta": 0}
-    workflow = report.input.workflow
-    arrivals_state = workflow[0]
-    departures_state = workflow[-1]
-    first = report.points[0].counts_by_state
-    last = report.points[-1].counts_by_state
-    start_wip = first.get(arrivals_state, 0) - first.get(departures_state, 0)
-    end_wip = last.get(arrivals_state, 0) - last.get(departures_state, 0)
-    delta = end_wip - start_wip
-    if delta > 0:
-        direction = "widening"
-    elif delta < 0:
-        direction = "narrowing"
-    else:
-        direction = "flat"
-    return {
-        "direction": direction,
-        "start_wip": start_wip,
-        "end_wip": end_wip,
-        "delta": delta,
-    }
 
 
 def _render_aging(report: AgingReport) -> str:
@@ -313,6 +284,10 @@ def _render_aging(report: AgingReport) -> str:
         other_caveats=other_caveats,
         vega_spec_json=(
             _safe_json_for_script_tag(vega_specs.aging_spec(report))
+            if report.items else ""
+        ),
+        aging_distribution_spec_json=(
+            _safe_json_for_script_tag(vega_specs.aging_distribution_spec(report))
             if report.items else ""
         ),
     )

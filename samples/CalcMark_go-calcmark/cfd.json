@@ -1,9 +1,9 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T10:23:17.878215-06:00",
+  "generated_at": "2026-05-15T13:14:44.090454-06:00",
   "headline": "CFD for CalcMark/go-calcmark Apr 15, 2026 \u2192 May 14, 2026: 20 items arrived, 20 completed, 0 still in flight at end.",
-  "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
+  "definition": "Cumulative Flow Diagram: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
     "workflow": [
       "Open",
@@ -20,7 +20,7 @@
     "Compare band widths to the previous window to spot accumulation trends."
   ],
   "caveats": [
-    "Past data only \u2014 Vacanti's CFD property #5. The chart does not project forward.",
+    "Past data only \u2014 the chart does not project forward.",
     "Items still in flight may be under-represented when the source only fetches completed work. Wider bands today may grow tomorrow.",
     "Workflow used: Open \u2192 Merged. Items that visit statuses outside this list are silently skipped at those points."
   ],
@@ -28,7 +28,7 @@
     "Cumulative Flow Diagram": "Stacked area chart of cumulative counts per workflow state over time. Each state's line counts items that have entered that state or any later one \u2014 so the lines never cross and never decrease.",
     "Arrivals": "Top line of a CFD. Cumulative count of items that have entered the workflow (first state) by each sample date. Slope = arrival rate.",
     "Departures": "Bottom line of a CFD. Cumulative count of items that have exited the workflow (last state) by each sample date. Slope = throughput.",
-    "WIP": "Work In Progress. Vertical distance between two adjacent CFD lines at a sample date = items currently in that workflow band. Per Vacanti's CFD property #3.",
+    "WIP": "Work In Progress. Vertical distance between two adjacent CFD lines at a sample date = items currently in that workflow band. Per (see DECISIONS.md for the math).",
     "Workflow state": "A named stage in your delivery process (e.g., Open, In Progress, Done). CFDs require an ordered list \u2014 earliest stage to latest."
   },
   "chart_data": {

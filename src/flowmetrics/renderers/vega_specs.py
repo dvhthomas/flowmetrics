@@ -146,16 +146,81 @@ def how_many_spec(report: HowManyReport) -> dict[str, Any]:
     )
 
 
+def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:
+    """Horizontal histogram of in-flight items per percentile band.
+
+    Replaces the earlier stacked-100% bar: when one band dominates
+    (e.g. 94% above P95), the smaller bands collapse into illegible
+    slivers. A simple horizontal bar chart keeps each band's count
+    proportional to the count, not to the share, so a 5-item band is
+    visible next to a 365-item band.
+
+    Single sequential color scheme (YlOrRd) preserves the percentile
+    severity gradient while keeping the chart visually unified.
+    """
+    from ..aging import compute_aging_distribution
+
+    dist = compute_aging_distribution(report.items, report.cycle_time_percentiles)
+    band_order = [b["label"] for b in dist]
+    values = [
+        {
+            "band": b["label"],
+            "count": b["count"],
+            "share": b["share"],
+        }
+        for b in dist
+    ]
+
+    bar_layer = {
+        "mark": {"type": "bar"},
+        "data": {"values": values},
+        "encoding": {
+            "y": {
+                "field": "band",
+                "type": "ordinal",
+                "sort": band_order,
+                "axis": {"title": "Percentile band", "titleFontWeight": "bold"},
+            },
+            "x": {
+                "field": "count",
+                "type": "quantitative",
+                "axis": {"title": "In-flight items", "titleFontWeight": "bold"},
+            },
+            "color": {
+                "field": "band",
+                "type": "ordinal",
+                "sort": band_order,
+                "scale": {"scheme": "yelloworangered"},
+                "legend": None,
+            },
+            "tooltip": [
+                {"field": "band", "title": "Band"},
+                {"field": "count", "title": "Items"},
+                {"field": "share", "title": "Share", "format": ".0%"},
+            ],
+        },
+    }
+
+    return {
+        "$schema": _VEGA_LITE_SCHEMA,
+        "width": "container",
+        "height": {"step": 32},
+        "background": "transparent",
+        "config": {"view": {"fill": None, "stroke": "#e5e5e5", "strokeWidth": 1}},
+        "layer": [bar_layer],
+    }
+
+
 def cfd_spec(report: CfdReport) -> dict[str, Any]:
-    """Stacked-area Cumulative Flow Diagram per Vacanti.
+    """Stacked-area Cumulative Flow Diagram.
 
-    Vertical thickness of any band at a sample date = WIP in that state
-    (property 3). Slope of any line = arrival rate into that state-or-
-    later (properties 5/6). Horizontal distance between two adjacent
-    lines at a given y = approximate average cycle time through the
-    bands between them (property 4).
+    Each band's vertical thickness at a sample date is the cumulative
+    count of items that have reached that state-or-later by that date.
+    The gap between the top line (items that ever entered the system)
+    and the bottom line (items finished) is WIP — items still in
+    flight.
 
-    Stacks earliest workflow state on bottom, latest on top (e.g.,
+    Stacks earliest workflow state on top, latest on bottom (e.g.,
     Open ⟶ In Progress ⟶ Done). Renders the GitHub-PR degenerate
     two-state case (Open / Merged) without complaint.
     """
@@ -191,26 +256,20 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
                 "field": "state",
                 "type": "nominal",
                 "sort": workflow,
-                # Sequential blue palette: dark = furthest along (Done),
-                # light = earliest (Open). Color-blind-safe.
-                "scale": {"scheme": "blues"},
+                # Qualitative ColorBrewer-style palette: distinct hues
+                # for each workflow stage so adjacent bands read as
+                # separate stages, not as shades of the same stage.
+                # `tableau10` is high-contrast and color-blind-safe
+                # for ~5-7 categories.
+                "scale": {"scheme": "tableau10"},
                 "legend": {"title": "Workflow state", "orient": "right"},
             },
             "order": {"field": "state_index", "type": "ordinal"},
-            "tooltip": [
-                {"field": "sampled_on", "type": "temporal", "title": "Date",
-                 "format": "%b %d, %Y"},
-                {"field": "state", "title": "State"},
-                {"field": "count", "title": "Items"},
-            ],
         },
         # Inject state_index for explicit stacking order matching
-        # workflow earliest→latest. Build a right-associative ternary
-        # chain `A ? 0 : B ? 1 : C ? 2 : -1`. Vega compiles the
-        # expression via `new Function()`, so the string must be valid
-        # JS — the earlier `A ? 0 || B ? 1 : -1` form was syntactically
-        # broken (`A ? B || C ? D : E` parses as a ternary missing its
-        # `:` after A) and rejected with "Unexpected end of input".
+        # workflow earliest→latest. Vega compiles the calculate string
+        # via `new Function()`, so it must be valid JS — a right-
+        # associative ternary `A ? 0 : B ? 1 : … : -1`.
         "transform": [
             {"calculate": "".join(
                 f"datum.state === '{s}' ? {i} : "
@@ -219,13 +278,100 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
         ],
     }
 
+    # Hover layer — vertical rule on the date nearest the cursor that
+    # surfaces every workflow state's count in one tooltip plus the
+    # WIP gap (top-state minus bottom-state). Uses a wide-format pivot
+    # so the tooltip can name each state as its own field.
+    first_state = workflow[0]
+    last_state = workflow[-1]
+    wip_calc = f"datum['{first_state}'] - datum['{last_state}']" if len(workflow) >= 2 else "0"
+    hover_layer = {
+        "data": {"values": rows},
+        "transform": [
+            {"pivot": "state", "value": "count", "groupby": ["sampled_on"]},
+            {"calculate": wip_calc, "as": "wip"},
+        ],
+        "mark": {"type": "rule", "color": "#666", "strokeWidth": 1},
+        "encoding": {
+            "x": {"field": "sampled_on", "type": "temporal"},
+            "opacity": {
+                "condition": {"param": "cfd_hover", "value": 0.6, "empty": False},
+                "value": 0,
+            },
+            "tooltip": [
+                {"field": "sampled_on", "type": "temporal", "title": "Date",
+                 "format": "%b %d, %Y"},
+                *[{"field": s, "type": "quantitative", "title": s}
+                  for s in workflow],
+                {"field": "wip", "type": "quantitative", "title": "WIP (in flight)"},
+            ],
+        },
+        "params": [
+            {
+                "name": "cfd_hover",
+                "select": {
+                    "type": "point",
+                    "fields": ["sampled_on"],
+                    "nearest": True,
+                    "on": "mouseover",
+                    "clear": "mouseout",
+                },
+            },
+        ],
+    }
+
+    # WIP-gap annotations — labels at the left and right edges showing
+    # start-WIP and end-WIP so the reader can see the trend without a
+    # prose banner. Two text marks at fixed dates.
+    layers: list[dict[str, Any]] = [area_layer, hover_layer]
+    if report.points and len(workflow) >= 2:
+        start_pt = report.points[0]
+        end_pt = report.points[-1]
+        start_wip = (
+            start_pt.counts_by_state.get(first_state, 0)
+            - start_pt.counts_by_state.get(last_state, 0)
+        )
+        end_wip = (
+            end_pt.counts_by_state.get(first_state, 0)
+            - end_pt.counts_by_state.get(last_state, 0)
+        )
+        delta = end_wip - start_wip
+        if delta > 0:
+            arrow, color = "▲", "#cc3333"
+        elif delta < 0:
+            arrow, color = "▼", "#10b981"
+        else:
+            arrow, color = "•", "#666"
+        annotation_layer = {
+            "mark": {
+                "type": "text",
+                "align": "right",
+                "baseline": "top",
+                "dx": -8,
+                "dy": 8,
+                "fontWeight": "bold",
+                "fontSize": 12,
+                "color": color,
+            },
+            "data": {"values": [
+                {"sampled_on": end_pt.sampled_on.isoformat(),
+                 "label": f"WIP {start_wip} → {end_wip} {arrow}"},
+            ]},
+            "encoding": {
+                "x": {"field": "sampled_on", "type": "temporal"},
+                "y": {"value": 8},  # near top of plot
+                "text": {"field": "label"},
+            },
+        }
+        layers.append(annotation_layer)
+
     return {
         "$schema": _VEGA_LITE_SCHEMA,
         "width": "container",
         "height": 360,
         "background": "transparent",
         "config": {"view": {"fill": None, "stroke": "#e5e5e5", "strokeWidth": 1}},
-        "layer": [area_layer],
+        "layer": layers,
     }
 
 

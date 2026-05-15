@@ -302,13 +302,16 @@ def build_index_html(sets: list[SampleSet], generated_at: datetime) -> str:
 <p class="stamp">Generated {generated_at.strftime("%Y-%m-%d %H:%M:%S %Z").strip()}</p>
 <p>Live data from public GitHub and Apache Jira sources. Each row gives
 three output formats per report (HTML, text, JSON).</p>
-<p class="note"><strong>About the GitHub samples:</strong> GitHub PRs
-don't expose a multi-state workflow, so CFD shows a degenerate
-two-band view (open → merged) — useful as a learning reference for
-what CFD looks like with no intermediate states. GitHub Aging uses a
-deliberately simple review-decision lifecycle (Draft → Awaiting Review
-→ Changes Requested → Approved). See <code>docs/DECISIONS.md</code>
-#9 and #10 for the full reasoning.</p>
+<p class="note"><strong>About the GitHub samples:</strong> the
+default GitHub CFD uses Open → Merged because PRs don't expose a
+multi-state workflow out of the box. Teams that label their PRs
+(e.g. <code>S-waiting-on-review</code>, <code>S-waiting-on-author</code>)
+can drive a richer multi-band CFD by passing <code>--wip-labels</code>
+to <code>flow aging</code>; the same labeling pattern works for CFD
+when you pass an ordered <code>--workflow</code>. The GitHub Aging
+samples here use the simple review-decision lifecycle
+(Draft → Awaiting Review → Changes Requested → Approved); see
+<code>docs/DECISIONS.md</code> #9 and #10 for the full reasoning.</p>
 <table>
 <thead>
 <tr><th>Repository</th>

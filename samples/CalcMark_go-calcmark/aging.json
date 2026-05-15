@@ -1,9 +1,9 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T10:23:18.230975-06:00",
+  "generated_at": "2026-05-15T13:14:44.441028-06:00",
   "headline": "WIP Aging for CalcMark/go-calcmark as of May 15, 2026: 2 in-flight items, 2 already past P85 (0.4d), 2 past P95 (1.0d).",
-  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast. See *When Will It Be Done?* by Daniel Vacanti.",
+  "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 2,
     "in_flight_total": 2,
@@ -112,7 +112,7 @@
       }
     ]
   },
-  "key_insight": "2 item(s) have aged past the P85 cycle time (0.4d) \u2014 Vacanti's threshold for likely forecast miss. Oldest: #115, #120. Concentrate decision-making here.",
+  "key_insight": "2 item(s) have aged past the P85 cycle time (0.4d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #115, #120. Concentrate decision-making here.",
   "next_actions": [
     "2 item(s) past P95 (1.0d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Draft' with 1 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",

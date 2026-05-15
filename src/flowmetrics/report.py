@@ -278,12 +278,12 @@ _EFFICIENCY_VOCABULARY = {
     ),
     "Wait time": (
         "cycle_time − active_time. Time the PR spent waiting in queues "
-        "(awaiting review, blocked, etc.). Vacanti's actionable signal — "
+        "(awaiting review, blocked, etc.). The actionable signal — "
         "queues are where the system bottlenecks live."
     ),
     "Flow efficiency": ("active_time / cycle_time. Reported per-PR and as a portfolio."),
     "Portfolio flow efficiency": (
-        "Σ active / Σ cycle across all merged PRs in this window. Vacanti's "
+        "Σ active / Σ cycle across all merged PRs in this window. The "
         "system-level recipe — long-running PRs dominate, which is what you "
         "want. Contrast with mean(per-PR FE), which weights every PR equally: "
         "fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, "
@@ -318,7 +318,7 @@ _CFD_VOCABULARY = {
     "WIP": (
         "Work In Progress. Vertical distance between two adjacent CFD lines "
         "at a sample date = items currently in that workflow band. Per "
-        "Vacanti's CFD property #3."
+        "(see DECISIONS.md for the math)."
     ),
     "Workflow state": (
         "A named stage in your delivery process (e.g., Open, In Progress, "
@@ -367,7 +367,7 @@ _FORECAST_VOCABULARY = {
     ),
     "Training window": (
         "The recent period whose daily throughput we sample. Defaults to the "
-        "last 30 calendar days ending yesterday-UTC — Vacanti's recommended "
+        "last 30 calendar days ending yesterday-UTC — the recommended "
         "horizon."
     ),
     "Monte Carlo Simulation": (
@@ -412,7 +412,7 @@ def report_definition(report: Report) -> str:
         return (
             "Portfolio flow efficiency: the share of cycle time that was actively "
             "worked on, vs. waiting in review or other queues. Portfolio FE = "
-            "Σ active / Σ cycle across all merged PRs in this window — Vacanti's "
+            "Σ active / Σ cycle across all merged PRs in this window — the "
             "recipe, the right number to act on."
         )
     if isinstance(report, WhenDoneReport):
@@ -431,7 +431,7 @@ def report_definition(report: Report) -> str:
         )
     if isinstance(report, CfdReport):
         return (
-            "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, "
+            "Cumulative Flow Diagram: cumulative arrivals on top, "
             "cumulative departures on bottom, intermediate workflow states "
             "stacked between. Vertical distance at any sample date = WIP in "
             "that band; slope = average arrival rate. Past data only — no "
@@ -443,8 +443,7 @@ def report_definition(report: Report) -> str:
             "current workflow state at a height equal to its Age (days since "
             "entering the workflow). Percentile lines come from the cycle "
             "times of recently completed items — read horizontally as risk "
-            "thresholds: an item aging past P85 likely misses its forecast. "
-            "See *When Will It Be Done?* by Daniel Vacanti."
+            "thresholds: an item aging past P85 likely misses its forecast."
         )
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 

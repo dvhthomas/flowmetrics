@@ -34,6 +34,27 @@ across {{ report.result.pr_count }} PRs
 {{ fmt_duration(report.result.total_active) }} active.
 </p>
 
+{# Assumptions callout — the GitHub API does not expose "active" vs
+   "wait" time directly, so active time is INFERRED from event
+   timings. The two parameters below drive that inference and can
+   swing FE meaningfully. Promote them out of the About collapsible
+   so the reader sees them before treating FE as a measurement. #}
+<div style="background: #fff8e1; border-left: 4px solid #d4a72c;
+            padding: 0.7rem 1rem; margin: 0.8rem 0 1.2rem;
+            font-size: 0.92rem; color: #5a4313; max-width: 70ch;">
+  <strong>Active time here is an estimate, not a measurement.</strong>
+  GitHub does not record when a PR is being worked on vs. waiting in
+  review. We infer activity by clustering events (commits, reviews,
+  comments) into work sessions: events more than
+  <strong>{{ report.input.gap_hours }}h</strong> apart start a new
+  session, and a lone event counts for at least
+  <strong>{{ report.input.min_cluster_minutes }} min</strong> so it
+  isn't zero. Both numbers are assumptions you can tune with
+  <code>--gap-hours</code> and <code>--min-cluster-minutes</code> —
+  raising the gap usually <em>raises</em> FE; lowering it usually
+  <em>lowers</em> FE. Treat the number as directional.
+</div>
+
 {# Top slowest PRs — the system bottleneck. #}
 <h2>Top slowest PRs</h2>
 <p style="font-size:0.9rem; color:#666; max-width:60ch">
