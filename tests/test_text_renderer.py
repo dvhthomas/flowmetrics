@@ -109,6 +109,32 @@ def _how_many_report() -> HowManyReport:
 # ---------------------------------------------------------------------------
 
 
+class TestAsciiSafeOutput:
+    """Text output must survive being redirected through a non-UTF-8
+    locale, piped into a clipboard, dropped into an email or chat
+    that auto-decodes as latin-1, etc. Unicode arrows (→) get
+    rendered as `â†'` mojibake under those conditions. HTML is
+    safe because the page declares charset=utf-8; text isn't."""
+
+    def test_no_unicode_arrows_in_terse_default(self):
+        out = text_renderer.render(_efficiency_report())
+        assert "→" not in out
+
+    def test_no_unicode_arrows_in_verbose(self):
+        for report_fn in (_efficiency_report, _when_done_report, _how_many_report):
+            out = text_renderer.render(report_fn(), verbose=True)
+            assert "→" not in out, (
+                f"Verbose output of {report_fn.__name__} contains "
+                f"a unicode arrow — text mode must use ASCII '->'."
+            )
+
+    def test_ascii_arrows_present_where_unicode_arrows_used_to_be(self):
+        """Sanity: the date-range / workflow-chain prose still
+        carries an arrow — just as ASCII '->' instead of '→'."""
+        out = text_renderer.render(_when_done_report(), verbose=True)
+        assert "->" in out
+
+
 class TestEfficiencyText:
     """Verbose efficiency mirrors the Aging text contract: headline +
     actionable numbers + slowest-PR table + reproduce. No more Key
@@ -283,8 +309,11 @@ class TestTerseDefault:
         out = text_renderer.render(_when_done_report())
         lines = [line for line in out.strip().splitlines() if line.strip()]
         assert len(lines) == 1
-        # Terse output is exactly the report's headline string
-        assert lines[0] == _interp().headline
+        # Terse output IS the report's headline string, modulo ASCII-
+        # safe substitution of unicode arrows / dashes (text mode
+        # writes mojibake-resistant output).
+        expected = _interp().headline.replace("→", "->").replace("—", "--")
+        assert lines[0] == expected
 
 
 class TestAnswerFirstOrdering:

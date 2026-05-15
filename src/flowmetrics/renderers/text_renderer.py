@@ -42,6 +42,26 @@ def _fmt_duration(td: timedelta) -> str:
     return f"{hours / 24:.1f}d"
 
 
+# Characters that look fine in a UTF-8 terminal but become mojibake
+# when text output gets redirected, copy-pasted into latin-1-decoding
+# tools, or pasted into email/chat clients that mis-detect the
+# encoding. Replace them with ASCII fall-backs in the final string;
+# HTML output keeps the unicode glyphs since HTML pages declare
+# charset=utf-8 explicitly.
+_ASCII_SAFE_MAP = {
+    "→": "->",
+    "←": "<-",
+    "—": "--",
+    "–": "-",
+}
+
+
+def _ascii_safe(text: str) -> str:
+    for u, ascii_ in _ASCII_SAFE_MAP.items():
+        text = text.replace(u, ascii_)
+    return text
+
+
 def render(
     report: Report,
     console: Console | None = None,
@@ -60,7 +80,7 @@ def render(
         # Terse: just the one-sentence headline. No rich styling, no panel
         # borders — pipeable to less / grep / a file viewer.
         console.print(report.interpretation.headline)
-        return buf.getvalue()
+        return _ascii_safe(buf.getvalue())
 
     if isinstance(report, EfficiencyReport):
         _render_efficiency(report, console)
@@ -74,7 +94,7 @@ def render(
         _render_aging(report, console)
     else:  # pragma: no cover
         raise TypeError(f"unknown report type: {type(report).__name__}")
-    return buf.getvalue()
+    return _ascii_safe(buf.getvalue())
 
 
 # ---------------------------------------------------------------------------
