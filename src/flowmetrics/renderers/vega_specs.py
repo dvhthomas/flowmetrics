@@ -216,7 +216,7 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
 
     Each band's vertical thickness at a sample date is the number of
     items currently in that workflow step (Vacanti's property #3 —
-    `wip_in_state` = line[step_i] − line[step_{i+1}], or just
+    `wip_in_state` = line[step_i] - line[step_{i+1}], or just
     line[terminal] for the bottom band). Stacked together, the bands
     sum to the top line — the cumulative-arrivals count
     (property #1).
@@ -291,21 +291,20 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
     # total WIP (items in flight) summary. A pivot widens the long-
     # format `wip_in_state` so each state becomes its own column in
     # the tooltip.
-    first_state = workflow[0]
-    last_state = workflow[-1]
-    # WIP-in-flight = top line - bottom line = (Σ band widths) - bottom band.
-    # Express as a sum of all non-terminal band widths.
-    if len(workflow) >= 2:
-        wip_calc = " + ".join(f"datum['{s}']" for s in workflow[:-1])
-    else:
-        wip_calc = "0"
+    #
+    # WIP-in-flight = top line - bottom line = (sum of band widths) -
+    # bottom band. Express as a sum of all non-terminal band widths.
+    wip_calc = (
+        " + ".join(f"datum['{s}']" for s in workflow[:-1])
+        if len(workflow) >= 2 else "0"
+    )
     hover_layer = {
         "data": {"values": rows},
         "transform": [
             {"pivot": "state", "value": "wip_in_state", "groupby": ["sampled_on"]},
             {"calculate": wip_calc, "as": "wip"},
         ],
-        "mark": {"type": "rule", "color": "#666", "strokeWidth": 1},
+        "mark": {"type": "rule", "color": "#222", "strokeWidth": 2},
         "encoding": {
             "x": {"field": "sampled_on", "type": "temporal"},
             "opacity": {
@@ -336,50 +335,11 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
         ],
     }
 
-    # WIP-gap annotations — labels at the left and right edges showing
-    # start-WIP and end-WIP so the reader can see the trend without a
-    # prose banner. Two text marks at fixed dates.
+    # WIP trend is now communicated by the chart's shape (a widening
+    # gap = growing WIP) and the hover tooltip — no in-chart text
+    # annotation. The visual signal speaks for itself; if a reader
+    # wants exact start vs end numbers they hover the two ends.
     layers: list[dict[str, Any]] = [area_layer, hover_layer]
-    if report.points and len(workflow) >= 2:
-        start_pt = report.points[0]
-        end_pt = report.points[-1]
-        start_wip = (
-            start_pt.counts_by_state.get(first_state, 0)
-            - start_pt.counts_by_state.get(last_state, 0)
-        )
-        end_wip = (
-            end_pt.counts_by_state.get(first_state, 0)
-            - end_pt.counts_by_state.get(last_state, 0)
-        )
-        delta = end_wip - start_wip
-        if delta > 0:
-            arrow, color = "▲", "#cc3333"
-        elif delta < 0:
-            arrow, color = "▼", "#10b981"
-        else:
-            arrow, color = "•", "#666"
-        annotation_layer = {
-            "mark": {
-                "type": "text",
-                "align": "right",
-                "baseline": "top",
-                "dx": -8,
-                "dy": 8,
-                "fontWeight": "bold",
-                "fontSize": 12,
-                "color": color,
-            },
-            "data": {"values": [
-                {"sampled_on": end_pt.sampled_on.isoformat(),
-                 "label": f"WIP {start_wip} → {end_wip} {arrow}"},
-            ]},
-            "encoding": {
-                "x": {"field": "sampled_on", "type": "temporal"},
-                "y": {"value": 8},  # near top of plot
-                "text": {"field": "label"},
-            },
-        }
-        layers.append(annotation_layer)
 
     return {
         "$schema": _VEGA_LITE_SCHEMA,

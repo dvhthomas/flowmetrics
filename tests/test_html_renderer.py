@@ -259,25 +259,29 @@ class TestCfdHtmlRedesign:
         out = html_renderer.render(_cfd_report())
         assert "Headline numbers" not in out
 
-    def test_wip_trend_visible_on_chart_when_widening(self):
-        """The WIP trend signal lives ON the chart as a labeled
-        annotation (e.g. "WIP 5 → 15 ▲"), not in a prose banner above
-        it. The triangle arrow encodes direction; the start → end
-        numbers carry the magnitude."""
+    def test_wip_trend_signal_lives_in_chart_shape_and_hover(self):
+        """The WIP-trend read is the vertical gap between top and
+        bottom lines, widening or narrowing across the window. That
+        signal is visible *in the area chart itself* and the exact
+        per-date numbers are available in the hover tooltip — no
+        prose banner, no corner annotation. The earlier triangle
+        marker ('WIP 5 → 15 ▲') was small, hard to associate with
+        the part of the chart it described, and just restated what
+        the hover already shows."""
         out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
-        assert "5 → 15" in out
-        assert "▲" in out  # ▲ growth marker
-
-    def test_wip_trend_visible_on_chart_when_narrowing(self):
-        out = html_renderer.render(_cfd_report(start_wip=20, end_wip=5))
-        assert "20 → 5" in out
-        assert "▼" in out  # ▼ shrink marker
+        # The corner annotation marker is gone.
+        assert "5 → 15" not in out
+        assert "▲" not in out
+        # The hover infrastructure is in place — that's where the
+        # numbers come from now.
+        assert "vegaEmbed" in out
+        assert "cfd_hover" in out
 
     def test_no_prose_wip_trend_banner(self):
-        """The old conditional banner ('WIP gap is widening / narrowing
-        ... arrivals are outpacing departures') is gone — its
-        connection to the chart wasn't visible. Signal now lives in
-        the chart annotation + hover tooltip."""
+        """The conditional 'WIP gap is widening / narrowing ...
+        arrivals are outpacing departures' banner is gone — its
+        connection to the chart wasn't visible. Signal lives in the
+        chart shape + hover tooltip."""
         out = html_renderer.render(_cfd_report(start_wip=5, end_wip=15))
         assert "outpacing" not in out.lower()
         assert "queue is growing" not in out.lower()

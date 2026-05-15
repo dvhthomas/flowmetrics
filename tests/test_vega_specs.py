@@ -962,26 +962,49 @@ class TestCfdSpec:
             for t in tooltip
         ), "Tooltip must include a 'WIP' row (top-state minus bottom-state)."
 
-    def test_wip_gap_annotation_marks_start_and_end_of_window(self):
-        """The WIP-trend signal (gap at start vs end) used to live in a
-        prose banner whose connection to the chart was invisible. Move
-        the signal onto the chart: a labeled vertical span at the right
-        edge showing end-WIP and a comparable label at the left edge
-        showing start-WIP."""
+    def test_no_corner_text_annotation_on_the_chart(self):
+        """The earlier 'WIP X → Y ▲' label sat in the chart's top-
+        right corner. It was visually weak (small green text on a
+        coloured background), didn't align with the WIP signal the
+        reader was looking at (the vertical gap at the right edge of
+        the area chart), and the same data already lives in the
+        hover tooltip — keep the chart minimal and let the tooltip
+        carry the per-date numbers."""
         spec = vega_specs.cfd_spec(_cfd_report(
             [(date(2026, 5, 1), {"Open": 5, "Done": 0}),
              (date(2026, 5, 14), {"Open": 10, "Done": 10})],
             workflow=("Open", "Done"),
         ))
-        # An annotation layer carries text marks with the gap values.
         text_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"]["type"] if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "text"
         ]
-        assert text_layers, (
-            "Expected a text-mark layer carrying labeled WIP-gap "
-            "annotations at the left and right edges of the window."
+        assert text_layers == [], (
+            f"Expected zero text-mark annotations on the chart; got {text_layers}"
+        )
+
+    def test_hover_rule_is_legible_when_active(self):
+        """The hover rule snaps to the nearest sample date but at
+        strokeWidth 1 with a mid-grey colour it reads as a faint
+        dashed line, hard to associate with a specific x-axis label.
+        Pin it to ≥ 2 px wide and use a darker hue so the eye finds
+        which date the tooltip is reading from."""
+        spec = vega_specs.cfd_spec(_cfd_report(
+            [(date(2026, 5, 1), {"Open": 5, "Done": 0})],
+            workflow=("Open", "Done"),
+        ))
+        hover = next(
+            layer for layer in spec["layer"]
+            if any(
+                isinstance(t, dict) and "pivot" in t
+                for t in layer.get("transform", [])
+            )
+        )
+        mark = hover["mark"]
+        assert mark["strokeWidth"] >= 2, (
+            f"Hover rule strokeWidth must be ≥ 2 px for legibility; "
+            f"got {mark.get('strokeWidth')}"
         )
 
     def test_hover_wip_calculate_is_valid_javascript(self):

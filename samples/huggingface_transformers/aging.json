@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T14:18:12.333453-06:00",
+  "generated_at": "2026-05-15T16:13:22.250112-06:00",
   "headline": "WIP Aging for huggingface/transformers as of May 15, 2026: 1000 in-flight items, 942 already past P85 (13.4d), 866 past P95 (36.5d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {

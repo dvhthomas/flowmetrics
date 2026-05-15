@@ -37,9 +37,10 @@
 </script>
 
 <p class="footnote-tight">
-Hover anywhere on the chart to see every state's cumulative count
-and WIP (items in flight) for that date. The annotation in the top
-corner tracks WIP from the start to the end of the window.
+Hover anywhere on the chart to see the per-step WIP and total
+items-in-flight for that date. Each column is a <em>snapshot</em>
+taken on that date, not a range — the chart steps to the next
+snapshot only when the next sample arrives.
 </p>
 
 {% endif %}
@@ -65,16 +66,31 @@ corner tracks WIP from the start to the end of the window.
 
 <p><strong>How to read the chart.</strong></p>
 <ul class="compact-prose">
-  <li>Each line is a running total. The top line is everything that's
-      ever entered the system; the bottom line is everything that's
-      reached "done".</li>
-  <li>The <em>vertical gap</em> between top and bottom at any date is
-      WIP — items in flight at that moment.</li>
-  <li>The <em>steeper</em> a line, the faster items are arriving into
-      that stage.</li>
-  <li>The <em>horizontal gap</em> between two adjacent lines at the same
-      height tells you roughly how long items spent in the stages
-      between them.</li>
+  <li>Each column is a <em>snapshot</em> taken on that date — every
+      band's height is the count of items currently in that workflow
+      step at that moment. Slide horizontally and you're watching the
+      same set of pipelines change over time.</li>
+  <li>The <em>top band</em> is items currently in the first workflow
+      step ({{ report.input.workflow[0] }} for this report). That's
+      where new arrivals land — items enter the system into this
+      band. Anything not yet in the workflow (e.g., a Jira ticket
+      that hasn't been filed; a PR not yet opened) is not on this
+      chart.</li>
+  <li>The <em>bottom band</em> is items that have reached the final
+      step ({{ report.input.workflow[-1] }}) — finished, accumulating
+      forever.</li>
+  <li>The <em>total height</em> at any date = cumulative items that
+      have ever entered the system (top line, including the finished
+      ones at the bottom).</li>
+  <li>The <em>vertical gap</em> between the top edge and the bottom
+      edge = items still in flight (WIP). A widening gap means
+      arrivals are outrunning departures; narrowing means the
+      opposite.</li>
+  <li>The <em>steeper</em> a band's edge, the faster items are
+      flowing into that step at that moment.</li>
+  <li>The <em>horizontal gap</em> between two adjacent lines at the
+      same height tells you roughly how long items spent in the
+      stages between them — a wide gap is a slow pipeline.</li>
 </ul>
 
 {% if interpretation.key_insight %}
