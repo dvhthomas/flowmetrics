@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-12T13:15:35.150651-06:00",
-  "headline": "CFD for pre-commit/pre-commit Apr 12, 2026 \u2192 May 11, 2026: 4 items arrived, 4 completed, 0 still in flight at end.",
+  "generated_at": "2026-05-15T10:17:47.986192-06:00",
+  "headline": "CFD for pre-commit/pre-commit Apr 15, 2026 \u2192 May 14, 2026: 5 items arrived, 5 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
     "workflow": [
@@ -10,8 +10,8 @@
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 4,
-    "departures_at_end": 4,
+    "arrivals_at_end": 5,
+    "departures_at_end": 5,
     "wip_at_end": 0
   },
   "key_insight": "Workflow has a single state \u2014 CFD collapses to one line of cumulative arrivals.",
@@ -34,221 +34,221 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-12",
+        "sampled_on": "2026-04-15",
         "counts_by_state": {
           "Open": 0,
           "Merged": 0
         }
       },
       {
-        "sampled_on": "2026-04-13",
-        "counts_by_state": {
-          "Open": 1,
-          "Merged": 0
-        }
-      },
-      {
-        "sampled_on": "2026-04-14",
-        "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
-        }
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
-        }
-      },
-      {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
+          "Open": 0,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
+          "Open": 0,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
+          "Open": 0,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
+          "Open": 0,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Open": 1,
-          "Merged": 1
+          "Open": 0,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Open": 3,
-          "Merged": 3
+          "Open": 2,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 3
+          "Open": 3,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-10",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 4
+          "Open": 3,
+          "Merged": 3
         }
       },
       {
         "sampled_on": "2026-05-11",
         "counts_by_state": {
           "Open": 4,
-          "Merged": 4
+          "Merged": 3
+        }
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "counts_by_state": {
+          "Open": 5,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "counts_by_state": {
+          "Open": 5,
+          "Merged": 5
+        }
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "counts_by_state": {
+          "Open": 5,
+          "Merged": 5
         }
       }
     ]
   },
   "input": {
     "repo": "pre-commit/pre-commit",
-    "start": "2026-04-12",
-    "stop": "2026-05-11",
+    "start": "2026-04-15",
+    "stop": "2026-05-14",
     "workflow": [
       "Open",
       "Merged"
@@ -261,6 +261,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo pre-commit/pre-commit --start 2026-04-12 --stop 2026-05-11 --workflow 'Open,Merged' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --repo pre-commit/pre-commit --start 2026-04-15 --stop 2026-05-14 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

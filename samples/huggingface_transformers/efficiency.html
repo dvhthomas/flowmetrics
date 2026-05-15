@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flow efficiency</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
+         line-height: 1.55; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
+       margin-top: 2.5rem; }
+  .stamp { color: #777; font-size: 0.85rem; }
+  .subtitle { color: #555; font-size: 1rem; margin: 0 0 0.6rem; }
+  .subtitle a { color: #555; text-decoration: underline; }
+  /* Tufte: non-conditional headline / definition / insight / caveats
+     used to carry decorative colored backgrounds. Three stacked colored
+     blocks at the top of the page (headline + banner + definition)
+     looked like chartjunk. Plain typographic hierarchy now; only the
+     conditional `.banner` and `.horizon` classes get colored chrome. */
+  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .insight { font-size: 1rem; margin: 0.7rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
+                      color: #2b7cff; }
+  details[open] > summary { margin-bottom: 0.5rem; }
+  .invocation { background: #1a1a1a; color: #f8f8f8; padding: 0.6rem 0.8rem;
+                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
+                overflow-x: auto; white-space: pre; }
+  .definition { font-size: 0.95rem; margin: 0.7rem 0; color: #444;
+                font-style: italic; }
+  /* State pill: workflow-stage labels rendered consistently across
+     the page (interventions list, per-state table, per-PR detail).
+     Visual marker says "this is a stage name." */
+  .pill { display: inline-block; padding: 0.1rem 0.55rem;
+          background: #eef1f5; color: #2b3a4a; border-radius: 999px;
+          font-size: 0.85rem; font-family: ui-monospace, "SF Mono",
+          Menlo, Consolas, monospace; white-space: nowrap; }
+  /* Single horizontal stacked bar for distribution. Each segment is
+     one aging band; width = share; color = yellow→red sequential.
+     Inline label inside the segment when wide enough. */
+  .dist-bar { display: flex; width: 100%; height: 42px;
+              border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+  .dist-bar .seg { display: flex; align-items: center; justify-content: center;
+                   color: #2b2b2b; font-size: 0.85rem; padding: 0 0.3rem;
+                   overflow: hidden; white-space: nowrap;
+                   text-overflow: ellipsis; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 0.8rem;
+                 font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+  .dist-legend .swatch { display: inline-block; width: 0.9rem;
+                         height: 0.9rem; vertical-align: middle;
+                         margin-right: 0.3rem; border-radius: 2px; }
+  .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
+             font-size: 0.95rem; }
+  .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
+  .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .banner { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d;
+            padding: 0.9rem 1.1rem; margin: 1rem 0; font-size: 1rem;
+            font-weight: 500; }
+  .intervention { display: flex; gap: 1rem; padding: 0.4rem 0;
+                  border-bottom: 1px solid #eee; align-items: center;
+                  font-variant-numeric: tabular-nums; }
+  .intervention .state { min-width: 22ch; font-size: 0.9rem; }
+  .intervention .id { min-width: 9ch; }
+  .intervention .age { min-width: 8ch; color: #cc3333; font-weight: 600; }
+  .intervention .title { flex: 1; color: #333; }
+  .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
+                    text-align: center; height: 0; position: relative; }
+  .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
+                           left: 50%; transform: translateX(-50%);
+                           background: white; padding: 0 0.8rem; color: #888;
+                           font-size: 0.85rem; letter-spacing: 0.1em;
+                           text-transform: uppercase; }
+  dl dt { margin-top: 0.6rem; }
+  dl dd { margin: 0.1rem 0 0.5rem 1.2rem; color: #444; }
+  table { border-collapse: collapse; margin: 0.5rem 0; }
+  th, td { padding: 0.3rem 0.7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #fafafa; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>Flow efficiency</h1>
+<p class="subtitle">
+  for <a href="https://github.com/huggingface/transformers">huggingface/transformers</a> ·
+  2026-05-08 → 2026-05-14 ·
+  <span class="stamp">generated 2026-05-15 10:17 MDT</span>
+</p>
+<div class="headline">Portfolio flow efficiency for huggingface/transformers May 8, 2026 → May 14, 2026: 1.9% across 59 completed items (57 human, 2 bot).</div>
+
+
+<div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — Vacanti&#39;s recipe, the right number to act on.</div>
+
+
+<p style="font-size:1.05rem;">
+<strong>Portfolio FE: 1.9%</strong>
+across 59 PRs (57 human, 2 bot).
+686.0d cycle,
+12.8d active.
+</p>
+
+<h2>Top slowest PRs</h2>
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+These PRs drove the portfolio's cycle-time tail. Improving any one of
+them moves the portfolio number more than improving a typical PR.
+</p>
+<div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/huggingface/transformers/pull/41693">#41693</a></span>
+    <span class="age">203.2d</span>
+    <span class="state"><span class="pill">FE 0.5%</span></span>
+    <span class="title">🚨 Refactor ViT to updated standards</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/huggingface/transformers/pull/43924">#43924</a></span>
+    <span class="age">89.8d</span>
+    <span class="state"><span class="pill">FE 0.4%</span></span>
+    <span class="title">:rotating_light: [`Attn`] Remove all old mask APIs from modeling</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/huggingface/transformers/pull/44830">#44830</a></span>
+    <span class="age">57.0d</span>
+    <span class="state"><span class="pill">FE 0.6%</span></span>
+    <span class="title">Support Audio Flamingo Next checkpoints</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/huggingface/transformers/pull/44664">#44664</a></span>
+    <span class="age">56.0d</span>
+    <span class="state"><span class="pill">FE 0.4%</span></span>
+    <span class="title">:rotating_light: Generic Sequence Classifier works for multimodal models</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/huggingface/transformers/pull/45034">#45034</a></span>
+    <span class="age">47.7d</span>
+    <span class="state"><span class="pill">FE 2.4%</span></span>
+    <span class="title">Pass packed boundary metadata to Qwen3.5 linear-attention fast kernels from data collator</span>
+  </div>
+</div>
+
+<div id="efficiency-chart" style="width:100%;"></div>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+<script>
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 1180, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#45966", "title": "chore: update benchmark_v2.yml", "cycle_hours": 0.32, "active_hours": 0.32, "efficiency_pct": 100.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/huggingface/transformers/pull/45966"}, {"item_id": "#45964", "title": "fix(ci): set persist-credentials: false on actions/checkout and close remaining template injection findings", "cycle_hours": 0.36, "active_hours": 0.36, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45964"}, {"item_id": "#45961", "title": "chore(ci): set default workflow permissions to contents: read", "cycle_hours": 0.27, "active_hours": 0.27, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45961"}, {"item_id": "#45959", "title": "chore: update build-ci-docker-images.yml", "cycle_hours": 0.94, "active_hours": 0.94, "efficiency_pct": 100.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/huggingface/transformers/pull/45959"}, {"item_id": "#45956", "title": "fix(ci): remove template injection on pull_request_target workflows", "cycle_hours": 0.54, "active_hours": 0.54, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45956"}, {"item_id": "#45955", "title": "chore(ci): pin all GitHub Actions and reusable workflows by SHA", "cycle_hours": 0.27, "active_hours": 0.27, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45955"}, {"item_id": "#45949", "title": "[docs] new attention mask helpers", "cycle_hours": 4.77, "active_hours": 4.77, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45949"}, {"item_id": "#45947", "title": "[docs] chat template prefill", "cycle_hours": 24.45, "active_hours": 3.16, "efficiency_pct": 12.9, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45947"}, {"item_id": "#45943", "title": "fix: restore `_attn_implementation `and fix request offset in `generate_batch()`", "cycle_hours": 23.86, "active_hours": 4.26, "efficiency_pct": 17.9, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45943"}, {"item_id": "#45942", "title": "Revert 45777", "cycle_hours": 0.23, "active_hours": 0.23, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45942"}, {"item_id": "#45933", "title": "pass the otel secrets", "cycle_hours": 2.0, "active_hours": 2.0, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45933"}, {"item_id": "#45928", "title": "Deepseek v4 csa mask collapse", "cycle_hours": 0.33, "active_hours": 0.33, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45928"}, {"item_id": "#45927", "title": "Expose `per_layer_inputs` for every Gemma4 variants", "cycle_hours": 28.92, "active_hours": 2.85, "efficiency_pct": 9.8, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45927"}, {"item_id": "#45921", "title": "BUGFIX: Support hubert models that don't have conv_pos_batch_norm configured", "cycle_hours": 17.85, "active_hours": 1.0, "efficiency_pct": 5.6, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45921"}, {"item_id": "#45918", "title": "Add initial torch_tpu backend support", "cycle_hours": 16.85, "active_hours": 3.85, "efficiency_pct": 22.9, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45918"}, {"item_id": "#45913", "title": "[CI] AMD docker: bump to ROCm 7.2.2 / PyTorch 2.10 + prebuilt FA wheel", "cycle_hours": 3.38, "active_hours": 3.38, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45913"}, {"item_id": "#45912", "title": "Fix fsdp2 for gemma models with shared kv states", "cycle_hours": 16.28, "active_hours": 1.45, "efficiency_pct": 8.9, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45912"}, {"item_id": "#45911", "title": "[CB] Hide activation footprint by using the CUDA graph pool", "cycle_hours": 25.36, "active_hours": 5.57, "efficiency_pct": 21.9, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45911"}, {"item_id": "#45909", "title": "Automatically inherit properties from children in composite models", "cycle_hours": 5.78, "active_hours": 5.78, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45909"}, {"item_id": "#45908", "title": "Forward `revision` to `list_repo_files` in tokenizer loading", "cycle_hours": 2.62, "active_hours": 2.62, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45908"}, {"item_id": "#45906", "title": "Remove `_checkpoint_conversion_mapping` from model attributes", "cycle_hours": 0.29, "active_hours": 0.29, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45906"}, {"item_id": "#45900", "title": "[docs] ALMModelTest", "cycle_hours": 49.51, "active_hours": 7.51, "efficiency_pct": 15.2, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45900"}, {"item_id": "#45899", "title": "[docs] decode fast path", "cycle_hours": 67.99, "active_hours": 2.27, "efficiency_pct": 3.3, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45899"}, {"item_id": "#45898", "title": "[fix] Add `fatal_error` to `ContinuousBatchingManager` so the serving layer can detect a dead CB worker", "cycle_hours": 30.34, "active_hours": 1.5, "efficiency_pct": 4.9, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45898"}, {"item_id": "#45896", "title": "Enhance apply_chat_template to support custom field prefilling (reasoning_content, thinking, etc.)", "cycle_hours": 47.49, "active_hours": 3.27, "efficiency_pct": 6.9, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45896"}, {"item_id": "#45895", "title": "Fix undefined 'input' variable", "cycle_hours": 39.73, "active_hours": 4.62, "efficiency_pct": 11.6, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45895"}, {"item_id": "#45892", "title": "Fix deepseek v4", "cycle_hours": 21.69, "active_hours": 10.05, "efficiency_pct": 46.3, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45892"}, {"item_id": "#45889", "title": "Do not keep refs to submodules internally", "cycle_hours": 16.85, "active_hours": 2.36, "efficiency_pct": 14.0, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45889"}, {"item_id": "#45887", "title": "fix(rope): read original_max_position_embeddings from yarn validator's argument", "cycle_hours": 24.64, "active_hours": 10.54, "efficiency_pct": 42.8, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45887"}, {"item_id": "#45886", "title": "Fix/pe audio video bugs", "cycle_hours": 24.86, "active_hours": 4.48, "efficiency_pct": 18.0, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45886"}, {"item_id": "#45885", "title": "Remove deprecation cycle for inputs embeds", "cycle_hours": 0.61, "active_hours": 0.61, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45885"}, {"item_id": "#45884", "title": "Remove deprecation cycle for `cache_position` in masking primitives", "cycle_hours": 0.47, "active_hours": 0.47, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45884"}, {"item_id": "#45881", "title": "[deepseek_v4] fix CSA per-query masking in eager path", "cycle_hours": 0.03, "active_hours": 0.03, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/huggingface/transformers/pull/45881"}, {"item_id": "#45860", "title": "fix(text-generation): use token-level slicing for return_full_text=Fa\u2026", "cycle_hours": 78.63, "active_hours": 3.58, "efficiency_pct": 4.6, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45860"}, {"item_id": "#45852", "title": "Fix slow Trainer path with 4D attention mask", "cycle_hours": 89.49, "active_hours": 2.17, "efficiency_pct": 2.4, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45852"}, {"item_id": "#45845", "title": "fix(rf_detr): fix failing tests", "cycle_hours": 6.55, "active_hours": 1.73, "efficiency_pct": 26.5, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45845"}, {"item_id": "#45844", "title": "fix(granite4_vision): auto-fix failing tests", "cycle_hours": 6.53, "active_hours": 1.31, "efficiency_pct": 20.0, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45844"}, {"item_id": "#45842", "title": "fix(laguna): fix failing tests", "cycle_hours": 7.79, "active_hours": 1.0, "efficiency_pct": 12.8, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45842"}, {"item_id": "#45836", "title": "fix(minicpmv4_6): skip invalid failing tests", "cycle_hours": 83.13, "active_hours": 2.14, "efficiency_pct": 2.6, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45836"}, {"item_id": "#45833", "title": "Add Qwen3.5 support for token classification", "cycle_hours": 12.52, "active_hours": 1.0, "efficiency_pct": 8.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45833"}, {"item_id": "#45828", "title": "[Weight converter] Revert unnecessary changes to `rename_source_key`", "cycle_hours": 97.37, "active_hours": 2.53, "efficiency_pct": 2.6, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45828"}, {"item_id": "#45824", "title": "fix: correct typo 'seperate' -\u003e 'separate' in comments across multipl\u2026", "cycle_hours": 23.69, "active_hours": 1.0, "efficiency_pct": 4.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45824"}, {"item_id": "#45811", "title": "Warn about forgetting attention mask functions", "cycle_hours": 110.44, "active_hours": 4.15, "efficiency_pct": 3.8, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45811"}, {"item_id": "#45808", "title": "\ud83d\udea8 [Fuyu] Remove FuyuBatchFeature subclass, use BatchFeature with skip_tensor_conversion", "cycle_hours": 41.99, "active_hours": 5.91, "efficiency_pct": 14.1, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45808"}, {"item_id": "#45804", "title": "Fix import error in moe.py by providing explicit schema to custom_op", "cycle_hours": 48.08, "active_hours": 1.5, "efficiency_pct": 3.1, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45804"}, {"item_id": "#45802", "title": "Keep deleting ", "cycle_hours": 46.75, "active_hours": 4.84, "efficiency_pct": 10.4, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/huggingface/transformers/pull/45802"}, {"item_id": "#45798", "title": "[docs] paper cuts", "cycle_hours": 139.22, "active_hours": 3.88, "efficiency_pct": 2.8, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45798"}, {"item_id": "#45777", "title": "torch.backends.fp32_precision cascade conv/rnn so removing the temp fix", "cycle_hours": 182.12, "active_hours": 3.56, "efficiency_pct": 2.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45777"}, {"item_id": "#45612", "title": "[docs] update model cards", "cycle_hours": 454.18, "active_hours": 3.25, "efficiency_pct": 0.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45612"}, {"item_id": "#45396", "title": "Extract dynamic vision/audio tensors into standalone pure functions", "cycle_hours": 719.64, "active_hours": 41.71, "efficiency_pct": 5.8, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45396"}, {"item_id": "#45391", "title": "audio tester class", "cycle_hours": 677.62, "active_hours": 32.96, "efficiency_pct": 4.9, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45391"}, {"item_id": "#45389", "title": "Require input_ids for repetition penalty", "cycle_hours": 722.0, "active_hours": 9.18, "efficiency_pct": 1.3, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45389"}, {"item_id": "#45351", "title": "fix(testing_utils): guard get_device_capability with torch.cuda.is_available()", "cycle_hours": 749.36, "active_hours": 7.63, "efficiency_pct": 1.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45351"}, {"item_id": "#45342", "title": "Use `_keys_to_ignore_on_load_unexpected/missing` recursively from children", "cycle_hours": 780.77, "active_hours": 2.01, "efficiency_pct": 0.3, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45342"}, {"item_id": "#45034", "title": "Pass packed boundary metadata to Qwen3.5 linear-attention fast kernels from data collator", "cycle_hours": 1144.76, "active_hours": 27.11, "efficiency_pct": 2.4, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/45034"}, {"item_id": "#44830", "title": "Support Audio Flamingo Next checkpoints", "cycle_hours": 1366.88, "active_hours": 8.54, "efficiency_pct": 0.6, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/44830"}, {"item_id": "#44664", "title": ":rotating_light: Generic Sequence Classifier works for multimodal models", "cycle_hours": 1343.79, "active_hours": 5.68, "efficiency_pct": 0.4, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/44664"}, {"item_id": "#43924", "title": ":rotating_light: [`Attn`] Remove all old mask APIs from modeling", "cycle_hours": 2155.25, "active_hours": 9.24, "efficiency_pct": 0.4, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/43924"}, {"item_id": "#41693", "title": "\ud83d\udea8 Refactor ViT to updated standards", "cycle_hours": 4876.3, "active_hours": 26.74, "efficiency_pct": 0.5, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/huggingface/transformers/pull/41693"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "cycle_hours", "order": "descending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10\u201350%", "\u2265 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 1.9, "label": "Portfolio FE: 1.9%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("efficiency-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<strong>Why are so many PRs at 100%?</strong>
+A PR scores 100% when its entire cycle fits inside one activity cluster
+(default: 4-hour quiet-period threshold). Short PRs — automated version
+bumps, fast community fixes, dependabot updates — trivially fit inside
+one cluster because there's no time for a queue to form. The signal is
+in the <strong>portfolio number</strong> in the headline and the PRs
+above, not in the 100%-bar tail.
+</p>
+
+
+
+<hr class="detail-divider">
+
+<details>
+<summary>Show all 59 PRs (slowest first)</summary>
+<table>
+<thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
+<tbody>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45342">#45342</a></td>
+    <td class="num">32.5d</td>
+    <td class="num">2.0h</td>
+    <td class="num">0.3%</td>
+    <td>Use `_keys_to_ignore_on_load_unexpected/missing` recursively from children</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/44664">#44664</a></td>
+    <td class="num">56.0d</td>
+    <td class="num">5.7h</td>
+    <td class="num">0.4%</td>
+    <td>:rotating_light: Generic Sequence Classifier works for multimodal models</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/43924">#43924</a></td>
+    <td class="num">89.8d</td>
+    <td class="num">9.2h</td>
+    <td class="num">0.4%</td>
+    <td>:rotating_light: [`Attn`] Remove all old mask APIs from modeling</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/41693">#41693</a></td>
+    <td class="num">203.2d</td>
+    <td class="num">26.7h</td>
+    <td class="num">0.5%</td>
+    <td>🚨 Refactor ViT to updated standards</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/44830">#44830</a></td>
+    <td class="num">57.0d</td>
+    <td class="num">8.5h</td>
+    <td class="num">0.6%</td>
+    <td>Support Audio Flamingo Next checkpoints</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45612">#45612</a></td>
+    <td class="num">18.9d</td>
+    <td class="num">3.3h</td>
+    <td class="num">0.7%</td>
+    <td>[docs] update model cards</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45351">#45351</a></td>
+    <td class="num">31.2d</td>
+    <td class="num">7.6h</td>
+    <td class="num">1.0%</td>
+    <td>fix(testing_utils): guard get_device_capability with torch.cuda.is_available()</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45389">#45389</a></td>
+    <td class="num">30.1d</td>
+    <td class="num">9.2h</td>
+    <td class="num">1.3%</td>
+    <td>Require input_ids for repetition penalty</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45777">#45777</a></td>
+    <td class="num">7.6d</td>
+    <td class="num">3.6h</td>
+    <td class="num">2.0%</td>
+    <td>torch.backends.fp32_precision cascade conv/rnn so removing the temp fix</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45034">#45034</a></td>
+    <td class="num">47.7d</td>
+    <td class="num">27.1h</td>
+    <td class="num">2.4%</td>
+    <td>Pass packed boundary metadata to Qwen3.5 linear-attention fast kernels from data</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45852">#45852</a></td>
+    <td class="num">3.7d</td>
+    <td class="num">2.2h</td>
+    <td class="num">2.4%</td>
+    <td>Fix slow Trainer path with 4D attention mask</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45836">#45836</a></td>
+    <td class="num">3.5d</td>
+    <td class="num">2.1h</td>
+    <td class="num">2.6%</td>
+    <td>fix(minicpmv4_6): skip invalid failing tests</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45828">#45828</a></td>
+    <td class="num">4.1d</td>
+    <td class="num">2.5h</td>
+    <td class="num">2.6%</td>
+    <td>[Weight converter] Revert unnecessary changes to `rename_source_key`</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45798">#45798</a></td>
+    <td class="num">5.8d</td>
+    <td class="num">3.9h</td>
+    <td class="num">2.8%</td>
+    <td>[docs] paper cuts</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45804">#45804</a></td>
+    <td class="num">2.0d</td>
+    <td class="num">1.5h</td>
+    <td class="num">3.1%</td>
+    <td>Fix import error in moe.py by providing explicit schema to custom_op</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45899">#45899</a></td>
+    <td class="num">2.8d</td>
+    <td class="num">2.3h</td>
+    <td class="num">3.3%</td>
+    <td>[docs] decode fast path</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45811">#45811</a></td>
+    <td class="num">4.6d</td>
+    <td class="num">4.2h</td>
+    <td class="num">3.8%</td>
+    <td>Warn about forgetting attention mask functions</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45824">#45824</a></td>
+    <td class="num">23.7h</td>
+    <td class="num">1.0h</td>
+    <td class="num">4.2%</td>
+    <td>fix: correct typo &#39;seperate&#39; -&gt; &#39;separate&#39; in comments across multipl…</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45860">#45860</a></td>
+    <td class="num">3.3d</td>
+    <td class="num">3.6h</td>
+    <td class="num">4.6%</td>
+    <td>fix(text-generation): use token-level slicing for return_full_text=Fa…</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45391">#45391</a></td>
+    <td class="num">28.2d</td>
+    <td class="num">33.0h</td>
+    <td class="num">4.9%</td>
+    <td>audio tester class</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45898">#45898</a></td>
+    <td class="num">30.3h</td>
+    <td class="num">1.5h</td>
+    <td class="num">4.9%</td>
+    <td>[fix] Add `fatal_error` to `ContinuousBatchingManager` so the serving layer can </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45921">#45921</a></td>
+    <td class="num">17.9h</td>
+    <td class="num">1.0h</td>
+    <td class="num">5.6%</td>
+    <td>BUGFIX: Support hubert models that don&#39;t have conv_pos_batch_norm configured</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45396">#45396</a></td>
+    <td class="num">30.0d</td>
+    <td class="num">41.7h</td>
+    <td class="num">5.8%</td>
+    <td>Extract dynamic vision/audio tensors into standalone pure functions</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45896">#45896</a></td>
+    <td class="num">47.5h</td>
+    <td class="num">3.3h</td>
+    <td class="num">6.9%</td>
+    <td>Enhance apply_chat_template to support custom field prefilling (reasoning_conten</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45833">#45833</a></td>
+    <td class="num">12.5h</td>
+    <td class="num">1.0h</td>
+    <td class="num">8.0%</td>
+    <td>Add Qwen3.5 support for token classification</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45912">#45912</a></td>
+    <td class="num">16.3h</td>
+    <td class="num">1.4h</td>
+    <td class="num">8.9%</td>
+    <td>Fix fsdp2 for gemma models with shared kv states</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45927">#45927</a></td>
+    <td class="num">28.9h</td>
+    <td class="num">2.8h</td>
+    <td class="num">9.8%</td>
+    <td>Expose `per_layer_inputs` for every Gemma4 variants</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45802">#45802</a></td>
+    <td class="num">46.8h</td>
+    <td class="num">4.8h</td>
+    <td class="num">10.4%</td>
+    <td>Keep deleting </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45895">#45895</a></td>
+    <td class="num">39.7h</td>
+    <td class="num">4.6h</td>
+    <td class="num">11.6%</td>
+    <td>Fix undefined &#39;input&#39; variable</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45842">#45842</a></td>
+    <td class="num">7.8h</td>
+    <td class="num">1.0h</td>
+    <td class="num">12.8%</td>
+    <td>fix(laguna): fix failing tests</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45947">#45947</a></td>
+    <td class="num">24.5h</td>
+    <td class="num">3.2h</td>
+    <td class="num">12.9%</td>
+    <td>[docs] chat template prefill</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45889">#45889</a></td>
+    <td class="num">16.9h</td>
+    <td class="num">2.4h</td>
+    <td class="num">14.0%</td>
+    <td>Do not keep refs to submodules internally</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45808">#45808</a></td>
+    <td class="num">42.0h</td>
+    <td class="num">5.9h</td>
+    <td class="num">14.1%</td>
+    <td>🚨 [Fuyu] Remove FuyuBatchFeature subclass, use BatchFeature with skip_tensor_con</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45900">#45900</a></td>
+    <td class="num">2.1d</td>
+    <td class="num">7.5h</td>
+    <td class="num">15.2%</td>
+    <td>[docs] ALMModelTest</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45943">#45943</a></td>
+    <td class="num">23.9h</td>
+    <td class="num">4.3h</td>
+    <td class="num">17.9%</td>
+    <td>fix: restore `_attn_implementation `and fix request offset in `generate_batch()`</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45886">#45886</a></td>
+    <td class="num">24.9h</td>
+    <td class="num">4.5h</td>
+    <td class="num">18.0%</td>
+    <td>Fix/pe audio video bugs</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45844">#45844</a></td>
+    <td class="num">6.5h</td>
+    <td class="num">1.3h</td>
+    <td class="num">20.0%</td>
+    <td>fix(granite4_vision): auto-fix failing tests</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45911">#45911</a></td>
+    <td class="num">25.4h</td>
+    <td class="num">5.6h</td>
+    <td class="num">21.9%</td>
+    <td>[CB] Hide activation footprint by using the CUDA graph pool</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45918">#45918</a></td>
+    <td class="num">16.8h</td>
+    <td class="num">3.9h</td>
+    <td class="num">22.9%</td>
+    <td>Add initial torch_tpu backend support</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45845">#45845</a></td>
+    <td class="num">6.5h</td>
+    <td class="num">1.7h</td>
+    <td class="num">26.5%</td>
+    <td>fix(rf_detr): fix failing tests</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45887">#45887</a></td>
+    <td class="num">24.6h</td>
+    <td class="num">10.5h</td>
+    <td class="num">42.8%</td>
+    <td>fix(rope): read original_max_position_embeddings from yarn validator&#39;s argument</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45892">#45892</a></td>
+    <td class="num">21.7h</td>
+    <td class="num">10.1h</td>
+    <td class="num">46.3%</td>
+    <td>Fix deepseek v4</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45966">#45966</a></td>
+    <td class="num">0.3h</td>
+    <td class="num">0.3h</td>
+    <td class="num">100.0%</td>
+    <td>chore: update benchmark_v2.yml</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45964">#45964</a></td>
+    <td class="num">0.4h</td>
+    <td class="num">0.4h</td>
+    <td class="num">100.0%</td>
+    <td>fix(ci): set persist-credentials: false on actions/checkout and close remaining </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45961">#45961</a></td>
+    <td class="num">0.3h</td>
+    <td class="num">0.3h</td>
+    <td class="num">100.0%</td>
+    <td>chore(ci): set default workflow permissions to contents: read</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45959">#45959</a></td>
+    <td class="num">0.9h</td>
+    <td class="num">0.9h</td>
+    <td class="num">100.0%</td>
+    <td>chore: update build-ci-docker-images.yml</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45956">#45956</a></td>
+    <td class="num">0.5h</td>
+    <td class="num">0.5h</td>
+    <td class="num">100.0%</td>
+    <td>fix(ci): remove template injection on pull_request_target workflows</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45955">#45955</a></td>
+    <td class="num">0.3h</td>
+    <td class="num">0.3h</td>
+    <td class="num">100.0%</td>
+    <td>chore(ci): pin all GitHub Actions and reusable workflows by SHA</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45949">#45949</a></td>
+    <td class="num">4.8h</td>
+    <td class="num">4.8h</td>
+    <td class="num">100.0%</td>
+    <td>[docs] new attention mask helpers</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45942">#45942</a></td>
+    <td class="num">0.2h</td>
+    <td class="num">0.2h</td>
+    <td class="num">100.0%</td>
+    <td>Revert 45777</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45933">#45933</a></td>
+    <td class="num">2.0h</td>
+    <td class="num">2.0h</td>
+    <td class="num">100.0%</td>
+    <td>pass the otel secrets</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45928">#45928</a></td>
+    <td class="num">0.3h</td>
+    <td class="num">0.3h</td>
+    <td class="num">100.0%</td>
+    <td>Deepseek v4 csa mask collapse</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45913">#45913</a></td>
+    <td class="num">3.4h</td>
+    <td class="num">3.4h</td>
+    <td class="num">100.0%</td>
+    <td>[CI] AMD docker: bump to ROCm 7.2.2 / PyTorch 2.10 + prebuilt FA wheel</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45909">#45909</a></td>
+    <td class="num">5.8h</td>
+    <td class="num">5.8h</td>
+    <td class="num">100.0%</td>
+    <td>Automatically inherit properties from children in composite models</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45908">#45908</a></td>
+    <td class="num">2.6h</td>
+    <td class="num">2.6h</td>
+    <td class="num">100.0%</td>
+    <td>Forward `revision` to `list_repo_files` in tokenizer loading</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45906">#45906</a></td>
+    <td class="num">0.3h</td>
+    <td class="num">0.3h</td>
+    <td class="num">100.0%</td>
+    <td>Remove `_checkpoint_conversion_mapping` from model attributes</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45885">#45885</a></td>
+    <td class="num">0.6h</td>
+    <td class="num">0.6h</td>
+    <td class="num">100.0%</td>
+    <td>Remove deprecation cycle for inputs embeds</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45884">#45884</a></td>
+    <td class="num">0.5h</td>
+    <td class="num">0.5h</td>
+    <td class="num">100.0%</td>
+    <td>Remove deprecation cycle for `cache_position` in masking primitives</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/huggingface/transformers/pull/45881">#45881</a></td>
+    <td class="num">0.0h</td>
+    <td class="num">0.0h</td>
+    <td class="num">100.0%</td>
+    <td>[deepseek_v4] fix CSA per-query masking in eager path</td>
+  </tr>
+</tbody>
+</table>
+</details>
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Repo</th><td>huggingface/transformers</td></tr>
+  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Active-time gap</th><td>4.0h</td></tr>
+  <tr><th>Min cluster</th><td>30.0min</td></tr>
+</table>
+<div class="invocation">uv run flow efficiency --repo huggingface/transformers --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — Vacanti&#39;s recipe, the right number to act on.</p>
+
+<p><strong>How active time was calculated.</strong>
+We grouped each PR's events (commits, reviews, comments) into work sessions:
+events more than <strong>4.0 hours</strong> apart start a new
+session, and a single isolated event counts as at least
+<strong>30.0 minutes</strong> of active time (so a
+lone comment isn't counted as zero work).</p>
+
+<p><strong>Per-PR distribution (median / mean).</strong>
+Reported because people ask for them, but the <strong>portfolio</strong>
+number above is the right one. Mean of per-PR ratios is inflated by a
+long tail of tiny fast PRs; median tells you what a typical PR looks
+like in isolation but doesn't reflect the system.</p>
+<table>
+  <tr><th>Median per-PR FE</th><td class="num">12.8%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">35.6%</td></tr>
+</table>
+
+<p><strong>Key insight.</strong> This is in Vacanti&#39;s typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (#41693)  ran 203.2d and dominates the ratio.</p>
+
+<p><strong>Next actions</strong></p>
+<ol style="font-size:0.95rem;">
+  <li>Inspect the three slowest PRs (#41693, #43924, #44830) — they likely sat in review queue.</li>
+  <li>Compare to the previous 2-4 weeks to spot a trend.</li>
+  <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
+</ol>
+
+<p><strong>Caveats</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+  <li>Never use this metric per engineer — it reflects the system, not individuals.</li>
+  <li>Per-PR FE is a directional indicator, not a precise measurement.</li>
+  <li>Active time uses gap=4.0h and min_cluster=30.0min — tuning these moves the number.</li>
+</ul>
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+  <dt><strong>Cycle time</strong></dt>
+  <dd>Wall-clock time from when a PR was opened until it was merged. The clock starts at `created_at` and stops at `merged_at`.</dd>
+  <dt><strong>Active time</strong></dt>
+  <dd>The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.</dd>
+  <dt><strong>Wait time</strong></dt>
+  <dd>cycle_time − active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). Vacanti&#39;s actionable signal — queues are where the system bottlenecks live.</dd>
+  <dt><strong>Flow efficiency</strong></dt>
+  <dd>active_time / cycle_time. Reported per-PR and as a portfolio.</dd>
+  <dt><strong>Portfolio flow efficiency</strong></dt>
+  <dd>Σ active / Σ cycle across all merged PRs in this window. Vacanti&#39;s system-level recipe — long-running PRs dominate, which is what you want. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, even though the latter is where your wait time actually lives. Portfolio = the system&#39;s number; mean per-PR = an aggregate of individual ratios that hides where the queue is.</dd>
+  <dt><strong>Mean per-PR FE (and why not to act on it)</strong></dt>
+  <dd>Simple average of each PR&#39;s individual flow efficiency. It tells you what a typical PR&#39;s ratio looks like in isolation, but it does not reflect the system — a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead.</dd>
+</dl>
+</details>
+
+
+
+</body>
+</html>

@@ -1,32 +1,32 @@
 {
   "schema": "flowmetrics.efficiency.v1",
-  "command": "efficiency week",
-  "generated_at": "2026-05-12T13:15:27.617290-06:00",
-  "headline": "No PRs merged in pre-commit/pre-commit between May 5, 2026 and May 11, 2026.",
+  "command": "efficiency",
+  "generated_at": "2026-05-15T10:17:50.709773-06:00",
+  "headline": "Portfolio flow efficiency for CalcMark/go-calcmark May 8, 2026 \u2192 May 14, 2026: 100.0% across 2 completed items.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
-    "pr_count": 0,
-    "human_pr_count": 0,
+    "pr_count": 2,
+    "human_pr_count": 2,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 0.0,
-    "median_efficiency": 0.0,
-    "mean_efficiency": 0.0,
+    "portfolio_efficiency": 1.0,
+    "median_efficiency": 1.0,
+    "mean_efficiency": 1.0,
     "total_cycle": {
-      "seconds": 0.0,
-      "hours": 0.0,
-      "days": 0.0
+      "seconds": 6312.0,
+      "hours": 1.7533333333333334,
+      "days": 0.07305555555555555
     },
     "total_active": {
-      "seconds": 0.0,
-      "hours": 0.0,
-      "days": 0.0
+      "seconds": 6312.0,
+      "hours": 1.7533333333333334,
+      "days": 0.07305555555555555
     },
     "observed_statuses": []
   },
-  "key_insight": "An empty window means nothing to measure \u2014 not a bad signal.",
+  "key_insight": "Portfolio FE of 100.0% is unusually high \u2014 verify the data. Common causes: dependabot automation, tiny version-bump PRs that merge in minutes, or stale draft handling. Cross-check by sampling a few PRs by hand.",
   "next_actions": [
-    "Widen the date window with --start/--stop.",
-    "Confirm the repo name is correct."
+    "Compare to the previous 2-4 weeks to spot a trend.",
+    "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
   "caveats": [
     "Never use this metric per engineer \u2014 it reflects the system, not individuals.",
@@ -42,28 +42,77 @@
     "Mean per-PR FE (and why not to act on it)": "Simple average of each PR's individual flow efficiency. It tells you what a typical PR's ratio looks like in isolation, but it does not reflect the system \u2014 a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead."
   },
   "chart_data": {
-    "per_pr_efficiency": []
+    "per_pr_efficiency": [
+      {
+        "item_id": "#161",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#159",
+        "efficiency": 1.0
+      }
+    ]
   },
   "input": {
-    "repo": "pre-commit/pre-commit",
-    "start": "2026-05-05",
-    "stop": "2026-05-11",
+    "repo": "CalcMark/go-calcmark",
+    "start": "2026-05-08",
+    "stop": "2026-05-14",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
-    ]
+    ],
+    "jira_url": null
   },
   "result": {
-    "per_pr": []
+    "per_pr": [
+      {
+        "item_id": "#161",
+        "title": "test: lock in variable +/- percentage widening (cmw#83)",
+        "created_at": "2026-05-11T18:09:39+00:00",
+        "merged_at": "2026-05-11T18:11:12+00:00",
+        "cycle_time": {
+          "seconds": 93.0,
+          "hours": 0.025833333333333333,
+          "days": 0.0010763888888888889
+        },
+        "active_time": {
+          "seconds": 93.0,
+          "hours": 0.025833333333333333,
+          "days": 0.0010763888888888889
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "dvhthomas"
+      },
+      {
+        "item_id": "#159",
+        "title": "fix(lsp): admit bare-IDENT-prefix-of-known-function as calc-shape for completion",
+        "created_at": "2026-05-08T17:54:53+00:00",
+        "merged_at": "2026-05-08T19:38:32+00:00",
+        "cycle_time": {
+          "seconds": 6219.0,
+          "hours": 1.7275,
+          "days": 0.07197916666666666
+        },
+        "active_time": {
+          "seconds": 6219.0,
+          "hours": 1.7275,
+          "days": 0.07197916666666666
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "dvhthomas"
+      }
+    ]
   },
   "docs": {
     "metrics": "docs/METRICS.md",
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency week --repo pre-commit/pre-commit --start 2026-05-05 --stop 2026-05-11 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo CalcMark/go-calcmark --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

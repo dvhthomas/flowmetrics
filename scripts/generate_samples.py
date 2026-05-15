@@ -186,6 +186,66 @@ def _cell(d: str, name: str, present: bool) -> str:
     )
 
 
+def build_samples_md(sets: list[SampleSet], generated_at: datetime) -> str:
+    """Markdown navigation for the samples/ directory.
+
+    Renders well on github.com (so the in-repo file is browsable) and
+    in any local Markdown viewer. The corresponding `index.html` is for
+    the Pages site; this one is for anyone reading the repo.
+
+    Per-report rows use relative links so the same file works whether
+    viewed at `samples/SAMPLES.md` or copied elsewhere in the tree."""
+    lines: list[str] = [
+        "# Sample reports",
+        "",
+        f"_Generated {generated_at.strftime('%Y-%m-%d %H:%M:%S %Z').strip()}_",
+        "",
+        "Open the `.html` files directly in a browser — no server needed; "
+        "Vega-Lite loads from CDN via plain `<script>` tags.",
+        "",
+        "Each report comes in three formats: **html** (interactive chart), "
+        "**txt** (terminal output), and **json** (agent-readable envelope). "
+        "Reports marked _n/a_ are skipped for sources whose data shape doesn't "
+        "support the report (e.g. CFD on a GitHub repo without intermediate "
+        "workflow states).",
+        "",
+    ]
+
+    def _link(d: str, name: str, present: bool) -> str:
+        if not present:
+            return "_n/a_"
+        return (
+            f"[html]({d}/{name}.html) · "
+            f"[txt]({d}/{name}.txt) · "
+            f"[json]({d}/{name}.json)"
+        )
+
+    for s in sets:
+        slug = s.repo.slug
+        d = s.efficiency_html.parent.name
+        lines.append(f"## {slug}")
+        lines.append("")
+        lines.append(f"_{s.repo.archetype}_")
+        lines.append("")
+        lines.append("| Report | Formats |")
+        lines.append("| --- | --- |")
+        lines.append(f"| Efficiency | {_link(d, 'efficiency', True)} |")
+        lines.append(f"| Forecast — when done | {_link(d, 'forecast-when-done', True)} |")
+        lines.append(f"| Forecast — how many | {_link(d, 'forecast-how-many', True)} |")
+        lines.append(f"| CFD | {_link(d, 'cfd', s.cfd_html is not None)} |")
+        lines.append(f"| Aging WIP | {_link(d, 'aging', s.aging_html is not None)} |")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+    lines.append("## Reference")
+    lines.append("")
+    for path, label, blurb in REFERENCE_DOCS:
+        lines.append(f"- **[{label}]({REPO_URL}/blob/main/{path})** — {blurb}")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def build_index_html(sets: list[SampleSet], generated_at: datetime) -> str:
     rows = []
     for s in sets:
@@ -437,19 +497,27 @@ def main() -> None:
     # links to it but doesn't duplicate the per-repo table.
     index_path = SAMPLES_DIR / "index.html"
     index_path.write_text(build_index_html(sets, generated_at), encoding="utf-8")
-    print(f"\nWrote {index_path}")
+    print(f"Wrote {index_path}")
 
-    # Landing-page preview image. README embeds this inline so the
-    # homepage shows a real chart above the fold without anyone needing
-    # to click "browse samples" first.
-    # Filename intentionally does NOT lead with underscore — Jekyll
-    # treats underscore-prefixed files/dirs as private and won't ship
-    # them, so the README's image reference would 404 on Pages.
+    # Markdown navigation, parallel to index.html — readable on github.com
+    # and in local Markdown viewers without rendering the HTML.
+    md_path = SAMPLES_DIR / "SAMPLES.md"
+    md_path.write_text(build_samples_md(sets, generated_at), encoding="utf-8")
+    print(f"Wrote {md_path}")
+
+    # Landing-page preview image (best-effort). Charts are now Vega
+    # specs loaded via CDN — there's no embedded PNG to extract. If a
+    # stale preview.png is on disk we leave it alone; refreshing it
+    # requires a headless-browser screenshot (see
+    # scripts/screenshot_sample.sh for the Aging report's preview).
     preview_path = SAMPLES_DIR / "preview.png"
     preview_source = SAMPLES_DIR / "ASF_CASSANDRA" / "cfd.html"
     if preview_source.exists():
-        extract_preview_png(preview_source, preview_path)
-        print(f"Wrote {preview_path}")
+        try:
+            extract_preview_png(preview_source, preview_path)
+            print(f"Wrote {preview_path}")
+        except ValueError:
+            print(f"(preview.png not regenerated — no embedded PNG in {preview_source.name})")
 
 
 def extract_preview_png(source_html: Path, dest_png: Path) -> Path:

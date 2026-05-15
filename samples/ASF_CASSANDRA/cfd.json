@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-12T13:15:49.866093-06:00",
-  "headline": "CFD for jira:CASSANDRA Apr 12, 2026 \u2192 May 11, 2026: 113 items arrived, 113 completed, 0 still in flight at end.",
+  "generated_at": "2026-05-15T10:17:58.719128-06:00",
+  "headline": "CFD for jira:CASSANDRA Apr 15, 2026 \u2192 May 14, 2026: 44 items arrived, 44 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
     "workflow": [
@@ -15,8 +15,8 @@
       "Resolved"
     ],
     "samples": 30,
-    "arrivals_at_end": 113,
-    "departures_at_end": 113,
+    "arrivals_at_end": 44,
+    "departures_at_end": 44,
     "wip_at_end": 0
   },
   "key_insight": "Workflow has a single state \u2014 CFD collapses to one line of cumulative arrivals.",
@@ -39,371 +39,371 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-12",
-        "counts_by_state": {
-          "Triage Needed": 98,
-          "Open": 30,
-          "In Progress": 27,
-          "Patch Available": 21,
-          "Review In Progress": 9,
-          "Ready to Commit": 6,
-          "Resolved": 5
-        }
-      },
-      {
-        "sampled_on": "2026-04-13",
-        "counts_by_state": {
-          "Triage Needed": 100,
-          "Open": 85,
-          "In Progress": 82,
-          "Patch Available": 77,
-          "Review In Progress": 65,
-          "Ready to Commit": 62,
-          "Resolved": 61
-        }
-      },
-      {
-        "sampled_on": "2026-04-14",
-        "counts_by_state": {
-          "Triage Needed": 100,
-          "Open": 95,
-          "In Progress": 91,
-          "Patch Available": 86,
-          "Review In Progress": 76,
-          "Ready to Commit": 74,
-          "Resolved": 73
-        }
-      },
-      {
         "sampled_on": "2026-04-15",
         "counts_by_state": {
-          "Triage Needed": 101,
-          "Open": 96,
-          "In Progress": 92,
-          "Patch Available": 88,
-          "Review In Progress": 78,
-          "Ready to Commit": 76,
-          "Resolved": 75
+          "Triage Needed": 29,
+          "Open": 24,
+          "In Progress": 20,
+          "Patch Available": 16,
+          "Review In Progress": 5,
+          "Ready to Commit": 3,
+          "Resolved": 2
         }
       },
       {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Triage Needed": 103,
-          "Open": 98,
-          "In Progress": 96,
-          "Patch Available": 93,
-          "Review In Progress": 82,
-          "Ready to Commit": 79,
-          "Resolved": 77
+          "Triage Needed": 31,
+          "Open": 26,
+          "In Progress": 24,
+          "Patch Available": 21,
+          "Review In Progress": 9,
+          "Ready to Commit": 6,
+          "Resolved": 4
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Triage Needed": 103,
-          "Open": 99,
-          "In Progress": 97,
-          "Patch Available": 95,
-          "Review In Progress": 85,
-          "Ready to Commit": 84,
-          "Resolved": 82
+          "Triage Needed": 31,
+          "Open": 27,
+          "In Progress": 25,
+          "Patch Available": 23,
+          "Review In Progress": 12,
+          "Ready to Commit": 11,
+          "Resolved": 9
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Triage Needed": 103,
-          "Open": 99,
-          "In Progress": 97,
-          "Patch Available": 95,
-          "Review In Progress": 86,
-          "Ready to Commit": 85,
-          "Resolved": 83
+          "Triage Needed": 31,
+          "Open": 27,
+          "In Progress": 25,
+          "Patch Available": 23,
+          "Review In Progress": 13,
+          "Ready to Commit": 12,
+          "Resolved": 10
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Triage Needed": 105,
-          "Open": 101,
-          "In Progress": 98,
-          "Patch Available": 96,
-          "Review In Progress": 86,
-          "Ready to Commit": 85,
-          "Resolved": 83
+          "Triage Needed": 33,
+          "Open": 29,
+          "In Progress": 26,
+          "Patch Available": 24,
+          "Review In Progress": 13,
+          "Ready to Commit": 12,
+          "Resolved": 10
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Triage Needed": 105,
-          "Open": 101,
-          "In Progress": 99,
-          "Patch Available": 96,
-          "Review In Progress": 89,
-          "Ready to Commit": 86,
-          "Resolved": 84
+          "Triage Needed": 33,
+          "Open": 29,
+          "In Progress": 27,
+          "Patch Available": 24,
+          "Review In Progress": 17,
+          "Ready to Commit": 13,
+          "Resolved": 11
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Triage Needed": 105,
-          "Open": 102,
-          "In Progress": 100,
-          "Patch Available": 97,
-          "Review In Progress": 91,
-          "Ready to Commit": 89,
-          "Resolved": 88
+          "Triage Needed": 33,
+          "Open": 30,
+          "In Progress": 28,
+          "Patch Available": 25,
+          "Review In Progress": 19,
+          "Ready to Commit": 16,
+          "Resolved": 15
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Triage Needed": 106,
-          "Open": 103,
-          "In Progress": 100,
-          "Patch Available": 98,
-          "Review In Progress": 91,
-          "Ready to Commit": 89,
-          "Resolved": 88
+          "Triage Needed": 34,
+          "Open": 31,
+          "In Progress": 28,
+          "Patch Available": 26,
+          "Review In Progress": 19,
+          "Ready to Commit": 16,
+          "Resolved": 15
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 104,
-          "In Progress": 102,
-          "Patch Available": 100,
-          "Review In Progress": 95,
-          "Ready to Commit": 91,
-          "Resolved": 90
+          "Triage Needed": 35,
+          "Open": 32,
+          "In Progress": 30,
+          "Patch Available": 28,
+          "Review In Progress": 23,
+          "Ready to Commit": 18,
+          "Resolved": 17
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 105,
-          "In Progress": 103,
-          "Patch Available": 101,
-          "Review In Progress": 98,
-          "Ready to Commit": 93,
-          "Resolved": 92
+          "Triage Needed": 35,
+          "Open": 33,
+          "In Progress": 31,
+          "Patch Available": 29,
+          "Review In Progress": 26,
+          "Ready to Commit": 20,
+          "Resolved": 19
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 105,
-          "In Progress": 103,
-          "Patch Available": 101,
-          "Review In Progress": 98,
-          "Ready to Commit": 93,
-          "Resolved": 92
+          "Triage Needed": 35,
+          "Open": 33,
+          "In Progress": 31,
+          "Patch Available": 29,
+          "Review In Progress": 26,
+          "Ready to Commit": 20,
+          "Resolved": 19
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 105,
-          "In Progress": 103,
-          "Patch Available": 101,
-          "Review In Progress": 98,
-          "Ready to Commit": 94,
-          "Resolved": 93
+          "Triage Needed": 35,
+          "Open": 33,
+          "In Progress": 31,
+          "Patch Available": 29,
+          "Review In Progress": 26,
+          "Ready to Commit": 21,
+          "Resolved": 20
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 106,
-          "In Progress": 104,
-          "Patch Available": 103,
-          "Review In Progress": 101,
-          "Ready to Commit": 98,
-          "Resolved": 98
+          "Triage Needed": 35,
+          "Open": 34,
+          "In Progress": 32,
+          "Patch Available": 31,
+          "Review In Progress": 29,
+          "Ready to Commit": 25,
+          "Resolved": 25
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 107,
-          "In Progress": 105,
-          "Patch Available": 105,
-          "Review In Progress": 103,
-          "Ready to Commit": 101,
-          "Resolved": 100
+          "Triage Needed": 35,
+          "Open": 35,
+          "In Progress": 33,
+          "Patch Available": 33,
+          "Review In Progress": 31,
+          "Ready to Commit": 28,
+          "Resolved": 27
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Triage Needed": 107,
-          "Open": 107,
-          "In Progress": 105,
-          "Patch Available": 105,
-          "Review In Progress": 103,
-          "Ready to Commit": 101,
-          "Resolved": 101
+          "Triage Needed": 35,
+          "Open": 35,
+          "In Progress": 33,
+          "Patch Available": 33,
+          "Review In Progress": 31,
+          "Ready to Commit": 28,
+          "Resolved": 28
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Triage Needed": 108,
-          "Open": 107,
-          "In Progress": 105,
-          "Patch Available": 105,
-          "Review In Progress": 105,
-          "Ready to Commit": 105,
-          "Resolved": 105
+          "Triage Needed": 36,
+          "Open": 35,
+          "In Progress": 33,
+          "Patch Available": 33,
+          "Review In Progress": 33,
+          "Ready to Commit": 32,
+          "Resolved": 32
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Triage Needed": 108,
-          "Open": 107,
-          "In Progress": 105,
-          "Patch Available": 105,
-          "Review In Progress": 105,
-          "Ready to Commit": 105,
-          "Resolved": 105
+          "Triage Needed": 36,
+          "Open": 35,
+          "In Progress": 33,
+          "Patch Available": 33,
+          "Review In Progress": 33,
+          "Ready to Commit": 32,
+          "Resolved": 32
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Triage Needed": 108,
-          "Open": 107,
-          "In Progress": 106,
-          "Patch Available": 106,
-          "Review In Progress": 106,
-          "Ready to Commit": 106,
-          "Resolved": 106
+          "Triage Needed": 36,
+          "Open": 35,
+          "In Progress": 34,
+          "Patch Available": 34,
+          "Review In Progress": 34,
+          "Ready to Commit": 33,
+          "Resolved": 33
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Triage Needed": 109,
-          "Open": 108,
-          "In Progress": 107,
-          "Patch Available": 107,
-          "Review In Progress": 107,
-          "Ready to Commit": 106,
-          "Resolved": 106
+          "Triage Needed": 37,
+          "Open": 36,
+          "In Progress": 35,
+          "Patch Available": 35,
+          "Review In Progress": 35,
+          "Ready to Commit": 33,
+          "Resolved": 33
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Triage Needed": 112,
-          "Open": 111,
-          "In Progress": 109,
-          "Patch Available": 109,
-          "Review In Progress": 107,
-          "Ready to Commit": 106,
-          "Resolved": 106
+          "Triage Needed": 40,
+          "Open": 39,
+          "In Progress": 37,
+          "Patch Available": 37,
+          "Review In Progress": 35,
+          "Ready to Commit": 33,
+          "Resolved": 33
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Triage Needed": 112,
-          "Open": 111,
-          "In Progress": 110,
-          "Patch Available": 110,
-          "Review In Progress": 110,
-          "Ready to Commit": 108,
-          "Resolved": 108
+          "Triage Needed": 40,
+          "Open": 39,
+          "In Progress": 38,
+          "Patch Available": 38,
+          "Review In Progress": 38,
+          "Ready to Commit": 35,
+          "Resolved": 35
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Triage Needed": 112,
-          "Open": 112,
-          "In Progress": 112,
-          "Patch Available": 112,
-          "Review In Progress": 112,
-          "Ready to Commit": 111,
-          "Resolved": 111
+          "Triage Needed": 40,
+          "Open": 40,
+          "In Progress": 40,
+          "Patch Available": 40,
+          "Review In Progress": 40,
+          "Ready to Commit": 38,
+          "Resolved": 38
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Triage Needed": 112,
-          "Open": 112,
-          "In Progress": 112,
-          "Patch Available": 112,
-          "Review In Progress": 112,
-          "Ready to Commit": 112,
-          "Resolved": 112
+          "Triage Needed": 40,
+          "Open": 40,
+          "In Progress": 40,
+          "Patch Available": 40,
+          "Review In Progress": 40,
+          "Ready to Commit": 39,
+          "Resolved": 39
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Triage Needed": 113,
-          "Open": 112,
-          "In Progress": 112,
-          "Patch Available": 112,
-          "Review In Progress": 112,
-          "Ready to Commit": 112,
-          "Resolved": 112
+          "Triage Needed": 41,
+          "Open": 40,
+          "In Progress": 40,
+          "Patch Available": 40,
+          "Review In Progress": 40,
+          "Ready to Commit": 39,
+          "Resolved": 39
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Triage Needed": 113,
-          "Open": 113,
-          "In Progress": 113,
-          "Patch Available": 113,
-          "Review In Progress": 113,
-          "Ready to Commit": 113,
-          "Resolved": 113
+          "Triage Needed": 41,
+          "Open": 41,
+          "In Progress": 41,
+          "Patch Available": 41,
+          "Review In Progress": 41,
+          "Ready to Commit": 40,
+          "Resolved": 40
         }
       },
       {
         "sampled_on": "2026-05-10",
         "counts_by_state": {
-          "Triage Needed": 113,
-          "Open": 113,
-          "In Progress": 113,
-          "Patch Available": 113,
-          "Review In Progress": 113,
-          "Ready to Commit": 113,
-          "Resolved": 113
+          "Triage Needed": 41,
+          "Open": 41,
+          "In Progress": 41,
+          "Patch Available": 41,
+          "Review In Progress": 41,
+          "Ready to Commit": 40,
+          "Resolved": 40
         }
       },
       {
         "sampled_on": "2026-05-11",
         "counts_by_state": {
-          "Triage Needed": 113,
-          "Open": 113,
-          "In Progress": 113,
-          "Patch Available": 113,
-          "Review In Progress": 113,
-          "Ready to Commit": 113,
-          "Resolved": 113
+          "Triage Needed": 42,
+          "Open": 42,
+          "In Progress": 42,
+          "Patch Available": 42,
+          "Review In Progress": 42,
+          "Ready to Commit": 41,
+          "Resolved": 41
+        }
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "counts_by_state": {
+          "Triage Needed": 44,
+          "Open": 44,
+          "In Progress": 44,
+          "Patch Available": 44,
+          "Review In Progress": 43,
+          "Ready to Commit": 43,
+          "Resolved": 42
+        }
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "counts_by_state": {
+          "Triage Needed": 44,
+          "Open": 44,
+          "In Progress": 44,
+          "Patch Available": 44,
+          "Review In Progress": 44,
+          "Ready to Commit": 44,
+          "Resolved": 44
+        }
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "counts_by_state": {
+          "Triage Needed": 44,
+          "Open": 44,
+          "In Progress": 44,
+          "Patch Available": 44,
+          "Review In Progress": 44,
+          "Ready to Commit": 44,
+          "Resolved": 44
         }
       }
     ]
   },
   "input": {
     "repo": "jira:CASSANDRA",
-    "start": "2026-04-12",
-    "stop": "2026-05-11",
+    "start": "2026-04-15",
+    "stop": "2026-05-14",
     "workflow": [
       "Triage Needed",
       "Open",
@@ -421,6 +421,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo jira:CASSANDRA --start 2026-04-12 --stop 2026-05-11 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-15 --stop 2026-05-14 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1",
   "logs": []
 }

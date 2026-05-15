@@ -1,27 +1,27 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-12T13:15:14.600998-06:00",
-  "headline": "Forecast for pytest-dev/pytest: 85% confidence 25 items are done by Jun 6, 2026, starting May 12, 2026.",
+  "generated_at": "2026-05-15T10:16:48.346438-06:00",
+  "headline": "Forecast for pytest-dev/pytest: 85% confidence 25 items are done by Jun 7, 2026, starting May 15, 2026.",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
-      "50": "2026-05-31",
-      "70": "2026-06-03",
-      "85": "2026-06-06",
-      "95": "2026-06-10"
+      "50": "2026-06-01",
+      "70": "2026-06-04",
+      "85": "2026-06-07",
+      "95": "2026-06-11"
     },
     "reading": "forward \u2014 higher confidence means a later date",
     "horizon": {
-      "days_ahead": 25,
+      "days_ahead": 23,
       "training_window_days": 30,
-      "ratio": 0.8333333333333334,
+      "ratio": 0.7666666666666667,
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is May 31, 2026. 95% confidence is Jun 10, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is Jun 1, 2026. 95% confidence is Jun 11, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
-    "Commit externally on the 85% date (Jun 6, 2026), not the 50% date (May 31, 2026).",
+    "Commit externally on the 85% date (Jun 7, 2026), not the 50% date (Jun 1, 2026).",
     "Re-run weekly to track drift in the forecast."
   ],
   "caveats": [
@@ -33,154 +33,142 @@
     "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
     "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
     "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
-    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Results histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
     "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
   },
   "chart_data": {
     "histogram": [
       {
-        "date": "2026-05-17",
-        "frequency": 2
-      },
-      {
-        "date": "2026-05-18",
-        "frequency": 7
-      },
-      {
-        "date": "2026-05-19",
-        "frequency": 22
-      },
-      {
         "date": "2026-05-20",
-        "frequency": 51
+        "frequency": 3
       },
       {
         "date": "2026-05-21",
-        "frequency": 103
+        "frequency": 6
       },
       {
         "date": "2026-05-22",
-        "frequency": 201
+        "frequency": 47
       },
       {
         "date": "2026-05-23",
-        "frequency": 291
+        "frequency": 88
       },
       {
         "date": "2026-05-24",
-        "frequency": 344
+        "frequency": 171
       },
       {
         "date": "2026-05-25",
-        "frequency": 465
+        "frequency": 282
       },
       {
         "date": "2026-05-26",
-        "frequency": 561
+        "frequency": 401
       },
       {
         "date": "2026-05-27",
-        "frequency": 675
+        "frequency": 477
       },
       {
         "date": "2026-05-28",
-        "frequency": 731
+        "frequency": 620
       },
       {
         "date": "2026-05-29",
-        "frequency": 693
-      },
-      {
-        "date": "2026-05-30",
-        "frequency": 746
-      },
-      {
-        "date": "2026-05-31",
-        "frequency": 728
-      },
-      {
-        "date": "2026-06-01",
         "frequency": 703
       },
       {
+        "date": "2026-05-30",
+        "frequency": 786
+      },
+      {
+        "date": "2026-05-31",
+        "frequency": 854
+      },
+      {
+        "date": "2026-06-01",
+        "frequency": 750
+      },
+      {
         "date": "2026-06-02",
-        "frequency": 572
+        "frequency": 742
       },
       {
         "date": "2026-06-03",
-        "frequency": 592
+        "frequency": 710
       },
       {
         "date": "2026-06-04",
-        "frequency": 490
+        "frequency": 619
       },
       {
         "date": "2026-06-05",
-        "frequency": 440
+        "frequency": 548
       },
       {
         "date": "2026-06-06",
-        "frequency": 304
+        "frequency": 429
       },
       {
         "date": "2026-06-07",
-        "frequency": 270
+        "frequency": 402
       },
       {
         "date": "2026-06-08",
-        "frequency": 236
+        "frequency": 288
       },
       {
         "date": "2026-06-09",
-        "frequency": 173
+        "frequency": 267
       },
       {
         "date": "2026-06-10",
-        "frequency": 142
+        "frequency": 221
       },
       {
         "date": "2026-06-11",
-        "frequency": 127
+        "frequency": 141
       },
       {
         "date": "2026-06-12",
-        "frequency": 86
+        "frequency": 117
       },
       {
         "date": "2026-06-13",
-        "frequency": 72
+        "frequency": 89
       },
       {
         "date": "2026-06-14",
-        "frequency": 49
+        "frequency": 74
       },
       {
         "date": "2026-06-15",
-        "frequency": 39
+        "frequency": 45
       },
       {
         "date": "2026-06-16",
-        "frequency": 29
+        "frequency": 33
       },
       {
         "date": "2026-06-17",
-        "frequency": 17
+        "frequency": 23
       },
       {
         "date": "2026-06-18",
-        "frequency": 16
+        "frequency": 17
       },
       {
         "date": "2026-06-19",
-        "frequency": 7
+        "frequency": 16
       },
       {
         "date": "2026-06-20",
-        "frequency": 5
+        "frequency": 15
       },
       {
         "date": "2026-06-21",
-        "frequency": 2
+        "frequency": 3
       },
       {
         "date": "2026-06-22",
@@ -188,7 +176,7 @@
       },
       {
         "date": "2026-06-23",
-        "frequency": 1
+        "frequency": 3
       },
       {
         "date": "2026-06-24",
@@ -196,14 +184,14 @@
       },
       {
         "date": "2026-06-25",
-        "frequency": 1
+        "frequency": 2
       },
       {
         "date": "2026-06-26",
-        "frequency": 1
+        "frequency": 2
       },
       {
-        "date": "2026-07-03",
+        "date": "2026-06-28",
         "frequency": 1
       }
     ],
@@ -212,18 +200,16 @@
   "input": {
     "repo": "pytest-dev/pytest",
     "items": 25,
-    "start_date": "2026-05-12",
-    "history_start": "2026-04-12",
-    "history_end": "2026-05-11",
-    "offline": false
+    "start_date": "2026-05-15",
+    "history_start": "2026-04-15",
+    "history_end": "2026-05-14",
+    "offline": false,
+    "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-12",
-    "window_end": "2026-05-11",
+    "window_start": "2026-04-15",
+    "window_end": "2026-05-14",
     "daily_throughput": [
-      2,
-      2,
-      0,
       0,
       1,
       0,
@@ -250,13 +236,16 @@
       3,
       2,
       1,
-      2
+      2,
+      2,
+      1,
+      4
     ],
-    "total_throughput": 39,
-    "avg_throughput_per_day": 1.3,
+    "total_throughput": 42,
+    "avg_throughput_per_day": 1.4,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 5,
-    "zero_throughput_days": 14
+    "zero_throughput_days": 13
   },
   "simulation": {
     "runs": 10000,
@@ -267,6 +256,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo pytest-dev/pytest --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast when-done --repo pytest-dev/pytest --items 25 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42",
   "logs": []
 }

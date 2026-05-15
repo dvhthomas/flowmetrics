@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flow efficiency</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
+         line-height: 1.55; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
+       margin-top: 2.5rem; }
+  .stamp { color: #777; font-size: 0.85rem; }
+  .subtitle { color: #555; font-size: 1rem; margin: 0 0 0.6rem; }
+  .subtitle a { color: #555; text-decoration: underline; }
+  /* Tufte: non-conditional headline / definition / insight / caveats
+     used to carry decorative colored backgrounds. Three stacked colored
+     blocks at the top of the page (headline + banner + definition)
+     looked like chartjunk. Plain typographic hierarchy now; only the
+     conditional `.banner` and `.horizon` classes get colored chrome. */
+  .headline { font-size: 1.05rem; margin: 0.7rem 0; }
+  .insight { font-size: 1rem; margin: 0.7rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
+                      color: #2b7cff; }
+  details[open] > summary { margin-bottom: 0.5rem; }
+  .invocation { background: #1a1a1a; color: #f8f8f8; padding: 0.6rem 0.8rem;
+                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
+                overflow-x: auto; white-space: pre; }
+  .definition { font-size: 0.95rem; margin: 0.7rem 0; color: #444;
+                font-style: italic; }
+  /* State pill: workflow-stage labels rendered consistently across
+     the page (interventions list, per-state table, per-PR detail).
+     Visual marker says "this is a stage name." */
+  .pill { display: inline-block; padding: 0.1rem 0.55rem;
+          background: #eef1f5; color: #2b3a4a; border-radius: 999px;
+          font-size: 0.85rem; font-family: ui-monospace, "SF Mono",
+          Menlo, Consolas, monospace; white-space: nowrap; }
+  /* Single horizontal stacked bar for distribution. Each segment is
+     one aging band; width = share; color = yellow→red sequential.
+     Inline label inside the segment when wide enough. */
+  .dist-bar { display: flex; width: 100%; height: 42px;
+              border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+  .dist-bar .seg { display: flex; align-items: center; justify-content: center;
+                   color: #2b2b2b; font-size: 0.85rem; padding: 0 0.3rem;
+                   overflow: hidden; white-space: nowrap;
+                   text-overflow: ellipsis; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 0.8rem;
+                 font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+  .dist-legend .swatch { display: inline-block; width: 0.9rem;
+                         height: 0.9rem; vertical-align: middle;
+                         margin-right: 0.3rem; border-radius: 2px; }
+  .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
+             font-size: 0.95rem; }
+  .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
+  .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .banner { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d;
+            padding: 0.9rem 1.1rem; margin: 1rem 0; font-size: 1rem;
+            font-weight: 500; }
+  .intervention { display: flex; gap: 1rem; padding: 0.4rem 0;
+                  border-bottom: 1px solid #eee; align-items: center;
+                  font-variant-numeric: tabular-nums; }
+  .intervention .state { min-width: 22ch; font-size: 0.9rem; }
+  .intervention .id { min-width: 9ch; }
+  .intervention .age { min-width: 8ch; color: #cc3333; font-weight: 600; }
+  .intervention .title { flex: 1; color: #333; }
+  .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
+                    text-align: center; height: 0; position: relative; }
+  .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
+                           left: 50%; transform: translateX(-50%);
+                           background: white; padding: 0 0.8rem; color: #888;
+                           font-size: 0.85rem; letter-spacing: 0.1em;
+                           text-transform: uppercase; }
+  dl dt { margin-top: 0.6rem; }
+  dl dd { margin: 0.1rem 0 0.5rem 1.2rem; color: #444; }
+  table { border-collapse: collapse; margin: 0.5rem 0; }
+  th, td { padding: 0.3rem 0.7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #fafafa; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>Flow efficiency</h1>
+<p class="subtitle">
+  for <a href="https://github.com/pytest-dev/pytest">pytest-dev/pytest</a> ·
+  2026-05-08 → 2026-05-14 ·
+  <span class="stamp">generated 2026-05-15 10:16 MDT</span>
+</p>
+<div class="headline">Portfolio flow efficiency for pytest-dev/pytest May 8, 2026 → May 14, 2026: 0.9% across 15 completed items (10 human, 5 bot).</div>
+
+
+<div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — Vacanti&#39;s recipe, the right number to act on.</div>
+
+
+<p style="font-size:1.05rem;">
+<strong>Portfolio FE: 0.9%</strong>
+across 15 PRs (10 human, 5 bot).
+188.9d cycle,
+40.8h active.
+</p>
+
+<h2>Top slowest PRs</h2>
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+These PRs drove the portfolio's cycle-time tail. Improving any one of
+them moves the portfolio number more than improving a typical PR.
+</p>
+<div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14071">#14071</a></span>
+    <span class="age">136.9d</span>
+    <span class="state"><span class="pill">FE 0.2%</span></span>
+    <span class="title">Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14375">#14375</a></span>
+    <span class="age">28.4d</span>
+    <span class="state"><span class="pill">FE 0.2%</span></span>
+    <span class="title">logging: also capture logs from non-propagating loggers</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14414">#14414</a></span>
+    <span class="age">14.9d</span>
+    <span class="state"><span class="pill">FE 3.5%</span></span>
+    <span class="title">Add datetime/timedelta support to pytest.approx (#8395)</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14443">#14443</a></span>
+    <span class="age">2.6d</span>
+    <span class="state"><span class="pill">FE 3.7%</span></span>
+    <span class="title">Fix strict options from addopts</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14472">#14472</a></span>
+    <span class="age">32.7h</span>
+    <span class="state"><span class="pill">FE 3.1%</span></span>
+    <span class="title">Fix _as_numpy_array: use variable obj instead of string literal &#34;obj&#34;</span>
+  </div>
+</div>
+
+<div id="efficiency-chart" style="width:100%;"></div>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+<script>
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 300, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#14479", "title": "docs: fix pytest-xdist plugin wording", "cycle_hours": 17.5, "active_hours": 1.0, "efficiency_pct": 5.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14479"}, {"item_id": "#14478", "title": "[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 17.71, "active_hours": 1.0, "efficiency_pct": 5.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14478"}, {"item_id": "#14475", "title": "fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 8.58, "active_hours": 1.0, "efficiency_pct": 11.7, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14475"}, {"item_id": "#14472", "title": "Fix _as_numpy_array: use variable obj instead of string literal \"obj\"", "cycle_hours": 32.68, "active_hours": 1.0, "efficiency_pct": 3.1, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14472"}, {"item_id": "#14467", "title": "docs: clarify subtests progress output", "cycle_hours": 6.13, "active_hours": 1.0, "efficiency_pct": 16.3, "is_bot": false, "band": "10\u201350%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14467"}, {"item_id": "#14466", "title": "fix approx rel for timedelta: accept float, compute rel * expected", "cycle_hours": 8.67, "active_hours": 8.67, "efficiency_pct": 100.0, "is_bot": false, "band": "\u2265 50% (healthy)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14466"}, {"item_id": "#14464", "title": "[pre-commit.ci] pre-commit autoupdate", "cycle_hours": 0.92, "active_hours": 0.92, "efficiency_pct": 100.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14464"}, {"item_id": "#14460", "title": "pastebin: deprecate `--pastebin`", "cycle_hours": 15.01, "active_hours": 1.5, "efficiency_pct": 10.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14460"}, {"item_id": "#14455", "title": "[automated] Update plugin list", "cycle_hours": 5.69, "active_hours": 1.0, "efficiency_pct": 17.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14455"}, {"item_id": "#14450", "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration", "cycle_hours": 12.45, "active_hours": 1.0, "efficiency_pct": 8.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14450"}, {"item_id": "#14449", "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts", "cycle_hours": 20.36, "active_hours": 1.0, "efficiency_pct": 4.9, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14449"}, {"item_id": "#14443", "title": "Fix strict options from addopts", "cycle_hours": 63.2, "active_hours": 2.36, "efficiency_pct": 3.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14443"}, {"item_id": "#14414", "title": "Add datetime/timedelta support to pytest.approx (#8395)", "cycle_hours": 356.91, "active_hours": 12.4, "efficiency_pct": 3.5, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14414"}, {"item_id": "#14375", "title": "logging: also capture logs from non-propagating loggers", "cycle_hours": 682.0, "active_hours": 1.5, "efficiency_pct": 0.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14375"}, {"item_id": "#14071", "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)", "cycle_hours": 3286.33, "active_hours": 5.42, "efficiency_pct": 0.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14071"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "cycle_hours", "order": "descending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10\u201350%", "\u2265 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.9, "label": "Portfolio FE: 0.9%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("efficiency-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
+<p style="font-size:0.9rem; color:#666; max-width:60ch">
+<strong>Why are so many PRs at 100%?</strong>
+A PR scores 100% when its entire cycle fits inside one activity cluster
+(default: 4-hour quiet-period threshold). Short PRs — automated version
+bumps, fast community fixes, dependabot updates — trivially fit inside
+one cluster because there's no time for a queue to form. The signal is
+in the <strong>portfolio number</strong> in the headline and the PRs
+above, not in the 100%-bar tail.
+</p>
+
+
+
+<hr class="detail-divider">
+
+<details>
+<summary>Show all 15 PRs (slowest first)</summary>
+<table>
+<thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
+<tbody>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14071">#14071</a></td>
+    <td class="num">136.9d</td>
+    <td class="num">5.4h</td>
+    <td class="num">0.2%</td>
+    <td>Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14375">#14375</a></td>
+    <td class="num">28.4d</td>
+    <td class="num">1.5h</td>
+    <td class="num">0.2%</td>
+    <td>logging: also capture logs from non-propagating loggers</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14472">#14472</a></td>
+    <td class="num">32.7h</td>
+    <td class="num">1.0h</td>
+    <td class="num">3.1%</td>
+    <td>Fix _as_numpy_array: use variable obj instead of string literal &#34;obj&#34;</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14414">#14414</a></td>
+    <td class="num">14.9d</td>
+    <td class="num">12.4h</td>
+    <td class="num">3.5%</td>
+    <td>Add datetime/timedelta support to pytest.approx (#8395)</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14443">#14443</a></td>
+    <td class="num">2.6d</td>
+    <td class="num">2.4h</td>
+    <td class="num">3.7%</td>
+    <td>Fix strict options from addopts</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14449">#14449</a></td>
+    <td class="num">20.4h</td>
+    <td class="num">1.0h</td>
+    <td class="num">4.9%</td>
+    <td>[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14478">#14478</a></td>
+    <td class="num">17.7h</td>
+    <td class="num">1.0h</td>
+    <td class="num">5.6%</td>
+    <td>[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for bac</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14479">#14479</a></td>
+    <td class="num">17.5h</td>
+    <td class="num">1.0h</td>
+    <td class="num">5.7%</td>
+    <td>docs: fix pytest-xdist plugin wording</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14450">#14450</a></td>
+    <td class="num">12.4h</td>
+    <td class="num">1.0h</td>
+    <td class="num">8.0%</td>
+    <td>build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14460">#14460</a></td>
+    <td class="num">15.0h</td>
+    <td class="num">1.5h</td>
+    <td class="num">10.0%</td>
+    <td>pastebin: deprecate `--pastebin`</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14475">#14475</a></td>
+    <td class="num">8.6h</td>
+    <td class="num">1.0h</td>
+    <td class="num">11.7%</td>
+    <td>fix mark expression scanner: search for backslash in string value, not entire in</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14467">#14467</a></td>
+    <td class="num">6.1h</td>
+    <td class="num">1.0h</td>
+    <td class="num">16.3%</td>
+    <td>docs: clarify subtests progress output</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14455">#14455</a></td>
+    <td class="num">5.7h</td>
+    <td class="num">1.0h</td>
+    <td class="num">17.6%</td>
+    <td>[automated] Update plugin list</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14466">#14466</a></td>
+    <td class="num">8.7h</td>
+    <td class="num">8.7h</td>
+    <td class="num">100.0%</td>
+    <td>fix approx rel for timedelta: accept float, compute rel * expected</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/pytest-dev/pytest/pull/14464">#14464</a></td>
+    <td class="num">0.9h</td>
+    <td class="num">0.9h</td>
+    <td class="num">100.0%</td>
+    <td>[pre-commit.ci] pre-commit autoupdate</td>
+  </tr>
+</tbody>
+</table>
+</details>
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Repo</th><td>pytest-dev/pytest</td></tr>
+  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Active-time gap</th><td>4.0h</td></tr>
+  <tr><th>Min cluster</th><td>30.0min</td></tr>
+</table>
+<div class="invocation">uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = Σ active / Σ cycle across all merged PRs in this window — Vacanti&#39;s recipe, the right number to act on.</p>
+
+<p><strong>How active time was calculated.</strong>
+We grouped each PR's events (commits, reviews, comments) into work sessions:
+events more than <strong>4.0 hours</strong> apart start a new
+session, and a single isolated event counts as at least
+<strong>30.0 minutes</strong> of active time (so a
+lone comment isn't counted as zero work).</p>
+
+<p><strong>Per-PR distribution (median / mean).</strong>
+Reported because people ask for them, but the <strong>portfolio</strong>
+number above is the right one. Mean of per-PR ratios is inflated by a
+long tail of tiny fast PRs; median tells you what a typical PR looks
+like in isolation but doesn't reflect the system.</p>
+<table>
+  <tr><th>Median per-PR FE</th><td class="num">5.7%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">19.4%</td></tr>
+</table>
+
+<p><strong>Key insight.</strong> This is in Vacanti&#39;s typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (#14071)  ran 136.9d and dominates the ratio.</p>
+
+<p><strong>Next actions</strong></p>
+<ol style="font-size:0.95rem;">
+  <li>Inspect the three slowest PRs (#14071, #14375, #14414) — they likely sat in review queue.</li>
+  <li>Compare to the previous 2-4 weeks to spot a trend.</li>
+  <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
+</ol>
+
+<p><strong>Caveats</strong></p>
+<ul style="font-size:0.9rem; color:#555">
+  <li>Never use this metric per engineer — it reflects the system, not individuals.</li>
+  <li>Per-PR FE is a directional indicator, not a precise measurement.</li>
+  <li>Active time uses gap=4.0h and min_cluster=30.0min — tuning these moves the number.</li>
+</ul>
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+  <dt><strong>Cycle time</strong></dt>
+  <dd>Wall-clock time from when a PR was opened until it was merged. The clock starts at `created_at` and stops at `merged_at`.</dd>
+  <dt><strong>Active time</strong></dt>
+  <dd>The share of cycle time covered by clusters of activity events (commits, reviews, comments). Events more than `gap-hours` apart form separate clusters; each cluster credits at least `min-cluster-minutes` of active time.</dd>
+  <dt><strong>Wait time</strong></dt>
+  <dd>cycle_time − active_time. Time the PR spent waiting in queues (awaiting review, blocked, etc.). Vacanti&#39;s actionable signal — queues are where the system bottlenecks live.</dd>
+  <dt><strong>Flow efficiency</strong></dt>
+  <dd>active_time / cycle_time. Reported per-PR and as a portfolio.</dd>
+  <dt><strong>Portfolio flow efficiency</strong></dt>
+  <dd>Σ active / Σ cycle across all merged PRs in this window. Vacanti&#39;s system-level recipe — long-running PRs dominate, which is what you want. Contrast with mean(per-PR FE), which weights every PR equally: fifty trivial 5-minute PRs at 100% drown out one 30-day PR at 5%, even though the latter is where your wait time actually lives. Portfolio = the system&#39;s number; mean per-PR = an aggregate of individual ratios that hides where the queue is.</dd>
+  <dt><strong>Mean per-PR FE (and why not to act on it)</strong></dt>
+  <dd>Simple average of each PR&#39;s individual flow efficiency. It tells you what a typical PR&#39;s ratio looks like in isolation, but it does not reflect the system — a long tail of small fast PRs makes it look great even when one big PR sits in review for weeks. Reported for transparency; do not optimize against it. Use Portfolio FE instead.</dd>
+</dl>
+</details>
+
+
+
+</body>
+</html>

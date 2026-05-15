@@ -1,31 +1,31 @@
 {
   "schema": "flowmetrics.efficiency.v1",
-  "command": "efficiency week",
-  "generated_at": "2026-05-12T13:15:13.052061-06:00",
-  "headline": "Portfolio flow efficiency for pytest-dev/pytest May 5, 2026 \u2192 May 11, 2026: 2.0% across 9 completed items (5 human, 4 bot).",
+  "command": "efficiency",
+  "generated_at": "2026-05-15T10:16:44.381911-06:00",
+  "headline": "Portfolio flow efficiency for pytest-dev/pytest May 8, 2026 \u2192 May 14, 2026: 0.9% across 15 completed items (10 human, 5 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
-    "pr_count": 9,
-    "human_pr_count": 5,
-    "bot_pr_count": 4,
-    "portfolio_efficiency": 0.020389740777361182,
-    "median_efficiency": 0.049109213434098166,
-    "mean_efficiency": 0.16772871020685706,
+    "pr_count": 15,
+    "human_pr_count": 10,
+    "bot_pr_count": 5,
+    "portfolio_efficiency": 0.008994519369672375,
+    "median_efficiency": 0.057151021574510644,
+    "mean_efficiency": 0.1936634529404578,
     "total_cycle": {
-      "seconds": 4857639.0,
-      "hours": 1349.3441666666668,
-      "days": 56.22267361111111
+      "seconds": 16322940.0,
+      "hours": 4534.15,
+      "days": 188.92291666666668
     },
     "total_active": {
-      "seconds": 99046.0,
-      "hours": 27.512777777777778,
-      "days": 1.1463657407407408
+      "seconds": 146817.0,
+      "hours": 40.7825,
+      "days": 1.6992708333333333
     },
     "observed_statuses": []
   },
-  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14375)  ran 28.4d and dominates the ratio.",
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14071)  ran 136.9d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (#14375, #14414, #14429) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (#14071, #14375, #14414) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -44,6 +44,30 @@
   },
   "chart_data": {
     "per_pr_efficiency": [
+      {
+        "item_id": "#14479",
+        "efficiency": 0.057151021574510644
+      },
+      {
+        "item_id": "#14478",
+        "efficiency": 0.056459075012154386
+      },
+      {
+        "item_id": "#14475",
+        "efficiency": 0.11658408627222384
+      },
+      {
+        "item_id": "#14472",
+        "efficiency": 0.03059845477803371
+      },
+      {
+        "item_id": "#14467",
+        "efficiency": 0.16317650258362795
+      },
+      {
+        "item_id": "#14466",
+        "efficiency": 1.0
+      },
       {
         "item_id": "#14464",
         "efficiency": 1.0
@@ -69,33 +93,148 @@
         "efficiency": 0.037332161300955936
       },
       {
-        "item_id": "#14429",
-        "efficiency": 0.030225753050454055
-      },
-      {
         "item_id": "#14414",
         "efficiency": 0.03475628263898077
       },
       {
         "item_id": "#14375",
         "efficiency": 0.002199415281374455
+      },
+      {
+        "item_id": "#14071",
+        "efficiency": 0.0016500150750570482
       }
     ]
   },
   "input": {
     "repo": "pytest-dev/pytest",
-    "start": "2026-05-05",
-    "stop": "2026-05-11",
+    "start": "2026-05-08",
+    "stop": "2026-05-14",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
-    ]
+    ],
+    "jira_url": null
   },
   "result": {
     "per_pr": [
+      {
+        "item_id": "#14479",
+        "title": "docs: fix pytest-xdist plugin wording",
+        "created_at": "2026-05-13T15:50:42+00:00",
+        "merged_at": "2026-05-14T09:20:33+00:00",
+        "cycle_time": {
+          "seconds": 62991.0,
+          "hours": 17.4975,
+          "days": 0.7290625
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.057151021574510644,
+        "is_bot": false,
+        "author_login": "lphuc2250gma"
+      },
+      {
+        "item_id": "#14478",
+        "title": "[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in string value, not entire input",
+        "created_at": "2026-05-13T15:42:55+00:00",
+        "merged_at": "2026-05-14T09:25:38+00:00",
+        "cycle_time": {
+          "seconds": 63763.0,
+          "hours": 17.711944444444445,
+          "days": 0.7379976851851852
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.056459075012154386,
+        "is_bot": true,
+        "author_login": "patchback"
+      },
+      {
+        "item_id": "#14475",
+        "title": "fix mark expression scanner: search for backslash in string value, not entire input",
+        "created_at": "2026-05-13T07:08:00+00:00",
+        "merged_at": "2026-05-13T15:42:39+00:00",
+        "cycle_time": {
+          "seconds": 30879.0,
+          "hours": 8.5775,
+          "days": 0.35739583333333336
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.11658408627222384,
+        "is_bot": false,
+        "author_login": "EternalRights"
+      },
+      {
+        "item_id": "#14472",
+        "title": "Fix _as_numpy_array: use variable obj instead of string literal \"obj\"",
+        "created_at": "2026-05-13T00:59:41+00:00",
+        "merged_at": "2026-05-14T09:40:34+00:00",
+        "cycle_time": {
+          "seconds": 117653.0,
+          "hours": 32.68138888888889,
+          "days": 1.361724537037037
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.03059845477803371,
+        "is_bot": false,
+        "author_login": "algojogacor"
+      },
+      {
+        "item_id": "#14467",
+        "title": "docs: clarify subtests progress output",
+        "created_at": "2026-05-12T07:54:49+00:00",
+        "merged_at": "2026-05-12T14:02:31+00:00",
+        "cycle_time": {
+          "seconds": 22062.0,
+          "hours": 6.128333333333333,
+          "days": 0.2553472222222222
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.16317650258362795,
+        "is_bot": false,
+        "author_login": "1Utkarsh1"
+      },
+      {
+        "item_id": "#14466",
+        "title": "fix approx rel for timedelta: accept float, compute rel * expected",
+        "created_at": "2026-05-12T00:43:44+00:00",
+        "merged_at": "2026-05-12T09:24:13+00:00",
+        "cycle_time": {
+          "seconds": 31229.0,
+          "hours": 8.674722222222222,
+          "days": 0.36144675925925923
+        },
+        "active_time": {
+          "seconds": 31229.0,
+          "hours": 8.674722222222222,
+          "days": 0.36144675925925923
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "EternalRights"
+      },
       {
         "item_id": "#14464",
         "title": "[pre-commit.ci] pre-commit autoupdate",
@@ -211,25 +350,6 @@
         "author_login": "praneethhere"
       },
       {
-        "item_id": "#14429",
-        "title": "Fix Argument.__repr__ crash when _action is not initialized",
-        "created_at": "2026-04-29T17:02:29+00:00",
-        "merged_at": "2026-05-07T17:50:26+00:00",
-        "cycle_time": {
-          "seconds": 694077.0,
-          "hours": 192.79916666666668,
-          "days": 8.03329861111111
-        },
-        "active_time": {
-          "seconds": 20979.0,
-          "hours": 5.8275,
-          "days": 0.2428125
-        },
-        "efficiency": 0.030225753050454055,
-        "is_bot": false,
-        "author_login": "EternalRights"
-      },
-      {
         "item_id": "#14414",
         "title": "Add datetime/timedelta support to pytest.approx (#8395)",
         "created_at": "2026-04-23T11:02:53+00:00",
@@ -266,6 +386,25 @@
         "efficiency": 0.002199415281374455,
         "is_bot": false,
         "author_login": "bluetech"
+      },
+      {
+        "item_id": "#14071",
+        "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)",
+        "created_at": "2025-12-28T15:27:52+00:00",
+        "merged_at": "2026-05-14T13:47:53+00:00",
+        "cycle_time": {
+          "seconds": 11830801.0,
+          "hours": 3286.333611111111,
+          "days": 136.93056712962962
+        },
+        "active_time": {
+          "seconds": 19521.0,
+          "hours": 5.4225,
+          "days": 0.2259375
+        },
+        "efficiency": 0.0016500150750570482,
+        "is_bot": false,
+        "author_login": "yastcher"
       }
     ]
   },
@@ -274,6 +413,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency week --repo pytest-dev/pytest --start 2026-05-05 --stop 2026-05-11 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

@@ -1,15 +1,15 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-12T13:15:21.778843-06:00",
-  "headline": "Forecast for huggingface/transformers: 85% confidence 25 items are done by May 16, 2026, starting May 12, 2026.",
+  "generated_at": "2026-05-15T10:17:24.147098-06:00",
+  "headline": "Forecast for huggingface/transformers: 85% confidence 25 items are done by May 19, 2026, starting May 15, 2026.",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
-      "50": "2026-05-15",
-      "70": "2026-05-15",
-      "85": "2026-05-16",
-      "95": "2026-05-18"
+      "50": "2026-05-17",
+      "70": "2026-05-18",
+      "85": "2026-05-19",
+      "95": "2026-05-20"
     },
     "reading": "forward \u2014 higher confidence means a later date",
     "horizon": {
@@ -19,9 +19,9 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is May 15, 2026. 95% confidence is May 18, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is May 17, 2026. 95% confidence is May 20, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
-    "Commit externally on the 85% date (May 16, 2026), not the 50% date (May 15, 2026).",
+    "Commit externally on the 85% date (May 19, 2026), not the 50% date (May 17, 2026).",
     "Re-run weekly to track drift in the forecast."
   ],
   "caveats": [
@@ -33,62 +33,62 @@
     "Throughput": "Items completed per unit time (here: per day). The empirical input Monte Carlo Simulation draws from.",
     "Training window": "The recent period whose daily throughput we sample. Defaults to the last 30 calendar days ending yesterday-UTC \u2014 Vacanti's recommended horizon.",
     "Monte Carlo Simulation": "Draws daily throughput with replacement, simulates forward, and repeats (10,000 runs by default). The distribution of outcomes is the forecast.",
-    "Results Histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
+    "Results histogram": "The empirical distribution produced by Monte Carlo. X-axis = outcome (date for when-done; item count for how-many); Y-axis = simulation-run frequency.",
     "Percentile": "Confidence level. For when-done (date axis): read FORWARD \u2014 85% confidence is a later date. For how-many (items axis): read BACKWARD \u2014 85% confidence is FEWER items, a more conservative commitment."
   },
   "chart_data": {
     "histogram": [
       {
-        "date": "2026-05-12",
-        "frequency": 296
-      },
-      {
-        "date": "2026-05-13",
-        "frequency": 1538
-      },
-      {
-        "date": "2026-05-14",
-        "frequency": 2934
-      },
-      {
         "date": "2026-05-15",
-        "frequency": 2403
+        "frequency": 298
       },
       {
         "date": "2026-05-16",
-        "frequency": 1518
+        "frequency": 1508
       },
       {
         "date": "2026-05-17",
-        "frequency": 723
+        "frequency": 3249
       },
       {
         "date": "2026-05-18",
-        "frequency": 332
+        "frequency": 2494
       },
       {
         "date": "2026-05-19",
-        "frequency": 162
+        "frequency": 1350
       },
       {
         "date": "2026-05-20",
-        "frequency": 59
+        "frequency": 637
       },
       {
         "date": "2026-05-21",
-        "frequency": 22
+        "frequency": 288
       },
       {
         "date": "2026-05-22",
-        "frequency": 6
+        "frequency": 106
       },
       {
         "date": "2026-05-23",
-        "frequency": 2
+        "frequency": 43
       },
       {
         "date": "2026-05-24",
-        "frequency": 5
+        "frequency": 17
+      },
+      {
+        "date": "2026-05-25",
+        "frequency": 7
+      },
+      {
+        "date": "2026-05-26",
+        "frequency": 2
+      },
+      {
+        "date": "2026-05-29",
+        "frequency": 1
       }
     ],
     "total_runs": 10000
@@ -96,18 +96,16 @@
   "input": {
     "repo": "huggingface/transformers",
     "items": 25,
-    "start_date": "2026-05-12",
-    "history_start": "2026-04-12",
-    "history_end": "2026-05-11",
-    "offline": false
+    "start_date": "2026-05-15",
+    "history_start": "2026-04-15",
+    "history_end": "2026-05-14",
+    "offline": false,
+    "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-12",
-    "window_end": "2026-05-11",
+    "window_start": "2026-04-15",
+    "window_end": "2026-05-14",
     "daily_throughput": [
-      0,
-      18,
-      12,
       13,
       8,
       8,
@@ -134,13 +132,16 @@
       10,
       0,
       0,
-      9
+      9,
+      14,
+      15,
+      11
     ],
-    "total_throughput": 241,
-    "avg_throughput_per_day": 8.033333333333333,
+    "total_throughput": 251,
+    "avg_throughput_per_day": 8.366666666666667,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 26,
-    "zero_throughput_days": 7
+    "zero_throughput_days": 6
   },
   "simulation": {
     "runs": 10000,
@@ -151,6 +152,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-12 --history-start 2026-04-12 --history-end 2026-05-11 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42",
   "logs": []
 }

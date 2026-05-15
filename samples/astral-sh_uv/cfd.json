@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-12T13:15:10.341624-06:00",
-  "headline": "CFD for astral-sh/uv Apr 12, 2026 \u2192 May 11, 2026: 197 items arrived, 197 completed, 0 still in flight at end.",
+  "generated_at": "2026-05-15T10:16:33.681412-06:00",
+  "headline": "CFD for astral-sh/uv Apr 15, 2026 \u2192 May 14, 2026: 202 items arrived, 202 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
     "workflow": [
@@ -10,8 +10,8 @@
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 197,
-    "departures_at_end": 197,
+    "arrivals_at_end": 202,
+    "departures_at_end": 202,
     "wip_at_end": 0
   },
   "key_insight": "Workflow has a single state \u2014 CFD collapses to one line of cumulative arrivals.",
@@ -34,221 +34,221 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-12",
-        "counts_by_state": {
-          "Open": 16,
-          "Merged": 2
-        }
-      },
-      {
-        "sampled_on": "2026-04-13",
-        "counts_by_state": {
-          "Open": 29,
-          "Merged": 14
-        }
-      },
-      {
-        "sampled_on": "2026-04-14",
-        "counts_by_state": {
-          "Open": 30,
-          "Merged": 18
-        }
-      },
-      {
         "sampled_on": "2026-04-15",
         "counts_by_state": {
-          "Open": 36,
-          "Merged": 23
+          "Open": 19,
+          "Merged": 5
         }
       },
       {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Open": 39,
-          "Merged": 25
+          "Open": 22,
+          "Merged": 7
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Open": 48,
-          "Merged": 34
+          "Open": 31,
+          "Merged": 16
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Open": 48,
-          "Merged": 35
+          "Open": 31,
+          "Merged": 17
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Open": 49,
-          "Merged": 36
+          "Open": 32,
+          "Merged": 18
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Open": 75,
-          "Merged": 60
+          "Open": 58,
+          "Merged": 42
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Open": 87,
-          "Merged": 78
+          "Open": 70,
+          "Merged": 60
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Open": 90,
-          "Merged": 82
+          "Open": 73,
+          "Merged": 64
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Open": 97,
-          "Merged": 89
+          "Open": 80,
+          "Merged": 71
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Open": 100,
-          "Merged": 91
+          "Open": 83,
+          "Merged": 73
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Open": 102,
-          "Merged": 92
+          "Open": 85,
+          "Merged": 74
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Open": 103,
-          "Merged": 92
+          "Open": 86,
+          "Merged": 74
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Open": 127,
-          "Merged": 115
+          "Open": 110,
+          "Merged": 97
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Open": 128,
-          "Merged": 116
+          "Open": 111,
+          "Merged": 98
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Open": 138,
-          "Merged": 130
+          "Open": 122,
+          "Merged": 112
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Open": 141,
-          "Merged": 136
+          "Open": 125,
+          "Merged": 118
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Open": 142,
-          "Merged": 136
+          "Open": 126,
+          "Merged": 118
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Open": 143,
-          "Merged": 137
+          "Open": 127,
+          "Merged": 119
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Open": 143,
-          "Merged": 138
+          "Open": 127,
+          "Merged": 120
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Open": 152,
-          "Merged": 151
+          "Open": 136,
+          "Merged": 133
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Open": 166,
-          "Merged": 163
+          "Open": 150,
+          "Merged": 145
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Open": 170,
-          "Merged": 167
+          "Open": 155,
+          "Merged": 149
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Open": 176,
-          "Merged": 173
+          "Open": 161,
+          "Merged": 155
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Open": 180,
-          "Merged": 176
+          "Open": 165,
+          "Merged": 158
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Open": 182,
-          "Merged": 178
+          "Open": 167,
+          "Merged": 160
         }
       },
       {
         "sampled_on": "2026-05-10",
         "counts_by_state": {
-          "Open": 186,
-          "Merged": 181
+          "Open": 171,
+          "Merged": 163
         }
       },
       {
         "sampled_on": "2026-05-11",
         "counts_by_state": {
-          "Open": 197,
-          "Merged": 197
+          "Open": 186,
+          "Merged": 179
+        }
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "counts_by_state": {
+          "Open": 193,
+          "Merged": 189
+        }
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "counts_by_state": {
+          "Open": 196,
+          "Merged": 194
+        }
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "counts_by_state": {
+          "Open": 202,
+          "Merged": 202
         }
       }
     ]
   },
   "input": {
     "repo": "astral-sh/uv",
-    "start": "2026-04-12",
-    "stop": "2026-05-11",
+    "start": "2026-04-15",
+    "stop": "2026-05-14",
     "workflow": [
       "Open",
       "Merged"
@@ -261,6 +261,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo astral-sh/uv --start 2026-04-12 --stop 2026-05-11 --workflow 'Open,Merged' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --repo astral-sh/uv --start 2026-04-15 --stop 2026-05-14 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

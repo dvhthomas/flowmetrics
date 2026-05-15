@@ -1,31 +1,31 @@
 {
   "schema": "flowmetrics.efficiency.v1",
-  "command": "efficiency week",
-  "generated_at": "2026-05-12T13:15:05.827422-06:00",
-  "headline": "Portfolio flow efficiency for astral-sh/uv May 5, 2026 \u2192 May 11, 2026: 8.4% across 46 completed items (31 human, 15 bot).",
+  "command": "efficiency",
+  "generated_at": "2026-05-15T10:16:21.257932-06:00",
+  "headline": "Portfolio flow efficiency for astral-sh/uv May 8, 2026 \u2192 May 14, 2026: 0.8% across 47 completed items (36 human, 11 bot).",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, vs. waiting in review or other queues. Portfolio FE = \u03a3 active / \u03a3 cycle across all merged PRs in this window \u2014 Vacanti's recipe, the right number to act on.",
   "summary": {
-    "pr_count": 46,
-    "human_pr_count": 31,
-    "bot_pr_count": 15,
-    "portfolio_efficiency": 0.08415354168248487,
+    "pr_count": 47,
+    "human_pr_count": 36,
+    "bot_pr_count": 11,
+    "portfolio_efficiency": 0.007593425698200119,
     "median_efficiency": 1.0,
-    "mean_efficiency": 0.7181648734466323,
+    "mean_efficiency": 0.612770606657861,
     "total_cycle": {
-      "seconds": 2423368.0,
-      "hours": 673.1577777777778,
-      "days": 28.04824074074074
+      "seconds": 41337074.0,
+      "hours": 11482.520555555555,
+      "days": 478.4383564814815
     },
     "total_active": {
-      "seconds": 203935.0,
-      "hours": 56.64861111111111,
-      "days": 2.360358796296296
+      "seconds": 313890.0,
+      "hours": 87.19166666666666,
+      "days": 3.6329861111111112
     },
     "observed_statuses": []
   },
-  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#19227)  ran 7.5d and dominates the ratio.",
+  "key_insight": "This is in Vacanti's typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#12156)  ran 427.0d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (#19227, #19311, #19312) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (#12156, #19206, #19305) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -45,12 +45,92 @@
   "chart_data": {
     "per_pr_efficiency": [
       {
+        "item_id": "#19409",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19407",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19406",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19405",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19402",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19398",
+        "efficiency": 0.3510716585410726
+      },
+      {
+        "item_id": "#19394",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19392",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19387",
+        "efficiency": 0.18234156881699032
+      },
+      {
+        "item_id": "#19386",
+        "efficiency": 0.07218045112781955
+      },
+      {
+        "item_id": "#19384",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19383",
+        "efficiency": 0.15844838087503807
+      },
+      {
+        "item_id": "#19382",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19381",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19378",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19377",
+        "efficiency": 1.0
+      },
+      {
         "item_id": "#19370",
         "efficiency": 1.0
       },
       {
+        "item_id": "#19366",
+        "efficiency": 0.06302252385167699
+      },
+      {
+        "item_id": "#19365",
+        "efficiency": 0.2105591123350453
+      },
+      {
+        "item_id": "#19364",
+        "efficiency": 0.14853001332060708
+      },
+      {
         "item_id": "#19361",
         "efficiency": 1.0
+      },
+      {
+        "item_id": "#19358",
+        "efficiency": 0.05901479732894894
       },
       {
         "item_id": "#19354",
@@ -129,18 +209,6 @@
         "efficiency": 0.062265778760346176
       },
       {
-        "item_id": "#19320",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19318",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19313",
-        "efficiency": 0.09653027296616078
-      },
-      {
         "item_id": "#19312",
         "efficiency": 0.017621030373435317
       },
@@ -149,101 +217,342 @@
         "efficiency": 0.023174971031286212
       },
       {
-        "item_id": "#19309",
-        "efficiency": 0.1792287322078782
-      },
-      {
-        "item_id": "#19306",
-        "efficiency": 0.11958223581204296
-      },
-      {
-        "item_id": "#19303",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19302",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19301",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19294",
-        "efficiency": 0.02980083111206768
-      },
-      {
-        "item_id": "#19293",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19292",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19291",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19288",
-        "efficiency": 0.09397940126846767
-      },
-      {
-        "item_id": "#19287",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19286",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19276",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19273",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19272",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19271",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19269",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19268",
-        "efficiency": 1.0
-      },
-      {
-        "item_id": "#19267",
-        "efficiency": 1.0
+        "item_id": "#19305",
+        "efficiency": 0.02631302761677967
       },
       {
         "item_id": "#19227",
         "efficiency": 0.013209110305790441
+      },
+      {
+        "item_id": "#19206",
+        "efficiency": 0.010853537694315385
+      },
+      {
+        "item_id": "#12156",
+        "efficiency": 0.0014207362327043104
       }
     ]
   },
   "input": {
     "repo": "astral-sh/uv",
-    "start": "2026-05-05",
-    "stop": "2026-05-11",
+    "start": "2026-05-08",
+    "stop": "2026-05-14",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
-    ]
+    ],
+    "jira_url": null
   },
   "result": {
     "per_pr": [
+      {
+        "item_id": "#19409",
+        "title": "Vendor netrc parser crate",
+        "created_at": "2026-05-14T22:38:52+00:00",
+        "merged_at": "2026-05-14T23:46:51+00:00",
+        "cycle_time": {
+          "seconds": 4079.0,
+          "hours": 1.1330555555555555,
+          "days": 0.04721064814814815
+        },
+        "active_time": {
+          "seconds": 4079.0,
+          "hours": 1.1330555555555555,
+          "days": 0.04721064814814815
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19407",
+        "title": "Bump `rustls-platform-verifier` to v0.7.0",
+        "created_at": "2026-05-14T22:15:33+00:00",
+        "merged_at": "2026-05-14T22:35:29+00:00",
+        "cycle_time": {
+          "seconds": 1196.0,
+          "hours": 0.3322222222222222,
+          "days": 0.013842592592592592
+        },
+        "active_time": {
+          "seconds": 1196.0,
+          "hours": 0.3322222222222222,
+          "days": 0.013842592592592592
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19406",
+        "title": "Pin to cargo-shear 1.11.2",
+        "created_at": "2026-05-14T19:36:12+00:00",
+        "merged_at": "2026-05-14T19:45:11+00:00",
+        "cycle_time": {
+          "seconds": 539.0,
+          "hours": 0.14972222222222223,
+          "days": 0.006238425925925926
+        },
+        "active_time": {
+          "seconds": 539.0,
+          "hours": 0.14972222222222223,
+          "days": 0.006238425925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "ntBre"
+      },
+      {
+        "item_id": "#19405",
+        "title": "Update toml-edit to v0.25",
+        "created_at": "2026-05-14T19:24:51+00:00",
+        "merged_at": "2026-05-14T19:39:59+00:00",
+        "cycle_time": {
+          "seconds": 908.0,
+          "hours": 0.25222222222222224,
+          "days": 0.01050925925925926
+        },
+        "active_time": {
+          "seconds": 908.0,
+          "hours": 0.25222222222222224,
+          "days": 0.01050925925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19402",
+        "title": "Verify created junctions",
+        "created_at": "2026-05-14T15:45:45+00:00",
+        "merged_at": "2026-05-14T18:06:50+00:00",
+        "cycle_time": {
+          "seconds": 8465.0,
+          "hours": 2.3513888888888888,
+          "days": 0.09797453703703704
+        },
+        "active_time": {
+          "seconds": 8465.0,
+          "hours": 2.3513888888888888,
+          "days": 0.09797453703703704
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "EliteTK"
+      },
+      {
+        "item_id": "#19398",
+        "title": "Avoid parsing JSON manifest when local Python is available",
+        "created_at": "2026-05-14T09:20:17+00:00",
+        "merged_at": "2026-05-14T15:22:39+00:00",
+        "cycle_time": {
+          "seconds": 21742.0,
+          "hours": 6.039444444444444,
+          "days": 0.2516435185185185
+        },
+        "active_time": {
+          "seconds": 7633.0,
+          "hours": 2.120277777777778,
+          "days": 0.08834490740740741
+        },
+        "efficiency": 0.3510716585410726,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19394",
+        "title": "Fix article grammar in comments",
+        "created_at": "2026-05-13T15:12:11+00:00",
+        "merged_at": "2026-05-13T17:45:43+00:00",
+        "cycle_time": {
+          "seconds": 9212.0,
+          "hours": 2.5588888888888888,
+          "days": 0.10662037037037037
+        },
+        "active_time": {
+          "seconds": 9212.0,
+          "hours": 2.5588888888888888,
+          "days": 0.10662037037037037
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "vip892766gma"
+      },
+      {
+        "item_id": "#19392",
+        "title": "Move Bazel auth helper setup into integration guide",
+        "created_at": "2026-05-13T13:37:30+00:00",
+        "merged_at": "2026-05-13T14:04:47+00:00",
+        "cycle_time": {
+          "seconds": 1637.0,
+          "hours": 0.45472222222222225,
+          "days": 0.01894675925925926
+        },
+        "active_time": {
+          "seconds": 1637.0,
+          "hours": 0.45472222222222225,
+          "days": 0.01894675925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "zsol"
+      },
+      {
+        "item_id": "#19387",
+        "title": "Remove `wmi` dependency",
+        "created_at": "2026-05-13T00:00:45+00:00",
+        "merged_at": "2026-05-13T19:33:11+00:00",
+        "cycle_time": {
+          "seconds": 70346.0,
+          "hours": 19.540555555555557,
+          "days": 0.8141898148148148
+        },
+        "active_time": {
+          "seconds": 12827.0,
+          "hours": 3.5630555555555556,
+          "days": 0.14846064814814816
+        },
+        "efficiency": 0.18234156881699032,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19386",
+        "title": "Bump `cyclonedx-bom` to remove duplicate `spdx`, `base64`, and `bitflags` crates",
+        "created_at": "2026-05-12T23:46:04+00:00",
+        "merged_at": "2026-05-13T13:37:19+00:00",
+        "cycle_time": {
+          "seconds": 49875.0,
+          "hours": 13.854166666666666,
+          "days": 0.5772569444444444
+        },
+        "active_time": {
+          "seconds": 3600.0,
+          "hours": 1.0,
+          "days": 0.041666666666666664
+        },
+        "efficiency": 0.07218045112781955,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19384",
+        "title": "Remove `zip` crate from dev dependencies",
+        "created_at": "2026-05-12T21:24:58+00:00",
+        "merged_at": "2026-05-12T21:44:29+00:00",
+        "cycle_time": {
+          "seconds": 1171.0,
+          "hours": 0.3252777777777778,
+          "days": 0.01355324074074074
+        },
+        "active_time": {
+          "seconds": 1171.0,
+          "hours": 0.3252777777777778,
+          "days": 0.01355324074074074
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19383",
+        "title": "Optimize async wheel ZIP writing",
+        "created_at": "2026-05-12T21:10:01+00:00",
+        "merged_at": "2026-05-13T19:03:29+00:00",
+        "cycle_time": {
+          "seconds": 78808.0,
+          "hours": 21.891111111111112,
+          "days": 0.9121296296296296
+        },
+        "active_time": {
+          "seconds": 12487.0,
+          "hours": 3.468611111111111,
+          "days": 0.14452546296296295
+        },
+        "efficiency": 0.15844838087503807,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19382",
+        "title": "Avoid walking nested directories in linker conflict registration",
+        "created_at": "2026-05-12T20:50:57+00:00",
+        "merged_at": "2026-05-12T21:20:57+00:00",
+        "cycle_time": {
+          "seconds": 1800.0,
+          "hours": 0.5,
+          "days": 0.020833333333333332
+        },
+        "active_time": {
+          "seconds": 1800.0,
+          "hours": 0.5,
+          "days": 0.020833333333333332
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19381",
+        "title": "Use the crates.io version of `astral_async_zip`",
+        "created_at": "2026-05-12T20:48:53+00:00",
+        "merged_at": "2026-05-12T20:59:40+00:00",
+        "cycle_time": {
+          "seconds": 647.0,
+          "hours": 0.17972222222222223,
+          "days": 0.007488425925925926
+        },
+        "active_time": {
+          "seconds": 647.0,
+          "hours": 0.17972222222222223,
+          "days": 0.007488425925925926
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19378",
+        "title": "Respect `required-environments` in `uv pip compile`",
+        "created_at": "2026-05-12T17:48:32+00:00",
+        "merged_at": "2026-05-12T18:04:52+00:00",
+        "cycle_time": {
+          "seconds": 980.0,
+          "hours": 0.2722222222222222,
+          "days": 0.011342592592592593
+        },
+        "active_time": {
+          "seconds": 980.0,
+          "hours": 0.2722222222222222,
+          "days": 0.011342592592592593
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19377",
+        "title": "Bump version to 0.11.14",
+        "created_at": "2026-05-12T15:47:44+00:00",
+        "merged_at": "2026-05-12T17:29:38+00:00",
+        "cycle_time": {
+          "seconds": 6114.0,
+          "hours": 1.6983333333333333,
+          "days": 0.07076388888888889
+        },
+        "active_time": {
+          "seconds": 6114.0,
+          "hours": 1.6983333333333333,
+          "days": 0.07076388888888889
+        },
+        "efficiency": 1.0,
+        "is_bot": true,
+        "author_login": "github-actions"
+      },
       {
         "item_id": "#19370",
         "title": "Fix JUnit upload on Windows runners",
@@ -264,6 +573,63 @@
         "author_login": "woodruffw"
       },
       {
+        "item_id": "#19366",
+        "title": "Respect build options (e.g., `--no-build`) during lock validation",
+        "created_at": "2026-05-11T17:34:49+00:00",
+        "merged_at": "2026-05-12T16:10:25+00:00",
+        "cycle_time": {
+          "seconds": 81336.0,
+          "hours": 22.593333333333334,
+          "days": 0.9413888888888889
+        },
+        "active_time": {
+          "seconds": 5126.0,
+          "hours": 1.423888888888889,
+          "days": 0.0593287037037037
+        },
+        "efficiency": 0.06302252385167699,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19365",
+        "title": "Remove usages of `zip` crate",
+        "created_at": "2026-05-11T17:09:42+00:00",
+        "merged_at": "2026-05-12T20:47:59+00:00",
+        "cycle_time": {
+          "seconds": 99497.0,
+          "hours": 27.638055555555557,
+          "days": 1.1515856481481481
+        },
+        "active_time": {
+          "seconds": 20950.0,
+          "hours": 5.819444444444445,
+          "days": 0.24247685185185186
+        },
+        "efficiency": 0.2105591123350453,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19364",
+        "title": "Apply stricter validation to all wheel filename segments",
+        "created_at": "2026-05-11T16:35:53+00:00",
+        "merged_at": "2026-05-12T19:04:54+00:00",
+        "cycle_time": {
+          "seconds": 95341.0,
+          "hours": 26.48361111111111,
+          "days": 1.1034837962962962
+        },
+        "active_time": {
+          "seconds": 14161.0,
+          "hours": 3.933611111111111,
+          "days": 0.16390046296296296
+        },
+        "efficiency": 0.14853001332060708,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
         "item_id": "#19361",
         "title": "Ensure publish to crates.io is idempotent",
         "created_at": "2026-05-11T14:44:45+00:00",
@@ -281,6 +647,25 @@
         "efficiency": 1.0,
         "is_bot": false,
         "author_login": "zanieb"
+      },
+      {
+        "item_id": "#19358",
+        "title": "Document `uv auth helper` for Bazel credential helper use",
+        "created_at": "2026-05-11T10:00:38+00:00",
+        "merged_at": "2026-05-12T16:15:09+00:00",
+        "cycle_time": {
+          "seconds": 108871.0,
+          "hours": 30.241944444444446,
+          "days": 1.2600810185185185
+        },
+        "active_time": {
+          "seconds": 6425.0,
+          "hours": 1.7847222222222223,
+          "days": 0.07436342592592593
+        },
+        "efficiency": 0.05901479732894894,
+        "is_bot": false,
+        "author_login": "zsol"
       },
       {
         "item_id": "#19354",
@@ -644,63 +1029,6 @@
         "author_login": "github-actions"
       },
       {
-        "item_id": "#19320",
-        "title": "Require git refs in URLs to be percent-encoded",
-        "created_at": "2026-05-07T21:32:38+00:00",
-        "merged_at": "2026-05-07T23:58:14+00:00",
-        "cycle_time": {
-          "seconds": 8736.0,
-          "hours": 2.4266666666666667,
-          "days": 0.10111111111111111
-        },
-        "active_time": {
-          "seconds": 8736.0,
-          "hours": 2.4266666666666667,
-          "days": 0.10111111111111111
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "woodruffw"
-      },
-      {
-        "item_id": "#19318",
-        "title": "Fix test filter to work with dot-dirs",
-        "created_at": "2026-05-07T15:08:48+00:00",
-        "merged_at": "2026-05-07T16:24:55+00:00",
-        "cycle_time": {
-          "seconds": 4567.0,
-          "hours": 1.2686111111111111,
-          "days": 0.0528587962962963
-        },
-        "active_time": {
-          "seconds": 4567.0,
-          "hours": 1.2686111111111111,
-          "days": 0.0528587962962963
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "Gankra"
-      },
-      {
-        "item_id": "#19313",
-        "title": "Respect `--no-dev` over `UV_DEV=1`",
-        "created_at": "2026-05-07T05:31:54+00:00",
-        "merged_at": "2026-05-07T15:53:28+00:00",
-        "cycle_time": {
-          "seconds": 37294.0,
-          "hours": 10.359444444444444,
-          "days": 0.4316435185185185
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.09653027296616078,
-        "is_bot": false,
-        "author_login": "charliermarsh"
-      },
-      {
         "item_id": "#19312",
         "title": "Include data files in editable builds",
         "created_at": "2026-05-07T05:23:48+00:00",
@@ -739,365 +1067,23 @@
         "author_login": "woodruffw"
       },
       {
-        "item_id": "#19309",
-        "title": "Fix bug from inconsistent workflow name in GHA-PyPI guide example",
-        "created_at": "2026-05-07T00:46:31+00:00",
-        "merged_at": "2026-05-07T17:33:31+00:00",
+        "item_id": "#19305",
+        "title": "uv audit: JSON output",
+        "created_at": "2026-05-06T22:15:39+00:00",
+        "merged_at": "2026-05-14T18:10:48+00:00",
         "cycle_time": {
-          "seconds": 60420.0,
-          "hours": 16.783333333333335,
-          "days": 0.6993055555555555
+          "seconds": 676509.0,
+          "hours": 187.91916666666665,
+          "days": 7.829965277777778
         },
         "active_time": {
-          "seconds": 10829.0,
-          "hours": 3.0080555555555555,
-          "days": 0.12533564814814815
+          "seconds": 17801.0,
+          "hours": 4.9447222222222225,
+          "days": 0.20603009259259258
         },
-        "efficiency": 0.1792287322078782,
+        "efficiency": 0.02631302761677967,
         "is_bot": false,
-        "author_login": "brews"
-      },
-      {
-        "item_id": "#19306",
-        "title": "Add `--no-editable` support to `uv pip install`",
-        "created_at": "2026-05-06T22:49:49+00:00",
-        "merged_at": "2026-05-07T13:54:38+00:00",
-        "cycle_time": {
-          "seconds": 54289.0,
-          "hours": 15.080277777777777,
-          "days": 0.6283449074074074
-        },
-        "active_time": {
-          "seconds": 6492.0,
-          "hours": 1.8033333333333332,
-          "days": 0.0751388888888889
-        },
-        "efficiency": 0.11958223581204296,
-        "is_bot": false,
-        "author_login": "zsol"
-      },
-      {
-        "item_id": "#19303",
-        "title": "Bump version to 0.11.11",
-        "created_at": "2026-05-06T18:49:52+00:00",
-        "merged_at": "2026-05-06T19:34:21+00:00",
-        "cycle_time": {
-          "seconds": 2669.0,
-          "hours": 0.7413888888888889,
-          "days": 0.030891203703703702
-        },
-        "active_time": {
-          "seconds": 2669.0,
-          "hours": 0.7413888888888889,
-          "days": 0.030891203703703702
-        },
-        "efficiency": 1.0,
-        "is_bot": true,
-        "author_login": "github-actions"
-      },
-      {
-        "item_id": "#19302",
-        "title": "Continue docs/versions/mirror publish on crates.io failure",
-        "created_at": "2026-05-06T16:43:17+00:00",
-        "merged_at": "2026-05-06T16:57:47+00:00",
-        "cycle_time": {
-          "seconds": 870.0,
-          "hours": 0.24166666666666667,
-          "days": 0.010069444444444445
-        },
-        "active_time": {
-          "seconds": 870.0,
-          "hours": 0.24166666666666667,
-          "days": 0.010069444444444445
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19301",
-        "title": "fix(cache): accept legacy ID format from pre-0.11.9 cache entries (#19298)",
-        "created_at": "2026-05-06T12:54:20+00:00",
-        "merged_at": "2026-05-06T16:16:44+00:00",
-        "cycle_time": {
-          "seconds": 12144.0,
-          "hours": 3.3733333333333335,
-          "days": 0.14055555555555554
-        },
-        "active_time": {
-          "seconds": 12144.0,
-          "hours": 3.3733333333333335,
-          "days": 0.14055555555555554
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "ChrisJr404"
-      },
-      {
-        "item_id": "#19294",
-        "title": "fix(lock): warning suggests non-existent --no-frozen flag (#19290)",
-        "created_at": "2026-05-05T19:28:09+00:00",
-        "merged_at": "2026-05-07T05:01:31+00:00",
-        "cycle_time": {
-          "seconds": 120802.0,
-          "hours": 33.556111111111115,
-          "days": 1.3981712962962962
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.02980083111206768,
-        "is_bot": false,
-        "author_login": "ChrisJr404"
-      },
-      {
-        "item_id": "#19293",
-        "title": "Bump version to 0.11.10",
-        "created_at": "2026-05-05T18:49:13+00:00",
-        "merged_at": "2026-05-05T19:39:52+00:00",
-        "cycle_time": {
-          "seconds": 3039.0,
-          "hours": 0.8441666666666666,
-          "days": 0.035173611111111114
-        },
-        "active_time": {
-          "seconds": 3039.0,
-          "hours": 0.8441666666666666,
-          "days": 0.035173611111111114
-        },
-        "efficiency": 1.0,
-        "is_bot": true,
-        "author_login": "github-actions"
-      },
-      {
-        "item_id": "#19292",
-        "title": "Add job to prepare a release branch",
-        "created_at": "2026-05-05T18:22:03+00:00",
-        "merged_at": "2026-05-05T18:43:51+00:00",
-        "cycle_time": {
-          "seconds": 1308.0,
-          "hours": 0.36333333333333334,
-          "days": 0.01513888888888889
-        },
-        "active_time": {
-          "seconds": 1308.0,
-          "hours": 0.36333333333333334,
-          "days": 0.01513888888888889
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19291",
-        "title": "Allow releases to continue on failure to publish to crates.io",
-        "created_at": "2026-05-05T16:30:06+00:00",
-        "merged_at": "2026-05-05T16:52:29+00:00",
-        "cycle_time": {
-          "seconds": 1343.0,
-          "hours": 0.37305555555555553,
-          "days": 0.015543981481481482
-        },
-        "active_time": {
-          "seconds": 1343.0,
-          "hours": 0.37305555555555553,
-          "days": 0.015543981481481482
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19288",
-        "title": "Ensure that all Python downloads do not panic on `VersionRequest::from(PythonVersion)`",
-        "created_at": "2026-05-05T14:43:40+00:00",
-        "merged_at": "2026-05-06T20:46:22+00:00",
-        "cycle_time": {
-          "seconds": 108162.0,
-          "hours": 30.045,
-          "days": 1.251875
-        },
-        "active_time": {
-          "seconds": 10165.0,
-          "hours": 2.823611111111111,
-          "days": 0.11765046296296296
-        },
-        "efficiency": 0.09397940126846767,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19287",
-        "title": "Increase the timeout for crates.io publishes",
-        "created_at": "2026-05-05T14:37:58+00:00",
-        "merged_at": "2026-05-05T17:09:47+00:00",
-        "cycle_time": {
-          "seconds": 9109.0,
-          "hours": 2.5302777777777776,
-          "days": 0.10542824074074074
-        },
-        "active_time": {
-          "seconds": 9109.0,
-          "hours": 2.5302777777777776,
-          "days": 0.10542824074074074
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19286",
-        "title": "Allow pre-release Python requests with non-zero patch versions",
-        "created_at": "2026-05-05T14:12:43+00:00",
-        "merged_at": "2026-05-05T14:37:26+00:00",
-        "cycle_time": {
-          "seconds": 1483.0,
-          "hours": 0.41194444444444445,
-          "days": 0.01716435185185185
-        },
-        "active_time": {
-          "seconds": 1483.0,
-          "hours": 0.41194444444444445,
-          "days": 0.01716435185185185
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19276",
-        "title": "Fix pre-release handling in the manual release script",
-        "created_at": "2026-05-05T07:02:32+00:00",
-        "merged_at": "2026-05-05T07:06:48+00:00",
-        "cycle_time": {
-          "seconds": 256.0,
-          "hours": 0.07111111111111111,
-          "days": 0.002962962962962963
-        },
-        "active_time": {
-          "seconds": 256.0,
-          "hours": 0.07111111111111111,
-          "days": 0.002962962962962963
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19273",
-        "title": "Bump version to 0.11.9",
-        "created_at": "2026-05-05T04:51:55+00:00",
-        "merged_at": "2026-05-05T05:06:20+00:00",
-        "cycle_time": {
-          "seconds": 865.0,
-          "hours": 0.24027777777777778,
-          "days": 0.010011574074074074
-        },
-        "active_time": {
-          "seconds": 865.0,
-          "hours": 0.24027777777777778,
-          "days": 0.010011574074074074
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "zanieb"
-      },
-      {
-        "item_id": "#19272",
-        "title": "Fix CI: update `python_upgrade` snapshot for `3.14.5rc1` pre-release, keep `LATEST_PYTHON_3_14` at stable `3.14.4`",
-        "created_at": "2026-05-05T01:32:15+00:00",
-        "merged_at": "2026-05-05T02:24:53+00:00",
-        "cycle_time": {
-          "seconds": 3158.0,
-          "hours": 0.8772222222222222,
-          "days": 0.036550925925925924
-        },
-        "active_time": {
-          "seconds": 3158.0,
-          "hours": 0.8772222222222222,
-          "days": 0.036550925925925924
-        },
-        "efficiency": 1.0,
-        "is_bot": true,
-        "author_login": "copilot-swe-agent"
-      },
-      {
-        "item_id": "#19271",
-        "title": "Bump `LATEST_PYTHON_3_14` to `3.14.5rc1`",
-        "created_at": "2026-05-05T01:10:56+00:00",
-        "merged_at": "2026-05-05T01:11:28+00:00",
-        "cycle_time": {
-          "seconds": 32.0,
-          "hours": 0.008888888888888889,
-          "days": 0.00037037037037037035
-        },
-        "active_time": {
-          "seconds": 32.0,
-          "hours": 0.008888888888888889,
-          "days": 0.00037037037037037035
-        },
-        "efficiency": 1.0,
-        "is_bot": true,
-        "author_login": "copilot-swe-agent"
-      },
-      {
-        "item_id": "#19269",
-        "title": "Fix transitive Git path dependencies in lockfiles",
-        "created_at": "2026-05-05T00:35:51+00:00",
-        "merged_at": "2026-05-05T00:47:10+00:00",
-        "cycle_time": {
-          "seconds": 679.0,
-          "hours": 0.18861111111111112,
-          "days": 0.007858796296296296
-        },
-        "active_time": {
-          "seconds": 679.0,
-          "hours": 0.18861111111111112,
-          "days": 0.007858796296296296
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "charliermarsh"
-      },
-      {
-        "item_id": "#19268",
-        "title": "Sync latest Python releases",
-        "created_at": "2026-05-05T00:35:11+00:00",
-        "merged_at": "2026-05-05T02:33:33+00:00",
-        "cycle_time": {
-          "seconds": 7102.0,
-          "hours": 1.9727777777777777,
-          "days": 0.08219907407407408
-        },
-        "active_time": {
-          "seconds": 7102.0,
-          "hours": 1.9727777777777777,
-          "days": 0.08219907407407408
-        },
-        "efficiency": 1.0,
-        "is_bot": true,
-        "author_login": "github-actions"
-      },
-      {
-        "item_id": "#19267",
-        "title": "Omit compatible release desugaring for pre-release hints",
-        "created_at": "2026-05-05T00:02:03+00:00",
-        "merged_at": "2026-05-05T00:11:22+00:00",
-        "cycle_time": {
-          "seconds": 559.0,
-          "hours": 0.15527777777777776,
-          "days": 0.006469907407407408
-        },
-        "active_time": {
-          "seconds": 559.0,
-          "hours": 0.15527777777777776,
-          "days": 0.006469907407407408
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "charliermarsh"
+        "author_login": "woodruffw"
       },
       {
         "item_id": "#19227",
@@ -1117,6 +1103,44 @@
         "efficiency": 0.013209110305790441,
         "is_bot": false,
         "author_login": "EliteTK"
+      },
+      {
+        "item_id": "#19206",
+        "title": "Add Astral mirror URL override",
+        "created_at": "2026-04-29T10:36:31+00:00",
+        "merged_at": "2026-05-12T15:39:30+00:00",
+        "cycle_time": {
+          "seconds": 1141379.0,
+          "hours": 317.0497222222222,
+          "days": 13.210405092592593
+        },
+        "active_time": {
+          "seconds": 12388.0,
+          "hours": 3.4411111111111112,
+          "days": 0.14337962962962963
+        },
+        "efficiency": 0.010853537694315385,
+        "is_bot": false,
+        "author_login": "zsol"
+      },
+      {
+        "item_id": "#12156",
+        "title": "fixed git submodule bug when using relative paths",
+        "created_at": "2025-03-13T23:22:10+00:00",
+        "merged_at": "2026-05-14T23:11:10+00:00",
+        "cycle_time": {
+          "seconds": 36892140.0,
+          "hours": 10247.816666666668,
+          "days": 426.9923611111111
+        },
+        "active_time": {
+          "seconds": 52414.0,
+          "hours": 14.559444444444445,
+          "days": 0.6066435185185185
+        },
+        "efficiency": 0.0014207362327043104,
+        "is_bot": false,
+        "author_login": "Choudhry18"
       }
     ]
   },
@@ -1125,6 +1149,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency week --repo astral-sh/uv --start 2026-05-05 --stop 2026-05-11 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo astral-sh/uv --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

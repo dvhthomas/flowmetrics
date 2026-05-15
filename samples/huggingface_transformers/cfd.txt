@@ -1,2 +1,2 @@
-CFD for huggingface/transformers Apr 12, 2026 → May 11, 2026: 241 items arrived, 241 completed, 0 
+CFD for huggingface/transformers Apr 15, 2026 → May 14, 2026: 251 items arrived, 251 completed, 0 
 still in flight at end.

@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-12T13:15:59.527464-06:00",
-  "headline": "CFD for jira:BIGTOP Apr 12, 2026 \u2192 May 11, 2026: 9 items arrived, 9 completed, 0 still in flight at end.",
+  "generated_at": "2026-05-15T10:18:33.413813-06:00",
+  "headline": "CFD for jira:BIGTOP Apr 15, 2026 \u2192 May 14, 2026: 9 items arrived, 9 completed, 0 still in flight at end.",
   "definition": "Cumulative Flow Diagram per Vacanti: cumulative arrivals on top, cumulative departures on bottom, intermediate workflow states stacked between. Vertical distance at any sample date = WIP in that band; slope = average arrival rate. Past data only \u2014 no projections.",
   "summary": {
     "workflow": [
@@ -35,33 +35,6 @@
   },
   "chart_data": {
     "points": [
-      {
-        "sampled_on": "2026-04-12",
-        "counts_by_state": {
-          "Open": 5,
-          "In Progress": 4,
-          "Patch Available": 4,
-          "Resolved": 0
-        }
-      },
-      {
-        "sampled_on": "2026-04-13",
-        "counts_by_state": {
-          "Open": 5,
-          "In Progress": 4,
-          "Patch Available": 4,
-          "Resolved": 0
-        }
-      },
-      {
-        "sampled_on": "2026-04-14",
-        "counts_by_state": {
-          "Open": 5,
-          "In Progress": 4,
-          "Patch Available": 4,
-          "Resolved": 0
-        }
-      },
       {
         "sampled_on": "2026-04-15",
         "counts_by_state": {
@@ -304,13 +277,40 @@
           "Patch Available": 9,
           "Resolved": 9
         }
+      },
+      {
+        "sampled_on": "2026-05-12",
+        "counts_by_state": {
+          "Open": 9,
+          "In Progress": 9,
+          "Patch Available": 9,
+          "Resolved": 9
+        }
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "counts_by_state": {
+          "Open": 9,
+          "In Progress": 9,
+          "Patch Available": 9,
+          "Resolved": 9
+        }
+      },
+      {
+        "sampled_on": "2026-05-14",
+        "counts_by_state": {
+          "Open": 9,
+          "In Progress": 9,
+          "Patch Available": 9,
+          "Resolved": 9
+        }
       }
     ]
   },
   "input": {
     "repo": "jira:BIGTOP",
-    "start": "2026-04-12",
-    "stop": "2026-05-11",
+    "start": "2026-04-15",
+    "stop": "2026-05-14",
     "workflow": [
       "Open",
       "In Progress",
@@ -325,6 +325,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo jira:BIGTOP --start 2026-04-12 --stop 2026-05-11 --workflow 'Open,In Progress,Patch Available,Resolved' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-15 --stop 2026-05-14 --workflow 'Open,In Progress,Patch Available,Resolved' --interval-days 1",
   "logs": []
 }
