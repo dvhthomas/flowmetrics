@@ -1,25 +1,25 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T17:19:59.866049-06:00",
-  "headline": "0.8% flow efficiency across 47 completed items (36 human, 11 bot) over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "generated_at": "2026-05-16T09:47:33.675671-06:00",
+  "headline": "0.8% flow efficiency across 50 completed items (40 human, 10 bot) over 7 days, May 9, 2026 \u2192 May 15, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 47,
-    "human_pr_count": 36,
-    "bot_pr_count": 11,
-    "portfolio_efficiency": 0.007593425698200119,
+    "pr_count": 50,
+    "human_pr_count": 40,
+    "bot_pr_count": 10,
+    "portfolio_efficiency": 0.008358030582567398,
     "median_efficiency": 1.0,
-    "mean_efficiency": 0.612770606657861,
+    "mean_efficiency": 0.6617820479935914,
     "total_cycle": {
-      "seconds": 41337074.0,
-      "hours": 11482.520555555555,
-      "days": 478.4383564814815
+      "seconds": 40669509.0,
+      "hours": 11297.085833333333,
+      "days": 470.71190972222223
     },
     "total_active": {
-      "seconds": 313890.0,
-      "hours": 87.19166666666666,
-      "days": 3.6329861111111112
+      "seconds": 339917.0,
+      "hours": 94.42138888888888,
+      "days": 3.934224537037037
     },
     "observed_statuses": []
   },
@@ -43,6 +43,30 @@
   },
   "chart_data": {
     "per_pr_efficiency": [
+      {
+        "item_id": "#19422",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19421",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19418",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19417",
+        "efficiency": 0.36435877582623577
+      },
+      {
+        "item_id": "#19414",
+        "efficiency": 1.0
+      },
+      {
+        "item_id": "#19413",
+        "efficiency": 1.0
+      },
       {
         "item_id": "#19409",
         "efficiency": 1.0
@@ -192,20 +216,12 @@
         "efficiency": 0.02999857488955394
       },
       {
-        "item_id": "#19331",
-        "efficiency": 1.0
-      },
-      {
         "item_id": "#19330",
         "efficiency": 0.2167448919367078
       },
       {
         "item_id": "#19328",
         "efficiency": 0.020967523549778527
-      },
-      {
-        "item_id": "#19322",
-        "efficiency": 0.062265778760346176
       },
       {
         "item_id": "#19312",
@@ -220,10 +236,6 @@
         "efficiency": 0.02631302761677967
       },
       {
-        "item_id": "#19227",
-        "efficiency": 0.013209110305790441
-      },
-      {
         "item_id": "#19206",
         "efficiency": 0.010853537694315385
       },
@@ -235,8 +247,8 @@
   },
   "input": {
     "repo": "astral-sh/uv",
-    "start": "2026-05-08",
-    "stop": "2026-05-14",
+    "start": "2026-05-09",
+    "stop": "2026-05-15",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
@@ -248,6 +260,120 @@
   },
   "result": {
     "per_pr": [
+      {
+        "item_id": "#19422",
+        "title": "Use structured errors for signing authentication failures",
+        "created_at": "2026-05-15T19:41:06+00:00",
+        "merged_at": "2026-05-15T21:50:57+00:00",
+        "cycle_time": {
+          "seconds": 7791.0,
+          "hours": 2.1641666666666666,
+          "days": 0.09017361111111111
+        },
+        "active_time": {
+          "seconds": 7791.0,
+          "hours": 2.1641666666666666,
+          "days": 0.09017361111111111
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19421",
+        "title": "Add support for Azure request signing",
+        "created_at": "2026-05-15T18:45:40+00:00",
+        "merged_at": "2026-05-15T19:33:36+00:00",
+        "cycle_time": {
+          "seconds": 2876.0,
+          "hours": 0.7988888888888889,
+          "days": 0.03328703703703704
+        },
+        "active_time": {
+          "seconds": 2876.0,
+          "hours": 0.7988888888888889,
+          "days": 0.03328703703703704
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19418",
+        "title": "Use audit preview feature in audit tests",
+        "created_at": "2026-05-15T15:53:11+00:00",
+        "merged_at": "2026-05-15T19:34:02+00:00",
+        "cycle_time": {
+          "seconds": 13251.0,
+          "hours": 3.680833333333333,
+          "days": 0.15336805555555555
+        },
+        "active_time": {
+          "seconds": 13251.0,
+          "hours": 3.680833333333333,
+          "days": 0.15336805555555555
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "EliteTK"
+      },
+      {
+        "item_id": "#19417",
+        "title": "Use async tar crate in `uv-build-backend`",
+        "created_at": "2026-05-15T14:12:10+00:00",
+        "merged_at": "2026-05-15T21:01:09+00:00",
+        "cycle_time": {
+          "seconds": 24539.0,
+          "hours": 6.816388888888889,
+          "days": 0.28401620370370373
+        },
+        "active_time": {
+          "seconds": 8941.0,
+          "hours": 2.483611111111111,
+          "days": 0.1034837962962963
+        },
+        "efficiency": 0.36435877582623577,
+        "is_bot": false,
+        "author_login": "charliermarsh"
+      },
+      {
+        "item_id": "#19414",
+        "title": "Move `cache_name` to uv-cache-key",
+        "created_at": "2026-05-15T12:26:36+00:00",
+        "merged_at": "2026-05-15T13:12:06+00:00",
+        "cycle_time": {
+          "seconds": 2730.0,
+          "hours": 0.7583333333333333,
+          "days": 0.03159722222222222
+        },
+        "active_time": {
+          "seconds": 2730.0,
+          "hours": 0.7583333333333333,
+          "days": 0.03159722222222222
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "EliteTK"
+      },
+      {
+        "item_id": "#19413",
+        "title": "Move `remove_virtualenv` to uv-fs",
+        "created_at": "2026-05-15T12:02:13+00:00",
+        "merged_at": "2026-05-15T13:33:27+00:00",
+        "cycle_time": {
+          "seconds": 5474.0,
+          "hours": 1.5205555555555557,
+          "days": 0.06335648148148149
+        },
+        "active_time": {
+          "seconds": 5474.0,
+          "hours": 1.5205555555555557,
+          "days": 0.06335648148148149
+        },
+        "efficiency": 1.0,
+        "is_bot": false,
+        "author_login": "EliteTK"
+      },
       {
         "item_id": "#19409",
         "title": "Vendor netrc parser crate",
@@ -952,25 +1078,6 @@
         "author_login": "nooscraft"
       },
       {
-        "item_id": "#19331",
-        "title": "Bump version to 0.11.12",
-        "created_at": "2026-05-08T21:35:27+00:00",
-        "merged_at": "2026-05-08T22:06:22+00:00",
-        "cycle_time": {
-          "seconds": 1855.0,
-          "hours": 0.5152777777777777,
-          "days": 0.021469907407407406
-        },
-        "active_time": {
-          "seconds": 1855.0,
-          "hours": 0.5152777777777777,
-          "days": 0.021469907407407406
-        },
-        "efficiency": 1.0,
-        "is_bot": false,
-        "author_login": "woodruffw"
-      },
-      {
         "item_id": "#19330",
         "title": "Upload JUnit summaries for our tests",
         "created_at": "2026-05-08T19:20:54+00:00",
@@ -1007,25 +1114,6 @@
         "efficiency": 0.020967523549778527,
         "is_bot": false,
         "author_login": "woodruffw"
-      },
-      {
-        "item_id": "#19322",
-        "title": "Sync latest Python releases",
-        "created_at": "2026-05-08T00:51:48+00:00",
-        "merged_at": "2026-05-08T21:28:10+00:00",
-        "cycle_time": {
-          "seconds": 74182.0,
-          "hours": 20.60611111111111,
-          "days": 0.8585879629629629
-        },
-        "active_time": {
-          "seconds": 4619.0,
-          "hours": 1.2830555555555556,
-          "days": 0.053460648148148146
-        },
-        "efficiency": 0.062265778760346176,
-        "is_bot": true,
-        "author_login": "github-actions"
       },
       {
         "item_id": "#19312",
@@ -1085,25 +1173,6 @@
         "author_login": "woodruffw"
       },
       {
-        "item_id": "#19227",
-        "title": "Detect TOML 1.1 and automatically enable the toml backwards compatibility preview feature",
-        "created_at": "2026-04-30T18:29:47+00:00",
-        "merged_at": "2026-05-08T06:32:56+00:00",
-        "cycle_time": {
-          "seconds": 648189.0,
-          "hours": 180.0525,
-          "days": 7.5021875
-        },
-        "active_time": {
-          "seconds": 8562.0,
-          "hours": 2.3783333333333334,
-          "days": 0.09909722222222223
-        },
-        "efficiency": 0.013209110305790441,
-        "is_bot": false,
-        "author_login": "EliteTK"
-      },
-      {
         "item_id": "#19206",
         "title": "Add Astral mirror URL override",
         "created_at": "2026-04-29T10:36:31+00:00",
@@ -1148,6 +1217,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --repo astral-sh/uv --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo astral-sh/uv --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

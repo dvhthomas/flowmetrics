@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T17:20:13.788934-06:00",
-  "headline": "CFD for jira:CASSANDRA Apr 15, 2026 \u2192 May 14, 2026: 3231 items arrived, 113 completed, 3118 still in flight at end.",
+  "generated_at": "2026-05-16T09:48:35.924888-06:00",
+  "headline": "CFD for jira:CASSANDRA Apr 16, 2026 \u2192 May 15, 2026: 3234 items arrived, 112 completed, 3122 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -15,13 +15,13 @@
       "Resolved"
     ],
     "samples": 30,
-    "arrivals_at_end": 3231,
-    "departures_at_end": 113,
-    "wip_at_start": 3098,
-    "wip_at_end": 3118,
-    "peak_wip": 3118
+    "arrivals_at_end": 3234,
+    "departures_at_end": 112,
+    "wip_at_start": 3102,
+    "wip_at_end": 3122,
+    "peak_wip": 3122
   },
-  "key_insight": "The largest WIP band at May 14, 2026 is 'Open' with 1783 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 15, 2026 is 'Open' with 1783 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -42,1633 +42,1633 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-15",
-        "counts_by_state": {
-          "Triage Needed": 3168,
-          "Open": 2348,
-          "In Progress": 560,
-          "Patch Available": 408,
-          "Review In Progress": 163,
-          "Ready to Commit": 93,
-          "Resolved": 70
-        }
-      },
-      {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Triage Needed": 3173,
-          "Open": 2351,
-          "In Progress": 567,
-          "Patch Available": 415,
-          "Review In Progress": 167,
-          "Ready to Commit": 96,
-          "Resolved": 72
+          "Triage Needed": 3172,
+          "Open": 2349,
+          "In Progress": 565,
+          "Patch Available": 413,
+          "Review In Progress": 165,
+          "Ready to Commit": 94,
+          "Resolved": 70
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Triage Needed": 3174,
-          "Open": 2352,
-          "In Progress": 568,
-          "Patch Available": 417,
-          "Review In Progress": 170,
-          "Ready to Commit": 101,
-          "Resolved": 77
+          "Triage Needed": 3173,
+          "Open": 2350,
+          "In Progress": 566,
+          "Patch Available": 415,
+          "Review In Progress": 168,
+          "Ready to Commit": 99,
+          "Resolved": 75
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Triage Needed": 3174,
-          "Open": 2352,
-          "In Progress": 569,
-          "Patch Available": 418,
-          "Review In Progress": 173,
-          "Ready to Commit": 102,
-          "Resolved": 78
+          "Triage Needed": 3173,
+          "Open": 2350,
+          "In Progress": 567,
+          "Patch Available": 416,
+          "Review In Progress": 171,
+          "Ready to Commit": 100,
+          "Resolved": 76
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Triage Needed": 3178,
-          "Open": 2355,
-          "In Progress": 571,
-          "Patch Available": 420,
-          "Review In Progress": 174,
-          "Ready to Commit": 103,
-          "Resolved": 79
+          "Triage Needed": 3177,
+          "Open": 2353,
+          "In Progress": 569,
+          "Patch Available": 418,
+          "Review In Progress": 172,
+          "Ready to Commit": 101,
+          "Resolved": 77
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Triage Needed": 3179,
-          "Open": 2355,
-          "In Progress": 573,
-          "Patch Available": 420,
-          "Review In Progress": 178,
-          "Ready to Commit": 104,
-          "Resolved": 80
+          "Triage Needed": 3178,
+          "Open": 2353,
+          "In Progress": 571,
+          "Patch Available": 418,
+          "Review In Progress": 176,
+          "Ready to Commit": 102,
+          "Resolved": 78
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Triage Needed": 3184,
-          "Open": 2357,
-          "In Progress": 575,
-          "Patch Available": 421,
-          "Review In Progress": 184,
-          "Ready to Commit": 107,
-          "Resolved": 84
+          "Triage Needed": 3183,
+          "Open": 2355,
+          "In Progress": 573,
+          "Patch Available": 419,
+          "Review In Progress": 182,
+          "Ready to Commit": 105,
+          "Resolved": 82
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Triage Needed": 3186,
-          "Open": 2360,
-          "In Progress": 575,
-          "Patch Available": 422,
-          "Review In Progress": 184,
-          "Ready to Commit": 107,
-          "Resolved": 84
+          "Triage Needed": 3185,
+          "Open": 2358,
+          "In Progress": 573,
+          "Patch Available": 420,
+          "Review In Progress": 182,
+          "Ready to Commit": 105,
+          "Resolved": 82
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Triage Needed": 3189,
-          "Open": 2362,
-          "In Progress": 578,
-          "Patch Available": 425,
-          "Review In Progress": 188,
-          "Ready to Commit": 109,
-          "Resolved": 86
+          "Triage Needed": 3188,
+          "Open": 2360,
+          "In Progress": 576,
+          "Patch Available": 423,
+          "Review In Progress": 186,
+          "Ready to Commit": 107,
+          "Resolved": 84
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Triage Needed": 3192,
-          "Open": 2364,
-          "In Progress": 580,
-          "Patch Available": 427,
-          "Review In Progress": 191,
-          "Ready to Commit": 111,
-          "Resolved": 88
+          "Triage Needed": 3191,
+          "Open": 2362,
+          "In Progress": 578,
+          "Patch Available": 425,
+          "Review In Progress": 189,
+          "Ready to Commit": 109,
+          "Resolved": 86
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Triage Needed": 3192,
-          "Open": 2364,
-          "In Progress": 580,
-          "Patch Available": 427,
-          "Review In Progress": 191,
-          "Ready to Commit": 111,
-          "Resolved": 88
+          "Triage Needed": 3191,
+          "Open": 2362,
+          "In Progress": 578,
+          "Patch Available": 425,
+          "Review In Progress": 189,
+          "Ready to Commit": 109,
+          "Resolved": 86
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Triage Needed": 3196,
-          "Open": 2364,
-          "In Progress": 580,
-          "Patch Available": 427,
-          "Review In Progress": 191,
-          "Ready to Commit": 112,
-          "Resolved": 89
+          "Triage Needed": 3195,
+          "Open": 2362,
+          "In Progress": 578,
+          "Patch Available": 425,
+          "Review In Progress": 189,
+          "Ready to Commit": 110,
+          "Resolved": 87
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Triage Needed": 3200,
-          "Open": 2367,
-          "In Progress": 583,
-          "Patch Available": 430,
-          "Review In Progress": 194,
-          "Ready to Commit": 116,
-          "Resolved": 94
+          "Triage Needed": 3199,
+          "Open": 2365,
+          "In Progress": 581,
+          "Patch Available": 428,
+          "Review In Progress": 192,
+          "Ready to Commit": 114,
+          "Resolved": 92
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Triage Needed": 3202,
-          "Open": 2369,
-          "In Progress": 585,
-          "Patch Available": 433,
-          "Review In Progress": 196,
-          "Ready to Commit": 119,
-          "Resolved": 96
+          "Triage Needed": 3201,
+          "Open": 2367,
+          "In Progress": 583,
+          "Patch Available": 431,
+          "Review In Progress": 194,
+          "Ready to Commit": 117,
+          "Resolved": 94
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Triage Needed": 3202,
-          "Open": 2369,
-          "In Progress": 585,
-          "Patch Available": 433,
-          "Review In Progress": 196,
-          "Ready to Commit": 119,
-          "Resolved": 97
+          "Triage Needed": 3201,
+          "Open": 2367,
+          "In Progress": 583,
+          "Patch Available": 431,
+          "Review In Progress": 194,
+          "Ready to Commit": 117,
+          "Resolved": 95
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Triage Needed": 3203,
-          "Open": 2369,
-          "In Progress": 585,
-          "Patch Available": 433,
-          "Review In Progress": 198,
-          "Ready to Commit": 123,
-          "Resolved": 101
+          "Triage Needed": 3202,
+          "Open": 2367,
+          "In Progress": 583,
+          "Patch Available": 431,
+          "Review In Progress": 196,
+          "Ready to Commit": 121,
+          "Resolved": 99
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Triage Needed": 3203,
-          "Open": 2369,
-          "In Progress": 585,
-          "Patch Available": 433,
-          "Review In Progress": 198,
-          "Ready to Commit": 123,
-          "Resolved": 101
+          "Triage Needed": 3202,
+          "Open": 2367,
+          "In Progress": 583,
+          "Patch Available": 431,
+          "Review In Progress": 196,
+          "Ready to Commit": 121,
+          "Resolved": 99
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Triage Needed": 3203,
-          "Open": 2369,
-          "In Progress": 586,
-          "Patch Available": 434,
-          "Review In Progress": 199,
-          "Ready to Commit": 124,
-          "Resolved": 102
+          "Triage Needed": 3202,
+          "Open": 2367,
+          "In Progress": 584,
+          "Patch Available": 432,
+          "Review In Progress": 197,
+          "Ready to Commit": 122,
+          "Resolved": 100
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Triage Needed": 3204,
-          "Open": 2370,
-          "In Progress": 587,
-          "Patch Available": 435,
-          "Review In Progress": 200,
-          "Ready to Commit": 124,
-          "Resolved": 102
+          "Triage Needed": 3203,
+          "Open": 2368,
+          "In Progress": 585,
+          "Patch Available": 433,
+          "Review In Progress": 198,
+          "Ready to Commit": 122,
+          "Resolved": 100
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Triage Needed": 3208,
-          "Open": 2373,
-          "In Progress": 589,
-          "Patch Available": 437,
-          "Review In Progress": 200,
-          "Ready to Commit": 124,
-          "Resolved": 102
+          "Triage Needed": 3207,
+          "Open": 2371,
+          "In Progress": 587,
+          "Patch Available": 435,
+          "Review In Progress": 198,
+          "Ready to Commit": 122,
+          "Resolved": 100
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Triage Needed": 3210,
-          "Open": 2373,
-          "In Progress": 590,
-          "Patch Available": 438,
-          "Review In Progress": 203,
-          "Ready to Commit": 126,
-          "Resolved": 104
+          "Triage Needed": 3209,
+          "Open": 2371,
+          "In Progress": 588,
+          "Patch Available": 436,
+          "Review In Progress": 201,
+          "Ready to Commit": 124,
+          "Resolved": 102
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Triage Needed": 3210,
-          "Open": 2374,
-          "In Progress": 592,
-          "Patch Available": 440,
-          "Review In Progress": 205,
-          "Ready to Commit": 129,
-          "Resolved": 107
+          "Triage Needed": 3209,
+          "Open": 2372,
+          "In Progress": 590,
+          "Patch Available": 438,
+          "Review In Progress": 203,
+          "Ready to Commit": 127,
+          "Resolved": 105
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Triage Needed": 3211,
-          "Open": 2375,
-          "In Progress": 593,
-          "Patch Available": 440,
-          "Review In Progress": 205,
-          "Ready to Commit": 130,
-          "Resolved": 108
+          "Triage Needed": 3210,
+          "Open": 2373,
+          "In Progress": 591,
+          "Patch Available": 438,
+          "Review In Progress": 203,
+          "Ready to Commit": 128,
+          "Resolved": 106
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Triage Needed": 3215,
-          "Open": 2375,
-          "In Progress": 593,
-          "Patch Available": 440,
-          "Review In Progress": 205,
-          "Ready to Commit": 130,
-          "Resolved": 108
+          "Triage Needed": 3214,
+          "Open": 2373,
+          "In Progress": 591,
+          "Patch Available": 438,
+          "Review In Progress": 203,
+          "Ready to Commit": 128,
+          "Resolved": 106
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Triage Needed": 3218,
-          "Open": 2379,
-          "In Progress": 596,
-          "Patch Available": 442,
-          "Review In Progress": 206,
-          "Ready to Commit": 131,
-          "Resolved": 109
+          "Triage Needed": 3217,
+          "Open": 2377,
+          "In Progress": 594,
+          "Patch Available": 440,
+          "Review In Progress": 204,
+          "Ready to Commit": 129,
+          "Resolved": 107
         }
       },
       {
         "sampled_on": "2026-05-10",
+        "counts_by_state": {
+          "Triage Needed": 3219,
+          "Open": 2380,
+          "In Progress": 597,
+          "Patch Available": 442,
+          "Review In Progress": 204,
+          "Ready to Commit": 129,
+          "Resolved": 107
+        }
+      },
+      {
+        "sampled_on": "2026-05-11",
         "counts_by_state": {
           "Triage Needed": 3220,
           "Open": 2382,
           "In Progress": 599,
           "Patch Available": 444,
           "Review In Progress": 206,
-          "Ready to Commit": 131,
-          "Resolved": 109
-        }
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "counts_by_state": {
-          "Triage Needed": 3221,
-          "Open": 2383,
-          "In Progress": 600,
-          "Patch Available": 445,
-          "Review In Progress": 207,
-          "Ready to Commit": 132,
-          "Resolved": 110
+          "Ready to Commit": 130,
+          "Resolved": 108
         }
       },
       {
         "sampled_on": "2026-05-12",
         "counts_by_state": {
-          "Triage Needed": 3224,
+          "Triage Needed": 3223,
+          "Open": 2384,
+          "In Progress": 601,
+          "Patch Available": 446,
+          "Review In Progress": 207,
+          "Ready to Commit": 132,
+          "Resolved": 109
+        }
+      },
+      {
+        "sampled_on": "2026-05-13",
+        "counts_by_state": {
+          "Triage Needed": 3225,
           "Open": 2385,
           "In Progress": 602,
           "Patch Available": 447,
-          "Review In Progress": 208,
+          "Review In Progress": 209,
           "Ready to Commit": 134,
           "Resolved": 111
         }
       },
       {
-        "sampled_on": "2026-05-13",
+        "sampled_on": "2026-05-14",
         "counts_by_state": {
-          "Triage Needed": 3226,
-          "Open": 2386,
-          "In Progress": 603,
-          "Patch Available": 448,
-          "Review In Progress": 210,
-          "Ready to Commit": 136,
-          "Resolved": 113
+          "Triage Needed": 3230,
+          "Open": 2385,
+          "In Progress": 602,
+          "Patch Available": 447,
+          "Review In Progress": 209,
+          "Ready to Commit": 135,
+          "Resolved": 112
         }
       },
       {
-        "sampled_on": "2026-05-14",
+        "sampled_on": "2026-05-15",
         "counts_by_state": {
-          "Triage Needed": 3231,
-          "Open": 2386,
-          "In Progress": 603,
-          "Patch Available": 448,
-          "Review In Progress": 210,
-          "Ready to Commit": 136,
-          "Resolved": 113
+          "Triage Needed": 3234,
+          "Open": 2385,
+          "In Progress": 602,
+          "Patch Available": 447,
+          "Review In Progress": 209,
+          "Ready to Commit": 135,
+          "Resolved": 112
         }
       }
     ],
     "bands": [
       {
-        "sampled_on": "2026-04-15",
-        "state": "Triage Needed",
-        "wip_in_state": 820,
-        "entered_at_or_later": 3168
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Open",
-        "wip_in_state": 1788,
-        "entered_at_or_later": 2348
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "In Progress",
-        "wip_in_state": 152,
-        "entered_at_or_later": 560
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Patch Available",
-        "wip_in_state": 245,
-        "entered_at_or_later": 408
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Review In Progress",
-        "wip_in_state": 70,
-        "entered_at_or_later": 163
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Ready to Commit",
-        "wip_in_state": 23,
-        "entered_at_or_later": 93
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Resolved",
-        "wip_in_state": 70,
-        "entered_at_or_later": 70
-      },
-      {
         "sampled_on": "2026-04-16",
         "state": "Triage Needed",
-        "wip_in_state": 822,
-        "entered_at_or_later": 3173
+        "wip_in_state": 823,
+        "entered_at_or_later": 3172
       },
       {
         "sampled_on": "2026-04-16",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2351
+        "entered_at_or_later": 2349
       },
       {
         "sampled_on": "2026-04-16",
         "state": "In Progress",
         "wip_in_state": 152,
-        "entered_at_or_later": 567
+        "entered_at_or_later": 565
       },
       {
         "sampled_on": "2026-04-16",
         "state": "Patch Available",
         "wip_in_state": 248,
-        "entered_at_or_later": 415
+        "entered_at_or_later": 413
       },
       {
         "sampled_on": "2026-04-16",
         "state": "Review In Progress",
         "wip_in_state": 71,
-        "entered_at_or_later": 167
+        "entered_at_or_later": 165
       },
       {
         "sampled_on": "2026-04-16",
         "state": "Ready to Commit",
         "wip_in_state": 24,
-        "entered_at_or_later": 96
+        "entered_at_or_later": 94
       },
       {
         "sampled_on": "2026-04-16",
         "state": "Resolved",
-        "wip_in_state": 72,
-        "entered_at_or_later": 72
+        "wip_in_state": 70,
+        "entered_at_or_later": 70
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Triage Needed",
-        "wip_in_state": 822,
-        "entered_at_or_later": 3174
+        "wip_in_state": 823,
+        "entered_at_or_later": 3173
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2352
+        "entered_at_or_later": 2350
       },
       {
         "sampled_on": "2026-04-17",
         "state": "In Progress",
         "wip_in_state": 151,
-        "entered_at_or_later": 568
+        "entered_at_or_later": 566
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Patch Available",
         "wip_in_state": 247,
-        "entered_at_or_later": 417
+        "entered_at_or_later": 415
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Review In Progress",
         "wip_in_state": 69,
-        "entered_at_or_later": 170
+        "entered_at_or_later": 168
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Ready to Commit",
         "wip_in_state": 24,
-        "entered_at_or_later": 101
+        "entered_at_or_later": 99
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Resolved",
-        "wip_in_state": 77,
-        "entered_at_or_later": 77
+        "wip_in_state": 75,
+        "entered_at_or_later": 75
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Triage Needed",
-        "wip_in_state": 822,
-        "entered_at_or_later": 3174
+        "wip_in_state": 823,
+        "entered_at_or_later": 3173
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2352
+        "entered_at_or_later": 2350
       },
       {
         "sampled_on": "2026-04-18",
         "state": "In Progress",
         "wip_in_state": 151,
-        "entered_at_or_later": 569
+        "entered_at_or_later": 567
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Patch Available",
         "wip_in_state": 245,
-        "entered_at_or_later": 418
+        "entered_at_or_later": 416
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Review In Progress",
         "wip_in_state": 71,
-        "entered_at_or_later": 173
+        "entered_at_or_later": 171
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Ready to Commit",
         "wip_in_state": 24,
-        "entered_at_or_later": 102
+        "entered_at_or_later": 100
       },
       {
         "sampled_on": "2026-04-18",
         "state": "Resolved",
-        "wip_in_state": 78,
-        "entered_at_or_later": 78
+        "wip_in_state": 76,
+        "entered_at_or_later": 76
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Triage Needed",
-        "wip_in_state": 823,
-        "entered_at_or_later": 3178
+        "wip_in_state": 824,
+        "entered_at_or_later": 3177
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2355
+        "entered_at_or_later": 2353
       },
       {
         "sampled_on": "2026-04-19",
         "state": "In Progress",
         "wip_in_state": 151,
-        "entered_at_or_later": 571
+        "entered_at_or_later": 569
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Patch Available",
         "wip_in_state": 246,
-        "entered_at_or_later": 420
+        "entered_at_or_later": 418
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Review In Progress",
         "wip_in_state": 71,
-        "entered_at_or_later": 174
+        "entered_at_or_later": 172
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Ready to Commit",
         "wip_in_state": 24,
-        "entered_at_or_later": 103
+        "entered_at_or_later": 101
       },
       {
         "sampled_on": "2026-04-19",
         "state": "Resolved",
-        "wip_in_state": 79,
-        "entered_at_or_later": 79
+        "wip_in_state": 77,
+        "entered_at_or_later": 77
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Triage Needed",
-        "wip_in_state": 824,
-        "entered_at_or_later": 3179
+        "wip_in_state": 825,
+        "entered_at_or_later": 3178
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Open",
         "wip_in_state": 1782,
-        "entered_at_or_later": 2355
+        "entered_at_or_later": 2353
       },
       {
         "sampled_on": "2026-04-20",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 573
+        "entered_at_or_later": 571
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Patch Available",
         "wip_in_state": 242,
-        "entered_at_or_later": 420
+        "entered_at_or_later": 418
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Review In Progress",
         "wip_in_state": 74,
-        "entered_at_or_later": 178
+        "entered_at_or_later": 176
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Ready to Commit",
         "wip_in_state": 24,
-        "entered_at_or_later": 104
+        "entered_at_or_later": 102
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Resolved",
-        "wip_in_state": 80,
-        "entered_at_or_later": 80
+        "wip_in_state": 78,
+        "entered_at_or_later": 78
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Triage Needed",
-        "wip_in_state": 827,
-        "entered_at_or_later": 3184
+        "wip_in_state": 828,
+        "entered_at_or_later": 3183
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Open",
         "wip_in_state": 1782,
-        "entered_at_or_later": 2357
+        "entered_at_or_later": 2355
       },
       {
         "sampled_on": "2026-04-21",
         "state": "In Progress",
         "wip_in_state": 154,
-        "entered_at_or_later": 575
+        "entered_at_or_later": 573
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Patch Available",
         "wip_in_state": 237,
-        "entered_at_or_later": 421
+        "entered_at_or_later": 419
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Review In Progress",
         "wip_in_state": 77,
-        "entered_at_or_later": 184
+        "entered_at_or_later": 182
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 107
+        "entered_at_or_later": 105
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Resolved",
-        "wip_in_state": 84,
-        "entered_at_or_later": 84
+        "wip_in_state": 82,
+        "entered_at_or_later": 82
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Triage Needed",
-        "wip_in_state": 826,
-        "entered_at_or_later": 3186
+        "wip_in_state": 827,
+        "entered_at_or_later": 3185
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Open",
         "wip_in_state": 1785,
-        "entered_at_or_later": 2360
+        "entered_at_or_later": 2358
       },
       {
         "sampled_on": "2026-04-22",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 575
+        "entered_at_or_later": 573
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Patch Available",
         "wip_in_state": 238,
-        "entered_at_or_later": 422
+        "entered_at_or_later": 420
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Review In Progress",
         "wip_in_state": 77,
-        "entered_at_or_later": 184
+        "entered_at_or_later": 182
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 107
+        "entered_at_or_later": 105
       },
       {
         "sampled_on": "2026-04-22",
+        "state": "Resolved",
+        "wip_in_state": 82,
+        "entered_at_or_later": 82
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Triage Needed",
+        "wip_in_state": 828,
+        "entered_at_or_later": 3188
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Open",
+        "wip_in_state": 1784,
+        "entered_at_or_later": 2360
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "In Progress",
+        "wip_in_state": 153,
+        "entered_at_or_later": 576
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Patch Available",
+        "wip_in_state": 237,
+        "entered_at_or_later": 423
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Review In Progress",
+        "wip_in_state": 79,
+        "entered_at_or_later": 186
+      },
+      {
+        "sampled_on": "2026-04-23",
+        "state": "Ready to Commit",
+        "wip_in_state": 23,
+        "entered_at_or_later": 107
+      },
+      {
+        "sampled_on": "2026-04-23",
         "state": "Resolved",
         "wip_in_state": 84,
         "entered_at_or_later": 84
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Triage Needed",
-        "wip_in_state": 827,
-        "entered_at_or_later": 3189
+        "wip_in_state": 829,
+        "entered_at_or_later": 3191
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Open",
         "wip_in_state": 1784,
         "entered_at_or_later": 2362
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "In Progress",
         "wip_in_state": 153,
         "entered_at_or_later": 578
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Patch Available",
-        "wip_in_state": 237,
+        "wip_in_state": 236,
         "entered_at_or_later": 425
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Review In Progress",
-        "wip_in_state": 79,
-        "entered_at_or_later": 188
+        "wip_in_state": 80,
+        "entered_at_or_later": 189
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Ready to Commit",
         "wip_in_state": 23,
         "entered_at_or_later": 109
       },
       {
-        "sampled_on": "2026-04-23",
+        "sampled_on": "2026-04-24",
         "state": "Resolved",
         "wip_in_state": 86,
         "entered_at_or_later": 86
       },
       {
-        "sampled_on": "2026-04-24",
-        "state": "Triage Needed",
-        "wip_in_state": 828,
-        "entered_at_or_later": 3192
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "Open",
-        "wip_in_state": 1784,
-        "entered_at_or_later": 2364
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "In Progress",
-        "wip_in_state": 153,
-        "entered_at_or_later": 580
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "Patch Available",
-        "wip_in_state": 236,
-        "entered_at_or_later": 427
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "Review In Progress",
-        "wip_in_state": 80,
-        "entered_at_or_later": 191
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "Ready to Commit",
-        "wip_in_state": 23,
-        "entered_at_or_later": 111
-      },
-      {
-        "sampled_on": "2026-04-24",
-        "state": "Resolved",
-        "wip_in_state": 88,
-        "entered_at_or_later": 88
-      },
-      {
         "sampled_on": "2026-04-25",
         "state": "Triage Needed",
-        "wip_in_state": 828,
-        "entered_at_or_later": 3192
+        "wip_in_state": 829,
+        "entered_at_or_later": 3191
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2364
+        "entered_at_or_later": 2362
       },
       {
         "sampled_on": "2026-04-25",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 580
+        "entered_at_or_later": 578
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Patch Available",
         "wip_in_state": 236,
-        "entered_at_or_later": 427
+        "entered_at_or_later": 425
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Review In Progress",
         "wip_in_state": 80,
-        "entered_at_or_later": 191
+        "entered_at_or_later": 189
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 111
+        "entered_at_or_later": 109
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Resolved",
-        "wip_in_state": 88,
-        "entered_at_or_later": 88
+        "wip_in_state": 86,
+        "entered_at_or_later": 86
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Triage Needed",
-        "wip_in_state": 832,
-        "entered_at_or_later": 3196
+        "wip_in_state": 833,
+        "entered_at_or_later": 3195
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2364
+        "entered_at_or_later": 2362
       },
       {
         "sampled_on": "2026-04-26",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 580
+        "entered_at_or_later": 578
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Patch Available",
         "wip_in_state": 236,
-        "entered_at_or_later": 427
+        "entered_at_or_later": 425
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Review In Progress",
         "wip_in_state": 79,
-        "entered_at_or_later": 191
+        "entered_at_or_later": 189
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 112
+        "entered_at_or_later": 110
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Resolved",
-        "wip_in_state": 89,
-        "entered_at_or_later": 89
+        "wip_in_state": 87,
+        "entered_at_or_later": 87
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Triage Needed",
-        "wip_in_state": 833,
-        "entered_at_or_later": 3200
+        "wip_in_state": 834,
+        "entered_at_or_later": 3199
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2367
+        "entered_at_or_later": 2365
       },
       {
         "sampled_on": "2026-04-27",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 583
+        "entered_at_or_later": 581
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Patch Available",
         "wip_in_state": 236,
-        "entered_at_or_later": 430
+        "entered_at_or_later": 428
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Review In Progress",
         "wip_in_state": 78,
-        "entered_at_or_later": 194
+        "entered_at_or_later": 192
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 116
+        "entered_at_or_later": 114
       },
       {
         "sampled_on": "2026-04-27",
+        "state": "Resolved",
+        "wip_in_state": 92,
+        "entered_at_or_later": 92
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Triage Needed",
+        "wip_in_state": 834,
+        "entered_at_or_later": 3201
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Open",
+        "wip_in_state": 1784,
+        "entered_at_or_later": 2367
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "In Progress",
+        "wip_in_state": 152,
+        "entered_at_or_later": 583
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Patch Available",
+        "wip_in_state": 237,
+        "entered_at_or_later": 431
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Review In Progress",
+        "wip_in_state": 77,
+        "entered_at_or_later": 194
+      },
+      {
+        "sampled_on": "2026-04-28",
+        "state": "Ready to Commit",
+        "wip_in_state": 23,
+        "entered_at_or_later": 117
+      },
+      {
+        "sampled_on": "2026-04-28",
         "state": "Resolved",
         "wip_in_state": 94,
         "entered_at_or_later": 94
       },
       {
-        "sampled_on": "2026-04-28",
-        "state": "Triage Needed",
-        "wip_in_state": 833,
-        "entered_at_or_later": 3202
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "Open",
-        "wip_in_state": 1784,
-        "entered_at_or_later": 2369
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "In Progress",
-        "wip_in_state": 152,
-        "entered_at_or_later": 585
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "Patch Available",
-        "wip_in_state": 237,
-        "entered_at_or_later": 433
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "Review In Progress",
-        "wip_in_state": 77,
-        "entered_at_or_later": 196
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "Ready to Commit",
-        "wip_in_state": 23,
-        "entered_at_or_later": 119
-      },
-      {
-        "sampled_on": "2026-04-28",
-        "state": "Resolved",
-        "wip_in_state": 96,
-        "entered_at_or_later": 96
-      },
-      {
         "sampled_on": "2026-04-29",
         "state": "Triage Needed",
-        "wip_in_state": 833,
-        "entered_at_or_later": 3202
+        "wip_in_state": 834,
+        "entered_at_or_later": 3201
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2369
+        "entered_at_or_later": 2367
       },
       {
         "sampled_on": "2026-04-29",
         "state": "In Progress",
         "wip_in_state": 152,
-        "entered_at_or_later": 585
+        "entered_at_or_later": 583
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Patch Available",
         "wip_in_state": 237,
-        "entered_at_or_later": 433
+        "entered_at_or_later": 431
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Review In Progress",
         "wip_in_state": 77,
+        "entered_at_or_later": 194
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Ready to Commit",
+        "wip_in_state": 22,
+        "entered_at_or_later": 117
+      },
+      {
+        "sampled_on": "2026-04-29",
+        "state": "Resolved",
+        "wip_in_state": 95,
+        "entered_at_or_later": 95
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Triage Needed",
+        "wip_in_state": 835,
+        "entered_at_or_later": 3202
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Open",
+        "wip_in_state": 1784,
+        "entered_at_or_later": 2367
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "In Progress",
+        "wip_in_state": 152,
+        "entered_at_or_later": 583
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Patch Available",
+        "wip_in_state": 235,
+        "entered_at_or_later": 431
+      },
+      {
+        "sampled_on": "2026-04-30",
+        "state": "Review In Progress",
+        "wip_in_state": 75,
         "entered_at_or_later": 196
       },
       {
-        "sampled_on": "2026-04-29",
-        "state": "Ready to Commit",
-        "wip_in_state": 22,
-        "entered_at_or_later": 119
-      },
-      {
-        "sampled_on": "2026-04-29",
-        "state": "Resolved",
-        "wip_in_state": 97,
-        "entered_at_or_later": 97
-      },
-      {
-        "sampled_on": "2026-04-30",
-        "state": "Triage Needed",
-        "wip_in_state": 834,
-        "entered_at_or_later": 3203
-      },
-      {
-        "sampled_on": "2026-04-30",
-        "state": "Open",
-        "wip_in_state": 1784,
-        "entered_at_or_later": 2369
-      },
-      {
-        "sampled_on": "2026-04-30",
-        "state": "In Progress",
-        "wip_in_state": 152,
-        "entered_at_or_later": 585
-      },
-      {
-        "sampled_on": "2026-04-30",
-        "state": "Patch Available",
-        "wip_in_state": 235,
-        "entered_at_or_later": 433
-      },
-      {
-        "sampled_on": "2026-04-30",
-        "state": "Review In Progress",
-        "wip_in_state": 75,
-        "entered_at_or_later": 198
-      },
-      {
         "sampled_on": "2026-04-30",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 123
+        "entered_at_or_later": 121
       },
       {
         "sampled_on": "2026-04-30",
         "state": "Resolved",
-        "wip_in_state": 101,
-        "entered_at_or_later": 101
+        "wip_in_state": 99,
+        "entered_at_or_later": 99
       },
       {
         "sampled_on": "2026-05-01",
         "state": "Triage Needed",
-        "wip_in_state": 834,
-        "entered_at_or_later": 3203
+        "wip_in_state": 835,
+        "entered_at_or_later": 3202
       },
       {
         "sampled_on": "2026-05-01",
         "state": "Open",
         "wip_in_state": 1784,
-        "entered_at_or_later": 2369
+        "entered_at_or_later": 2367
       },
       {
         "sampled_on": "2026-05-01",
+        "state": "In Progress",
+        "wip_in_state": 152,
+        "entered_at_or_later": 583
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Patch Available",
+        "wip_in_state": 235,
+        "entered_at_or_later": 431
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Review In Progress",
+        "wip_in_state": 75,
+        "entered_at_or_later": 196
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Ready to Commit",
+        "wip_in_state": 22,
+        "entered_at_or_later": 121
+      },
+      {
+        "sampled_on": "2026-05-01",
+        "state": "Resolved",
+        "wip_in_state": 99,
+        "entered_at_or_later": 99
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Triage Needed",
+        "wip_in_state": 835,
+        "entered_at_or_later": 3202
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Open",
+        "wip_in_state": 1783,
+        "entered_at_or_later": 2367
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "In Progress",
+        "wip_in_state": 152,
+        "entered_at_or_later": 584
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Patch Available",
+        "wip_in_state": 235,
+        "entered_at_or_later": 432
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Review In Progress",
+        "wip_in_state": 75,
+        "entered_at_or_later": 197
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Ready to Commit",
+        "wip_in_state": 22,
+        "entered_at_or_later": 122
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Resolved",
+        "wip_in_state": 100,
+        "entered_at_or_later": 100
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Triage Needed",
+        "wip_in_state": 835,
+        "entered_at_or_later": 3203
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Open",
+        "wip_in_state": 1783,
+        "entered_at_or_later": 2368
+      },
+      {
+        "sampled_on": "2026-05-03",
         "state": "In Progress",
         "wip_in_state": 152,
         "entered_at_or_later": 585
       },
       {
-        "sampled_on": "2026-05-01",
+        "sampled_on": "2026-05-03",
         "state": "Patch Available",
         "wip_in_state": 235,
         "entered_at_or_later": 433
       },
       {
-        "sampled_on": "2026-05-01",
+        "sampled_on": "2026-05-03",
         "state": "Review In Progress",
-        "wip_in_state": 75,
+        "wip_in_state": 76,
         "entered_at_or_later": 198
       },
       {
-        "sampled_on": "2026-05-01",
+        "sampled_on": "2026-05-03",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 123
+        "entered_at_or_later": 122
       },
       {
-        "sampled_on": "2026-05-01",
+        "sampled_on": "2026-05-03",
         "state": "Resolved",
-        "wip_in_state": 101,
-        "entered_at_or_later": 101
+        "wip_in_state": 100,
+        "entered_at_or_later": 100
       },
       {
-        "sampled_on": "2026-05-02",
+        "sampled_on": "2026-05-04",
         "state": "Triage Needed",
-        "wip_in_state": 834,
-        "entered_at_or_later": 3203
+        "wip_in_state": 836,
+        "entered_at_or_later": 3207
       },
       {
-        "sampled_on": "2026-05-02",
+        "sampled_on": "2026-05-04",
         "state": "Open",
-        "wip_in_state": 1783,
-        "entered_at_or_later": 2369
+        "wip_in_state": 1784,
+        "entered_at_or_later": 2371
       },
       {
-        "sampled_on": "2026-05-02",
-        "state": "In Progress",
-        "wip_in_state": 152,
-        "entered_at_or_later": 586
-      },
-      {
-        "sampled_on": "2026-05-02",
-        "state": "Patch Available",
-        "wip_in_state": 235,
-        "entered_at_or_later": 434
-      },
-      {
-        "sampled_on": "2026-05-02",
-        "state": "Review In Progress",
-        "wip_in_state": 75,
-        "entered_at_or_later": 199
-      },
-      {
-        "sampled_on": "2026-05-02",
-        "state": "Ready to Commit",
-        "wip_in_state": 22,
-        "entered_at_or_later": 124
-      },
-      {
-        "sampled_on": "2026-05-02",
-        "state": "Resolved",
-        "wip_in_state": 102,
-        "entered_at_or_later": 102
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Triage Needed",
-        "wip_in_state": 834,
-        "entered_at_or_later": 3204
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Open",
-        "wip_in_state": 1783,
-        "entered_at_or_later": 2370
-      },
-      {
-        "sampled_on": "2026-05-03",
+        "sampled_on": "2026-05-04",
         "state": "In Progress",
         "wip_in_state": 152,
         "entered_at_or_later": 587
       },
       {
-        "sampled_on": "2026-05-03",
-        "state": "Patch Available",
-        "wip_in_state": 235,
-        "entered_at_or_later": 435
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Review In Progress",
-        "wip_in_state": 76,
-        "entered_at_or_later": 200
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Ready to Commit",
-        "wip_in_state": 22,
-        "entered_at_or_later": 124
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Resolved",
-        "wip_in_state": 102,
-        "entered_at_or_later": 102
-      },
-      {
-        "sampled_on": "2026-05-04",
-        "state": "Triage Needed",
-        "wip_in_state": 835,
-        "entered_at_or_later": 3208
-      },
-      {
-        "sampled_on": "2026-05-04",
-        "state": "Open",
-        "wip_in_state": 1784,
-        "entered_at_or_later": 2373
-      },
-      {
-        "sampled_on": "2026-05-04",
-        "state": "In Progress",
-        "wip_in_state": 152,
-        "entered_at_or_later": 589
-      },
-      {
         "sampled_on": "2026-05-04",
         "state": "Patch Available",
         "wip_in_state": 237,
-        "entered_at_or_later": 437
+        "entered_at_or_later": 435
       },
       {
         "sampled_on": "2026-05-04",
         "state": "Review In Progress",
         "wip_in_state": 76,
-        "entered_at_or_later": 200
+        "entered_at_or_later": 198
       },
       {
         "sampled_on": "2026-05-04",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 124
+        "entered_at_or_later": 122
       },
       {
         "sampled_on": "2026-05-04",
         "state": "Resolved",
-        "wip_in_state": 102,
-        "entered_at_or_later": 102
+        "wip_in_state": 100,
+        "entered_at_or_later": 100
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Triage Needed",
-        "wip_in_state": 837,
-        "entered_at_or_later": 3210
+        "wip_in_state": 838,
+        "entered_at_or_later": 3209
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2373
+        "entered_at_or_later": 2371
       },
       {
         "sampled_on": "2026-05-05",
         "state": "In Progress",
         "wip_in_state": 152,
-        "entered_at_or_later": 590
+        "entered_at_or_later": 588
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Patch Available",
         "wip_in_state": 235,
-        "entered_at_or_later": 438
+        "entered_at_or_later": 436
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Review In Progress",
         "wip_in_state": 77,
-        "entered_at_or_later": 203
+        "entered_at_or_later": 201
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 126
+        "entered_at_or_later": 124
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Resolved",
-        "wip_in_state": 104,
-        "entered_at_or_later": 104
+        "wip_in_state": 102,
+        "entered_at_or_later": 102
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Triage Needed",
-        "wip_in_state": 836,
-        "entered_at_or_later": 3210
+        "wip_in_state": 837,
+        "entered_at_or_later": 3209
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Open",
         "wip_in_state": 1782,
-        "entered_at_or_later": 2374
+        "entered_at_or_later": 2372
       },
       {
         "sampled_on": "2026-05-06",
         "state": "In Progress",
         "wip_in_state": 152,
-        "entered_at_or_later": 592
+        "entered_at_or_later": 590
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Patch Available",
         "wip_in_state": 235,
-        "entered_at_or_later": 440
+        "entered_at_or_later": 438
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Review In Progress",
         "wip_in_state": 76,
-        "entered_at_or_later": 205
+        "entered_at_or_later": 203
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 129
+        "entered_at_or_later": 127
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Resolved",
-        "wip_in_state": 107,
-        "entered_at_or_later": 107
+        "wip_in_state": 105,
+        "entered_at_or_later": 105
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Triage Needed",
-        "wip_in_state": 836,
-        "entered_at_or_later": 3211
+        "wip_in_state": 837,
+        "entered_at_or_later": 3210
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Open",
         "wip_in_state": 1782,
-        "entered_at_or_later": 2375
+        "entered_at_or_later": 2373
       },
       {
         "sampled_on": "2026-05-07",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 593
+        "entered_at_or_later": 591
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Patch Available",
         "wip_in_state": 235,
-        "entered_at_or_later": 440
+        "entered_at_or_later": 438
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Review In Progress",
         "wip_in_state": 75,
-        "entered_at_or_later": 205
+        "entered_at_or_later": 203
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 130
+        "entered_at_or_later": 128
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Resolved",
-        "wip_in_state": 108,
-        "entered_at_or_later": 108
+        "wip_in_state": 106,
+        "entered_at_or_later": 106
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Triage Needed",
-        "wip_in_state": 840,
-        "entered_at_or_later": 3215
+        "wip_in_state": 841,
+        "entered_at_or_later": 3214
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Open",
         "wip_in_state": 1782,
-        "entered_at_or_later": 2375
+        "entered_at_or_later": 2373
       },
       {
         "sampled_on": "2026-05-08",
         "state": "In Progress",
         "wip_in_state": 153,
-        "entered_at_or_later": 593
+        "entered_at_or_later": 591
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Patch Available",
         "wip_in_state": 235,
-        "entered_at_or_later": 440
+        "entered_at_or_later": 438
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Review In Progress",
         "wip_in_state": 75,
-        "entered_at_or_later": 205
+        "entered_at_or_later": 203
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 130
+        "entered_at_or_later": 128
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Resolved",
-        "wip_in_state": 108,
-        "entered_at_or_later": 108
+        "wip_in_state": 106,
+        "entered_at_or_later": 106
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Triage Needed",
-        "wip_in_state": 839,
-        "entered_at_or_later": 3218
+        "wip_in_state": 840,
+        "entered_at_or_later": 3217
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2379
+        "entered_at_or_later": 2377
       },
       {
         "sampled_on": "2026-05-09",
         "state": "In Progress",
         "wip_in_state": 154,
-        "entered_at_or_later": 596
+        "entered_at_or_later": 594
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Patch Available",
         "wip_in_state": 236,
-        "entered_at_or_later": 442
+        "entered_at_or_later": 440
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Review In Progress",
         "wip_in_state": 75,
-        "entered_at_or_later": 206
+        "entered_at_or_later": 204
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 131
+        "entered_at_or_later": 129
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Resolved",
-        "wip_in_state": 109,
-        "entered_at_or_later": 109
+        "wip_in_state": 107,
+        "entered_at_or_later": 107
       },
       {
         "sampled_on": "2026-05-10",
+        "state": "Triage Needed",
+        "wip_in_state": 839,
+        "entered_at_or_later": 3219
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Open",
+        "wip_in_state": 1783,
+        "entered_at_or_later": 2380
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "In Progress",
+        "wip_in_state": 155,
+        "entered_at_or_later": 597
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Patch Available",
+        "wip_in_state": 238,
+        "entered_at_or_later": 442
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Review In Progress",
+        "wip_in_state": 75,
+        "entered_at_or_later": 204
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Ready to Commit",
+        "wip_in_state": 22,
+        "entered_at_or_later": 129
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Resolved",
+        "wip_in_state": 107,
+        "entered_at_or_later": 107
+      },
+      {
+        "sampled_on": "2026-05-11",
         "state": "Triage Needed",
         "wip_in_state": 838,
         "entered_at_or_later": 3220
       },
       {
-        "sampled_on": "2026-05-10",
+        "sampled_on": "2026-05-11",
         "state": "Open",
         "wip_in_state": 1783,
         "entered_at_or_later": 2382
       },
       {
-        "sampled_on": "2026-05-10",
+        "sampled_on": "2026-05-11",
         "state": "In Progress",
         "wip_in_state": 155,
         "entered_at_or_later": 599
       },
       {
-        "sampled_on": "2026-05-10",
+        "sampled_on": "2026-05-11",
         "state": "Patch Available",
         "wip_in_state": 238,
         "entered_at_or_later": 444
       },
       {
-        "sampled_on": "2026-05-10",
+        "sampled_on": "2026-05-11",
         "state": "Review In Progress",
-        "wip_in_state": 75,
+        "wip_in_state": 76,
         "entered_at_or_later": 206
       },
       {
-        "sampled_on": "2026-05-10",
-        "state": "Ready to Commit",
-        "wip_in_state": 22,
-        "entered_at_or_later": 131
-      },
-      {
-        "sampled_on": "2026-05-10",
-        "state": "Resolved",
-        "wip_in_state": 109,
-        "entered_at_or_later": 109
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Triage Needed",
-        "wip_in_state": 838,
-        "entered_at_or_later": 3221
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Open",
-        "wip_in_state": 1783,
-        "entered_at_or_later": 2383
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "In Progress",
-        "wip_in_state": 155,
-        "entered_at_or_later": 600
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Patch Available",
-        "wip_in_state": 238,
-        "entered_at_or_later": 445
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Review In Progress",
-        "wip_in_state": 75,
-        "entered_at_or_later": 207
-      },
-      {
         "sampled_on": "2026-05-11",
         "state": "Ready to Commit",
         "wip_in_state": 22,
-        "entered_at_or_later": 132
+        "entered_at_or_later": 130
       },
       {
         "sampled_on": "2026-05-11",
         "state": "Resolved",
-        "wip_in_state": 110,
-        "entered_at_or_later": 110
+        "wip_in_state": 108,
+        "entered_at_or_later": 108
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Triage Needed",
         "wip_in_state": 839,
-        "entered_at_or_later": 3224
+        "entered_at_or_later": 3223
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2385
+        "entered_at_or_later": 2384
       },
       {
         "sampled_on": "2026-05-12",
         "state": "In Progress",
         "wip_in_state": 155,
-        "entered_at_or_later": 602
+        "entered_at_or_later": 601
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Patch Available",
         "wip_in_state": 239,
-        "entered_at_or_later": 447
+        "entered_at_or_later": 446
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Review In Progress",
-        "wip_in_state": 74,
-        "entered_at_or_later": 208
+        "wip_in_state": 75,
+        "entered_at_or_later": 207
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 134
+        "entered_at_or_later": 132
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Resolved",
-        "wip_in_state": 111,
-        "entered_at_or_later": 111
+        "wip_in_state": 109,
+        "entered_at_or_later": 109
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Triage Needed",
         "wip_in_state": 840,
-        "entered_at_or_later": 3226
+        "entered_at_or_later": 3225
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2386
+        "entered_at_or_later": 2385
       },
       {
         "sampled_on": "2026-05-13",
         "state": "In Progress",
         "wip_in_state": 155,
-        "entered_at_or_later": 603
+        "entered_at_or_later": 602
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Patch Available",
         "wip_in_state": 238,
-        "entered_at_or_later": 448
+        "entered_at_or_later": 447
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Review In Progress",
-        "wip_in_state": 74,
-        "entered_at_or_later": 210
+        "wip_in_state": 75,
+        "entered_at_or_later": 209
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 136
+        "entered_at_or_later": 134
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Resolved",
-        "wip_in_state": 113,
-        "entered_at_or_later": 113
+        "wip_in_state": 111,
+        "entered_at_or_later": 111
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Triage Needed",
         "wip_in_state": 845,
-        "entered_at_or_later": 3231
+        "entered_at_or_later": 3230
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Open",
         "wip_in_state": 1783,
-        "entered_at_or_later": 2386
+        "entered_at_or_later": 2385
       },
       {
         "sampled_on": "2026-05-14",
         "state": "In Progress",
         "wip_in_state": 155,
-        "entered_at_or_later": 603
+        "entered_at_or_later": 602
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Patch Available",
         "wip_in_state": 238,
-        "entered_at_or_later": 448
+        "entered_at_or_later": 447
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Review In Progress",
         "wip_in_state": 74,
-        "entered_at_or_later": 210
+        "entered_at_or_later": 209
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Ready to Commit",
         "wip_in_state": 23,
-        "entered_at_or_later": 136
+        "entered_at_or_later": 135
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Resolved",
-        "wip_in_state": 113,
-        "entered_at_or_later": 113
+        "wip_in_state": 112,
+        "entered_at_or_later": 112
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Triage Needed",
+        "wip_in_state": 849,
+        "entered_at_or_later": 3234
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Open",
+        "wip_in_state": 1783,
+        "entered_at_or_later": 2385
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "In Progress",
+        "wip_in_state": 155,
+        "entered_at_or_later": 602
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Patch Available",
+        "wip_in_state": 238,
+        "entered_at_or_later": 447
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Review In Progress",
+        "wip_in_state": 74,
+        "entered_at_or_later": 209
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Ready to Commit",
+        "wip_in_state": 23,
+        "entered_at_or_later": 135
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Resolved",
+        "wip_in_state": 112,
+        "entered_at_or_later": 112
       }
     ]
   },
   "input": {
     "repo": "jira:CASSANDRA",
-    "start": "2026-04-15",
-    "stop": "2026-05-14",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
     "workflow": [
       "Triage Needed",
       "Open",
@@ -1686,6 +1686,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-15 --stop 2026-05-14 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-16 --stop 2026-05-15 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1",
   "logs": []
 }

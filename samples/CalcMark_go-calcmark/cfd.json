@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T17:20:11.165234-06:00",
-  "headline": "CFD for CalcMark/go-calcmark Apr 15, 2026 \u2192 May 14, 2026: 22 items arrived, 20 completed, 2 still in flight at end.",
+  "generated_at": "2026-05-16T09:48:30.619110-06:00",
+  "headline": "CFD for CalcMark/go-calcmark Apr 16, 2026 \u2192 May 15, 2026: 20 items arrived, 18 completed, 2 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -10,13 +10,13 @@
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 22,
-    "departures_at_end": 20,
+    "arrivals_at_end": 20,
+    "departures_at_end": 18,
     "wip_at_start": 2,
     "wip_at_end": 2,
     "peak_wip": 5
   },
-  "key_insight": "The largest WIP band at May 14, 2026 is 'Open' with 2 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 15, 2026 is 'Open' with 2 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -37,583 +37,583 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-15",
-        "counts_by_state": {
-          "Open": 4,
-          "Merged": 2
-        }
-      },
-      {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 2
+          "Open": 2,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Open": 4,
-          "Merged": 2
+          "Open": 2,
+          "Merged": 0
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Open": 6,
-          "Merged": 4
+          "Open": 4,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Open": 9,
-          "Merged": 4
+          "Open": 7,
+          "Merged": 2
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Open": 12,
-          "Merged": 10
+          "Open": 10,
+          "Merged": 8
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Open": 12,
-          "Merged": 10
+          "Open": 10,
+          "Merged": 8
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Open": 12,
-          "Merged": 10
+          "Open": 10,
+          "Merged": 8
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Open": 13,
-          "Merged": 11
+          "Open": 11,
+          "Merged": 9
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Open": 13,
-          "Merged": 11
+          "Open": 11,
+          "Merged": 9
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Open": 13,
-          "Merged": 11
+          "Open": 11,
+          "Merged": 9
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Open": 14,
-          "Merged": 12
+          "Open": 12,
+          "Merged": 10
         }
       },
       {
         "sampled_on": "2026-05-07",
+        "counts_by_state": {
+          "Open": 18,
+          "Merged": 16
+        }
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "counts_by_state": {
+          "Open": 19,
+          "Merged": 17
+        }
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "counts_by_state": {
+          "Open": 19,
+          "Merged": 17
+        }
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "counts_by_state": {
+          "Open": 19,
+          "Merged": 17
+        }
+      },
+      {
+        "sampled_on": "2026-05-11",
         "counts_by_state": {
           "Open": 20,
           "Merged": 18
         }
       },
       {
-        "sampled_on": "2026-05-08",
-        "counts_by_state": {
-          "Open": 21,
-          "Merged": 19
-        }
-      },
-      {
-        "sampled_on": "2026-05-09",
-        "counts_by_state": {
-          "Open": 21,
-          "Merged": 19
-        }
-      },
-      {
-        "sampled_on": "2026-05-10",
-        "counts_by_state": {
-          "Open": 21,
-          "Merged": 19
-        }
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "counts_by_state": {
-          "Open": 22,
-          "Merged": 20
-        }
-      },
-      {
         "sampled_on": "2026-05-12",
         "counts_by_state": {
-          "Open": 22,
-          "Merged": 20
+          "Open": 20,
+          "Merged": 18
         }
       },
       {
         "sampled_on": "2026-05-13",
         "counts_by_state": {
-          "Open": 22,
-          "Merged": 20
+          "Open": 20,
+          "Merged": 18
         }
       },
       {
         "sampled_on": "2026-05-14",
         "counts_by_state": {
-          "Open": 22,
-          "Merged": 20
+          "Open": 20,
+          "Merged": 18
+        }
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "counts_by_state": {
+          "Open": 20,
+          "Merged": 18
         }
       }
     ],
     "bands": [
       {
-        "sampled_on": "2026-04-15",
+        "sampled_on": "2026-04-16",
         "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 4
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Merged",
         "wip_in_state": 2,
         "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-16",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 4
-      },
-      {
-        "sampled_on": "2026-04-16",
         "state": "Merged",
-        "wip_in_state": 2,
-        "entered_at_or_later": 2
+        "wip_in_state": 0,
+        "entered_at_or_later": 0
       },
       {
         "sampled_on": "2026-04-17",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 4
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-17",
+        "state": "Merged",
+        "wip_in_state": 0,
+        "entered_at_or_later": 0
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 4
+      },
+      {
+        "sampled_on": "2026-04-18",
         "state": "Merged",
         "wip_in_state": 2,
         "entered_at_or_later": 2
       },
       {
-        "sampled_on": "2026-04-18",
+        "sampled_on": "2026-04-19",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
-      },
-      {
-        "sampled_on": "2026-04-18",
-        "state": "Merged",
-        "wip_in_state": 4,
         "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-19",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 6
-      },
-      {
-        "sampled_on": "2026-04-19",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-23",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-23",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-24",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-24",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-28",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 6
+        "entered_at_or_later": 4
       },
       {
         "sampled_on": "2026-04-28",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Open",
         "wip_in_state": 5,
-        "entered_at_or_later": 9
+        "entered_at_or_later": 7
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Merged",
-        "wip_in_state": 4,
-        "entered_at_or_later": 4
+        "wip_in_state": 2,
+        "entered_at_or_later": 2
       },
       {
         "sampled_on": "2026-04-30",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 12
+        "entered_at_or_later": 10
       },
       {
         "sampled_on": "2026-04-30",
         "state": "Merged",
-        "wip_in_state": 10,
-        "entered_at_or_later": 10
+        "wip_in_state": 8,
+        "entered_at_or_later": 8
       },
       {
         "sampled_on": "2026-05-01",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 12
+        "entered_at_or_later": 10
       },
       {
         "sampled_on": "2026-05-01",
         "state": "Merged",
-        "wip_in_state": 10,
-        "entered_at_or_later": 10
+        "wip_in_state": 8,
+        "entered_at_or_later": 8
       },
       {
         "sampled_on": "2026-05-02",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 12
+        "entered_at_or_later": 10
       },
       {
         "sampled_on": "2026-05-02",
         "state": "Merged",
+        "wip_in_state": 8,
+        "entered_at_or_later": 8
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Merged",
+        "wip_in_state": 9,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-05-04",
+        "state": "Merged",
+        "wip_in_state": 9,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-05-05",
+        "state": "Merged",
+        "wip_in_state": 9,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 12
+      },
+      {
+        "sampled_on": "2026-05-06",
+        "state": "Merged",
         "wip_in_state": 10,
         "entered_at_or_later": 10
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 13
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Merged",
-        "wip_in_state": 11,
-        "entered_at_or_later": 11
-      },
-      {
-        "sampled_on": "2026-05-04",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 13
-      },
-      {
-        "sampled_on": "2026-05-04",
-        "state": "Merged",
-        "wip_in_state": 11,
-        "entered_at_or_later": 11
-      },
-      {
-        "sampled_on": "2026-05-05",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 13
-      },
-      {
-        "sampled_on": "2026-05-05",
-        "state": "Merged",
-        "wip_in_state": 11,
-        "entered_at_or_later": 11
-      },
-      {
-        "sampled_on": "2026-05-06",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 14
-      },
-      {
-        "sampled_on": "2026-05-06",
-        "state": "Merged",
-        "wip_in_state": 12,
-        "entered_at_or_later": 12
       },
       {
         "sampled_on": "2026-05-07",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 18
+      },
+      {
+        "sampled_on": "2026-05-07",
+        "state": "Merged",
+        "wip_in_state": 16,
+        "entered_at_or_later": 16
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-05-08",
+        "state": "Merged",
+        "wip_in_state": 17,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-05-09",
+        "state": "Merged",
+        "wip_in_state": 17,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Open",
+        "wip_in_state": 2,
+        "entered_at_or_later": 19
+      },
+      {
+        "sampled_on": "2026-05-10",
+        "state": "Merged",
+        "wip_in_state": 17,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-05-11",
         "state": "Open",
         "wip_in_state": 2,
         "entered_at_or_later": 20
       },
       {
-        "sampled_on": "2026-05-07",
+        "sampled_on": "2026-05-11",
         "state": "Merged",
         "wip_in_state": 18,
         "entered_at_or_later": 18
       },
       {
-        "sampled_on": "2026-05-08",
+        "sampled_on": "2026-05-12",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 21
-      },
-      {
-        "sampled_on": "2026-05-08",
-        "state": "Merged",
-        "wip_in_state": 19,
-        "entered_at_or_later": 19
-      },
-      {
-        "sampled_on": "2026-05-09",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 21
-      },
-      {
-        "sampled_on": "2026-05-09",
-        "state": "Merged",
-        "wip_in_state": 19,
-        "entered_at_or_later": 19
-      },
-      {
-        "sampled_on": "2026-05-10",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 21
-      },
-      {
-        "sampled_on": "2026-05-10",
-        "state": "Merged",
-        "wip_in_state": 19,
-        "entered_at_or_later": 19
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 22
-      },
-      {
-        "sampled_on": "2026-05-11",
-        "state": "Merged",
-        "wip_in_state": 20,
         "entered_at_or_later": 20
       },
       {
         "sampled_on": "2026-05-12",
-        "state": "Open",
-        "wip_in_state": 2,
-        "entered_at_or_later": 22
-      },
-      {
-        "sampled_on": "2026-05-12",
         "state": "Merged",
-        "wip_in_state": 20,
-        "entered_at_or_later": 20
+        "wip_in_state": 18,
+        "entered_at_or_later": 18
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 22
+        "entered_at_or_later": 20
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Merged",
-        "wip_in_state": 20,
-        "entered_at_or_later": 20
+        "wip_in_state": 18,
+        "entered_at_or_later": 18
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Open",
         "wip_in_state": 2,
-        "entered_at_or_later": 22
+        "entered_at_or_later": 20
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Merged",
-        "wip_in_state": 20,
+        "wip_in_state": 18,
+        "entered_at_or_later": 18
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Open",
+        "wip_in_state": 2,
         "entered_at_or_later": 20
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Merged",
+        "wip_in_state": 18,
+        "entered_at_or_later": 18
       }
     ]
   },
   "input": {
     "repo": "CalcMark/go-calcmark",
-    "start": "2026-04-15",
-    "stop": "2026-05-14",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
     "workflow": [
       "Open",
       "Merged"
@@ -626,6 +626,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo CalcMark/go-calcmark --start 2026-04-15 --stop 2026-05-14 --workflow 'Open,Merged' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --repo CalcMark/go-calcmark --start 2026-04-16 --stop 2026-05-15 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

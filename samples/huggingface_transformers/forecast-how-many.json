@@ -1,15 +1,15 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-15T17:20:04.965879-06:00",
-  "headline": "85% confident at least 101 items finish in the next 15 days (by May 29, 2026).",
+  "generated_at": "2026-05-16T09:48:18.755893-06:00",
+  "headline": "85% confident at least 97 items finish in the next 15 days (by May 30, 2026).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {
-      "50": 125,
-      "70": 113,
-      "85": 101,
-      "95": 87
+      "50": 121,
+      "70": 108,
+      "85": 97,
+      "95": 83
     },
     "reading": "backward \u2014 higher confidence means FEWER items",
     "horizon": {
@@ -19,10 +19,10 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is 125 items; 95% commitment floor is 87. Higher confidence = fewer items \u2014 promising 87 leaves throughput on the table to buy certainty.",
+  "key_insight": "Median outcome is 121 items; 95% commitment floor is 83. Higher confidence = fewer items \u2014 promising 83 leaves throughput on the table to buy certainty.",
   "next_actions": [
-    "For external commitments, promise 101 items (or 87 if stakes are high).",
-    "For internal planning, treat 125 as the realistic target \u2014 half the time you deliver less.",
+    "For external commitments, promise 97 items (or 83 if stakes are high).",
+    "For internal planning, treat 121 as the realistic target \u2014 half the time you deliver less.",
     "Re-run weekly; the floor moves as historical throughput shifts."
   ],
   "caveats": [
@@ -40,19 +40,15 @@
   "chart_data": {
     "histogram": [
       {
-        "items": 37,
+        "items": 39,
         "frequency": 1
       },
       {
-        "items": 38,
-        "frequency": 2
-      },
-      {
-        "items": 41,
+        "items": 45,
         "frequency": 1
       },
       {
-        "items": 47,
+        "items": 46,
         "frequency": 1
       },
       {
@@ -60,19 +56,15 @@
         "frequency": 1
       },
       {
-        "items": 50,
-        "frequency": 2
-      },
-      {
-        "items": 51,
+        "items": 49,
         "frequency": 1
       },
       {
-        "items": 53,
-        "frequency": 2
+        "items": 50,
+        "frequency": 1
       },
       {
-        "items": 54,
+        "items": 52,
         "frequency": 1
       },
       {
@@ -81,11 +73,11 @@
       },
       {
         "items": 56,
-        "frequency": 3
+        "frequency": 2
       },
       {
         "items": 57,
-        "frequency": 2
+        "frequency": 3
       },
       {
         "items": 58,
@@ -93,23 +85,27 @@
       },
       {
         "items": 59,
-        "frequency": 3
-      },
-      {
-        "items": 60,
-        "frequency": 3
-      },
-      {
-        "items": 62,
         "frequency": 2
       },
       {
+        "items": 60,
+        "frequency": 6
+      },
+      {
+        "items": 61,
+        "frequency": 4
+      },
+      {
+        "items": 62,
+        "frequency": 9
+      },
+      {
         "items": 63,
-        "frequency": 3
+        "frequency": 11
       },
       {
         "items": 64,
-        "frequency": 5
+        "frequency": 9
       },
       {
         "items": 65,
@@ -117,31 +113,31 @@
       },
       {
         "items": 66,
-        "frequency": 6
+        "frequency": 11
       },
       {
         "items": 67,
-        "frequency": 6
+        "frequency": 5
       },
       {
         "items": 68,
-        "frequency": 9
-      },
-      {
-        "items": 69,
-        "frequency": 10
-      },
-      {
-        "items": 70,
-        "frequency": 9
-      },
-      {
-        "items": 71,
         "frequency": 14
       },
       {
+        "items": 69,
+        "frequency": 14
+      },
+      {
+        "items": 70,
+        "frequency": 15
+      },
+      {
+        "items": 71,
+        "frequency": 22
+      },
+      {
         "items": 72,
-        "frequency": 9
+        "frequency": 21
       },
       {
         "items": 73,
@@ -149,75 +145,75 @@
       },
       {
         "items": 74,
-        "frequency": 16
+        "frequency": 21
       },
       {
         "items": 75,
-        "frequency": 16
+        "frequency": 29
       },
       {
         "items": 76,
-        "frequency": 16
+        "frequency": 28
       },
       {
         "items": 77,
-        "frequency": 25
+        "frequency": 36
       },
       {
         "items": 78,
-        "frequency": 23
+        "frequency": 30
       },
       {
         "items": 79,
-        "frequency": 27
-      },
-      {
-        "items": 80,
-        "frequency": 26
-      },
-      {
-        "items": 81,
         "frequency": 38
       },
       {
-        "items": 82,
-        "frequency": 35
-      },
-      {
-        "items": 83,
+        "items": 80,
         "frequency": 33
       },
       {
-        "items": 84,
-        "frequency": 33
-      },
-      {
-        "items": 85,
-        "frequency": 37
-      },
-      {
-        "items": 86,
-        "frequency": 52
-      },
-      {
-        "items": 87,
-        "frequency": 49
-      },
-      {
-        "items": 88,
+        "items": 81,
         "frequency": 51
       },
       {
+        "items": 82,
+        "frequency": 54
+      },
+      {
+        "items": 83,
+        "frequency": 61
+      },
+      {
+        "items": 84,
+        "frequency": 51
+      },
+      {
+        "items": 85,
+        "frequency": 57
+      },
+      {
+        "items": 86,
+        "frequency": 65
+      },
+      {
+        "items": 87,
+        "frequency": 71
+      },
+      {
+        "items": 88,
+        "frequency": 67
+      },
+      {
         "items": 89,
-        "frequency": 59
+        "frequency": 57
       },
       {
         "items": 90,
-        "frequency": 59
+        "frequency": 70
       },
       {
         "items": 91,
-        "frequency": 64
+        "frequency": 69
       },
       {
         "items": 92,
@@ -225,223 +221,223 @@
       },
       {
         "items": 93,
-        "frequency": 65
+        "frequency": 88
       },
       {
         "items": 94,
-        "frequency": 62
+        "frequency": 92
       },
       {
         "items": 95,
-        "frequency": 68
+        "frequency": 80
       },
       {
         "items": 96,
-        "frequency": 86
+        "frequency": 94
       },
       {
         "items": 97,
-        "frequency": 93
+        "frequency": 95
       },
       {
         "items": 98,
-        "frequency": 83
-      },
-      {
-        "items": 99,
-        "frequency": 83
-      },
-      {
-        "items": 100,
         "frequency": 102
       },
       {
+        "items": 99,
+        "frequency": 106
+      },
+      {
+        "items": 100,
+        "frequency": 107
+      },
+      {
         "items": 101,
-        "frequency": 101
+        "frequency": 111
       },
       {
         "items": 102,
-        "frequency": 119
+        "frequency": 121
       },
       {
         "items": 103,
-        "frequency": 123
-      },
-      {
-        "items": 104,
-        "frequency": 104
-      },
-      {
-        "items": 105,
-        "frequency": 114
-      },
-      {
-        "items": 106,
-        "frequency": 127
-      },
-      {
-        "items": 107,
-        "frequency": 121
-      },
-      {
-        "items": 108,
-        "frequency": 116
-      },
-      {
-        "items": 109,
-        "frequency": 144
-      },
-      {
-        "items": 110,
-        "frequency": 144
-      },
-      {
-        "items": 111,
-        "frequency": 125
-      },
-      {
-        "items": 112,
-        "frequency": 148
-      },
-      {
-        "items": 113,
-        "frequency": 152
-      },
-      {
-        "items": 114,
-        "frequency": 165
-      },
-      {
-        "items": 115,
-        "frequency": 155
-      },
-      {
-        "items": 116,
-        "frequency": 173
-      },
-      {
-        "items": 117,
-        "frequency": 194
-      },
-      {
-        "items": 118,
-        "frequency": 168
-      },
-      {
-        "items": 119,
-        "frequency": 149
-      },
-      {
-        "items": 120,
-        "frequency": 169
-      },
-      {
-        "items": 121,
-        "frequency": 157
-      },
-      {
-        "items": 122,
-        "frequency": 162
-      },
-      {
-        "items": 123,
-        "frequency": 151
-      },
-      {
-        "items": 124,
-        "frequency": 160
-      },
-      {
-        "items": 125,
-        "frequency": 193
-      },
-      {
-        "items": 126,
-        "frequency": 178
-      },
-      {
-        "items": 127,
-        "frequency": 156
-      },
-      {
-        "items": 128,
-        "frequency": 169
-      },
-      {
-        "items": 129,
         "frequency": 161
       },
       {
-        "items": 130,
-        "frequency": 148
+        "items": 104,
+        "frequency": 139
       },
       {
-        "items": 131,
-        "frequency": 162
+        "items": 105,
+        "frequency": 135
       },
       {
-        "items": 132,
-        "frequency": 173
+        "items": 106,
+        "frequency": 146
       },
       {
-        "items": 133,
-        "frequency": 153
+        "items": 107,
+        "frequency": 155
       },
       {
-        "items": 134,
+        "items": 108,
+        "frequency": 152
+      },
+      {
+        "items": 109,
         "frequency": 137
       },
       {
-        "items": 135,
+        "items": 110,
+        "frequency": 161
+      },
+      {
+        "items": 111,
+        "frequency": 166
+      },
+      {
+        "items": 112,
+        "frequency": 132
+      },
+      {
+        "items": 113,
+        "frequency": 157
+      },
+      {
+        "items": 114,
+        "frequency": 147
+      },
+      {
+        "items": 115,
+        "frequency": 176
+      },
+      {
+        "items": 116,
         "frequency": 138
       },
       {
-        "items": 136,
-        "frequency": 148
+        "items": 117,
+        "frequency": 162
       },
       {
-        "items": 137,
-        "frequency": 150
+        "items": 118,
+        "frequency": 174
       },
       {
-        "items": 138,
-        "frequency": 130
+        "items": 119,
+        "frequency": 164
       },
       {
-        "items": 139,
-        "frequency": 120
+        "items": 120,
+        "frequency": 181
       },
       {
-        "items": 140,
-        "frequency": 117
+        "items": 121,
+        "frequency": 167
       },
       {
-        "items": 141,
-        "frequency": 143
+        "items": 122,
+        "frequency": 180
       },
       {
-        "items": 142,
+        "items": 123,
+        "frequency": 164
+      },
+      {
+        "items": 124,
+        "frequency": 147
+      },
+      {
+        "items": 125,
+        "frequency": 156
+      },
+      {
+        "items": 126,
+        "frequency": 157
+      },
+      {
+        "items": 127,
+        "frequency": 142
+      },
+      {
+        "items": 128,
+        "frequency": 156
+      },
+      {
+        "items": 129,
+        "frequency": 149
+      },
+      {
+        "items": 130,
+        "frequency": 156
+      },
+      {
+        "items": 131,
+        "frequency": 139
+      },
+      {
+        "items": 132,
+        "frequency": 146
+      },
+      {
+        "items": 133,
+        "frequency": 149
+      },
+      {
+        "items": 134,
         "frequency": 140
       },
       {
+        "items": 135,
+        "frequency": 147
+      },
+      {
+        "items": 136,
+        "frequency": 127
+      },
+      {
+        "items": 137,
+        "frequency": 140
+      },
+      {
+        "items": 138,
+        "frequency": 126
+      },
+      {
+        "items": 139,
+        "frequency": 112
+      },
+      {
+        "items": 140,
+        "frequency": 133
+      },
+      {
+        "items": 141,
+        "frequency": 111
+      },
+      {
+        "items": 142,
+        "frequency": 129
+      },
+      {
         "items": 143,
-        "frequency": 120
+        "frequency": 107
       },
       {
         "items": 144,
-        "frequency": 121
+        "frequency": 108
       },
       {
         "items": 145,
-        "frequency": 99
+        "frequency": 93
       },
       {
         "items": 146,
-        "frequency": 110
+        "frequency": 95
       },
       {
         "items": 147,
-        "frequency": 120
+        "frequency": 86
       },
       {
         "items": 148,
@@ -449,83 +445,83 @@
       },
       {
         "items": 149,
-        "frequency": 123
+        "frequency": 94
       },
       {
         "items": 150,
-        "frequency": 96
+        "frequency": 83
       },
       {
         "items": 151,
-        "frequency": 91
+        "frequency": 80
       },
       {
         "items": 152,
-        "frequency": 92
+        "frequency": 75
       },
       {
         "items": 153,
-        "frequency": 65
+        "frequency": 77
       },
       {
         "items": 154,
-        "frequency": 88
+        "frequency": 54
       },
       {
         "items": 155,
-        "frequency": 71
-      },
-      {
-        "items": 156,
-        "frequency": 76
-      },
-      {
-        "items": 157,
-        "frequency": 74
-      },
-      {
-        "items": 158,
-        "frequency": 65
-      },
-      {
-        "items": 159,
-        "frequency": 60
-      },
-      {
-        "items": 160,
         "frequency": 59
       },
       {
+        "items": 156,
+        "frequency": 57
+      },
+      {
+        "items": 157,
+        "frequency": 53
+      },
+      {
+        "items": 158,
+        "frequency": 57
+      },
+      {
+        "items": 159,
+        "frequency": 43
+      },
+      {
+        "items": 160,
+        "frequency": 40
+      },
+      {
         "items": 161,
-        "frequency": 47
-      },
-      {
-        "items": 162,
-        "frequency": 49
-      },
-      {
-        "items": 163,
-        "frequency": 62
-      },
-      {
-        "items": 164,
-        "frequency": 45
-      },
-      {
-        "items": 165,
         "frequency": 44
       },
       {
-        "items": 166,
-        "frequency": 33
+        "items": 162,
+        "frequency": 30
       },
       {
-        "items": 167,
+        "items": 163,
+        "frequency": 40
+      },
+      {
+        "items": 164,
         "frequency": 35
       },
       {
+        "items": 165,
+        "frequency": 28
+      },
+      {
+        "items": 166,
+        "frequency": 38
+      },
+      {
+        "items": 167,
+        "frequency": 28
+      },
+      {
         "items": 168,
-        "frequency": 32
+        "frequency": 20
       },
       {
         "items": 169,
@@ -537,47 +533,47 @@
       },
       {
         "items": 171,
-        "frequency": 25
+        "frequency": 16
       },
       {
         "items": 172,
-        "frequency": 19
+        "frequency": 16
       },
       {
         "items": 173,
-        "frequency": 25
-      },
-      {
-        "items": 174,
-        "frequency": 18
-      },
-      {
-        "items": 175,
-        "frequency": 23
-      },
-      {
-        "items": 176,
-        "frequency": 17
-      },
-      {
-        "items": 177,
-        "frequency": 15
-      },
-      {
-        "items": 178,
-        "frequency": 13
-      },
-      {
-        "items": 179,
-        "frequency": 12
-      },
-      {
-        "items": 180,
         "frequency": 14
       },
       {
-        "items": 181,
+        "items": 174,
+        "frequency": 16
+      },
+      {
+        "items": 175,
+        "frequency": 8
+      },
+      {
+        "items": 176,
+        "frequency": 10
+      },
+      {
+        "items": 177,
+        "frequency": 10
+      },
+      {
+        "items": 178,
+        "frequency": 12
+      },
+      {
+        "items": 179,
         "frequency": 11
+      },
+      {
+        "items": 180,
+        "frequency": 12
+      },
+      {
+        "items": 181,
+        "frequency": 14
       },
       {
         "items": 182,
@@ -585,7 +581,7 @@
       },
       {
         "items": 183,
-        "frequency": 12
+        "frequency": 11
       },
       {
         "items": 184,
@@ -593,39 +589,39 @@
       },
       {
         "items": 185,
-        "frequency": 9
+        "frequency": 6
       },
       {
         "items": 186,
-        "frequency": 5
+        "frequency": 6
       },
       {
         "items": 187,
-        "frequency": 7
+        "frequency": 4
       },
       {
         "items": 188,
-        "frequency": 11
+        "frequency": 3
       },
       {
         "items": 189,
-        "frequency": 7
+        "frequency": 6
       },
       {
         "items": 190,
-        "frequency": 7
-      },
-      {
-        "items": 191,
-        "frequency": 8
-      },
-      {
-        "items": 192,
         "frequency": 5
       },
       {
+        "items": 191,
+        "frequency": 1
+      },
+      {
+        "items": 192,
+        "frequency": 4
+      },
+      {
         "items": 193,
-        "frequency": 8
+        "frequency": 2
       },
       {
         "items": 194,
@@ -633,38 +629,58 @@
       },
       {
         "items": 195,
-        "frequency": 6
+        "frequency": 2
       },
       {
         "items": 196,
-        "frequency": 4
+        "frequency": 2
       },
       {
-        "items": 200,
+        "items": 197,
+        "frequency": 2
+      },
+      {
+        "items": 198,
         "frequency": 1
+      },
+      {
+        "items": 199,
+        "frequency": 2
       },
       {
         "items": 201,
         "frequency": 2
       },
       {
-        "items": 203,
-        "frequency": 3
-      },
-      {
         "items": 204,
-        "frequency": 4
+        "frequency": 2
       },
       {
         "items": 205,
         "frequency": 1
       },
       {
-        "items": 211,
-        "frequency": 2
+        "items": 206,
+        "frequency": 1
       },
       {
-        "items": 226,
+        "items": 209,
+        "frequency": 1
+      },
+      {
+        "items": 210,
+        "frequency": 1
+      },
+      {
+        "items": 212,
+        "frequency": 1
+      },
+      {
+        "items": 216,
+        "frequency": 1
+      },
+      {
+        "items": 220,
         "frequency": 1
       }
     ],
@@ -672,18 +688,17 @@
   },
   "input": {
     "repo": "huggingface/transformers",
-    "start_date": "2026-05-15",
-    "target_date": "2026-05-29",
-    "history_start": "2026-04-15",
-    "history_end": "2026-05-14",
+    "start_date": "2026-05-16",
+    "target_date": "2026-05-30",
+    "history_start": "2026-04-16",
+    "history_end": "2026-05-15",
     "offline": false,
     "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-15",
-    "window_end": "2026-05-14",
+    "window_start": "2026-04-16",
+    "window_end": "2026-05-15",
     "daily_throughput": [
-      13,
       8,
       8,
       0,
@@ -712,10 +727,11 @@
       9,
       14,
       15,
-      11
+      11,
+      6
     ],
-    "total_throughput": 251,
-    "avg_throughput_per_day": 8.366666666666667,
+    "total_throughput": 244,
+    "avg_throughput_per_day": 8.133333333333333,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 26,
     "zero_throughput_days": 6
@@ -729,6 +745,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --repo huggingface/transformers --target-date 2026-05-29 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast how-many --repo huggingface/transformers --target-date 2026-05-30 --start-date 2026-05-16 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42",
   "logs": []
 }

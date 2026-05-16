@@ -1,0 +1,348 @@
+{
+  "schema": "flowmetrics.scatterplot.v1",
+  "command": "scatterplot",
+  "generated_at": "2026-05-16T09:47:52.259703-06:00",
+  "headline": "42 items completed in 30 days; 85% finished within 19.6 days (Apr 16, 2026 -> May 15, 2026).",
+  "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
+  "summary": {
+    "completed_count": 42,
+    "window": {
+      "start": "2026-04-16",
+      "stop": "2026-05-15",
+      "days": 30
+    },
+    "cycle_time_percentiles_days": {
+      "50": 0.7379976851851852,
+      "70": 7.246296296296296,
+      "85": 19.617291666666667,
+      "95": 56.768055555555556
+    }
+  },
+  "key_insight": "Median cycle time is 0.7 days; deep-tail P95 is 56.8 days. A new item entering the system has, by definition, an 85% chance of finishing in 19.6 days or less and a 50% chance of finishing in 0.7 days or less.",
+  "next_actions": [
+    "Use P85 (19.6d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
+    "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
+  ],
+  "caveats": [
+    "Percentiles are EMPIRICAL \u2014 read from the actual finished items in this window. No simulation, no estimation.",
+    "Outliers (very long cycle times) shift P85 / P95 up. If the window is short or includes a single stuck-then-finished PR, the deep-tail percentiles can be noisy."
+  ],
+  "vocabulary": {
+    "Cycle Time": "Days from when a work item entered the system (created) to when it left (merged / resolved). One dot on the chart per completed item; the dot's y-position is its cycle time.",
+    "Percentile Line": "A horizontal line on the scatterplot such that the given percent of dots fall on or below it. P50 = median cycle time; 85% of completed items finished in P85 days or less. A new item entering the system has, by definition, the matching probability of finishing in that time.",
+    "Completion date": "When the item was merged (GitHub) or resolved (Jira). The dot's x-position on the chart.",
+    "Source": "Vacanti, _When Will It Be Done?_ (Leanpub)."
+  },
+  "chart_data": {
+    "points": [
+      {
+        "item_id": "#14479",
+        "title": "docs: fix pytest-xdist plugin wording",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 0.7290625,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14479"
+      },
+      {
+        "item_id": "#14478",
+        "title": "[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in string value, not entire input",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 0.7379976851851852,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14478"
+      },
+      {
+        "item_id": "#14475",
+        "title": "fix mark expression scanner: search for backslash in string value, not entire input",
+        "completed_at": "2026-05-13",
+        "cycle_time_days": 0.35739583333333336,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14475"
+      },
+      {
+        "item_id": "#14472",
+        "title": "Fix _as_numpy_array: use variable obj instead of string literal \"obj\"",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 1.361724537037037,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14472"
+      },
+      {
+        "item_id": "#14467",
+        "title": "docs: clarify subtests progress output",
+        "completed_at": "2026-05-12",
+        "cycle_time_days": 0.2553472222222222,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14467"
+      },
+      {
+        "item_id": "#14466",
+        "title": "fix approx rel for timedelta: accept float, compute rel * expected",
+        "completed_at": "2026-05-12",
+        "cycle_time_days": 0.36144675925925923,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14466"
+      },
+      {
+        "item_id": "#14464",
+        "title": "[pre-commit.ci] pre-commit autoupdate",
+        "completed_at": "2026-05-11",
+        "cycle_time_days": 0.03836805555555556,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14464"
+      },
+      {
+        "item_id": "#14460",
+        "title": "pastebin: deprecate `--pastebin`",
+        "completed_at": "2026-05-11",
+        "cycle_time_days": 0.6252893518518519,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14460"
+      },
+      {
+        "item_id": "#14455",
+        "title": "[automated] Update plugin list",
+        "completed_at": "2026-05-10",
+        "cycle_time_days": 0.2372337962962963,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14455"
+      },
+      {
+        "item_id": "#14450",
+        "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration",
+        "completed_at": "2026-05-09",
+        "cycle_time_days": 0.518587962962963,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14450"
+      },
+      {
+        "item_id": "#14449",
+        "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts",
+        "completed_at": "2026-05-09",
+        "cycle_time_days": 0.8484490740740741,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14449"
+      },
+      {
+        "item_id": "#14443",
+        "title": "Fix strict options from addopts",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 2.6333912037037037,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14443"
+      },
+      {
+        "item_id": "#14438",
+        "title": "update Pytester.LineMatcher._no_match_line docstring",
+        "completed_at": "2026-05-03",
+        "cycle_time_days": 0.02179398148148148,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14438"
+      },
+      {
+        "item_id": "#14437",
+        "title": "[automated] Update plugin list",
+        "completed_at": "2026-05-03",
+        "cycle_time_days": 0.17039351851851853,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14437"
+      },
+      {
+        "item_id": "#14433",
+        "title": "[PR #14254/2aa07343 backport][9.0.x] docs: guard pytestconfig.cache example when cacheprovider is disabled",
+        "completed_at": "2026-05-01",
+        "cycle_time_days": 0.013541666666666667,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14433"
+      },
+      {
+        "item_id": "#14430",
+        "title": "Add a space after the test name with `--setup-show`",
+        "completed_at": "2026-05-01",
+        "cycle_time_days": 1.7577314814814815,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14430"
+      },
+      {
+        "item_id": "#14429",
+        "title": "Fix Argument.__repr__ crash when _action is not initialized",
+        "completed_at": "2026-05-07",
+        "cycle_time_days": 8.03329861111111,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14429"
+      },
+      {
+        "item_id": "#14426",
+        "title": "[pre-commit.ci] pre-commit autoupdate",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 0.31707175925925923,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14426"
+      },
+      {
+        "item_id": "#14422",
+        "title": "Fix duplicate values in Config.known_args_namespace for append actions",
+        "completed_at": "2026-04-29",
+        "cycle_time_days": 2.9925462962962963,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14422"
+      },
+      {
+        "item_id": "#14421",
+        "title": "changelog: fix up #14389 entry",
+        "completed_at": "2026-04-26",
+        "cycle_time_days": 0.010868055555555556,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14421"
+      },
+      {
+        "item_id": "#14420",
+        "title": "[PR #14391/cd7592c4 backport][9.0.x] Use direct cause for raises match failures",
+        "completed_at": "2026-04-26",
+        "cycle_time_days": 0.04513888888888889,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14420"
+      },
+      {
+        "item_id": "#14419",
+        "title": "[automated] Update plugin list",
+        "completed_at": "2026-04-26",
+        "cycle_time_days": 0.4787268518518519,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14419"
+      },
+      {
+        "item_id": "#14418",
+        "title": " assertion/rewrite: fix test crash on assert failure with `terminalreporter` disabled",
+        "completed_at": "2026-05-01",
+        "cycle_time_days": 5.592974537037037,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14418"
+      },
+      {
+        "item_id": "#14414",
+        "title": "Add datetime/timedelta support to pytest.approx (#8395)",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 14.871412037037038,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14414"
+      },
+      {
+        "item_id": "#14407",
+        "title": "[PR #14382/d72943a5 backport][9.0.x] Fix `-V` to show version information",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 0.009259259259259259,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14407"
+      },
+      {
+        "item_id": "#14405",
+        "title": "[pre-commit.ci] pre-commit autoupdate",
+        "completed_at": "2026-04-20",
+        "cycle_time_days": 0.028819444444444446,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14405"
+      },
+      {
+        "item_id": "#14402",
+        "title": "build(deps): Bump actions/upload-artifact from 7.0.0 to 7.0.1",
+        "completed_at": "2026-04-20",
+        "cycle_time_days": 0.19342592592592592,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14402"
+      },
+      {
+        "item_id": "#14401",
+        "title": "build(deps): Bump peter-evans/create-pull-request from 8.1.0 to 8.1.1",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 1.370474537037037,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14401"
+      },
+      {
+        "item_id": "#14400",
+        "title": "build(deps): Bump actions/cache from 5.0.4 to 5.0.5",
+        "completed_at": "2026-04-20",
+        "cycle_time_days": 0.19393518518518518,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14400"
+      },
+      {
+        "item_id": "#14399",
+        "title": "build(deps): Bump pypa/gh-action-pypi-publish from 1.13.0 to 1.14.0",
+        "completed_at": "2026-04-20",
+        "cycle_time_days": 0.6778935185185185,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14399"
+      },
+      {
+        "item_id": "#14395",
+        "title": "[automated] Update plugin list",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 2.461423611111111,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14395"
+      },
+      {
+        "item_id": "#14393",
+        "title": "Fix: is_fully_escaped does not handle consecutive backslashes correctly",
+        "completed_at": "2026-04-25",
+        "cycle_time_days": 7.246296296296296,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14393"
+      },
+      {
+        "item_id": "#14391",
+        "title": "Use direct cause for raises match failures",
+        "completed_at": "2026-04-26",
+        "cycle_time_days": 8.309988425925926,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14391"
+      },
+      {
+        "item_id": "#14383",
+        "title": "assertion/util: improve typing",
+        "completed_at": "2026-05-01",
+        "cycle_time_days": 19.617291666666667,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14383"
+      },
+      {
+        "item_id": "#14382",
+        "title": "Fix `-V` to show version information",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 9.936539351851852,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14382"
+      },
+      {
+        "item_id": "#14375",
+        "title": "logging: also capture logs from non-propagating loggers",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 28.41664351851852,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14375"
+      },
+      {
+        "item_id": "#14372",
+        "title": "Add `--max-warnings` option to fail test runs",
+        "completed_at": "2026-04-16",
+        "cycle_time_days": 7.525868055555556,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14372"
+      },
+      {
+        "item_id": "#14369",
+        "title": " fixtures: fix parametrization losing (static) transitive dependencies from overridden fixtures",
+        "completed_at": "2026-05-03",
+        "cycle_time_days": 24.85134259259259,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14369"
+      },
+      {
+        "item_id": "#14254",
+        "title": "docs: guard pytestconfig.cache example when cacheprovider is disabled",
+        "completed_at": "2026-05-01",
+        "cycle_time_days": 56.768055555555556,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14254"
+      },
+      {
+        "item_id": "#14246",
+        "title": "Include pytest.HIDDEN_PARAM in parametrize(ids=...) type annotations",
+        "completed_at": "2026-04-26",
+        "cycle_time_days": 55.48709490740741,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14246"
+      },
+      {
+        "item_id": "#14071",
+        "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 136.93056712962962,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/14071"
+      },
+      {
+        "item_id": "#10546",
+        "title": "Stop using `atexit` and add integration tests for `tmpdir` fixture",
+        "completed_at": "2026-05-03",
+        "cycle_time_days": 1251.1922337962963,
+        "pr_url": "https://github.com/pytest-dev/pytest/pull/10546"
+      }
+    ]
+  },
+  "input": {
+    "repo": "pytest-dev/pytest",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
+    "offline": false,
+    "jira_url": null
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow scatterplot --repo pytest-dev/pytest --start 2026-04-16 --stop 2026-05-15",
+  "logs": []
+}

@@ -146,6 +146,9 @@ class SampleSet:
     how_many_html: Path
     how_many_json: Path
     how_many_text: Path
+    scatterplot_html: Path
+    scatterplot_json: Path
+    scatterplot_text: Path
     # CFD/Aging are conditional on the repo carrying a workflow.
     # GitHub repos skip CFD (degenerate; see docs/DECISIONS.md #9).
     cfd_html: Path | None = None
@@ -232,6 +235,7 @@ def build_samples_md(sets: list[SampleSet], generated_at: datetime) -> str:
         lines.append(f"| Efficiency | {_link(d, 'efficiency', True)} |")
         lines.append(f"| Forecast — when done | {_link(d, 'forecast-when-done', True)} |")
         lines.append(f"| Forecast — how many | {_link(d, 'forecast-how-many', True)} |")
+        lines.append(f"| Cycle-time scatterplot | {_link(d, 'scatterplot', True)} |")
         lines.append(f"| CFD | {_link(d, 'cfd', s.cfd_html is not None)} |")
         lines.append(f"| Aging WIP | {_link(d, 'aging', s.aging_html is not None)} |")
         lines.append("")
@@ -258,6 +262,7 @@ def build_index_html(sets: list[SampleSet], generated_at: datetime) -> str:
             f"          {_cell(d, 'efficiency', True)}\n"
             f"          {_cell(d, 'forecast-when-done', True)}\n"
             f"          {_cell(d, 'forecast-how-many', True)}\n"
+            f"          {_cell(d, 'scatterplot', True)}\n"
             f"          {_cell(d, 'cfd', s.cfd_html is not None)}\n"
             f"          {_cell(d, 'aging', s.aging_html is not None)}\n"
             "        </tr>"
@@ -318,6 +323,7 @@ samples here use the simple review-decision lifecycle
 <th>Efficiency (week)</th>
 <th>Forecast: when-done</th>
 <th>Forecast: how-many</th>
+<th>Scatterplot</th>
 <th>CFD</th>
 <th>Aging WIP</th></tr>
 </thead>
@@ -406,10 +412,17 @@ def _produce_one_repo(repo: Repo, history_end: str, target_date: str) -> SampleS
         *common_cache,
     ]
 
+    common_scatterplot = [
+        "scatterplot",
+        *source_args,
+        "--start", history_start, "--stop", history_end,
+        *common_cache,
+    ]
     commands: list[tuple[list[str], str]] = [
         (common_efficiency, "efficiency"),
         (common_when_done, "forecast-when-done"),
         (common_how_many, "forecast-how-many"),
+        (common_scatterplot, "scatterplot"),
     ]
     if repo.cfd_workflow is not None:
         # CFD uses the 30-day training window, not the 7-day efficiency
@@ -465,6 +478,9 @@ def _produce_one_repo(repo: Repo, history_end: str, target_date: str) -> SampleS
         how_many_html=out_dir / "forecast-how-many.html",
         how_many_json=out_dir / "forecast-how-many.json",
         how_many_text=out_dir / "forecast-how-many.txt",
+        scatterplot_html=out_dir / "scatterplot.html",
+        scatterplot_json=out_dir / "scatterplot.json",
+        scatterplot_text=out_dir / "scatterplot.txt",
         cfd_html=_opt("cfd", "html"),
         cfd_json=_opt("cfd", "json"),
         cfd_text=_opt("cfd", "txt"),

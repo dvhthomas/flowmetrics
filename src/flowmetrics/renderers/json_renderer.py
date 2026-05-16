@@ -15,6 +15,7 @@ from ..report import (
     ForecastHorizon,
     HowManyReport,
     Report,
+    ScatterplotReport,
     WhenDoneReport,
     cli_invocation,
     forecast_horizon,
@@ -58,6 +59,8 @@ def render(report: Report, *, logs: list[str] | None = None) -> str:
         payload = _render_cfd(report)
     elif isinstance(report, AgingReport):
         payload = _render_aging(report)
+    elif isinstance(report, ScatterplotReport):
+        payload = _render_scatterplot(report)
     else:  # pragma: no cover
         raise TypeError(f"unknown report type: {type(report).__name__}")
     payload["cli_invocation"] = cli_invocation(report)
@@ -380,5 +383,47 @@ def _render_how_many(report: HowManyReport) -> dict[str, Any]:
         "input": _encode(asdict(report.input)),
         "training": _render_training(report),
         "simulation": {"runs": report.simulation.runs, "seed": report.simulation.seed},
+        "docs": _DOCS,
+    }
+
+
+def _render_scatterplot(report: ScatterplotReport) -> dict[str, Any]:
+    points = report.points
+    return {
+        # ── Answer first ────────────────────────────────────────────────
+        "schema": report.schema,
+        "command": report.command,
+        "generated_at": report.generated_at.isoformat(),
+        "headline": report.interpretation.headline,
+        "definition": report_definition(report),
+        "summary": {
+            "completed_count": len(points),
+            "window": {
+                "start": report.input.start.isoformat(),
+                "stop": report.input.stop.isoformat(),
+                "days": (report.input.stop - report.input.start).days + 1,
+            },
+            "cycle_time_percentiles_days": {
+                str(p): v for p, v in report.cycle_time_percentiles.items()
+            },
+        },
+        "key_insight": report.interpretation.key_insight,
+        "next_actions": list(report.interpretation.next_actions),
+        "caveats": list(report.interpretation.caveats),
+        "vocabulary": report_vocabulary(report),
+        # ── Detail ──────────────────────────────────────────────────────
+        "chart_data": {
+            "points": [
+                {
+                    "item_id": p.item_id,
+                    "title": p.title,
+                    "completed_at": p.completed_at.isoformat(),
+                    "cycle_time_days": p.cycle_time_days,
+                    "pr_url": p.pr_url,
+                }
+                for p in points
+            ],
+        },
+        "input": _encode(asdict(report.input)),
         "docs": _DOCS,
     }

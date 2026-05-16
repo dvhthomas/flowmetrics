@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cycle Time Scatterplot</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
+         line-height: 1.55; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
+       margin-top: 2.5rem; }
+  .stamp { color: #777; font-size: 0.85rem; }
+  .subtitle { color: #555; font-size: 1rem; margin: 0 0 0.6rem; }
+  .subtitle a { color: #555; text-decoration: underline; }
+  /* Tufte: non-conditional headline / definition / insight / caveats
+     used to carry decorative colored backgrounds. Three stacked colored
+     blocks at the top of the page (headline + banner + definition)
+     looked like chartjunk. Plain typographic hierarchy now; only the
+     conditional `.banner` and `.horizon` classes get colored chrome. */
+  .headline { font-size: 1.35rem; font-weight: 500; color: #0d2440;
+              line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 60ch; }
+  .insight { font-size: 1rem; margin: 0.7rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  /* Trust notes — small, italic, used for "see how it's estimated" */
+  .trust-note { font-size: 0.88rem; color: #666; margin: 0.3rem 0 1rem; }
+  /* Boxed callouts for orientation / standup framing */
+  .standup-callout { background: #eef4ff; border-left: 4px solid #3b6fb8;
+                     padding: 0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+                     font-size: 0.92rem; color: #1f3a5f; max-width: 70ch; }
+  /* Compact prose blocks within details sections */
+  .walkthrough { font-size: 0.95rem; margin-left: 0.5rem; }
+  .compact-prose { font-size: 0.95rem; }
+  .footnote { font-size: 0.85rem; color: #666; max-width: 65ch; }
+  .footnote-tight { font-size: 0.85rem; color: #666; margin: 0.3rem 0 1rem; }
+  .footnote-wider { font-size: 0.9rem; color: #666; max-width: 60ch; }
+  /* Chart caption that hangs immediately under a chart */
+  .chart-caption { font-size: 0.85rem; color: #666;
+                   margin: 0.4rem 0 1.2rem; max-width: 65ch; }
+  /* About-section subhead (h3 within details) */
+  details h3 { margin-top: 1rem; font-size: 1rem; }
+  /* Vega chart containers — fluid width, fixed minimum height */
+  .chart { width: 100%; }
+  .chart.tall { min-height: 380px; }
+  .chart.medium { min-height: 340px; }
+  .chart.short { min-height: 200px; }
+  /* Success note (e.g. "no items past P85 — pipeline on track") */
+  .ok-note { font-size: 0.95rem; color: #137333; }
+  /* Walkthrough list inside an About-style details section */
+  .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
+  /* CFD workflow bookends: the user-supplied --workflow order
+     rendered as a pill chain with the entry/exit pills emphasised.
+     The pair tells the reader where new items arrive and where they
+     leave, which is exactly what the chart's top/bottom lines
+     measure. */
+  .workflow-bookends { display: flex; align-items: center;
+                       flex-wrap: wrap; gap: 0.6rem;
+                       padding: 0.7rem 0.9rem; margin: 0.6rem 0 1rem;
+                       background: #fafafa;
+                       border: 1px solid #eee; border-radius: 4px;
+                       font-size: 0.9rem; }
+  .workflow-bookends .bookend-label { color: #555;
+                                      font-variant: small-caps;
+                                      letter-spacing: 0.05em; }
+  .workflow-bookends .bookend-label.entry { font-weight: 600; }
+  .workflow-bookends .bookend-label.exit { font-weight: 600;
+                                            margin-left: auto; }
+  .workflow-bookends .workflow-chain { display: flex; flex-wrap: wrap;
+                                       align-items: center; gap: 0.35rem; }
+  .workflow-bookends .arrow { color: #999; }
+  /* Entry / exit pills carry a tint so the eye finds the
+     bookends amid the rest of the workflow. */
+  .pill.pill-entry { background: #e8f0fc; color: #1f3a5f;
+                     border: 1px solid #c7dafc; }
+  .pill.pill-exit  { background: #ecfdf5; color: #064e3b;
+                     border: 1px solid #b9e7d3; }
+  details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
+                      color: #2b7cff; }
+  details[open] > summary { margin-bottom: 0.5rem; }
+  .invocation { background: #1a1a1a; color: #f8f8f8; padding: 0.6rem 0.8rem;
+                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
+                overflow-x: auto; white-space: pre; }
+  .definition { font-size: 0.95rem; margin: 0.7rem 0; color: #444;
+                font-style: italic; }
+  /* State pill: workflow-stage labels rendered consistently across
+     the page (interventions list, per-state table, per-PR detail).
+     Visual marker says "this is a stage name." */
+  .pill { display: inline-block; padding: 0.1rem 0.55rem;
+          background: #eef1f5; color: #2b3a4a; border-radius: 999px;
+          font-size: 0.85rem; font-family: ui-monospace, "SF Mono",
+          Menlo, Consolas, monospace; white-space: nowrap; }
+  /* Single horizontal stacked bar for distribution. Each segment is
+     one aging band; width = share; color = yellow→red sequential.
+     Inline label inside the segment when wide enough. */
+  .dist-bar { display: flex; width: 100%; height: 42px;
+              border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+  .dist-bar .seg { display: flex; align-items: center; justify-content: center;
+                   color: #2b2b2b; font-size: 0.85rem; padding: 0 0.3rem;
+                   overflow: hidden; white-space: nowrap;
+                   text-overflow: ellipsis; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 0.8rem;
+                 font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+  .dist-legend .swatch { display: inline-block; width: 0.9rem;
+                         height: 0.9rem; vertical-align: middle;
+                         margin-right: 0.3rem; border-radius: 2px; }
+  .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
+             font-size: 0.95rem; }
+  .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
+  .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .banner { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d;
+            padding: 0.9rem 1.1rem; margin: 1rem 0; font-size: 1rem;
+            font-weight: 500; }
+  .intervention { display: flex; gap: 1rem; padding: 0.4rem 0;
+                  border-bottom: 1px solid #eee; align-items: center;
+                  font-variant-numeric: tabular-nums; }
+  .intervention .state { min-width: 22ch; font-size: 0.9rem; }
+  .intervention .id { min-width: 9ch; }
+  .intervention .age { min-width: 8ch; color: #cc3333; font-weight: 600; }
+  .intervention .title { flex: 1; color: #333; }
+  .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
+                    text-align: center; height: 0; position: relative; }
+  .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
+                           left: 50%; transform: translateX(-50%);
+                           background: white; padding: 0 0.8rem; color: #888;
+                           font-size: 0.85rem; letter-spacing: 0.1em;
+                           text-transform: uppercase; }
+  dl dt { margin-top: 0.6rem; }
+  dl dd { margin: 0.1rem 0 0.5rem 1.2rem; color: #444; }
+  table { border-collapse: collapse; margin: 0.5rem 0; }
+  th, td { padding: 0.3rem 0.7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #fafafa; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>Cycle Time Scatterplot</h1>
+<p class="subtitle">
+  for jira:CASSANDRA ·
+  2026-04-16 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
+</p>
+
+
+
+
+<div class="headline">
+43 items completed in 30 days; 85% finished within 1148.6 days (Apr 16, 2026 -&gt; May 15, 2026).
+</div>
+
+<div id="scatterplot-chart" class="chart tall"
+     role="img"
+     aria-label="Cycle-time scatterplot with P50, P70, P85, P95 percentile lines"></div>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+<script>
+  vegaEmbed("#scatterplot-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 380, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "circle", "size": 70, "opacity": 0.55, "color": "#2b7cff"}, "data": {"values": [{"completed_at": "2026-04-16", "cycle_time_days": 1907.6839351851852, "item_id": "CASSANDRA-16403", "title": "Python 3 compatibility for Cassandra 3", "pr_url": null}, {"completed_at": "2026-04-16", "cycle_time_days": 638.2433449074074, "item_id": "CASSANDRA-19777", "title": "Update doc page for how-to commit with more intro", "pr_url": null}, {"completed_at": "2026-04-17", "cycle_time_days": 18.36369212962963, "item_id": "CASSANDRA-21263", "title": "Fix intermittent QuickTheories exhaustion in WriteWarningsSnapshotTest property tests", "pr_url": null}, {"completed_at": "2026-04-17", "cycle_time_days": 1148.6280208333333, "item_id": "CASSANDRA-18282", "title": "Exception for RTBoundValidator", "pr_url": null}, {"completed_at": "2026-04-17", "cycle_time_days": 0.8235648148148148, "item_id": "CASSANDRA-21312", "title": "generate-eclipse-files missing simulator/harry and missing src class path", "pr_url": null}, {"completed_at": "2026-04-17", "cycle_time_days": 118.95561342592593, "item_id": "CASSANDRA-21089", "title": "Disable SEP Thread renaming by default", "pr_url": null}, {"completed_at": "2026-04-17", "cycle_time_days": 4.139328703703704, "item_id": "CASSANDRA-21304", "title": "Inspect and expose Paxos-related configuration properties in cassandra.yaml", "pr_url": null}, {"completed_at": "2026-04-18", "cycle_time_days": 1.713900462962963, "item_id": "CASSANDRA-21316", "title": "Paxos v2 cassandra.yaml option", "pr_url": null}, {"completed_at": "2026-04-20", "cycle_time_days": 32.1753125, "item_id": "CASSANDRA-21239", "title": "Synchronously publish changes to local gossip state following metadata updates", "pr_url": null}, {"completed_at": "2026-04-21", "cycle_time_days": 1.7939930555555557, "item_id": "CASSANDRA-21319", "title": "Create release branch cassandra-6.0", "pr_url": null}, {"completed_at": "2026-04-21", "cycle_time_days": 11.153252314814814, "item_id": "CASSANDRA-21293", "title": "Introduce minimum threshold for data resurrection check for tables with very low gc_grace (e.g. 0)", "pr_url": null}, {"completed_at": "2026-04-21", "cycle_time_days": 35.75798611111111, "item_id": "CASSANDRA-21221", "title": "Refuse to start Cassandra if local data is dangerously stale", "pr_url": null}, {"completed_at": "2026-04-21", "cycle_time_days": 27.010625, "item_id": "CASSANDRA-21255", "title": "Differentiate between legitimate cases where the first entry is the same as the last entry and empty bounds in SSTableCursorWriter#addIndexBlock()", "pr_url": null}, {"completed_at": "2026-04-23", "cycle_time_days": 0.7607175925925926, "item_id": "CASSANDRA-21329", "title": "Fix flaky CompactionTaskTest.testFullyExpiredSSTablesAreNotReleasedPrematurely", "pr_url": null}, {"completed_at": "2026-04-23", "cycle_time_days": 4.0072222222222225, "item_id": "CASSANDRA-21318", "title": "Test failure: org.apache.cassandra.distributed.test.QueriesTableTest", "pr_url": null}, {"completed_at": "2026-04-24", "cycle_time_days": 32.07496527777778, "item_id": "CASSANDRA-21246", "title": "Snapshots from tables without table-id embedded in their folder name are not loaded by SnapshotLoader", "pr_url": null}, {"completed_at": "2026-04-24", "cycle_time_days": 253.7430324074074, "item_id": "CASSANDRA-20835", "title": "IAuthenticator should support authenticator-specific role options", "pr_url": null}, {"completed_at": "2026-04-26", "cycle_time_days": 16.443969907407407, "item_id": "CASSANDRA-21294", "title": "Avoid CompactionOptions parsing for every read by WithoutPurgeableTombstones", "pr_url": null}, {"completed_at": "2026-04-27", "cycle_time_days": 2543.5004166666668, "item_id": "CASSANDRA-15125", "title": "Replace Math.random with Replace.nextDouble to remove performance overhead", "pr_url": null}, {"completed_at": "2026-04-27", "cycle_time_days": 328.96650462962964, "item_id": "CASSANDRA-20694", "title": "Server-side of CASSJAVA-92", "pr_url": null}, {"completed_at": "2026-04-27", "cycle_time_days": 1243.0473958333334, "item_id": "CASSANDRA-18084", "title": "Introduce tags to snitch for better decision making for replica placement in topology strategies", "pr_url": null}, {"completed_at": "2026-04-27", "cycle_time_days": 151.3204861111111, "item_id": "CASSANDRA-21046", "title": "Schema annotations escape validation on CREATE and ALTER DDL statements", "pr_url": null}, {"completed_at": "2026-04-27", "cycle_time_days": 3.8139351851851853, "item_id": "CASSANDRA-21332", "title": "Queries on Static SAI-indexed Columns May Resurrect Range Tombstoned Data During Replica Filtering Protection", "pr_url": null}, {"completed_at": "2026-04-28", "cycle_time_days": 35.47133101851852, "item_id": "CASSANDRA-21247", "title": "Enable check_data_resurrection by default in cassandra_latest.yaml", "pr_url": null}, {"completed_at": "2026-04-28", "cycle_time_days": 33.9819212962963, "item_id": "CASSANDRA-21252", "title": "CEP-45: BRR doesn't do tracked writes when needed during migration", "pr_url": null}, {"completed_at": "2026-04-29", "cycle_time_days": 370.9535763888889, "item_id": "CASSANDRA-20588", "title": "Fix single token batch atomicity with Accord/non-Accord batches by using the batch log", "pr_url": null}, {"completed_at": "2026-04-30", "cycle_time_days": 1768.317835648148, "item_id": "CASSANDRA-16767", "title": "Add user defined SSTables option for nodetool garbagecollect", "pr_url": null}, {"completed_at": "2026-04-30", "cycle_time_days": 92.44725694444445, "item_id": "CASSANDRA-21139", "title": "Guardrail for miss-prepared statements", "pr_url": null}, {"completed_at": "2026-04-30", "cycle_time_days": 3999.016203703704, "item_id": "CASSANDRA-9430", "title": "Add startup options to cqlshrc", "pr_url": null}, {"completed_at": "2026-04-30", "cycle_time_days": 20.496944444444445, "item_id": "CASSANDRA-21295", "title": "Avoid unit conversion in DatabaseDescriptor.getMaxValueSize() for every deserializing Cell", "pr_url": null}, {"completed_at": "2026-05-02", "cycle_time_days": 3354.5080902777777, "item_id": "CASSANDRA-13260", "title": "Add UDT support to Cassandra stress", "pr_url": null}, {"completed_at": "2026-05-05", "cycle_time_days": 1.2629050925925926, "item_id": "CASSANDRA-21348", "title": "system_views.settings fails for map settings with non-string keys", "pr_url": null}, {"completed_at": "2026-05-05", "cycle_time_days": 348.3891203703704, "item_id": "CASSANDRA-20672", "title": "release scripts should allow skipping the changelog update", "pr_url": null}, {"completed_at": "2026-05-06", "cycle_time_days": 2.03337962962963, "item_id": "CASSANDRA-21350", "title": "Add no-build-accord Ant option to be able to skip Accord module rebuild", "pr_url": null}, {"completed_at": "2026-05-06", "cycle_time_days": 2.798020833333333, "item_id": "CASSANDRA-21347", "title": "Avoid allocation by getFunctions in SelectStatement.authorize ", "pr_url": null}, {"completed_at": "2026-05-06", "cycle_time_days": 6.550810185185185, "item_id": "CASSANDRA-21346", "title": "Update aber's gpg key in project's KEYS file", "pr_url": null}, {"completed_at": "2026-05-07", "cycle_time_days": 3.0768981481481483, "item_id": "CASSANDRA-21351", "title": "Reduce memory allocations in SelectStatement.getQuery", "pr_url": null}, {"completed_at": "2026-05-09", "cycle_time_days": 0.9708449074074074, "item_id": "CASSANDRA-21355", "title": "Accord: Clean Shutdown/Restart, Rebootstrap, et al", "pr_url": null}, {"completed_at": "2026-05-11", "cycle_time_days": 0.1317361111111111, "item_id": "CASSANDRA-21364", "title": "Add ability to skip post-checkout submodule init with BUILD_OFFLINE env var", "pr_url": null}, {"completed_at": "2026-05-12", "cycle_time_days": 0.2942939814814815, "item_id": "CASSANDRA-21367", "title": "Cassandra CIs fail on artifacts resolution", "pr_url": null}, {"completed_at": "2026-05-13", "cycle_time_days": 0.8596064814814814, "item_id": "CASSANDRA-21366", "title": "Fix MutationId class hierarchy and related maps lookup issues", "pr_url": null}, {"completed_at": "2026-05-13", "cycle_time_days": 52.00672453703704, "item_id": "CASSANDRA-21245", "title": "Uncompressed size is being used for compressed tables in maintenance operations", "pr_url": null}, {"completed_at": "2026-05-14", "cycle_time_days": 31.934965277777778, "item_id": "CASSANDRA-21301", "title": "add AGENTS.md and CLAUDE.md", "pr_url": null}]}, "encoding": {"x": {"field": "completed_at", "type": "temporal", "scale": {"type": "utc"}, "axis": {"title": "Completion date", "titleFontWeight": "bold", "format": "%b %d", "labelAngle": 0}}, "y": {"field": "cycle_time_days", "type": "quantitative", "axis": {"title": "Cycle time (days)", "titleFontWeight": "bold"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "cycle_time_days", "title": "Cycle (d)", "format": ".1f"}, {"field": "completed_at", "title": "Completed", "type": "temporal", "format": "%b %d, %Y", "formatType": "utc"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 31.934965277777778, "label": "P50 (31.9d)"}, {"pct": "P70", "y": 151.3204861111111, "label": "P70 (151.3d)"}, {"pct": "P85", "y": 1148.6280208333333, "label": "P85 (1148.6d)"}, {"pct": "P95", "y": 2543.5004166666668, "label": "P95 (2543.5d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 31.934965277777778, "label": "P50 (31.9d)"}, {"pct": "P70", "y": 151.3204861111111, "label": "P70 (151.3d)"}, {"pct": "P85", "y": 1148.6280208333333, "label": "P85 (1148.6d)"}, {"pct": "P95", "y": 2543.5004166666668, "label": "P95 (2543.5d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}]}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("scatterplot-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
+<p class="footnote-tight">
+Hover any dot to see the item that finished there. Click a dot to
+open its PR / issue. Horizontal lines mark percentile thresholds —
+a new item entering the system has the matching probability of
+finishing in that time or less.
+</p>
+
+<h2>Slowest items in this window</h2>
+<div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-9430</span>
+    <span class="age">3999.0d</span>
+    <span class="state">2026-04-30</span>
+    <span class="title">Add startup options to cqlshrc</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-13260</span>
+    <span class="age">3354.5d</span>
+    <span class="state">2026-05-02</span>
+    <span class="title">Add UDT support to Cassandra stress</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-15125</span>
+    <span class="age">2543.5d</span>
+    <span class="state">2026-04-27</span>
+    <span class="title">Replace Math.random with Replace.nextDouble to remove performance overhead</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-16403</span>
+    <span class="age">1907.7d</span>
+    <span class="state">2026-04-16</span>
+    <span class="title">Python 3 compatibility for Cassandra 3</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-16767</span>
+    <span class="age">1768.3d</span>
+    <span class="state">2026-04-30</span>
+    <span class="title">Add user defined SSTables option for nodetool garbagecollect</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-18084</span>
+    <span class="age">1243.0d</span>
+    <span class="state">2026-04-27</span>
+    <span class="title">Introduce tags to snitch for better decision making for replica placement in topology strategies</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-18282</span>
+    <span class="age">1148.6d</span>
+    <span class="state">2026-04-17</span>
+    <span class="title">Exception for RTBoundValidator</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-19777</span>
+    <span class="age">638.2d</span>
+    <span class="state">2026-04-16</span>
+    <span class="title">Update doc page for how-to commit with more intro</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-20588</span>
+    <span class="age">371.0d</span>
+    <span class="state">2026-04-29</span>
+    <span class="title">Fix single token batch atomicity with Accord/non-Accord batches by using the batch log</span>
+  </div>
+  <div class="intervention">
+    <span class="id">CASSANDRA-20672</span>
+    <span class="age">348.4d</span>
+    <span class="state">2026-05-05</span>
+    <span class="title">release scripts should allow skipping the changelog update</span>
+  </div>
+</div>
+
+
+
+
+<hr class="detail-divider">
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Repo</th><td>jira:CASSANDRA</td></tr>
+  <tr><th>Window</th><td>2026-04-16 → 2026-05-15</td></tr>
+  <tr><th>Completed items</th><td>43</td></tr>
+</table>
+<div class="invocation">uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-16 --stop 2026-05-15</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds — a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.</p>
+
+<p><strong>How to read the percentile lines.</strong></p>
+<ul class="compact-prose">
+  <li>The lines are EMPIRICAL — drawn at the cycle times that
+      separate the finished items into ranked groups. P50 = half
+      the items finished at or below this number of days; P85 =
+      85% of items finished at or below this number; etc.</li>
+  <li>By definition, a new item entering the system has the matching
+      probability of finishing in that time or less. P85 (1148.6d
+      for this window) is the conventional external-commitment line.</li>
+  <li>The deep tail (above P95) is where retrospectives find the
+      most leverage — what happened with each of those items, and
+      can we prevent it next time?</li>
+</ul>
+
+<p><strong>Key insight.</strong> Median cycle time is 31.9 days; deep-tail P95 is 2543.5 days. A new item entering the system has, by definition, an 85% chance of finishing in 1148.6 days or less and a 50% chance of finishing in 31.9 days or less.</p>
+
+<p><strong>Next actions</strong></p>
+<ol class="compact-prose">
+  <li>Use P85 (1148.6d) as the external commitment for new work — promising P50 builds a 50% miss rate into the plan.</li>
+  <li>Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down.</li>
+</ol>
+
+<p><strong>Caveats</strong></p>
+<ul class="footnote-wider">
+  <li>Percentiles are EMPIRICAL — read from the actual finished items in this window. No simulation, no estimation.</li>
+  <li>Outliers (very long cycle times) shift P85 / P95 up. If the window is short or includes a single stuck-then-finished PR, the deep-tail percentiles can be noisy.</li>
+</ul>
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+  <dt><strong>Cycle Time</strong></dt>
+  <dd>Days from when a work item entered the system (created) to when it left (merged / resolved). One dot on the chart per completed item; the dot&#39;s y-position is its cycle time.</dd>
+  <dt><strong>Percentile Line</strong></dt>
+  <dd>A horizontal line on the scatterplot such that the given percent of dots fall on or below it. P50 = median cycle time; 85% of completed items finished in P85 days or less. A new item entering the system has, by definition, the matching probability of finishing in that time.</dd>
+  <dt><strong>Completion date</strong></dt>
+  <dd>When the item was merged (GitHub) or resolved (Jira). The dot&#39;s x-position on the chart.</dd>
+  <dt><strong>Source</strong></dt>
+  <dd>Vacanti, _When Will It Be Done?_ (Leanpub).</dd>
+</dl>
+</details>
+
+
+
+</body>
+</html>

@@ -13,7 +13,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..report import AgingReport, CfdReport, EfficiencyReport, HowManyReport, WhenDoneReport
+from ..report import (
+    AgingReport,
+    CfdReport,
+    EfficiencyReport,
+    HowManyReport,
+    ScatterplotReport,
+    WhenDoneReport,
+)
 
 _VEGA_LITE_SCHEMA = "https://vega.github.io/schema/vega-lite/v5.json"
 
@@ -149,6 +156,134 @@ def how_many_spec(report: HowManyReport) -> dict[str, Any]:
         x_type="quantitative",
         x_title="Item count",
     )
+
+
+def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
+    """Vacanti's Cycle-Time Scatterplot.
+
+    x = completion date (temporal)
+    y = cycle time in days (quantitative)
+    Each dot = one completed item.
+
+    Horizontal percentile lines (P50, P70, P85, P95) mark probability-
+    of-finish thresholds — a new item entering the system has a 50%
+    chance of finishing in P50 days, 85% in P85 days, etc. P85 is
+    typically the commitment threshold."""
+    point_rows = [
+        {
+            "completed_at": pt.completed_at.isoformat(),
+            "cycle_time_days": pt.cycle_time_days,
+            "item_id": pt.item_id,
+            "title": pt.title,
+            "pr_url": pt.pr_url,
+        }
+        for pt in report.points
+    ]
+
+    # Cap y-axis below P95 * 1.5 so a single deep-tail outlier doesn't
+    # crush the rest of the chart. The outlier is still on the dot
+    # data; only the percentile-line that's pathologically high gets
+    # rendered out of band.
+    p95 = report.cycle_time_percentiles.get(95, 0.0)
+    max_cycle = max((p.cycle_time_days for p in report.points), default=0.0)
+    y_cap = max(p95 * 1.5, max_cycle * 1.1) if report.points else 0
+    percentile_rows = [
+        {
+            "pct": f"P{p}",
+            "y": v,
+            "label": f"P{p} ({v:.1f}d)",
+        }
+        for p, v in sorted(report.cycle_time_percentiles.items())
+        if 0 < v <= y_cap
+    ]
+
+    circle_layer = {
+        "mark": {"type": "circle", "size": 70, "opacity": 0.55,
+                 "color": "#2b7cff"},
+        "data": {"values": point_rows},
+        "encoding": {
+            "x": {
+                "field": "completed_at",
+                "type": "temporal",
+                "scale": {"type": "utc"},  # Match the CFD's UTC fix.
+                "axis": {"title": "Completion date",
+                         "titleFontWeight": "bold",
+                         "format": "%b %d", "labelAngle": 0},
+            },
+            "y": {
+                "field": "cycle_time_days",
+                "type": "quantitative",
+                "axis": {"title": "Cycle time (days)",
+                         "titleFontWeight": "bold"},
+            },
+            "tooltip": [
+                {"field": "item_id", "title": "ID"},
+                {"field": "title", "title": "Title"},
+                {"field": "cycle_time_days", "title": "Cycle (d)",
+                 "format": ".1f"},
+                {"field": "completed_at", "title": "Completed",
+                 "type": "temporal", "format": "%b %d, %Y",
+                 "formatType": "utc"},
+            ],
+            "href": {"field": "pr_url", "type": "nominal"},
+        },
+    }
+
+    rule_layer = {
+        # Yellow→red sequential palette: P50 = "still ok", P95 =
+        # "danger". P85 stays solid + heavier as the canonical
+        # commitment threshold; the others render dashed.
+        "mark": {"type": "rule"},
+        "data": {"values": percentile_rows},
+        "encoding": {
+            "y": {"field": "y", "type": "quantitative"},
+            "color": {
+                "field": "pct",
+                "type": "ordinal",
+                "sort": ["P50", "P70", "P85", "P95"],
+                "scale": {"scheme": "yelloworangered"},
+                "legend": {"title": "Cycle-time percentile",
+                           "orient": "right"},
+            },
+            "strokeDash": {
+                "condition": {"test": "datum.pct === 'P85'", "value": [1, 0]},
+                "value": [6, 4],
+            },
+            "size": {
+                "condition": {"test": "datum.pct === 'P85'", "value": 4},
+                "value": 2,
+            },
+            "tooltip": [{"field": "label", "title": "Threshold"}],
+        },
+    }
+
+    text_layer = {
+        # Direct labels next to the rule lines so the reader doesn't
+        # have to bounce between legend and chart.
+        "mark": {"type": "text", "align": "left", "baseline": "bottom",
+                 "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"},
+        "data": {"values": percentile_rows},
+        "encoding": {
+            "y": {"field": "y", "type": "quantitative"},
+            "text": {"field": "label"},
+            "color": {
+                "field": "pct",
+                "type": "ordinal",
+                "sort": ["P50", "P70", "P85", "P95"],
+                "scale": {"scheme": "yelloworangered"},
+                "legend": None,
+            },
+        },
+    }
+
+    return {
+        "$schema": _VEGA_LITE_SCHEMA,
+        "width": "container",
+        "height": 380,
+        "background": "transparent",
+        "config": {"view": {"fill": None, "stroke": "#e5e5e5", "strokeWidth": 1}},
+        "layer": [circle_layer, rule_layer, text_layer],
+    }
 
 
 def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:

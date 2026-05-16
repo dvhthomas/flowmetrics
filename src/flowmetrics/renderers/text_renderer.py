@@ -30,6 +30,7 @@ from ..report import (
     EfficiencyReport,
     HowManyReport,
     Report,
+    ScatterplotReport,
     WhenDoneReport,
     cli_invocation,
 )
@@ -92,6 +93,8 @@ def render(
         _render_cfd(report, console)
     elif isinstance(report, AgingReport):
         _render_aging(report, console)
+    elif isinstance(report, ScatterplotReport):
+        _render_scatterplot(report, console)
     else:  # pragma: no cover
         raise TypeError(f"unknown report type: {type(report).__name__}")
     return _ascii_safe(buf.getvalue())
@@ -379,4 +382,58 @@ def _render_how_many(report: HowManyReport, console: Console) -> None:
     ]
     console.print(_input_table(report, rows))
     console.print("[dim](Distribution chart: use --format html.)[/dim]")
+    _reproduce(console, report)
+
+
+def _render_scatterplot(report: ScatterplotReport, console: Console) -> None:
+    _top(console, report)
+
+    if not report.points:
+        _detail_divider(console)
+        _reproduce(console, report)
+        return
+
+    pct = Table(title="Cycle-time percentiles (days)")
+    pct.add_column("Percentile")
+    pct.add_column("Days", justify="right")
+    pct.add_column("How to use it")
+    use_hints = {
+        50: "half of items finish in this time or less",
+        70: "internal planning estimate",
+        85: "external commitment threshold",
+        95: "high-stakes commitment / deep-tail risk",
+    }
+    for p in [50, 70, 85, 95]:
+        v = report.cycle_time_percentiles.get(p, 0.0)
+        pct.add_row(f"P{p}", f"{v:.1f}", use_hints.get(p, ""))
+    console.print(pct)
+
+    # Slowest 10 finishers — deep-tail items to retrospect.
+    slowest = sorted(
+        report.points, key=lambda p: p.cycle_time_days, reverse=True
+    )[:10]
+    slow_table = Table(title="Slowest finishers")
+    slow_table.add_column("#")
+    slow_table.add_column("Cycle (d)", justify="right")
+    slow_table.add_column("Completed")
+    slow_table.add_column("Title")
+    for p in slowest:
+        slow_table.add_row(
+            p.item_id,
+            f"{p.cycle_time_days:.1f}",
+            p.completed_at.isoformat(),
+            p.title[:60],
+        )
+    console.print(slow_table)
+
+    _caveats(console, report)
+    _detail_divider(console)
+
+    rows = [
+        ("Repo", report.input.repo),
+        ("Window", f"{report.input.start} -> {report.input.stop}"),
+        ("Completed items", str(len(report.points))),
+    ]
+    console.print(_input_table(report, rows))
+    console.print("[dim](Scatterplot chart: use --format html.)[/dim]")
     _reproduce(console, report)

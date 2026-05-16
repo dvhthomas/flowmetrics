@@ -1,2 +1,2 @@
-WIP Aging for astral-sh/uv as of May 15, 2026: 388 in-flight items, 378 already past P85 (3.1d), 365
+WIP Aging for astral-sh/uv as of May 16, 2026: 388 in-flight items, 381 already past P85 (3.0d), 368
 past P95 (9.5d).

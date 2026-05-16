@@ -1,0 +1,124 @@
+{
+  "schema": "flowmetrics.scatterplot.v1",
+  "command": "scatterplot",
+  "generated_at": "2026-05-16T09:48:40.199621-06:00",
+  "headline": "10 items completed in 30 days; 85% finished within 84.5 days (Apr 16, 2026 -> May 15, 2026).",
+  "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
+  "summary": {
+    "completed_count": 10,
+    "window": {
+      "start": "2026-04-16",
+      "stop": "2026-05-15",
+      "days": 30
+    },
+    "cycle_time_percentiles_days": {
+      "50": 21.09633101851852,
+      "70": 57.42270833333333,
+      "85": 84.48579861111111,
+      "95": 98.37445601851852
+    }
+  },
+  "key_insight": "Median cycle time is 21.1 days; deep-tail P95 is 98.4 days. A new item entering the system has, by definition, an 85% chance of finishing in 84.5 days or less and a 50% chance of finishing in 21.1 days or less.",
+  "next_actions": [
+    "Use P85 (84.5d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
+    "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
+  ],
+  "caveats": [
+    "Percentiles are EMPIRICAL \u2014 read from the actual finished items in this window. No simulation, no estimation.",
+    "Outliers (very long cycle times) shift P85 / P95 up. If the window is short or includes a single stuck-then-finished PR, the deep-tail percentiles can be noisy."
+  ],
+  "vocabulary": {
+    "Cycle Time": "Days from when a work item entered the system (created) to when it left (merged / resolved). One dot on the chart per completed item; the dot's y-position is its cycle time.",
+    "Percentile Line": "A horizontal line on the scatterplot such that the given percent of dots fall on or below it. P50 = median cycle time; 85% of completed items finished in P85 days or less. A new item entering the system has, by definition, the matching probability of finishing in that time.",
+    "Completion date": "When the item was merged (GitHub) or resolved (Jira). The dot's x-position on the chart.",
+    "Source": "Vacanti, _When Will It Be Done?_ (Leanpub)."
+  },
+  "chart_data": {
+    "points": [
+      {
+        "item_id": "BIGTOP-4519",
+        "title": "Upgrade Groovy to 3.0.25",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 57.42270833333333,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4520",
+        "title": "Upgrade Hadoop to 3.4.3",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 50.782986111111114,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4516",
+        "title": "Upgrade Tez to 0.10.5",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 82.70313657407408,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4524",
+        "title": "Add libuv1-dev to the toolchain for Debian 12",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 0.8863888888888889,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4523",
+        "title": "Make container tagging consistent between Linux and Mac OS on ARM",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 17.81144675925926,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4517",
+        "title": "Fix build failure of Hive 4.0.1 against Hadoop 3.4.2",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 84.48579861111111,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4522",
+        "title": "Fix installation failure of Puppet on openEuler 22.03",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 21.09633101851852,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4525",
+        "title": "Upgrade Ranger to 2.8.0",
+        "completed_at": "2026-05-08",
+        "cycle_time_days": 8.036365740740742,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4528",
+        "title": "conf-select is missing",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 5.8048263888888885,
+        "pr_url": null
+      },
+      {
+        "item_id": "BIGTOP-4515",
+        "title": "Upgrade HBase to 2.6.5",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 98.37445601851852,
+        "pr_url": null
+      }
+    ]
+  },
+  "input": {
+    "repo": "jira:BIGTOP",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
+    "offline": false,
+    "jira_url": "https://issues.apache.org/jira"
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-16 --stop 2026-05-15",
+  "logs": []
+}

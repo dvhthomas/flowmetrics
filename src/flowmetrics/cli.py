@@ -40,6 +40,7 @@ from .interpretation import (
     interpret_cfd,
     interpret_efficiency,
     interpret_how_many,
+    interpret_scatterplot,
     interpret_when_done,
 )
 from .logcapture import LogCapture
@@ -53,6 +54,9 @@ from .report import (
     EfficiencyReport,
     HowManyInput,
     HowManyReport,
+    ScatterplotInput,
+    ScatterplotPoint,
+    ScatterplotReport,
     SimulationSummary,
     WhenDoneInput,
     WhenDoneReport,
@@ -441,6 +445,123 @@ def cfd(
         )
 
     _dispatch(fmt, output, build, verbose=verbose)
+
+
+@cli.command(short_help="Cycle Time Scatterplot per Vacanti")
+@_apply_source_options
+@click.option(
+    "--start",
+    type=str,
+    default=None,
+    help=(
+        "Window start (YYYY-MM-DD). Default: 29 days before --stop, "
+        "giving the recommended 30-day window."
+    ),
+)
+@click.option(
+    "--stop",
+    type=str,
+    default=None,
+    help="Window stop (YYYY-MM-DD). Default: yesterday-UTC.",
+)
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path), default=DEFAULT_CACHE_DIR, show_default=True
+)
+@click.option("--offline/--online", default=False)
+@_FORMAT_OPTION
+@_OUTPUT_OPTION
+@_VERBOSE_OPTION
+def scatterplot(
+    repo: str | None,
+    jira_url: str | None,
+    jira_project: str | None,
+    start: str | None,
+    stop: str | None,
+    cache_dir: Path,
+    offline: bool,
+    fmt: str,
+    output: Path | None,
+    verbose: bool,
+) -> None:
+    """Cycle Time Scatterplot — empirical cycle-time distribution.
+
+    For each item completed in the window, plot a dot at (completion
+    date, cycle time in days). Horizontal percentile lines (P50, P70,
+    P85, P95) mark probability-of-completion thresholds. P85 is the
+    conventional external-commitment line: a new item has an 85%
+    chance of finishing in P85 days or less.
+
+    For a sprint/standup-friendly view, set --start / --stop to a
+    7-day window. The default is the 30-day window ending yesterday-
+    UTC.
+    """
+    from .service import default_history_end, default_history_start
+    stop_d = _parse_date(stop) if stop else default_history_end()
+    start_d = _parse_date(start) if start else default_history_start(stop_d)
+    if start_d > stop_d:
+        raise click.UsageError(
+            f"--start ({start_d}) must be on or before --stop ({stop_d})"
+        )
+
+    src = _build_source(
+        repo=repo,
+        jira_url=jira_url,
+        jira_project=jira_project,
+        cache_dir=cache_dir,
+        offline=offline,
+    )
+
+    def build() -> ScatterplotReport:
+        from .percentiles import chart_percentiles
+        items = src.fetch_for_percentile_training(start_d, stop_d)
+        pr_url_for = _github_pr_url_builder(src.label)
+        points: list[ScatterplotPoint] = []
+        cycle_days: list[float] = []
+        for it in items:
+            if it.merged_at is None:
+                continue
+            cycle = (it.merged_at - it.created_at).total_seconds() / 86400
+            points.append(ScatterplotPoint(
+                item_id=it.item_id,
+                title=it.title,
+                completed_at=it.merged_at.date(),
+                cycle_time_days=cycle,
+                pr_url=pr_url_for(it.item_id),
+            ))
+            cycle_days.append(cycle)
+
+        percentiles = chart_percentiles(cycle_days) if cycle_days else {
+            50: 0.0, 70: 0.0, 85: 0.0, 95: 0.0
+        }
+        input_ = ScatterplotInput(
+            repo=src.label,
+            start=start_d,
+            stop=stop_d,
+            offline=offline,
+            jira_url=jira_url,
+        )
+        return ScatterplotReport(
+            input=input_,
+            points=points,
+            cycle_time_percentiles=percentiles,
+            interpretation=interpret_scatterplot(input_, points, percentiles),
+        )
+
+    _dispatch(fmt, output, build, verbose=verbose)
+
+
+def _github_pr_url_builder(repo_label: str):
+    """Returns a callable item_id -> PR URL for GitHub repos,
+    item_id -> None for everything else (Jira gets its URL from
+    the source-level metadata, not constructed here)."""
+    if not repo_label or "/" not in repo_label or repo_label.startswith("jira:"):
+        return lambda _id: None
+
+    def f(item_id: str) -> str | None:
+        if item_id.startswith("#"):
+            return f"https://github.com/{repo_label}/pull/{item_id.lstrip('#')}"
+        return None
+    return f
 
 
 @cli.command(short_help="Aging Work In Progress (Vacanti WWIBD)")

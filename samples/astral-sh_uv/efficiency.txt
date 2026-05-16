@@ -1,2 +1,2 @@
-0.8% flow efficiency across 47 completed items (36 human, 11 bot) over 7 days, May 8, 2026 -> May 14,
+0.8% flow efficiency across 50 completed items (40 human, 10 bot) over 7 days, May 9, 2026 -> May 15,
 2026.

@@ -1,15 +1,15 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-15T17:20:04.514337-06:00",
-  "headline": "85% confident the next 25 items finish by May 19, 2026 (starting May 15, 2026).",
+  "generated_at": "2026-05-16T09:48:18.342482-06:00",
+  "headline": "85% confident the next 25 items finish by May 20, 2026 (starting May 16, 2026).",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
-      "50": "2026-05-17",
-      "70": "2026-05-18",
-      "85": "2026-05-19",
-      "95": "2026-05-20"
+      "50": "2026-05-19",
+      "70": "2026-05-19",
+      "85": "2026-05-20",
+      "95": "2026-05-21"
     },
     "reading": "forward \u2014 higher confidence means a later date",
     "horizon": {
@@ -19,9 +19,9 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is May 17, 2026. 95% confidence is May 20, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is May 19, 2026. 95% confidence is May 21, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
-    "Commit externally on the 85% date (May 19, 2026), not the 50% date (May 17, 2026).",
+    "Commit externally on the 85% date (May 20, 2026), not the 50% date (May 19, 2026).",
     "Re-run weekly to track drift in the forecast."
   ],
   "caveats": [
@@ -39,55 +39,55 @@
   "chart_data": {
     "histogram": [
       {
-        "date": "2026-05-15",
-        "frequency": 298
-      },
-      {
         "date": "2026-05-16",
-        "frequency": 1508
+        "frequency": 317
       },
       {
         "date": "2026-05-17",
-        "frequency": 3249
+        "frequency": 1420
       },
       {
         "date": "2026-05-18",
-        "frequency": 2494
+        "frequency": 3049
       },
       {
         "date": "2026-05-19",
-        "frequency": 1350
+        "frequency": 2502
       },
       {
         "date": "2026-05-20",
-        "frequency": 637
+        "frequency": 1515
       },
       {
         "date": "2026-05-21",
-        "frequency": 288
+        "frequency": 704
       },
       {
         "date": "2026-05-22",
-        "frequency": 106
+        "frequency": 312
       },
       {
         "date": "2026-05-23",
-        "frequency": 43
+        "frequency": 121
       },
       {
         "date": "2026-05-24",
-        "frequency": 17
+        "frequency": 42
       },
       {
         "date": "2026-05-25",
-        "frequency": 7
+        "frequency": 10
       },
       {
         "date": "2026-05-26",
-        "frequency": 2
+        "frequency": 4
       },
       {
-        "date": "2026-05-29",
+        "date": "2026-05-27",
+        "frequency": 3
+      },
+      {
+        "date": "2026-05-30",
         "frequency": 1
       }
     ],
@@ -96,17 +96,16 @@
   "input": {
     "repo": "huggingface/transformers",
     "items": 25,
-    "start_date": "2026-05-15",
-    "history_start": "2026-04-15",
-    "history_end": "2026-05-14",
+    "start_date": "2026-05-16",
+    "history_start": "2026-04-16",
+    "history_end": "2026-05-15",
     "offline": false,
     "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-15",
-    "window_end": "2026-05-14",
+    "window_start": "2026-04-16",
+    "window_end": "2026-05-15",
     "daily_throughput": [
-      13,
       8,
       8,
       0,
@@ -135,10 +134,11 @@
       9,
       14,
       15,
-      11
+      11,
+      6
     ],
-    "total_throughput": 251,
-    "avg_throughput_per_day": 8.366666666666667,
+    "total_throughput": 244,
+    "avg_throughput_per_day": 8.133333333333333,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 26,
     "zero_throughput_days": 6
@@ -152,6 +152,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-16 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42",
   "logs": []
 }

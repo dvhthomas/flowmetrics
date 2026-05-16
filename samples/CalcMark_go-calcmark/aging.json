@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-15T17:20:11.521562-06:00",
-  "headline": "WIP Aging for CalcMark/go-calcmark as of May 15, 2026: 2 in-flight items, 2 already past P85 (0.4d), 2 past P95 (1.0d).",
+  "generated_at": "2026-05-16T09:48:30.970361-06:00",
+  "headline": "WIP Aging for CalcMark/go-calcmark as of May 16, 2026: 2 in-flight items, 2 already past P85 (0.9d), 2 past P95 (1.0d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 2,
@@ -14,23 +14,23 @@
       "Awaiting Review": 1
     },
     "cycle_time_percentiles_days": {
-      "50": 0.001863425925925926,
+      "50": 0.0010763888888888889,
       "70": 0.023541666666666666,
-      "85": 0.3801157407407407,
-      "95": 1.0188310185185185
+      "85": 0.8535648148148148,
+      "95": 1.0318287037037037
     },
-    "completed_count_for_percentiles": 20,
+    "completed_count_for_percentiles": 18,
     "aging_distribution": [
       {
         "label": "Below P50",
         "lower": null,
-        "upper": 0.001863425925925926,
+        "upper": 0.0010763888888888889,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "P50\u2013P70",
-        "lower": 0.001863425925925926,
+        "lower": 0.0010763888888888889,
         "upper": 0.023541666666666666,
         "count": 0,
         "share": 0.0
@@ -38,20 +38,20 @@
       {
         "label": "P70\u2013P85",
         "lower": 0.023541666666666666,
-        "upper": 0.3801157407407407,
+        "upper": 0.8535648148148148,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "P85\u2013P95",
-        "lower": 0.3801157407407407,
-        "upper": 1.0188310185185185,
+        "lower": 0.8535648148148148,
+        "upper": 1.0318287037037037,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "Above P95",
-        "lower": 1.0188310185185185,
+        "lower": 1.0318287037037037,
         "upper": null,
         "count": 2,
         "share": 1.0
@@ -61,8 +61,8 @@
       {
         "state": "Draft",
         "count": 1,
-        "median_age_days": 38,
-        "oldest_age_days": 38,
+        "median_age_days": 39,
+        "oldest_age_days": 39,
         "at_risk_p50_to_p85": 0,
         "past_p85": 1,
         "past_p95": 1
@@ -70,8 +70,8 @@
       {
         "state": "Awaiting Review",
         "count": 1,
-        "median_age_days": 39,
-        "oldest_age_days": 39,
+        "median_age_days": 40,
+        "oldest_age_days": 40,
         "at_risk_p50_to_p85": 0,
         "past_p85": 1,
         "past_p95": 1
@@ -100,27 +100,27 @@
         "item_id": "#115",
         "title": "fix: interpolation bold doubling and error recovery display fixes",
         "current_state": "Awaiting Review",
-        "age_days": 39,
+        "age_days": 40,
         "pr_url": "https://github.com/CalcMark/go-calcmark/pull/115"
       },
       {
         "item_id": "#120",
         "title": "feat: named tables and array type",
         "current_state": "Draft",
-        "age_days": 38,
+        "age_days": 39,
         "pr_url": "https://github.com/CalcMark/go-calcmark/pull/120"
       }
     ]
   },
-  "key_insight": "2 item(s) have aged past the P85 cycle time (0.4d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #115, #120. Concentrate decision-making here.",
+  "key_insight": "2 item(s) have aged past the P85 cycle time (0.9d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #115, #120. Concentrate decision-making here.",
   "next_actions": [
     "2 item(s) past P95 (1.0d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Draft' with 1 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",
     "Re-check daily; Aging is a leading indicator of forecast slip."
   ],
   "caveats": [
-    "Aging is a snapshot as of May 15, 2026 \u2014 not a trend over time.",
-    "Percentile lines reflect the completed-item distribution from Apr 15, 2026 \u2192 May 14, 2026 (20 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Aging is a snapshot as of May 16, 2026 \u2014 not a trend over time.",
+    "Percentile lines reflect the completed-item distribution from Apr 16, 2026 \u2192 May 15, 2026 (18 items). If recent throughput has changed, those checkpoints may have drifted.",
     "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "100% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
@@ -139,29 +139,29 @@
         "item_id": "#120",
         "title": "feat: named tables and array type",
         "current_state": "Draft",
-        "age_days": 38,
+        "age_days": 39,
         "pr_url": "https://github.com/CalcMark/go-calcmark/pull/120"
       },
       {
         "item_id": "#115",
         "title": "fix: interpolation bold doubling and error recovery display fixes",
         "current_state": "Awaiting Review",
-        "age_days": 39,
+        "age_days": 40,
         "pr_url": "https://github.com/CalcMark/go-calcmark/pull/115"
       }
     ]
   },
   "input": {
     "repo": "CalcMark/go-calcmark",
-    "asof": "2026-05-15",
+    "asof": "2026-05-16",
     "workflow": [
       "Draft",
       "Awaiting Review",
       "Changes Requested",
       "Approved"
     ],
-    "history_start": "2026-04-15",
-    "history_end": "2026-05-14",
+    "history_start": "2026-04-16",
+    "history_end": "2026-05-15",
     "offline": false,
     "max_age_days": null
   },
@@ -170,6 +170,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --repo CalcMark/go-calcmark --asof 2026-05-15 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-15 --history-end 2026-05-14",
+  "cli_invocation": "uv run flow aging --repo CalcMark/go-calcmark --asof 2026-05-16 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-16 --history-end 2026-05-15",
   "logs": []
 }

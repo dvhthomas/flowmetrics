@@ -139,10 +139,10 @@
 <h1>Flow efficiency</h1>
 <p class="subtitle">
   for jira:BIGTOP ·
-  2026-05-08 → 2026-05-14 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  2026-05-09 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
 </p>
-<div class="headline">0.0% flow efficiency across 4 completed items over 7 days, May 8, 2026 → May 14, 2026.</div>
+<div class="headline">0.0% flow efficiency across 2 completed items over 7 days, May 9, 2026 → May 15, 2026.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
@@ -162,28 +162,16 @@ them moves the portfolio number more than improving a typical PR.
 </p>
 <div>
   <div class="intervention">
-    <span class="id">BIGTOP-4517</span>
-    <span class="age">84.5d</span>
+    <span class="id">BIGTOP-4515</span>
+    <span class="age">98.4d</span>
     <span class="state"><span class="pill">FE 0.0%</span></span>
-    <span class="title">Fix build failure of Hive 4.0.1 against Hadoop 3.4.2</span>
+    <span class="title">Upgrade HBase to 2.6.5</span>
   </div>
   <div class="intervention">
-    <span class="id">BIGTOP-4522</span>
-    <span class="age">21.1d</span>
+    <span class="id">BIGTOP-4528</span>
+    <span class="age">5.8d</span>
     <span class="state"><span class="pill">FE 0.0%</span></span>
-    <span class="title">Fix installation failure of Puppet on openEuler 22.03</span>
-  </div>
-  <div class="intervention">
-    <span class="id">BIGTOP-4523</span>
-    <span class="age">17.8d</span>
-    <span class="state"><span class="pill">FE 0.0%</span></span>
-    <span class="title">Make container tagging consistent between Linux and Mac OS on ARM</span>
-  </div>
-  <div class="intervention">
-    <span class="id">BIGTOP-4525</span>
-    <span class="age">8.0d</span>
-    <span class="state"><span class="pill">FE 0.0%</span></span>
-    <span class="title">Upgrade Ranger to 2.8.0</span>
+    <span class="title">conf-select is missing</span>
   </div>
 </div>
 
@@ -192,7 +180,7 @@ them moves the portfolio number more than improving a typical PR.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "BIGTOP-4523", "title": "Make container tagging consistent between Linux and Mac OS on ARM", "cycle_hours": 427.47, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "BIGTOP-4517", "title": "Fix build failure of Hive 4.0.1 against Hadoop 3.4.2", "cycle_hours": 2027.66, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "BIGTOP-4522", "title": "Fix installation failure of Puppet on openEuler 22.03", "cycle_hours": 506.31, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "BIGTOP-4525", "title": "Upgrade Ranger to 2.8.0", "cycle_hours": 192.87, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.0, "label": "Portfolio FE: 0.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "BIGTOP-4528", "title": "conf-select is missing", "cycle_hours": 139.32, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "BIGTOP-4515", "title": "Upgrade HBase to 2.6.5", "cycle_hours": 2360.99, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.0, "label": "Portfolio FE: 0.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -216,37 +204,23 @@ up the way they drag this bar's count up.
 <hr class="detail-divider">
 
 <details>
-<summary>Show all 4 PRs (slowest first)</summary>
+<summary>Show all 2 PRs (slowest first)</summary>
 <table>
 <thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
 <tbody>
   <tr>
-    <td>BIGTOP-4523</td>
-    <td class="num">17.8d</td>
+    <td>BIGTOP-4528</td>
+    <td class="num">5.8d</td>
     <td class="num">0.0h</td>
     <td class="num">0.0%</td>
-    <td>Make container tagging consistent between Linux and Mac OS on ARM</td>
+    <td>conf-select is missing</td>
   </tr>
   <tr>
-    <td>BIGTOP-4517</td>
-    <td class="num">84.5d</td>
+    <td>BIGTOP-4515</td>
+    <td class="num">98.4d</td>
     <td class="num">0.0h</td>
     <td class="num">0.0%</td>
-    <td>Fix build failure of Hive 4.0.1 against Hadoop 3.4.2</td>
-  </tr>
-  <tr>
-    <td>BIGTOP-4522</td>
-    <td class="num">21.1d</td>
-    <td class="num">0.0h</td>
-    <td class="num">0.0%</td>
-    <td>Fix installation failure of Puppet on openEuler 22.03</td>
-  </tr>
-  <tr>
-    <td>BIGTOP-4525</td>
-    <td class="num">8.0d</td>
-    <td class="num">0.0h</td>
-    <td class="num">0.0%</td>
-    <td>Upgrade Ranger to 2.8.0</td>
+    <td>Upgrade HBase to 2.6.5</td>
   </tr>
 </tbody>
 </table>
@@ -303,11 +277,11 @@ FE.
 <summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>jira:BIGTOP</td></tr>
-  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Window</th><td>2026-05-09 → 2026-05-15</td></tr>
   <tr><th>Active-time gap</th><td>4.0h</td></tr>
   <tr><th>Min cluster</th><td>30.0min</td></tr>
 </table>
-<div class="invocation">uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+<div class="invocation">uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
 </details>
 
 <details>
@@ -327,12 +301,12 @@ number in the headline; these two are listed for completeness.</p>
   <tr><th>Mean per-PR FE</th><td class="num">0.0%</td></tr>
 </table>
 
-<p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (BIGTOP-4517)  ran 84.5d and dominates the ratio.</p>
+<p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (BIGTOP-4515)  ran 98.4d and dominates the ratio.</p>
 
 <p><strong>Next actions</strong></p>
 <ol class="compact-prose">
   <li>Configured --active-statuses (&#39;In Development&#39;, &#39;In Progress&#39;) don&#39;t appear in this workflow. Statuses actually observed: &#39;Open&#39;, &#39;Patch Available&#39;. Pick whichever represent active development and pass them as `--active-statuses &#39;X,Y&#39;` — or accept that work happens outside the issue tracker.</li>
-  <li>Inspect the three slowest PRs (BIGTOP-4517, BIGTOP-4522, BIGTOP-4523) — they likely sat in review queue.</li>
+  <li>Inspect the three slowest PRs (BIGTOP-4515, BIGTOP-4528) — they likely sat in review queue.</li>
   <li>Compare to the previous 2-4 weeks to spot a trend.</li>
   <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
 </ol>

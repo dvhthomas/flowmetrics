@@ -1,20 +1,20 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T17:20:11.882747-06:00",
-  "headline": "0.0% flow efficiency across 5 completed items over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "generated_at": "2026-05-16T09:48:32.077426-06:00",
+  "headline": "0.0% flow efficiency across 6 completed items over 7 days, May 9, 2026 \u2192 May 15, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 5,
-    "human_pr_count": 5,
+    "pr_count": 6,
+    "human_pr_count": 6,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 4.525374754097451e-05,
+    "portfolio_efficiency": 2.8487999095538086e-05,
     "median_efficiency": 0.0,
-    "mean_efficiency": 0.0005347894986123124,
+    "mean_efficiency": 0.00044565791551026034,
     "total_cycle": {
-      "seconds": 4688341.0,
-      "hours": 1302.3169444444445,
-      "days": 54.26320601851852
+      "seconds": 7447522.0,
+      "hours": 2068.7561111111113,
+      "days": 86.1981712962963
     },
     "total_active": {
       "seconds": 212.165,
@@ -33,7 +33,7 @@
   },
   "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-21245)  ran 52.0d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (CASSANDRA-21245, CASSANDRA-21355, CASSANDRA-21366) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (CASSANDRA-21245, CASSANDRA-21301, CASSANDRA-21355) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -70,13 +70,17 @@
       {
         "item_id": "CASSANDRA-21245",
         "efficiency": 3.0709614875747238e-06
+      },
+      {
+        "item_id": "CASSANDRA-21301",
+        "efficiency": 0.0
       }
     ]
   },
   "input": {
     "repo": "jira:CASSANDRA",
-    "start": "2026-05-08",
-    "stop": "2026-05-14",
+    "start": "2026-05-09",
+    "stop": "2026-05-15",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
@@ -182,6 +186,25 @@
         "efficiency": 3.0709614875747238e-06,
         "is_bot": false,
         "author_login": "idnull"
+      },
+      {
+        "item_id": "CASSANDRA-21301",
+        "title": "add AGENTS.md and CLAUDE.md",
+        "created_at": "2026-04-12T12:59:30+00:00",
+        "merged_at": "2026-05-14T11:25:51+00:00",
+        "cycle_time": {
+          "seconds": 2759181.0,
+          "hours": 766.4391666666667,
+          "days": 31.934965277777778
+        },
+        "active_time": {
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
+        },
+        "efficiency": 0.0,
+        "is_bot": false,
+        "author_login": "maoling"
       }
     ]
   },
@@ -190,6 +213,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

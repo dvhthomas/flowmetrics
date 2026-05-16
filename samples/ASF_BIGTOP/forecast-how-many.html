@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Forecast how many items finish by 2026-05-29</title>
+<title>Forecast how many items finish by 2026-05-30</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
          max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
@@ -136,13 +136,13 @@
 </style>
 </head>
 <body>
-<h1>Forecast how many items finish by 2026-05-29</h1>
+<h1>Forecast how many items finish by 2026-05-30</h1>
 <p class="subtitle">
   for jira:BIGTOP ·
-  2026-05-15 → 2026-05-29 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  2026-05-16 → 2026-05-30 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
 </p>
-<div class="headline">85% confident at least 0 items finish in the next 15 days (by May 29, 2026).</div>
+<div class="headline">85% confident at least 0 items finish in the next 15 days (by May 30, 2026).</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.</div>
@@ -159,7 +159,7 @@
 <thead><tr><th>Confidence</th><th>Minimum items</th><th>How to use it</th></tr></thead>
 <tbody>
   <tr><td>50%</td><td class="num">4</td><td>median — do NOT commit to this</td></tr>
-  <tr><td>70%</td><td class="num">1</td><td>internal stretch</td></tr>
+  <tr><td>70%</td><td class="num">2</td><td>internal stretch</td></tr>
   <tr><td>85%</td><td class="num">0</td><td>external commitment</td></tr>
   <tr><td>95%</td><td class="num">0</td><td>high-stakes commitment</td></tr>
 </tbody>
@@ -171,7 +171,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#howmany-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": 0, "frequency": 2039}, {"outcome": 1, "frequency": 1179}, {"outcome": 2, "frequency": 294}, {"outcome": 3, "frequency": 42}, {"outcome": 4, "frequency": 2225}, {"outcome": 5, "frequency": 1176}, {"outcome": 6, "frequency": 316}, {"outcome": 7, "frequency": 39}, {"outcome": 8, "frequency": 1230}, {"outcome": 9, "frequency": 577}, {"outcome": 10, "frequency": 124}, {"outcome": 11, "frequency": 18}, {"outcome": 12, "frequency": 391}, {"outcome": 13, "frequency": 177}, {"outcome": 14, "frequency": 27}, {"outcome": 15, "frequency": 5}, {"outcome": 16, "frequency": 76}, {"outcome": 17, "frequency": 34}, {"outcome": 18, "frequency": 4}, {"outcome": 20, "frequency": 12}, {"outcome": 21, "frequency": 10}, {"outcome": 22, "frequency": 3}, {"outcome": 24, "frequency": 1}, {"outcome": 26, "frequency": 1}]}, "encoding": {"x": {"field": "outcome", "type": "quantitative", "axis": {"title": "Item count", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "quantitative", "title": "Item count"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": 4, "label": "P50 (4 items)"}, {"pct": "P70", "x": 1, "label": "P70 (1 items)"}, {"pct": "P85", "x": 0, "label": "P85 (0 items)"}, {"pct": "P95", "x": 0, "label": "P95 (0 items)"}]}, "encoding": {"x": {"field": "x", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
+  vegaEmbed("#howmany-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": 0, "frequency": 2067}, {"outcome": 2, "frequency": 1114}, {"outcome": 4, "frequency": 2608}, {"outcome": 6, "frequency": 1254}, {"outcome": 8, "frequency": 1478}, {"outcome": 10, "frequency": 594}, {"outcome": 12, "frequency": 498}, {"outcome": 14, "frequency": 174}, {"outcome": 16, "frequency": 134}, {"outcome": 18, "frequency": 37}, {"outcome": 20, "frequency": 33}, {"outcome": 22, "frequency": 4}, {"outcome": 24, "frequency": 5}]}, "encoding": {"x": {"field": "outcome", "type": "quantitative", "axis": {"title": "Item count", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "quantitative", "title": "Item count"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": 4, "label": "P50 (4 items)"}, {"pct": "P70", "x": 2, "label": "P70 (2 items)"}, {"pct": "P85", "x": 0, "label": "P85 (0 items)"}, {"pct": "P95", "x": 0, "label": "P95 (0 items)"}]}, "encoding": {"x": {"field": "x", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -188,22 +188,22 @@
 <summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>jira:BIGTOP</td></tr>
-  <tr><th>Forecast window</th><td>2026-05-15 → 2026-05-29</td></tr>
-  <tr><th>Training window</th><td>2026-04-15 → 2026-05-14
-      (30 days, 9 items)</td></tr>
+  <tr><th>Forecast window</th><td>2026-05-16 → 2026-05-30</td></tr>
+  <tr><th>Training window</th><td>2026-04-16 → 2026-05-15
+      (30 days, 10 items)</td></tr>
   <tr><th>Monte Carlo runs</th><td>10,000</td></tr>
   <tr><th>RNG seed</th><td>42</td></tr>
 </table>
-<div class="invocation">uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-29 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42</div>
+<div class="invocation">uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-30 --start-date 2026-05-16 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42</div>
 </details>
 
 <details>
 <summary>Training window detail</summary>
 <table>
-  <tr><th>Window</th><td>2026-04-15 → 2026-05-14
+  <tr><th>Window</th><td>2026-04-16 → 2026-05-15
       (30 days)</td></tr>
-  <tr><th>Total throughput (items)</th><td class="num">9</td></tr>
-  <tr><th>Average throughput / day</th><td class="num">0.30</td></tr>
+  <tr><th>Total throughput (items)</th><td class="num">10</td></tr>
+  <tr><th>Average throughput / day</th><td class="num">0.33</td></tr>
   <tr><th>Zero-throughput days</th><td class="num">27 of 30</td></tr>
 </table>
 </details>

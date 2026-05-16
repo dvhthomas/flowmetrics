@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-15T17:20:03.334668-06:00",
-  "headline": "CFD for pytest-dev/pytest Apr 15, 2026 \u2192 May 14, 2026: 169 items arrived, 42 completed, 127 still in flight at end.",
+  "generated_at": "2026-05-16T09:47:52.614615-06:00",
+  "headline": "CFD for pytest-dev/pytest Apr 16, 2026 \u2192 May 15, 2026: 170 items arrived, 42 completed, 128 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -10,13 +10,13 @@
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 169,
+    "arrivals_at_end": 170,
     "departures_at_end": 42,
-    "wip_at_start": 121,
-    "wip_at_end": 127,
+    "wip_at_start": 120,
+    "wip_at_end": 128,
     "peak_wip": 129
   },
-  "key_insight": "The largest WIP band at May 14, 2026 is 'Open' with 127 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 15, 2026 is 'Open' with 128 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -36,13 +36,6 @@
   },
   "chart_data": {
     "points": [
-      {
-        "sampled_on": "2026-04-15",
-        "counts_by_state": {
-          "Open": 121,
-          "Merged": 0
-        }
-      },
       {
         "sampled_on": "2026-04-16",
         "counts_by_state": {
@@ -245,21 +238,16 @@
           "Open": 169,
           "Merged": 42
         }
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "counts_by_state": {
+          "Open": 170,
+          "Merged": 42
+        }
       }
     ],
     "bands": [
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Open",
-        "wip_in_state": 121,
-        "entered_at_or_later": 121
-      },
-      {
-        "sampled_on": "2026-04-15",
-        "state": "Merged",
-        "wip_in_state": 0,
-        "entered_at_or_later": 0
-      },
       {
         "sampled_on": "2026-04-16",
         "state": "Open",
@@ -607,13 +595,25 @@
         "state": "Merged",
         "wip_in_state": 42,
         "entered_at_or_later": 42
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Open",
+        "wip_in_state": 128,
+        "entered_at_or_later": 170
+      },
+      {
+        "sampled_on": "2026-05-15",
+        "state": "Merged",
+        "wip_in_state": 42,
+        "entered_at_or_later": 42
       }
     ]
   },
   "input": {
     "repo": "pytest-dev/pytest",
-    "start": "2026-04-15",
-    "stop": "2026-05-14",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
     "workflow": [
       "Open",
       "Merged"
@@ -626,6 +626,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo pytest-dev/pytest --start 2026-04-15 --stop 2026-05-14 --workflow 'Open,Merged' --interval-days 1",
+  "cli_invocation": "uv run flow cfd --repo pytest-dev/pytest --start 2026-04-16 --stop 2026-05-15 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

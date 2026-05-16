@@ -1,0 +1,89 @@
+{
+  "schema": "flowmetrics.scatterplot.v1",
+  "command": "scatterplot",
+  "generated_at": "2026-05-16T09:48:25.578193-06:00",
+  "headline": "5 items completed in 30 days; 85% finished within 1.1 days (Apr 16, 2026 -> May 15, 2026).",
+  "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
+  "summary": {
+    "completed_count": 5,
+    "window": {
+      "start": "2026-04-16",
+      "stop": "2026-05-15",
+      "days": 30
+    },
+    "cycle_time_percentiles_days": {
+      "50": 0.006099537037037037,
+      "70": 0.7757986111111111,
+      "85": 1.0534837962962964,
+      "95": 1.0534837962962964
+    }
+  },
+  "key_insight": "Median cycle time is 0.0 days; deep-tail P95 is 1.1 days. A new item entering the system has, by definition, an 85% chance of finishing in 1.1 days or less and a 50% chance of finishing in 0.0 days or less.",
+  "next_actions": [
+    "Use P85 (1.1d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
+    "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
+  ],
+  "caveats": [
+    "Percentiles are EMPIRICAL \u2014 read from the actual finished items in this window. No simulation, no estimation.",
+    "Outliers (very long cycle times) shift P85 / P95 up. If the window is short or includes a single stuck-then-finished PR, the deep-tail percentiles can be noisy."
+  ],
+  "vocabulary": {
+    "Cycle Time": "Days from when a work item entered the system (created) to when it left (merged / resolved). One dot on the chart per completed item; the dot's y-position is its cycle time.",
+    "Percentile Line": "A horizontal line on the scatterplot such that the given percent of dots fall on or below it. P50 = median cycle time; 85% of completed items finished in P85 days or less. A new item entering the system has, by definition, the matching probability of finishing in that time.",
+    "Completion date": "When the item was merged (GitHub) or resolved (Jira). The dot's x-position on the chart.",
+    "Source": "Vacanti, _When Will It Be Done?_ (Leanpub)."
+  },
+  "chart_data": {
+    "points": [
+      {
+        "item_id": "#3683",
+        "title": "bash on windows-latest now reports cygwin",
+        "completed_at": "2026-05-12",
+        "cycle_time_days": 0.006053240740740741,
+        "pr_url": "https://github.com/pre-commit/pre-commit/pull/3683"
+      },
+      {
+        "item_id": "#3681",
+        "title": "[pre-commit.ci] pre-commit autoupdate",
+        "completed_at": "2026-05-12",
+        "cycle_time_days": 0.7757986111111111,
+        "pr_url": "https://github.com/pre-commit/pre-commit/pull/3681"
+      },
+      {
+        "item_id": "#3673",
+        "title": "[pre-commit.ci] pre-commit autoupdate",
+        "completed_at": "2026-04-28",
+        "cycle_time_days": 1.0534837962962964,
+        "pr_url": "https://github.com/pre-commit/pre-commit/pull/3673"
+      },
+      {
+        "item_id": "#3662",
+        "title": "make --hook-dir optional for hook-impl",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 0.00542824074074074,
+        "pr_url": "https://github.com/pre-commit/pre-commit/pull/3662"
+      },
+      {
+        "item_id": "#3661",
+        "title": "--hook-type is required for hook-impl",
+        "completed_at": "2026-04-21",
+        "cycle_time_days": 0.006099537037037037,
+        "pr_url": "https://github.com/pre-commit/pre-commit/pull/3661"
+      }
+    ]
+  },
+  "input": {
+    "repo": "pre-commit/pre-commit",
+    "start": "2026-04-16",
+    "stop": "2026-05-15",
+    "offline": false,
+    "jira_url": null
+  },
+  "docs": {
+    "metrics": "docs/METRICS.md",
+    "forecast": "docs/FORECAST.md",
+    "decisions": "docs/DECISIONS.md"
+  },
+  "cli_invocation": "uv run flow scatterplot --repo pre-commit/pre-commit --start 2026-04-16 --stop 2026-05-15",
+  "logs": []
+}

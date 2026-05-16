@@ -1,20 +1,20 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T17:20:15.456385-06:00",
-  "headline": "0.0% flow efficiency across 4 completed items over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "generated_at": "2026-05-16T09:48:38.241480-06:00",
+  "headline": "0.0% flow efficiency across 2 completed items over 7 days, May 9, 2026 \u2192 May 15, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 4,
-    "human_pr_count": 4,
+    "pr_count": 2,
+    "human_pr_count": 2,
     "bot_pr_count": 0,
     "portfolio_efficiency": 0.0,
     "median_efficiency": 0.0,
     "mean_efficiency": 0.0,
     "total_cycle": {
-      "seconds": 11355547.0,
-      "hours": 3154.3186111111113,
-      "days": 131.42994212962964
+      "seconds": 9001090.0,
+      "hours": 2500.302777777778,
+      "days": 104.17928240740741
     },
     "total_active": {
       "seconds": 0.0,
@@ -26,10 +26,10 @@
       "Patch Available"
     ]
   },
-  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (BIGTOP-4517)  ran 84.5d and dominates the ratio.",
+  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (BIGTOP-4515)  ran 98.4d and dominates the ratio.",
   "next_actions": [
     "Configured --active-statuses ('In Development', 'In Progress') don't appear in this workflow. Statuses actually observed: 'Open', 'Patch Available'. Pick whichever represent active development and pass them as `--active-statuses 'X,Y'` \u2014 or accept that work happens outside the issue tracker.",
-    "Inspect the three slowest PRs (BIGTOP-4517, BIGTOP-4522, BIGTOP-4523) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (BIGTOP-4515, BIGTOP-4528) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -48,27 +48,19 @@
   "chart_data": {
     "per_pr_efficiency": [
       {
-        "item_id": "BIGTOP-4523",
+        "item_id": "BIGTOP-4528",
         "efficiency": 0.0
       },
       {
-        "item_id": "BIGTOP-4517",
-        "efficiency": 0.0
-      },
-      {
-        "item_id": "BIGTOP-4522",
-        "efficiency": 0.0
-      },
-      {
-        "item_id": "BIGTOP-4525",
+        "item_id": "BIGTOP-4515",
         "efficiency": 0.0
       }
     ]
   },
   "input": {
     "repo": "jira:BIGTOP",
-    "start": "2026-05-08",
-    "stop": "2026-05-14",
+    "start": "2026-05-09",
+    "stop": "2026-05-15",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
@@ -81,14 +73,14 @@
   "result": {
     "per_pr": [
       {
-        "item_id": "BIGTOP-4523",
-        "title": "Make container tagging consistent between Linux and Mac OS on ARM",
-        "created_at": "2026-04-20T06:41:52+00:00",
-        "merged_at": "2026-05-08T02:10:21+00:00",
+        "item_id": "BIGTOP-4528",
+        "title": "conf-select is missing",
+        "created_at": "2026-05-08T11:04:51+00:00",
+        "merged_at": "2026-05-14T06:23:48+00:00",
         "cycle_time": {
-          "seconds": 1538909.0,
-          "hours": 427.4747222222222,
-          "days": 17.81144675925926
+          "seconds": 501537.0,
+          "hours": 139.31583333333333,
+          "days": 5.8048263888888885
         },
         "active_time": {
           "seconds": 0.0,
@@ -97,55 +89,17 @@
         },
         "efficiency": 0.0,
         "is_bot": false,
-        "author_login": "iwasakims"
+        "author_login": "eub"
       },
       {
-        "item_id": "BIGTOP-4517",
-        "title": "Fix build failure of Hive 4.0.1 against Hadoop 3.4.2",
-        "created_at": "2026-02-12T14:32:38+00:00",
-        "merged_at": "2026-05-08T02:12:11+00:00",
+        "item_id": "BIGTOP-4515",
+        "title": "Upgrade HBase to 2.6.5",
+        "created_at": "2026-02-05T01:27:05+00:00",
+        "merged_at": "2026-05-14T10:26:18+00:00",
         "cycle_time": {
-          "seconds": 7299573.0,
-          "hours": 2027.6591666666666,
-          "days": 84.48579861111111
-        },
-        "active_time": {
-          "seconds": 0.0,
-          "hours": 0.0,
-          "days": 0.0
-        },
-        "efficiency": 0.0,
-        "is_bot": false,
-        "author_login": "iwasakims"
-      },
-      {
-        "item_id": "BIGTOP-4522",
-        "title": "Fix installation failure of Puppet on openEuler 22.03",
-        "created_at": "2026-04-17T06:15:59+00:00",
-        "merged_at": "2026-05-08T08:34:42+00:00",
-        "cycle_time": {
-          "seconds": 1822723.0,
-          "hours": 506.31194444444446,
-          "days": 21.09633101851852
-        },
-        "active_time": {
-          "seconds": 0.0,
-          "hours": 0.0,
-          "days": 0.0
-        },
-        "efficiency": 0.0,
-        "is_bot": false,
-        "author_login": "iwasakims"
-      },
-      {
-        "item_id": "BIGTOP-4525",
-        "title": "Upgrade Ranger to 2.8.0",
-        "created_at": "2026-04-30T07:43:47+00:00",
-        "merged_at": "2026-05-08T08:36:09+00:00",
-        "cycle_time": {
-          "seconds": 694342.0,
-          "hours": 192.87277777777777,
-          "days": 8.036365740740742
+          "seconds": 8499553.0,
+          "hours": 2360.9869444444444,
+          "days": 98.37445601851852
         },
         "active_time": {
           "seconds": 0.0,
@@ -163,6 +117,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

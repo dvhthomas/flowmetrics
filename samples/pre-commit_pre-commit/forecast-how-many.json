@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-15T17:20:08.536190-06:00",
-  "headline": "85% confident at least 0 items finish in the next 15 days (by May 29, 2026).",
+  "generated_at": "2026-05-16T09:48:24.739979-06:00",
+  "headline": "85% confident at least 0 items finish in the next 15 days (by May 30, 2026).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {
@@ -41,69 +41,76 @@
     "histogram": [
       {
         "items": 0,
-        "frequency": 2066
+        "frequency": 2065
       },
       {
         "items": 1,
-        "frequency": 1175
+        "frequency": 1159
       },
       {
         "items": 2,
-        "frequency": 2532
+        "frequency": 2612
       },
       {
         "items": 3,
-        "frequency": 1257
+        "frequency": 1222
       },
       {
         "items": 4,
-        "frequency": 1498
+        "frequency": 1464
       },
       {
         "items": 5,
-        "frequency": 590
+        "frequency": 617
       },
       {
         "items": 6,
-        "frequency": 527
+        "frequency": 485
       },
       {
         "items": 7,
-        "frequency": 200
+        "frequency": 184
       },
       {
         "items": 8,
-        "frequency": 91
+        "frequency": 131
       },
       {
         "items": 9,
-        "frequency": 43
+        "frequency": 32
       },
       {
         "items": 10,
-        "frequency": 16
+        "frequency": 18
       },
       {
         "items": 11,
-        "frequency": 5
+        "frequency": 7
+      },
+      {
+        "items": 13,
+        "frequency": 3
+      },
+      {
+        "items": 16,
+        "frequency": 1
       }
     ],
     "total_runs": 10000
   },
   "input": {
     "repo": "pre-commit/pre-commit",
-    "start_date": "2026-05-15",
-    "target_date": "2026-05-29",
-    "history_start": "2026-04-15",
-    "history_end": "2026-05-14",
+    "start_date": "2026-05-16",
+    "target_date": "2026-05-30",
+    "history_start": "2026-04-16",
+    "history_end": "2026-05-15",
     "offline": false,
     "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-15",
-    "window_end": "2026-05-14",
+    "window_start": "2026-04-16",
+    "window_end": "2026-05-15",
     "daily_throughput": [
-      0,
       0,
       0,
       0,
@@ -132,6 +139,7 @@
       0,
       2,
       0,
+      0,
       0
     ],
     "total_throughput": 5,
@@ -149,6 +157,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --repo pre-commit/pre-commit --target-date 2026-05-29 --start-date 2026-05-15 --history-start 2026-04-15 --history-end 2026-05-14 --runs 10000 --seed 42",
+  "cli_invocation": "uv run flow forecast how-many --repo pre-commit/pre-commit --target-date 2026-05-30 --start-date 2026-05-16 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42",
   "logs": []
 }

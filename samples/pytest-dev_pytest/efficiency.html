@@ -139,10 +139,10 @@
 <h1>Flow efficiency</h1>
 <p class="subtitle">
   for <a href="https://github.com/pytest-dev/pytest">pytest-dev/pytest</a> ·
-  2026-05-08 → 2026-05-14 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  2026-05-09 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:47 MDT</span>
 </p>
-<div class="headline">0.9% flow efficiency across 15 completed items (10 human, 5 bot) over 7 days, May 8, 2026 → May 14, 2026.</div>
+<div class="headline">0.7% flow efficiency across 12 completed items (7 human, 5 bot) over 7 days, May 9, 2026 → May 15, 2026.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
@@ -168,28 +168,28 @@ them moves the portfolio number more than improving a typical PR.
     <span class="title">Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)</span>
   </div>
   <div class="intervention">
-    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14375">#14375</a></span>
-    <span class="age">28.4d</span>
-    <span class="state"><span class="pill">FE 0.2%</span></span>
-    <span class="title">logging: also capture logs from non-propagating loggers</span>
-  </div>
-  <div class="intervention">
-    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14414">#14414</a></span>
-    <span class="age">14.9d</span>
-    <span class="state"><span class="pill">FE 3.5%</span></span>
-    <span class="title">Add datetime/timedelta support to pytest.approx (#8395)</span>
-  </div>
-  <div class="intervention">
-    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14443">#14443</a></span>
-    <span class="age">2.6d</span>
-    <span class="state"><span class="pill">FE 3.7%</span></span>
-    <span class="title">Fix strict options from addopts</span>
-  </div>
-  <div class="intervention">
     <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14472">#14472</a></span>
     <span class="age">32.7h</span>
     <span class="state"><span class="pill">FE 3.1%</span></span>
     <span class="title">Fix _as_numpy_array: use variable obj instead of string literal &#34;obj&#34;</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14449">#14449</a></span>
+    <span class="age">20.4h</span>
+    <span class="state"><span class="pill">FE 4.9%</span></span>
+    <span class="title">[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts</span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14478">#14478</a></span>
+    <span class="age">17.7h</span>
+    <span class="state"><span class="pill">FE 5.6%</span></span>
+    <span class="title">[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in </span>
+  </div>
+  <div class="intervention">
+    <span class="id"><a href="https://github.com/pytest-dev/pytest/pull/14479">#14479</a></span>
+    <span class="age">17.5h</span>
+    <span class="state"><span class="pill">FE 5.7%</span></span>
+    <span class="title">docs: fix pytest-xdist plugin wording</span>
   </div>
 </div>
 
@@ -198,7 +198,7 @@ them moves the portfolio number more than improving a typical PR.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 300, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#14479", "title": "docs: fix pytest-xdist plugin wording", "cycle_hours": 17.5, "active_hours": 1.0, "efficiency_pct": 5.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14479"}, {"item_id": "#14478", "title": "[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 17.71, "active_hours": 1.0, "efficiency_pct": 5.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14478"}, {"item_id": "#14475", "title": "fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 8.58, "active_hours": 1.0, "efficiency_pct": 11.7, "is_bot": false, "band": "10–50%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14475"}, {"item_id": "#14472", "title": "Fix _as_numpy_array: use variable obj instead of string literal \"obj\"", "cycle_hours": 32.68, "active_hours": 1.0, "efficiency_pct": 3.1, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14472"}, {"item_id": "#14467", "title": "docs: clarify subtests progress output", "cycle_hours": 6.13, "active_hours": 1.0, "efficiency_pct": 16.3, "is_bot": false, "band": "10–50%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14467"}, {"item_id": "#14466", "title": "fix approx rel for timedelta: accept float, compute rel * expected", "cycle_hours": 8.67, "active_hours": 8.67, "efficiency_pct": 100.0, "is_bot": false, "band": "≥ 50% (healthy)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14466"}, {"item_id": "#14464", "title": "[pre-commit.ci] pre-commit autoupdate", "cycle_hours": 0.92, "active_hours": 0.92, "efficiency_pct": 100.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14464"}, {"item_id": "#14460", "title": "pastebin: deprecate `--pastebin`", "cycle_hours": 15.01, "active_hours": 1.5, "efficiency_pct": 10.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14460"}, {"item_id": "#14455", "title": "[automated] Update plugin list", "cycle_hours": 5.69, "active_hours": 1.0, "efficiency_pct": 17.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14455"}, {"item_id": "#14450", "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration", "cycle_hours": 12.45, "active_hours": 1.0, "efficiency_pct": 8.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14450"}, {"item_id": "#14449", "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts", "cycle_hours": 20.36, "active_hours": 1.0, "efficiency_pct": 4.9, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14449"}, {"item_id": "#14443", "title": "Fix strict options from addopts", "cycle_hours": 63.2, "active_hours": 2.36, "efficiency_pct": 3.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14443"}, {"item_id": "#14414", "title": "Add datetime/timedelta support to pytest.approx (#8395)", "cycle_hours": 356.91, "active_hours": 12.4, "efficiency_pct": 3.5, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14414"}, {"item_id": "#14375", "title": "logging: also capture logs from non-propagating loggers", "cycle_hours": 682.0, "active_hours": 1.5, "efficiency_pct": 0.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14375"}, {"item_id": "#14071", "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)", "cycle_hours": 3286.33, "active_hours": 5.42, "efficiency_pct": 0.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14071"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.9, "label": "Portfolio FE: 0.9%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 240, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#14479", "title": "docs: fix pytest-xdist plugin wording", "cycle_hours": 17.5, "active_hours": 1.0, "efficiency_pct": 5.7, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14479"}, {"item_id": "#14478", "title": "[PR #14475/984cabfa backport][9.0.x] fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 17.71, "active_hours": 1.0, "efficiency_pct": 5.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14478"}, {"item_id": "#14475", "title": "fix mark expression scanner: search for backslash in string value, not entire input", "cycle_hours": 8.58, "active_hours": 1.0, "efficiency_pct": 11.7, "is_bot": false, "band": "10–50%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14475"}, {"item_id": "#14472", "title": "Fix _as_numpy_array: use variable obj instead of string literal \"obj\"", "cycle_hours": 32.68, "active_hours": 1.0, "efficiency_pct": 3.1, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14472"}, {"item_id": "#14467", "title": "docs: clarify subtests progress output", "cycle_hours": 6.13, "active_hours": 1.0, "efficiency_pct": 16.3, "is_bot": false, "band": "10–50%", "pr_url": "https://github.com/pytest-dev/pytest/pull/14467"}, {"item_id": "#14466", "title": "fix approx rel for timedelta: accept float, compute rel * expected", "cycle_hours": 8.67, "active_hours": 8.67, "efficiency_pct": 100.0, "is_bot": false, "band": "≥ 50% (healthy)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14466"}, {"item_id": "#14464", "title": "[pre-commit.ci] pre-commit autoupdate", "cycle_hours": 0.92, "active_hours": 0.92, "efficiency_pct": 100.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14464"}, {"item_id": "#14460", "title": "pastebin: deprecate `--pastebin`", "cycle_hours": 15.01, "active_hours": 1.5, "efficiency_pct": 10.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14460"}, {"item_id": "#14455", "title": "[automated] Update plugin list", "cycle_hours": 5.69, "active_hours": 1.0, "efficiency_pct": 17.6, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14455"}, {"item_id": "#14450", "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration", "cycle_hours": 12.45, "active_hours": 1.0, "efficiency_pct": 8.0, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14450"}, {"item_id": "#14449", "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts", "cycle_hours": 20.36, "active_hours": 1.0, "efficiency_pct": 4.9, "is_bot": true, "band": "bot", "pr_url": "https://github.com/pytest-dev/pytest/pull/14449"}, {"item_id": "#14071", "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)", "cycle_hours": 3286.33, "active_hours": 5.42, "efficiency_pct": 0.2, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": "https://github.com/pytest-dev/pytest/pull/14071"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.7, "label": "Portfolio FE: 0.7%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -222,7 +222,7 @@ up the way they drag this bar's count up.
 <hr class="detail-divider">
 
 <details>
-<summary>Show all 15 PRs (slowest first)</summary>
+<summary>Show all 12 PRs (slowest first)</summary>
 <table>
 <thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
 <tbody>
@@ -234,32 +234,11 @@ up the way they drag this bar's count up.
     <td>Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/pytest-dev/pytest/pull/14375">#14375</a></td>
-    <td class="num">28.4d</td>
-    <td class="num">1.5h</td>
-    <td class="num">0.2%</td>
-    <td>logging: also capture logs from non-propagating loggers</td>
-  </tr>
-  <tr>
     <td><a href="https://github.com/pytest-dev/pytest/pull/14472">#14472</a></td>
     <td class="num">32.7h</td>
     <td class="num">1.0h</td>
     <td class="num">3.1%</td>
     <td>Fix _as_numpy_array: use variable obj instead of string literal &#34;obj&#34;</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/pytest-dev/pytest/pull/14414">#14414</a></td>
-    <td class="num">14.9d</td>
-    <td class="num">12.4h</td>
-    <td class="num">3.5%</td>
-    <td>Add datetime/timedelta support to pytest.approx (#8395)</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/pytest-dev/pytest/pull/14443">#14443</a></td>
-    <td class="num">2.6d</td>
-    <td class="num">2.4h</td>
-    <td class="num">3.7%</td>
-    <td>Fix strict options from addopts</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pytest-dev/pytest/pull/14449">#14449</a></td>
@@ -386,11 +365,11 @@ FE.
 <summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>pytest-dev/pytest</td></tr>
-  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Window</th><td>2026-05-09 → 2026-05-15</td></tr>
   <tr><th>Active-time gap</th><td>4.0h</td></tr>
   <tr><th>Min cluster</th><td>30.0min</td></tr>
 </table>
-<div class="invocation">uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+<div class="invocation">uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
 </details>
 
 <details>
@@ -406,15 +385,15 @@ is a different question from "how efficient is our system overall".
 For decisions about where wait time is leaking, use the portfolio
 number in the headline; these two are listed for completeness.</p>
 <table>
-  <tr><th>Median per-PR FE</th><td class="num">5.7%</td></tr>
-  <tr><th>Mean per-PR FE</th><td class="num">19.4%</td></tr>
+  <tr><th>Median per-PR FE</th><td class="num">9.0%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">23.6%</td></tr>
 </table>
 
 <p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (#14071)  ran 136.9d and dominates the ratio.</p>
 
 <p><strong>Next actions</strong></p>
 <ol class="compact-prose">
-  <li>Inspect the three slowest PRs (#14071, #14375, #14414) — they likely sat in review queue.</li>
+  <li>Inspect the three slowest PRs (#14071, #14472, #14449) — they likely sat in review queue.</li>
   <li>Compare to the previous 2-4 weeks to spot a trend.</li>
   <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
 </ol>

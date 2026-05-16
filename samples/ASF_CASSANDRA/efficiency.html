@@ -139,10 +139,10 @@
 <h1>Flow efficiency</h1>
 <p class="subtitle">
   for jira:CASSANDRA ·
-  2026-05-08 → 2026-05-14 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  2026-05-09 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
 </p>
-<div class="headline">0.0% flow efficiency across 5 completed items over 7 days, May 8, 2026 → May 14, 2026.</div>
+<div class="headline">0.0% flow efficiency across 6 completed items over 7 days, May 9, 2026 → May 15, 2026.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
@@ -168,6 +168,12 @@ them moves the portfolio number more than improving a typical PR.
     <span class="title">Uncompressed size is being used for compressed tables in maintenance operations</span>
   </div>
   <div class="intervention">
+    <span class="id">CASSANDRA-21301</span>
+    <span class="age">31.9d</span>
+    <span class="state"><span class="pill">FE 0.0%</span></span>
+    <span class="title">add AGENTS.md and CLAUDE.md</span>
+  </div>
+  <div class="intervention">
     <span class="id">CASSANDRA-21355</span>
     <span class="age">23.3h</span>
     <span class="state"><span class="pill">FE 0.0%</span></span>
@@ -185,12 +191,6 @@ them moves the portfolio number more than improving a typical PR.
     <span class="state"><span class="pill">FE 0.0%</span></span>
     <span class="title">Cassandra CIs fail on artifacts resolution</span>
   </div>
-  <div class="intervention">
-    <span class="id">CASSANDRA-21364</span>
-    <span class="age">3.2h</span>
-    <span class="state"><span class="pill">FE 0.0%</span></span>
-    <span class="title">Add ability to skip post-checkout submodule init with BUILD_OFFLINE env var</span>
-  </div>
 </div>
 
 <div id="efficiency-chart" class="chart"></div>
@@ -198,7 +198,7 @@ them moves the portfolio number more than improving a typical PR.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "CASSANDRA-21355", "title": "Accord: Clean Shutdown/Restart, Rebootstrap, et al", "cycle_hours": 23.3, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21364", "title": "Add ability to skip post-checkout submodule init with BUILD_OFFLINE env var", "cycle_hours": 3.16, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21367", "title": "Cassandra CIs fail on artifacts resolution", "cycle_hours": 7.06, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21366", "title": "Fix MutationId class hierarchy and related maps lookup issues", "cycle_hours": 20.63, "active_hours": 0.06, "efficiency_pct": 0.3, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21245", "title": "Uncompressed size is being used for compressed tables in maintenance operations", "cycle_hours": 1248.16, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.0, "label": "Portfolio FE: 0.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "CASSANDRA-21355", "title": "Accord: Clean Shutdown/Restart, Rebootstrap, et al", "cycle_hours": 23.3, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21364", "title": "Add ability to skip post-checkout submodule init with BUILD_OFFLINE env var", "cycle_hours": 3.16, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21367", "title": "Cassandra CIs fail on artifacts resolution", "cycle_hours": 7.06, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21366", "title": "Fix MutationId class hierarchy and related maps lookup issues", "cycle_hours": 20.63, "active_hours": 0.06, "efficiency_pct": 0.3, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21245", "title": "Uncompressed size is being used for compressed tables in maintenance operations", "cycle_hours": 1248.16, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}, {"item_id": "CASSANDRA-21301", "title": "add AGENTS.md and CLAUDE.md", "cycle_hours": 766.44, "active_hours": 0.0, "efficiency_pct": 0.0, "is_bot": false, "band": "\u003c 10% (slow)", "pr_url": null}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.0, "label": "Portfolio FE: 0.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -222,7 +222,7 @@ up the way they drag this bar's count up.
 <hr class="detail-divider">
 
 <details>
-<summary>Show all 5 PRs (slowest first)</summary>
+<summary>Show all 6 PRs (slowest first)</summary>
 <table>
 <thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
 <tbody>
@@ -246,6 +246,13 @@ up the way they drag this bar's count up.
     <td class="num">0.0h</td>
     <td class="num">0.0%</td>
     <td>Cassandra CIs fail on artifacts resolution</td>
+  </tr>
+  <tr>
+    <td>CASSANDRA-21301</td>
+    <td class="num">31.9d</td>
+    <td class="num">0.0h</td>
+    <td class="num">0.0%</td>
+    <td>add AGENTS.md and CLAUDE.md</td>
   </tr>
   <tr>
     <td>CASSANDRA-21245</td>
@@ -316,11 +323,11 @@ FE.
 <summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>jira:CASSANDRA</td></tr>
-  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Window</th><td>2026-05-09 → 2026-05-15</td></tr>
   <tr><th>Active-time gap</th><td>4.0h</td></tr>
   <tr><th>Min cluster</th><td>30.0min</td></tr>
 </table>
-<div class="invocation">uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+<div class="invocation">uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
 </details>
 
 <details>
@@ -337,14 +344,14 @@ For decisions about where wait time is leaking, use the portfolio
 number in the headline; these two are listed for completeness.</p>
 <table>
   <tr><th>Median per-PR FE</th><td class="num">0.0%</td></tr>
-  <tr><th>Mean per-PR FE</th><td class="num">0.1%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">0.0%</td></tr>
 </table>
 
 <p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (CASSANDRA-21245)  ran 52.0d and dominates the ratio.</p>
 
 <p><strong>Next actions</strong></p>
 <ol class="compact-prose">
-  <li>Inspect the three slowest PRs (CASSANDRA-21245, CASSANDRA-21355, CASSANDRA-21366) — they likely sat in review queue.</li>
+  <li>Inspect the three slowest PRs (CASSANDRA-21245, CASSANDRA-21301, CASSANDRA-21355) — they likely sat in review queue.</li>
   <li>Compare to the previous 2-4 weeks to spot a trend.</li>
   <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
 </ol>

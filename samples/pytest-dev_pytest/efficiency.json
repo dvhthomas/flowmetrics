@@ -1,31 +1,31 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T17:20:01.945079-06:00",
-  "headline": "0.9% flow efficiency across 15 completed items (10 human, 5 bot) over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "generated_at": "2026-05-16T09:47:47.627374-06:00",
+  "headline": "0.7% flow efficiency across 12 completed items (7 human, 5 bot) over 7 days, May 9, 2026 \u2192 May 15, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 15,
-    "human_pr_count": 10,
+    "pr_count": 12,
+    "human_pr_count": 7,
     "bot_pr_count": 5,
-    "portfolio_efficiency": 0.008994519369672375,
-    "median_efficiency": 0.057151021574510644,
-    "mean_efficiency": 0.1936634529404578,
+    "portfolio_efficiency": 0.007143882148971047,
+    "median_efficiency": 0.0901500536541069,
+    "mean_efficiency": 0.23588866124046295,
     "total_cycle": {
-      "seconds": 16322940.0,
-      "hours": 4534.15,
-      "days": 188.92291666666668
+      "seconds": 12355327.0,
+      "hours": 3432.035277777778,
+      "days": 143.0014699074074
     },
     "total_active": {
-      "seconds": 146817.0,
-      "hours": 40.7825,
-      "days": 1.6992708333333333
+      "seconds": 88265.0,
+      "hours": 24.518055555555556,
+      "days": 1.0215856481481482
     },
     "observed_statuses": []
   },
   "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14071)  ran 136.9d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (#14071, #14375, #14414) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (#14071, #14472, #14449) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -88,18 +88,6 @@
         "efficiency": 0.049109213434098166
       },
       {
-        "item_id": "#14443",
-        "efficiency": 0.037332161300955936
-      },
-      {
-        "item_id": "#14414",
-        "efficiency": 0.03475628263898077
-      },
-      {
-        "item_id": "#14375",
-        "efficiency": 0.002199415281374455
-      },
-      {
         "item_id": "#14071",
         "efficiency": 0.0016500150750570482
       }
@@ -107,8 +95,8 @@
   },
   "input": {
     "repo": "pytest-dev/pytest",
-    "start": "2026-05-08",
-    "stop": "2026-05-14",
+    "start": "2026-05-09",
+    "stop": "2026-05-15",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
@@ -330,63 +318,6 @@
         "author_login": "patchback"
       },
       {
-        "item_id": "#14443",
-        "title": "Fix strict options from addopts",
-        "created_at": "2026-05-06T05:28:27+00:00",
-        "merged_at": "2026-05-08T20:40:32+00:00",
-        "cycle_time": {
-          "seconds": 227525.0,
-          "hours": 63.201388888888886,
-          "days": 2.6333912037037037
-        },
-        "active_time": {
-          "seconds": 8494.0,
-          "hours": 2.3594444444444442,
-          "days": 0.09831018518518518
-        },
-        "efficiency": 0.037332161300955936,
-        "is_bot": false,
-        "author_login": "praneethhere"
-      },
-      {
-        "item_id": "#14414",
-        "title": "Add datetime/timedelta support to pytest.approx (#8395)",
-        "created_at": "2026-04-23T11:02:53+00:00",
-        "merged_at": "2026-05-08T07:57:43+00:00",
-        "cycle_time": {
-          "seconds": 1284890.0,
-          "hours": 356.9138888888889,
-          "days": 14.871412037037038
-        },
-        "active_time": {
-          "seconds": 44658.0,
-          "hours": 12.405,
-          "days": 0.516875
-        },
-        "efficiency": 0.03475628263898077,
-        "is_bot": false,
-        "author_login": "hamza-mobeen"
-      },
-      {
-        "item_id": "#14375",
-        "title": "logging: also capture logs from non-propagating loggers",
-        "created_at": "2026-04-10T09:36:06+00:00",
-        "merged_at": "2026-05-08T19:36:04+00:00",
-        "cycle_time": {
-          "seconds": 2455198.0,
-          "hours": 681.9994444444444,
-          "days": 28.41664351851852
-        },
-        "active_time": {
-          "seconds": 5400.0,
-          "hours": 1.5,
-          "days": 0.0625
-        },
-        "efficiency": 0.002199415281374455,
-        "is_bot": false,
-        "author_login": "bluetech"
-      },
-      {
         "item_id": "#14071",
         "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)",
         "created_at": "2025-12-28T15:27:52+00:00",
@@ -412,6 +343,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

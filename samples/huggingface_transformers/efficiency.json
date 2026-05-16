@@ -1,31 +1,31 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-15T17:20:04.087563-06:00",
-  "headline": "1.9% flow efficiency across 59 completed items (57 human, 2 bot) over 7 days, May 8, 2026 \u2192 May 14, 2026.",
+  "generated_at": "2026-05-16T09:47:57.490150-06:00",
+  "headline": "2.7% flow efficiency across 55 completed items (53 human, 2 bot) over 7 days, May 9, 2026 \u2192 May 15, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 59,
-    "human_pr_count": 57,
+    "pr_count": 55,
+    "human_pr_count": 53,
     "bot_pr_count": 2,
-    "portfolio_efficiency": 0.018604626680094702,
-    "median_efficiency": 0.1284292390567586,
-    "mean_efficiency": 0.3561261936333396,
+    "portfolio_efficiency": 0.02681710836071274,
+    "median_efficiency": 0.1293092676942649,
+    "mean_efficiency": 0.3770640217916157,
     "total_cycle": {
-      "seconds": 59272998.0,
-      "hours": 16464.721666666668,
-      "days": 686.0300694444444
+      "seconds": 37509637.0,
+      "hours": 10419.343611111111,
+      "days": 434.1393171296296
     },
     "total_active": {
-      "seconds": 1102752.0,
-      "hours": 306.32,
-      "days": 12.763333333333334
+      "seconds": 1005900.0,
+      "hours": 279.4166666666667,
+      "days": 11.64236111111111
     },
     "observed_statuses": []
   },
-  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#41693)  ran 203.2d and dominates the ratio.",
+  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#43924)  ran 89.8d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (#41693, #43924, #44830) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (#43924, #44830, #45034) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -43,6 +43,14 @@
   },
   "chart_data": {
     "per_pr_efficiency": [
+      {
+        "item_id": "#45988",
+        "efficiency": 0.4131193085352678
+      },
+      {
+        "item_id": "#45981",
+        "efficiency": 0.06307008428587924
+      },
       {
         "item_id": "#45966",
         "efficiency": 1.0
@@ -76,6 +84,10 @@
         "efficiency": 0.1293092676942649
       },
       {
+        "item_id": "#45946",
+        "efficiency": 0.02437724645325474
+      },
+      {
         "item_id": "#45943",
         "efficiency": 0.17858140834575262
       },
@@ -96,12 +108,20 @@
         "efficiency": 0.09839025702101502
       },
       {
+        "item_id": "#45922",
+        "efficiency": 0.16887731670675415
+      },
+      {
         "item_id": "#45921",
         "efficiency": 0.05601892194696875
       },
       {
         "item_id": "#45918",
         "efficiency": 0.22874243598410526
+      },
+      {
+        "item_id": "#45914",
+        "efficiency": 0.040759140836731766
       },
       {
         "item_id": "#45913",
@@ -176,6 +196,10 @@
         "efficiency": 1.0
       },
       {
+        "item_id": "#45861",
+        "efficiency": 0.01756159240714796
+      },
+      {
         "item_id": "#45860",
         "efficiency": 0.04555121420446115
       },
@@ -184,48 +208,16 @@
         "efficiency": 0.024257229057770384
       },
       {
-        "item_id": "#45845",
-        "efficiency": 0.2648281714043275
-      },
-      {
-        "item_id": "#45844",
-        "efficiency": 0.20012771392081738
-      },
-      {
-        "item_id": "#45842",
-        "efficiency": 0.1284292390567586
-      },
-      {
         "item_id": "#45836",
         "efficiency": 0.025684891456524136
-      },
-      {
-        "item_id": "#45833",
-        "efficiency": 0.07986866042507876
       },
       {
         "item_id": "#45828",
         "efficiency": 0.0259977006313279
       },
       {
-        "item_id": "#45824",
-        "efficiency": 0.042219824553173524
-      },
-      {
         "item_id": "#45811",
         "efficiency": 0.037577342924694404
-      },
-      {
-        "item_id": "#45808",
-        "efficiency": 0.14070727383377873
-      },
-      {
-        "item_id": "#45804",
-        "efficiency": 0.03119836381914193
-      },
-      {
-        "item_id": "#45802",
-        "efficiency": 0.1035998835489065
       },
       {
         "item_id": "#45798",
@@ -268,23 +260,15 @@
         "efficiency": 0.006244341592533696
       },
       {
-        "item_id": "#44664",
-        "efficiency": 0.0042258322107099205
-      },
-      {
         "item_id": "#43924",
         "efficiency": 0.004287336202555595
-      },
-      {
-        "item_id": "#41693",
-        "efficiency": 0.005483952280517868
       }
     ]
   },
   "input": {
     "repo": "huggingface/transformers",
-    "start": "2026-05-08",
-    "stop": "2026-05-14",
+    "start": "2026-05-09",
+    "stop": "2026-05-15",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": false,
@@ -296,6 +280,44 @@
   },
   "result": {
     "per_pr": [
+      {
+        "item_id": "#45988",
+        "title": "docs: Fix formatting issues in weightconverter.md",
+        "created_at": "2026-05-15T07:53:36+00:00",
+        "merged_at": "2026-05-15T16:53:31+00:00",
+        "cycle_time": {
+          "seconds": 32395.0,
+          "hours": 8.998611111111112,
+          "days": 0.37494212962962964
+        },
+        "active_time": {
+          "seconds": 13383.0,
+          "hours": 3.7175,
+          "days": 0.15489583333333334
+        },
+        "efficiency": 0.4131193085352678,
+        "is_bot": false,
+        "author_login": "ArjunSrivastava1"
+      },
+      {
+        "item_id": "#45981",
+        "title": "Fix colqwen2 test",
+        "created_at": "2026-05-14T17:09:52+00:00",
+        "merged_at": "2026-05-15T12:24:40+00:00",
+        "cycle_time": {
+          "seconds": 69288.0,
+          "hours": 19.246666666666666,
+          "days": 0.8019444444444445
+        },
+        "active_time": {
+          "seconds": 4370.0,
+          "hours": 1.2138888888888888,
+          "days": 0.0505787037037037
+        },
+        "efficiency": 0.06307008428587924,
+        "is_bot": false,
+        "author_login": "IlyasMoutawwakil"
+      },
       {
         "item_id": "#45966",
         "title": "chore: update benchmark_v2.yml",
@@ -449,6 +471,25 @@
         "author_login": "stevhliu"
       },
       {
+        "item_id": "#45946",
+        "title": "RFDetr - use correct Roboflow org for release",
+        "created_at": "2026-05-13T15:16:59+00:00",
+        "merged_at": "2026-05-15T18:22:00+00:00",
+        "cycle_time": {
+          "seconds": 183901.0,
+          "hours": 51.08361111111111,
+          "days": 2.128483796296296
+        },
+        "active_time": {
+          "seconds": 4483.0,
+          "hours": 1.2452777777777777,
+          "days": 0.05188657407407407
+        },
+        "efficiency": 0.02437724645325474,
+        "is_bot": false,
+        "author_login": "sbucaille"
+      },
+      {
         "item_id": "#45943",
         "title": "fix: restore `_attn_implementation `and fix request offset in `generate_batch()`",
         "created_at": "2026-05-13T13:58:21+00:00",
@@ -544,6 +585,25 @@
         "author_login": "Cyrilvallez"
       },
       {
+        "item_id": "#45922",
+        "title": "\ud83d\udea8Fix memory leaks caused by lru decorators in vision models",
+        "created_at": "2026-05-12T20:59:12+00:00",
+        "merged_at": "2026-05-15T20:21:30+00:00",
+        "cycle_time": {
+          "seconds": 256938.0,
+          "hours": 71.37166666666667,
+          "days": 2.9738194444444446
+        },
+        "active_time": {
+          "seconds": 43391.0,
+          "hours": 12.053055555555556,
+          "days": 0.5022106481481482
+        },
+        "efficiency": 0.16887731670675415,
+        "is_bot": false,
+        "author_login": "yonigozlan"
+      },
+      {
         "item_id": "#45921",
         "title": "BUGFIX: Support hubert models that don't have conv_pos_batch_norm configured",
         "created_at": "2026-05-12T19:17:05+00:00",
@@ -580,6 +640,25 @@
         "efficiency": 0.22874243598410526,
         "is_bot": false,
         "author_login": "tengomucho"
+      },
+      {
+        "item_id": "#45914",
+        "title": "Block image_start/end_token_id in generation test sampling",
+        "created_at": "2026-05-12T12:25:09+00:00",
+        "merged_at": "2026-05-15T15:57:28+00:00",
+        "cycle_time": {
+          "seconds": 271939.0,
+          "hours": 75.53861111111111,
+          "days": 3.1474421296296295
+        },
+        "active_time": {
+          "seconds": 11084.0,
+          "hours": 3.078888888888889,
+          "days": 0.12828703703703703
+        },
+        "efficiency": 0.040759140836731766,
+        "is_bot": false,
+        "author_login": "Rocketknight1"
       },
       {
         "item_id": "#45913",
@@ -924,6 +1003,25 @@
         "author_login": "ArthurZucker"
       },
       {
+        "item_id": "#45861",
+        "title": "Fix M-RoPE device mismatch in Qwen3VL family under FSDP2 CPU offload",
+        "created_at": "2026-05-09T06:30:56+00:00",
+        "merged_at": "2026-05-15T04:52:18+00:00",
+        "cycle_time": {
+          "seconds": 512482.0,
+          "hours": 142.35611111111112,
+          "days": 5.93150462962963
+        },
+        "active_time": {
+          "seconds": 9000.0,
+          "hours": 2.5,
+          "days": 0.10416666666666667
+        },
+        "efficiency": 0.01756159240714796,
+        "is_bot": false,
+        "author_login": "jamesbraza"
+      },
+      {
         "item_id": "#45860",
         "title": "fix(text-generation): use token-level slicing for return_full_text=Fa\u2026",
         "created_at": "2026-05-09T06:09:44+00:00",
@@ -962,63 +1060,6 @@
         "author_login": "qflen"
       },
       {
-        "item_id": "#45845",
-        "title": "fix(rf_detr): fix failing tests",
-        "created_at": "2026-05-08T08:29:23+00:00",
-        "merged_at": "2026-05-08T15:02:13+00:00",
-        "cycle_time": {
-          "seconds": 23570.0,
-          "hours": 6.5472222222222225,
-          "days": 0.2728009259259259
-        },
-        "active_time": {
-          "seconds": 6242.0,
-          "hours": 1.7338888888888888,
-          "days": 0.07224537037037038
-        },
-        "efficiency": 0.2648281714043275,
-        "is_bot": false,
-        "author_login": "kaixuanliu"
-      },
-      {
-        "item_id": "#45844",
-        "title": "fix(granite4_vision): auto-fix failing tests",
-        "created_at": "2026-05-08T08:28:56+00:00",
-        "merged_at": "2026-05-08T15:00:26+00:00",
-        "cycle_time": {
-          "seconds": 23490.0,
-          "hours": 6.525,
-          "days": 0.271875
-        },
-        "active_time": {
-          "seconds": 4701.0,
-          "hours": 1.3058333333333334,
-          "days": 0.05440972222222222
-        },
-        "efficiency": 0.20012771392081738,
-        "is_bot": false,
-        "author_login": "kaixuanliu"
-      },
-      {
-        "item_id": "#45842",
-        "title": "fix(laguna): fix failing tests",
-        "created_at": "2026-05-08T07:12:31+00:00",
-        "merged_at": "2026-05-08T14:59:42+00:00",
-        "cycle_time": {
-          "seconds": 28031.0,
-          "hours": 7.786388888888889,
-          "days": 0.3244328703703704
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.1284292390567586,
-        "is_bot": false,
-        "author_login": "kaixuanliu"
-      },
-      {
         "item_id": "#45836",
         "title": "fix(minicpmv4_6): skip invalid failing tests",
         "created_at": "2026-05-08T01:24:20+00:00",
@@ -1036,25 +1077,6 @@
         "efficiency": 0.025684891456524136,
         "is_bot": false,
         "author_login": "kaixuanliu"
-      },
-      {
-        "item_id": "#45833",
-        "title": "Add Qwen3.5 support for token classification",
-        "created_at": "2026-05-07T23:30:45+00:00",
-        "merged_at": "2026-05-08T12:01:59+00:00",
-        "cycle_time": {
-          "seconds": 45074.0,
-          "hours": 12.520555555555555,
-          "days": 0.5216898148148148
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.07986866042507876,
-        "is_bot": false,
-        "author_login": "Ratwood98"
       },
       {
         "item_id": "#45828",
@@ -1076,25 +1098,6 @@
         "author_login": "yonigozlan"
       },
       {
-        "item_id": "#45824",
-        "title": "fix: correct typo 'seperate' -> 'separate' in comments across multipl\u2026",
-        "created_at": "2026-05-07T11:50:40+00:00",
-        "merged_at": "2026-05-08T11:31:48+00:00",
-        "cycle_time": {
-          "seconds": 85268.0,
-          "hours": 23.685555555555556,
-          "days": 0.9868981481481481
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.042219824553173524,
-        "is_bot": false,
-        "author_login": "Caromisc"
-      },
-      {
         "item_id": "#45811",
         "title": "Warn about forgetting attention mask functions",
         "created_at": "2026-05-06T16:55:33+00:00",
@@ -1112,63 +1115,6 @@
         "efficiency": 0.037577342924694404,
         "is_bot": false,
         "author_login": "TuringTux"
-      },
-      {
-        "item_id": "#45808",
-        "title": "\ud83d\udea8 [Fuyu] Remove FuyuBatchFeature subclass, use BatchFeature with skip_tensor_conversion",
-        "created_at": "2026-05-06T15:57:21+00:00",
-        "merged_at": "2026-05-08T09:56:53+00:00",
-        "cycle_time": {
-          "seconds": 151172.0,
-          "hours": 41.992222222222225,
-          "days": 1.749675925925926
-        },
-        "active_time": {
-          "seconds": 21271.0,
-          "hours": 5.908611111111111,
-          "days": 0.24619212962962964
-        },
-        "efficiency": 0.14070727383377873,
-        "is_bot": false,
-        "author_login": "Abineshabee"
-      },
-      {
-        "item_id": "#45804",
-        "title": "Fix import error in moe.py by providing explicit schema to custom_op",
-        "created_at": "2026-05-06T11:49:41+00:00",
-        "merged_at": "2026-05-08T11:54:27+00:00",
-        "cycle_time": {
-          "seconds": 173086.0,
-          "hours": 48.07944444444445,
-          "days": 2.0033101851851853
-        },
-        "active_time": {
-          "seconds": 5400.0,
-          "hours": 1.5,
-          "days": 0.0625
-        },
-        "efficiency": 0.03119836381914193,
-        "is_bot": false,
-        "author_login": "rraghavkaushik"
-      },
-      {
-        "item_id": "#45802",
-        "title": "Keep deleting ",
-        "created_at": "2026-05-06T10:51:49+00:00",
-        "merged_at": "2026-05-08T09:37:00+00:00",
-        "cycle_time": {
-          "seconds": 168311.0,
-          "hours": 46.753055555555555,
-          "days": 1.9480439814814814
-        },
-        "active_time": {
-          "seconds": 17437.0,
-          "hours": 4.8436111111111115,
-          "days": 0.20181712962962964
-        },
-        "efficiency": 0.1035998835489065,
-        "is_bot": false,
-        "author_login": "zucchini-nlp"
       },
       {
         "item_id": "#45798",
@@ -1361,25 +1307,6 @@
         "author_login": "lashahub"
       },
       {
-        "item_id": "#44664",
-        "title": ":rotating_light: Generic Sequence Classifier works for multimodal models",
-        "created_at": "2026-03-13T13:39:52+00:00",
-        "merged_at": "2026-05-08T13:26:59+00:00",
-        "cycle_time": {
-          "seconds": 4837627.0,
-          "hours": 1343.7852777777778,
-          "days": 55.99105324074074
-        },
-        "active_time": {
-          "seconds": 20443.0,
-          "hours": 5.6786111111111115,
-          "days": 0.2366087962962963
-        },
-        "efficiency": 0.0042258322107099205,
-        "is_bot": false,
-        "author_login": "zucchini-nlp"
-      },
-      {
         "item_id": "#43924",
         "title": ":rotating_light: [`Attn`] Remove all old mask APIs from modeling",
         "created_at": "2026-02-11T17:35:45+00:00",
@@ -1397,25 +1324,6 @@
         "efficiency": 0.004287336202555595,
         "is_bot": false,
         "author_login": "vasqu"
-      },
-      {
-        "item_id": "#41693",
-        "title": "\ud83d\udea8 Refactor ViT to updated standards",
-        "created_at": "2025-10-17T15:05:33+00:00",
-        "merged_at": "2026-05-08T19:23:28+00:00",
-        "cycle_time": {
-          "seconds": 17554675.0,
-          "hours": 4876.298611111111,
-          "days": 203.1791087962963
-        },
-        "active_time": {
-          "seconds": 96269.0,
-          "hours": 26.74138888888889,
-          "days": 1.114224537037037
-        },
-        "efficiency": 0.005483952280517868,
-        "is_bot": false,
-        "author_login": "yonigozlan"
       }
     ]
   },
@@ -1424,6 +1332,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --repo huggingface/transformers --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0",
+  "cli_invocation": "uv run flow efficiency --repo huggingface/transformers --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

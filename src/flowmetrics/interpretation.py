@@ -14,6 +14,8 @@ from .report import (
     EfficiencyInput,
     HowManyInput,
     Interpretation,
+    ScatterplotInput,
+    ScatterplotPoint,
     TrainingSummary,
     WhenDoneInput,
 )
@@ -517,6 +519,78 @@ def interpret_aging(
         "Re-check daily; Aging is a leading indicator of forecast slip."
     )
 
+    return Interpretation(
+        headline=headline,
+        key_insight=key_insight,
+        next_actions=next_actions,
+        caveats=caveats,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Scatterplot
+# ---------------------------------------------------------------------------
+
+
+def interpret_scatterplot(
+    input: ScatterplotInput,
+    points: list[ScatterplotPoint],
+    percentiles: dict[int, float],
+) -> Interpretation:
+    """Narrate a Cycle-Time Scatterplot.
+
+    The actionable framing: percentile lines give probability-of-
+    completion-by-N-days without estimation. P85 is the conventional
+    commitment threshold."""
+    window_days = (input.stop - input.start).days + 1
+    day_word = "day" if window_days == 1 else "days"
+
+    if not points:
+        return Interpretation(
+            headline=(
+                f"No items completed in the {window_days} {day_word} "
+                f"{_prose_date(input.start)} -> {_prose_date(input.stop)}."
+            ),
+            key_insight=(
+                "An empty window has no cycle-time distribution to plot. "
+                "Widen the window or check that the source has data for "
+                "this period."
+            ),
+            next_actions=[
+                "Widen the date window with --start/--stop.",
+                "Confirm the repo / Jira project is correct.",
+            ],
+            caveats=[],
+        )
+
+    p50 = percentiles.get(50, 0.0)
+    p85 = percentiles.get(85, 0.0)
+    p95 = percentiles.get(95, 0.0)
+    headline = (
+        f"{len(points)} items completed in {window_days} {day_word}; "
+        f"85% finished within {p85:.1f} days "
+        f"({_prose_date(input.start)} -> {_prose_date(input.stop)})."
+    )
+    key_insight = (
+        f"Median cycle time is {p50:.1f} days; deep-tail P95 is "
+        f"{p95:.1f} days. A new item entering the system has, by "
+        f"definition, an 85% chance of finishing in {p85:.1f} days or "
+        f"less and a 50% chance of finishing in {p50:.1f} days or less."
+    )
+    next_actions = [
+        f"Use P85 ({p85:.1f}d) as the external commitment for new "
+        "work — promising P50 builds a 50% miss rate into the plan.",
+        "Re-check at the end of each iteration to spot trends; a "
+        "rising P85 over consecutive windows means the system is "
+        "slowing down.",
+    ]
+    caveats = [
+        "Percentiles are EMPIRICAL — read from the actual finished "
+        "items in this window. No simulation, no estimation.",
+        "Outliers (very long cycle times) shift P85 / P95 up. If the "
+        "window is short or includes a single stuck-then-finished PR, "
+        "the deep-tail percentiles can be noisy.",
+    ]
     return Interpretation(
         headline=headline,
         key_insight=key_insight,

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cycle Time Scatterplot</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a;
+         line-height: 1.55; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+  h2 { font-size: 1.2rem; border-bottom: 1px solid #eee; padding-bottom: 0.3rem;
+       margin-top: 2.5rem; }
+  .stamp { color: #777; font-size: 0.85rem; }
+  .subtitle { color: #555; font-size: 1rem; margin: 0 0 0.6rem; }
+  .subtitle a { color: #555; text-decoration: underline; }
+  /* Tufte: non-conditional headline / definition / insight / caveats
+     used to carry decorative colored backgrounds. Three stacked colored
+     blocks at the top of the page (headline + banner + definition)
+     looked like chartjunk. Plain typographic hierarchy now; only the
+     conditional `.banner` and `.horizon` classes get colored chrome. */
+  .headline { font-size: 1.35rem; font-weight: 500; color: #0d2440;
+              line-height: 1.4; margin: 0.4rem 0 1rem; max-width: 60ch; }
+  .insight { font-size: 1rem; margin: 0.7rem 0; }
+  .caveats { color: #555; font-size: 0.9rem; margin: 0.7rem 0; }
+  /* Trust notes — small, italic, used for "see how it's estimated" */
+  .trust-note { font-size: 0.88rem; color: #666; margin: 0.3rem 0 1rem; }
+  /* Boxed callouts for orientation / standup framing */
+  .standup-callout { background: #eef4ff; border-left: 4px solid #3b6fb8;
+                     padding: 0.7rem 1rem; margin: 0.4rem 0 1.2rem;
+                     font-size: 0.92rem; color: #1f3a5f; max-width: 70ch; }
+  /* Compact prose blocks within details sections */
+  .walkthrough { font-size: 0.95rem; margin-left: 0.5rem; }
+  .compact-prose { font-size: 0.95rem; }
+  .footnote { font-size: 0.85rem; color: #666; max-width: 65ch; }
+  .footnote-tight { font-size: 0.85rem; color: #666; margin: 0.3rem 0 1rem; }
+  .footnote-wider { font-size: 0.9rem; color: #666; max-width: 60ch; }
+  /* Chart caption that hangs immediately under a chart */
+  .chart-caption { font-size: 0.85rem; color: #666;
+                   margin: 0.4rem 0 1.2rem; max-width: 65ch; }
+  /* About-section subhead (h3 within details) */
+  details h3 { margin-top: 1rem; font-size: 1rem; }
+  /* Vega chart containers — fluid width, fixed minimum height */
+  .chart { width: 100%; }
+  .chart.tall { min-height: 380px; }
+  .chart.medium { min-height: 340px; }
+  .chart.short { min-height: 200px; }
+  /* Success note (e.g. "no items past P85 — pipeline on track") */
+  .ok-note { font-size: 0.95rem; color: #137333; }
+  /* Walkthrough list inside an About-style details section */
+  .walkthrough-list { font-size: 0.95rem; max-width: 62ch; }
+  /* CFD workflow bookends: the user-supplied --workflow order
+     rendered as a pill chain with the entry/exit pills emphasised.
+     The pair tells the reader where new items arrive and where they
+     leave, which is exactly what the chart's top/bottom lines
+     measure. */
+  .workflow-bookends { display: flex; align-items: center;
+                       flex-wrap: wrap; gap: 0.6rem;
+                       padding: 0.7rem 0.9rem; margin: 0.6rem 0 1rem;
+                       background: #fafafa;
+                       border: 1px solid #eee; border-radius: 4px;
+                       font-size: 0.9rem; }
+  .workflow-bookends .bookend-label { color: #555;
+                                      font-variant: small-caps;
+                                      letter-spacing: 0.05em; }
+  .workflow-bookends .bookend-label.entry { font-weight: 600; }
+  .workflow-bookends .bookend-label.exit { font-weight: 600;
+                                            margin-left: auto; }
+  .workflow-bookends .workflow-chain { display: flex; flex-wrap: wrap;
+                                       align-items: center; gap: 0.35rem; }
+  .workflow-bookends .arrow { color: #999; }
+  /* Entry / exit pills carry a tint so the eye finds the
+     bookends amid the rest of the workflow. */
+  .pill.pill-entry { background: #e8f0fc; color: #1f3a5f;
+                     border: 1px solid #c7dafc; }
+  .pill.pill-exit  { background: #ecfdf5; color: #064e3b;
+                     border: 1px solid #b9e7d3; }
+  details > summary { cursor: pointer; padding: 0.4rem 0; font-weight: 600;
+                      color: #2b7cff; }
+  details[open] > summary { margin-bottom: 0.5rem; }
+  .invocation { background: #1a1a1a; color: #f8f8f8; padding: 0.6rem 0.8rem;
+                font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+                font-size: 0.85rem; border-radius: 4px; margin: 0.5rem 0 1.5rem;
+                overflow-x: auto; white-space: pre; }
+  .definition { font-size: 0.95rem; margin: 0.7rem 0; color: #444;
+                font-style: italic; }
+  /* State pill: workflow-stage labels rendered consistently across
+     the page (interventions list, per-state table, per-PR detail).
+     Visual marker says "this is a stage name." */
+  .pill { display: inline-block; padding: 0.1rem 0.55rem;
+          background: #eef1f5; color: #2b3a4a; border-radius: 999px;
+          font-size: 0.85rem; font-family: ui-monospace, "SF Mono",
+          Menlo, Consolas, monospace; white-space: nowrap; }
+  /* Single horizontal stacked bar for distribution. Each segment is
+     one aging band; width = share; color = yellow→red sequential.
+     Inline label inside the segment when wide enough. */
+  .dist-bar { display: flex; width: 100%; height: 42px;
+              border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+  .dist-bar .seg { display: flex; align-items: center; justify-content: center;
+                   color: #2b2b2b; font-size: 0.85rem; padding: 0 0.3rem;
+                   overflow: hidden; white-space: nowrap;
+                   text-overflow: ellipsis; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 0.8rem;
+                 font-size: 0.85rem; color: #555; margin: 0 0 1rem; }
+  .dist-legend .swatch { display: inline-block; width: 0.9rem;
+                         height: 0.9rem; vertical-align: middle;
+                         margin-right: 0.3rem; border-radius: 2px; }
+  .horizon { padding: 0.6rem 1rem; margin: 1rem 0; border-radius: 4px;
+             font-size: 0.95rem; }
+  .horizon.green  { background: #ecfdf5; border-left: 4px solid #10b981; color: #064e3b; }
+  .horizon.yellow { background: #fefce8; border-left: 4px solid #d4a72c; color: #713f12; }
+  .horizon.red    { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d; }
+  .banner { background: #fef2f2; border-left: 4px solid #cc3333; color: #7f1d1d;
+            padding: 0.9rem 1.1rem; margin: 1rem 0; font-size: 1rem;
+            font-weight: 500; }
+  .intervention { display: flex; gap: 1rem; padding: 0.4rem 0;
+                  border-bottom: 1px solid #eee; align-items: center;
+                  font-variant-numeric: tabular-nums; }
+  .intervention .state { min-width: 22ch; font-size: 0.9rem; }
+  .intervention .id { min-width: 9ch; }
+  .intervention .age { min-width: 8ch; color: #cc3333; font-weight: 600; }
+  .intervention .title { flex: 1; color: #333; }
+  .detail-divider { margin: 3rem 0 1rem; border: 0; border-top: 2px dashed #ccc;
+                    text-align: center; height: 0; position: relative; }
+  .detail-divider::after { content: "Detail"; position: absolute; top: -0.7em;
+                           left: 50%; transform: translateX(-50%);
+                           background: white; padding: 0 0.8rem; color: #888;
+                           font-size: 0.85rem; letter-spacing: 0.1em;
+                           text-transform: uppercase; }
+  dl dt { margin-top: 0.6rem; }
+  dl dd { margin: 0.1rem 0 0.5rem 1.2rem; color: #444; }
+  table { border-collapse: collapse; margin: 0.5rem 0; }
+  th, td { padding: 0.3rem 0.7rem; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #fafafa; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  img { max-width: 100%; height: auto; display: block; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>Cycle Time Scatterplot</h1>
+<p class="subtitle">
+  for jira:BIGTOP ·
+  2026-04-16 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
+</p>
+
+
+
+
+<div class="headline">
+10 items completed in 30 days; 85% finished within 84.5 days (Apr 16, 2026 -&gt; May 15, 2026).
+</div>
+
+<div id="scatterplot-chart" class="chart tall"
+     role="img"
+     aria-label="Cycle-time scatterplot with P50, P70, P85, P95 percentile lines"></div>
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+<script>
+  vegaEmbed("#scatterplot-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 380, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "circle", "size": 70, "opacity": 0.55, "color": "#2b7cff"}, "data": {"values": [{"completed_at": "2026-04-28", "cycle_time_days": 57.42270833333333, "item_id": "BIGTOP-4519", "title": "Upgrade Groovy to 3.0.25", "pr_url": null}, {"completed_at": "2026-04-28", "cycle_time_days": 50.782986111111114, "item_id": "BIGTOP-4520", "title": "Upgrade Hadoop to 3.4.3", "pr_url": null}, {"completed_at": "2026-04-28", "cycle_time_days": 82.70313657407408, "item_id": "BIGTOP-4516", "title": "Upgrade Tez to 0.10.5", "pr_url": null}, {"completed_at": "2026-04-28", "cycle_time_days": 0.8863888888888889, "item_id": "BIGTOP-4524", "title": "Add libuv1-dev to the toolchain for Debian 12", "pr_url": null}, {"completed_at": "2026-05-08", "cycle_time_days": 17.81144675925926, "item_id": "BIGTOP-4523", "title": "Make container tagging consistent between Linux and Mac OS on ARM", "pr_url": null}, {"completed_at": "2026-05-08", "cycle_time_days": 84.48579861111111, "item_id": "BIGTOP-4517", "title": "Fix build failure of Hive 4.0.1 against Hadoop 3.4.2", "pr_url": null}, {"completed_at": "2026-05-08", "cycle_time_days": 21.09633101851852, "item_id": "BIGTOP-4522", "title": "Fix installation failure of Puppet on openEuler 22.03", "pr_url": null}, {"completed_at": "2026-05-08", "cycle_time_days": 8.036365740740742, "item_id": "BIGTOP-4525", "title": "Upgrade Ranger to 2.8.0", "pr_url": null}, {"completed_at": "2026-05-14", "cycle_time_days": 5.8048263888888885, "item_id": "BIGTOP-4528", "title": "conf-select is missing", "pr_url": null}, {"completed_at": "2026-05-14", "cycle_time_days": 98.37445601851852, "item_id": "BIGTOP-4515", "title": "Upgrade HBase to 2.6.5", "pr_url": null}]}, "encoding": {"x": {"field": "completed_at", "type": "temporal", "scale": {"type": "utc"}, "axis": {"title": "Completion date", "titleFontWeight": "bold", "format": "%b %d", "labelAngle": 0}}, "y": {"field": "cycle_time_days", "type": "quantitative", "axis": {"title": "Cycle time (days)", "titleFontWeight": "bold"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "cycle_time_days", "title": "Cycle (d)", "format": ".1f"}, {"field": "completed_at", "title": "Completed", "type": "temporal", "format": "%b %d, %Y", "formatType": "utc"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 21.09633101851852, "label": "P50 (21.1d)"}, {"pct": "P70", "y": 57.42270833333333, "label": "P70 (57.4d)"}, {"pct": "P85", "y": 84.48579861111111, "label": "P85 (84.5d)"}, {"pct": "P95", "y": 98.37445601851852, "label": "P95 (98.4d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 21.09633101851852, "label": "P50 (21.1d)"}, {"pct": "P70", "y": 57.42270833333333, "label": "P70 (57.4d)"}, {"pct": "P85", "y": 84.48579861111111, "label": "P85 (84.5d)"}, {"pct": "P95", "y": 98.37445601851852, "label": "P95 (98.4d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}]}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("scatterplot-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
+<p class="footnote-tight">
+Hover any dot to see the item that finished there. Click a dot to
+open its PR / issue. Horizontal lines mark percentile thresholds —
+a new item entering the system has the matching probability of
+finishing in that time or less.
+</p>
+
+<h2>Slowest items in this window</h2>
+<div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4515</span>
+    <span class="age">98.4d</span>
+    <span class="state">2026-05-14</span>
+    <span class="title">Upgrade HBase to 2.6.5</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4517</span>
+    <span class="age">84.5d</span>
+    <span class="state">2026-05-08</span>
+    <span class="title">Fix build failure of Hive 4.0.1 against Hadoop 3.4.2</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4516</span>
+    <span class="age">82.7d</span>
+    <span class="state">2026-04-28</span>
+    <span class="title">Upgrade Tez to 0.10.5</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4519</span>
+    <span class="age">57.4d</span>
+    <span class="state">2026-04-28</span>
+    <span class="title">Upgrade Groovy to 3.0.25</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4520</span>
+    <span class="age">50.8d</span>
+    <span class="state">2026-04-28</span>
+    <span class="title">Upgrade Hadoop to 3.4.3</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4522</span>
+    <span class="age">21.1d</span>
+    <span class="state">2026-05-08</span>
+    <span class="title">Fix installation failure of Puppet on openEuler 22.03</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4523</span>
+    <span class="age">17.8d</span>
+    <span class="state">2026-05-08</span>
+    <span class="title">Make container tagging consistent between Linux and Mac OS on ARM</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4525</span>
+    <span class="age">8.0d</span>
+    <span class="state">2026-05-08</span>
+    <span class="title">Upgrade Ranger to 2.8.0</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4528</span>
+    <span class="age">5.8d</span>
+    <span class="state">2026-05-14</span>
+    <span class="title">conf-select is missing</span>
+  </div>
+  <div class="intervention">
+    <span class="id">BIGTOP-4524</span>
+    <span class="age">0.9d</span>
+    <span class="state">2026-04-28</span>
+    <span class="title">Add libuv1-dev to the toolchain for Debian 12</span>
+  </div>
+</div>
+
+
+
+
+<hr class="detail-divider">
+
+<details>
+<summary>Reproduce this report</summary>
+<table>
+  <tr><th>Repo</th><td>jira:BIGTOP</td></tr>
+  <tr><th>Window</th><td>2026-04-16 → 2026-05-15</td></tr>
+  <tr><th>Completed items</th><td>10</td></tr>
+</table>
+<div class="invocation">uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-16 --stop 2026-05-15</div>
+</details>
+
+<details>
+<summary>About this report</summary>
+<p><strong>What this shows.</strong> Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds — a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.</p>
+
+<p><strong>How to read the percentile lines.</strong></p>
+<ul class="compact-prose">
+  <li>The lines are EMPIRICAL — drawn at the cycle times that
+      separate the finished items into ranked groups. P50 = half
+      the items finished at or below this number of days; P85 =
+      85% of items finished at or below this number; etc.</li>
+  <li>By definition, a new item entering the system has the matching
+      probability of finishing in that time or less. P85 (84.5d
+      for this window) is the conventional external-commitment line.</li>
+  <li>The deep tail (above P95) is where retrospectives find the
+      most leverage — what happened with each of those items, and
+      can we prevent it next time?</li>
+</ul>
+
+<p><strong>Key insight.</strong> Median cycle time is 21.1 days; deep-tail P95 is 98.4 days. A new item entering the system has, by definition, an 85% chance of finishing in 84.5 days or less and a 50% chance of finishing in 21.1 days or less.</p>
+
+<p><strong>Next actions</strong></p>
+<ol class="compact-prose">
+  <li>Use P85 (84.5d) as the external commitment for new work — promising P50 builds a 50% miss rate into the plan.</li>
+  <li>Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down.</li>
+</ol>
+
+<p><strong>Caveats</strong></p>
+<ul class="footnote-wider">
+  <li>Percentiles are EMPIRICAL — read from the actual finished items in this window. No simulation, no estimation.</li>
+  <li>Outliers (very long cycle times) shift P85 / P95 up. If the window is short or includes a single stuck-then-finished PR, the deep-tail percentiles can be noisy.</li>
+</ul>
+
+<p><strong>Vocabulary</strong></p>
+<dl>
+  <dt><strong>Cycle Time</strong></dt>
+  <dd>Days from when a work item entered the system (created) to when it left (merged / resolved). One dot on the chart per completed item; the dot&#39;s y-position is its cycle time.</dd>
+  <dt><strong>Percentile Line</strong></dt>
+  <dd>A horizontal line on the scatterplot such that the given percent of dots fall on or below it. P50 = median cycle time; 85% of completed items finished in P85 days or less. A new item entering the system has, by definition, the matching probability of finishing in that time.</dd>
+  <dt><strong>Completion date</strong></dt>
+  <dd>When the item was merged (GitHub) or resolved (Jira). The dot&#39;s x-position on the chart.</dd>
+  <dt><strong>Source</strong></dt>
+  <dd>Vacanti, _When Will It Be Done?_ (Leanpub).</dd>
+</dl>
+</details>
+
+
+
+</body>
+</html>

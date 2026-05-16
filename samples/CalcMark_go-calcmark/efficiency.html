@@ -139,10 +139,10 @@
 <h1>Flow efficiency</h1>
 <p class="subtitle">
   for <a href="https://github.com/CalcMark/go-calcmark">CalcMark/go-calcmark</a> ·
-  2026-05-08 → 2026-05-14 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  2026-05-09 → 2026-05-15 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
 </p>
-<div class="headline">100.0% flow efficiency across 2 completed items over 7 days, May 8, 2026 → May 14, 2026.</div>
+<div class="headline">100.0% flow efficiency across 1 completed items over 7 days, May 9, 2026 → May 15, 2026.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
@@ -162,12 +162,6 @@ them moves the portfolio number more than improving a typical PR.
 </p>
 <div>
   <div class="intervention">
-    <span class="id"><a href="https://github.com/CalcMark/go-calcmark/pull/159">#159</a></span>
-    <span class="age">1.7h</span>
-    <span class="state"><span class="pill">FE 100.0%</span></span>
-    <span class="title">fix(lsp): admit bare-IDENT-prefix-of-known-function as calc-shape for completion</span>
-  </div>
-  <div class="intervention">
     <span class="id"><a href="https://github.com/CalcMark/go-calcmark/pull/161">#161</a></span>
     <span class="age">0.0h</span>
     <span class="state"><span class="pill">FE 100.0%</span></span>
@@ -180,7 +174,7 @@ them moves the portfolio number more than improving a typical PR.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#161", "title": "test: lock in variable +/- percentage widening (cmw#83)", "cycle_hours": 0.03, "active_hours": 0.03, "efficiency_pct": 100.0, "is_bot": false, "band": "≥ 50% (healthy)", "pr_url": "https://github.com/CalcMark/go-calcmark/pull/161"}, {"item_id": "#159", "title": "fix(lsp): admit bare-IDENT-prefix-of-known-function as calc-shape for completion", "cycle_hours": 1.73, "active_hours": 1.73, "efficiency_pct": 100.0, "is_bot": false, "band": "≥ 50% (healthy)", "pr_url": "https://github.com/CalcMark/go-calcmark/pull/159"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 100.0, "label": "Portfolio FE: 100.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "#161", "title": "test: lock in variable +/- percentage widening (cmw#83)", "cycle_hours": 0.03, "active_hours": 0.03, "efficiency_pct": 100.0, "is_bot": false, "band": "≥ 50% (healthy)", "pr_url": "https://github.com/CalcMark/go-calcmark/pull/161"}]}, "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 100.0, "label": "Portfolio FE: 100.0%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -204,7 +198,7 @@ up the way they drag this bar's count up.
 <hr class="detail-divider">
 
 <details>
-<summary>Show all 2 PRs (slowest first)</summary>
+<summary>Show all 1 PRs (slowest first)</summary>
 <table>
 <thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
 <tbody>
@@ -214,13 +208,6 @@ up the way they drag this bar's count up.
     <td class="num">0.0h</td>
     <td class="num">100.0%</td>
     <td>test: lock in variable +/- percentage widening (cmw#83)</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/CalcMark/go-calcmark/pull/159">#159</a></td>
-    <td class="num">1.7h</td>
-    <td class="num">1.7h</td>
-    <td class="num">100.0%</td>
-    <td>fix(lsp): admit bare-IDENT-prefix-of-known-function as calc-shape for completion</td>
   </tr>
 </tbody>
 </table>
@@ -277,11 +264,11 @@ FE.
 <summary>Reproduce this report</summary>
 <table>
   <tr><th>Repo</th><td>CalcMark/go-calcmark</td></tr>
-  <tr><th>Window</th><td>2026-05-08 → 2026-05-14</td></tr>
+  <tr><th>Window</th><td>2026-05-09 → 2026-05-15</td></tr>
   <tr><th>Active-time gap</th><td>4.0h</td></tr>
   <tr><th>Min cluster</th><td>30.0min</td></tr>
 </table>
-<div class="invocation">uv run flow efficiency --repo CalcMark/go-calcmark --start 2026-05-08 --stop 2026-05-14 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
+<div class="invocation">uv run flow efficiency --repo CalcMark/go-calcmark --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0</div>
 </details>
 
 <details>

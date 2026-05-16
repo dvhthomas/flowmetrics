@@ -216,8 +216,49 @@ class AgingReport:
             )
 
 
+# ---------------------------------------------------------------------------
+# Cycle-Time Scatterplot
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ScatterplotPoint:
+    """One completed item plotted on the scatterplot.
+
+    `completed_at` is when the item finished (= merged_at for GitHub
+    PRs, resolved at for Jira issues). `cycle_time_days` is the
+    elapsed time from creation to completion. `item_id` / `title` /
+    `pr_url` carry display + drill-down context."""
+    item_id: str
+    title: str
+    completed_at: date
+    cycle_time_days: float
+    pr_url: str | None = None
+
+
+@dataclass(frozen=True)
+class ScatterplotInput:
+    repo: str
+    start: date
+    stop: date
+    offline: bool
+    jira_url: str | None = None
+
+
+@dataclass(frozen=True)
+class ScatterplotReport:
+    input: ScatterplotInput
+    points: list[ScatterplotPoint]
+    cycle_time_percentiles: dict[int, float]  # P50, P70, P85, P95 in days
+    interpretation: Interpretation
+    generated_at: datetime = field(default_factory=lambda: datetime.now().astimezone())
+    schema: str = "flowmetrics.scatterplot.v1"
+    command: str = "scatterplot"
+
+
 Report = (
     EfficiencyReport | WhenDoneReport | HowManyReport | CfdReport | AgingReport
+    | ScatterplotReport
 )
 
 
@@ -391,6 +432,27 @@ _FORECAST_VOCABULARY = {
 }
 
 
+_SCATTERPLOT_VOCABULARY = {
+    "Cycle Time": (
+        "Days from when a work item entered the system (created) to when "
+        "it left (merged / resolved). One dot on the chart per completed "
+        "item; the dot's y-position is its cycle time."
+    ),
+    "Percentile Line": (
+        "A horizontal line on the scatterplot such that the given percent "
+        "of dots fall on or below it. P50 = median cycle time; 85% of "
+        "completed items finished in P85 days or less. A new item entering "
+        "the system has, by definition, the matching probability of "
+        "finishing in that time."
+    ),
+    "Completion date": (
+        "When the item was merged (GitHub) or resolved (Jira). The dot's "
+        "x-position on the chart."
+    ),
+    "Source": "Vacanti, _When Will It Be Done?_ (Leanpub).",
+}
+
+
 def report_vocabulary(report: Report) -> dict[str, str]:
     """Inline canonical definitions for the terms a reader will encounter."""
     if isinstance(report, EfficiencyReport):
@@ -401,6 +463,8 @@ def report_vocabulary(report: Report) -> dict[str, str]:
         return dict(_CFD_VOCABULARY)
     if isinstance(report, AgingReport):
         return dict(_AGING_VOCABULARY)
+    if isinstance(report, ScatterplotReport):
+        return dict(_SCATTERPLOT_VOCABULARY)
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
@@ -449,6 +513,14 @@ def report_definition(report: Report) -> str:
             "entering the workflow). Percentile lines come from the cycle "
             "times of recently completed items — read horizontally as risk "
             "thresholds: an item aging past P85 likely misses its forecast."
+        )
+    if isinstance(report, ScatterplotReport):
+        return (
+            "Each dot is one completed item: x = completion date, "
+            "y = cycle time (days from creation to completion). "
+            "Horizontal percentile lines mark probability thresholds — a "
+            "new item entering the system has an 85% chance of finishing "
+            "in P85 days or less, by definition of the percentile."
         )
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
@@ -570,6 +642,17 @@ def cli_invocation(report: Report) -> str:
             parts.append("--offline")
         return " ".join(parts)
 
+    if isinstance(report, ScatterplotReport):
+        parts = [
+            "uv run flow scatterplot",
+            *_source_args(report.input),
+            f"--start {report.input.start.isoformat()}",
+            f"--stop {report.input.stop.isoformat()}",
+        ]
+        if report.input.offline:
+            parts.append("--offline")
+        return " ".join(parts)
+
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
@@ -592,4 +675,5 @@ _REPORT_TITLES.update({
     WhenDoneReport: "When will it be done?",
     HowManyReport: "How many items?",
     AgingReport: "Aging Work In Progress",
+    ScatterplotReport: "Cycle Time Scatterplot",
 })

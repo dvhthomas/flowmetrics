@@ -21,6 +21,7 @@ from ..report import (
     EfficiencyReport,
     HowManyReport,
     Report,
+    ScatterplotReport,
     WhenDoneReport,
     cli_invocation,
     forecast_horizon,
@@ -101,6 +102,8 @@ def render(report: Report) -> str:
         return _render_cfd(report)
     if isinstance(report, AgingReport):
         return _render_aging(report)
+    if isinstance(report, ScatterplotReport):
+        return _render_scatterplot(report)
     raise TypeError(f"unknown report type: {type(report).__name__}")  # pragma: no cover
 
 
@@ -312,5 +315,31 @@ def _render_how_many(report: HowManyReport) -> str:
         vega_spec_json=(
             _safe_json_for_script_tag(vega_specs.how_many_spec(report))
             if report.histogram.counts else ""
+        ),
+    )
+
+
+def _render_scatterplot(report: ScatterplotReport) -> str:
+    from . import vega_specs
+
+    template = _env.get_template("scatterplot.html.jinja")
+    repo_url = _repo_url(report.input.repo)
+    # Slowest-finishers list: items that landed in the deep tail. Sort
+    # by cycle_time desc, top 10. Each row is a candidate to ask
+    # "what happened with this PR?" in retrospective.
+    slowest = sorted(report.points, key=lambda p: p.cycle_time_days, reverse=True)[:10]
+    return template.render(
+        title=report_title(report),
+        repo_url=repo_url,
+        generated_at=report.generated_at,
+        interpretation=report.interpretation,
+        definition=report_definition(report),
+        invocation=cli_invocation(report),
+        vocabulary=report_vocabulary(report),
+        report=report,
+        slowest=slowest,
+        vega_spec_json=(
+            _safe_json_for_script_tag(vega_specs.scatterplot_spec(report))
+            if report.points else ""
         ),
     )

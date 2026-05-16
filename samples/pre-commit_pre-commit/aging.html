@@ -139,8 +139,8 @@
 <h1>Aging Work In Progress</h1>
 <p class="subtitle">
   for <a href="https://github.com/pre-commit/pre-commit">pre-commit/pre-commit</a> ·
-  as of May 15, 2026 ·
-  <span class="stamp">generated 2026-05-15 17:20 MDT</span>
+  as of May 16, 2026 ·
+  <span class="stamp">generated 2026-05-16 09:48 MDT</span>
 </p>
 
 
@@ -171,7 +171,7 @@
 Each bar counts in-flight PRs whose age sits inside that band's
 cycle-time range. Thresholds come from the
 5 PRs that merged
-2026-04-15 → 2026-05-14: below 0.0d; 0.0–0.8d; 0.8–1.1d; 1.1–1.1d; ≥ 1.1d.
+2026-04-16 → 2026-05-15: below 0.0d; 0.0–0.8d; 0.8–1.1d; 1.1–1.1d; ≥ 1.1d.
 </p>
 
 <h2>WIP Aging</h2>
@@ -180,7 +180,7 @@ cycle-time range. Thresholds come from the
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#aging-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 360, "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04}, "data": {"values": [{"current_state": "Draft"}, {"current_state": "Changes Requested"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}, {"mark": {"type": "circle", "size": 60, "opacity": 0.5}, "data": {"values": [{"item_id": "#3617", "title": "feature: fetch tag pointing to HEAD in shallow clone", "current_state": "Awaiting Review", "age_days": 98, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3617"}, {"item_id": "#3605", "title": "use git cat-file -e instead of git rev-list in _rev_exists", "current_state": "Changes Requested", "age_days": 140, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3605"}, {"item_id": "#3498", "title": "Julia: support `language_version`", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3498"}, {"item_id": "#3497", "title": "Julia: copy src files", "current_state": "Awaiting Review", "age_days": 298, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3497"}, {"item_id": "#3460", "title": "fix: Proper way of finding `npm pack` `filename` output.", "current_state": "Awaiting Review", "age_days": 371, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3460"}, {"item_id": "#3427", "title": "Fix pre-push after rebase", "current_state": "Awaiting Review", "age_days": 427, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3427"}]}, "transform": [{"calculate": "random()", "as": "jitter"}], "params": [{"name": "zoom", "select": {"type": "interval", "encodings": ["y"]}, "bind": "scales"}], "encoding": {"x": {"field": "current_state", "type": "nominal", "axis": {"title": "WIP Stage", "labelAngle": 0, "titleFontWeight": "bold", "titlePadding": 8}, "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"field": "age_days", "type": "quantitative", "axis": {"title": "Age (days)"}}, "xOffset": {"field": "jitter", "type": "quantitative"}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "current_state", "title": "State"}, {"field": "age_days", "title": "Age (d)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "bottom", "fontWeight": "bold", "fontSize": 12, "dy": -6}, "data": {"values": [{"current_state": "Draft", "count": 0, "label": "0 · 0%"}, {"current_state": "Awaiting Review", "count": 5, "label": "5 · 83%"}, {"current_state": "Changes Requested", "count": 1, "label": "1 · 17%"}, {"current_state": "Approved", "count": 0, "label": "0 · 0%"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"value": 0}, "text": {"field": "label"}}}]}, {
+  vegaEmbed("#aging-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 360, "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8}, "background": "transparent", "config": {"view": {"fill": null, "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04}, "data": {"values": [{"current_state": "Draft"}, {"current_state": "Changes Requested"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}, {"mark": {"type": "circle", "size": 60, "opacity": 0.5}, "data": {"values": [{"item_id": "#3617", "title": "feature: fetch tag pointing to HEAD in shallow clone", "current_state": "Awaiting Review", "age_days": 99, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3617"}, {"item_id": "#3605", "title": "use git cat-file -e instead of git rev-list in _rev_exists", "current_state": "Changes Requested", "age_days": 141, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3605"}, {"item_id": "#3498", "title": "Julia: support `language_version`", "current_state": "Awaiting Review", "age_days": 299, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3498"}, {"item_id": "#3497", "title": "Julia: copy src files", "current_state": "Awaiting Review", "age_days": 299, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3497"}, {"item_id": "#3460", "title": "fix: Proper way of finding `npm pack` `filename` output.", "current_state": "Awaiting Review", "age_days": 372, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3460"}, {"item_id": "#3427", "title": "Fix pre-push after rebase", "current_state": "Awaiting Review", "age_days": 428, "pr_url": "https://github.com/pre-commit/pre-commit/pull/3427"}]}, "transform": [{"calculate": "random()", "as": "jitter"}], "params": [{"name": "zoom", "select": {"type": "interval", "encodings": ["y"]}, "bind": "scales"}], "encoding": {"x": {"field": "current_state", "type": "nominal", "axis": {"title": "WIP Stage", "labelAngle": 0, "titleFontWeight": "bold", "titlePadding": 8}, "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"field": "age_days", "type": "quantitative", "axis": {"title": "Age (days)"}}, "xOffset": {"field": "jitter", "type": "quantitative"}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "current_state", "title": "State"}, {"field": "age_days", "title": "Age (d)"}], "href": {"field": "pr_url", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "bottom", "fontWeight": "bold", "fontSize": 12, "dy": -6}, "data": {"values": [{"current_state": "Draft", "count": 0, "label": "0 · 0%"}, {"current_state": "Awaiting Review", "count": 5, "label": "5 · 83%"}, {"current_state": "Changes Requested", "count": 1, "label": "1 · 17%"}, {"current_state": "Approved", "count": 0, "label": "0 · 0%"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"value": 0}, "text": {"field": "label"}}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -194,25 +194,25 @@ cycle-time range. Thresholds come from the
   <div class="intervention">
     <span class="state"><span class="pill">Changes Requested</span></span>
     <span class="id"><a href="https://github.com/pre-commit/pre-commit/pull/3605">#3605</a></span>
-    <span class="age">140d</span>
+    <span class="age">141d</span>
     <span class="title">use git cat-file -e instead of git rev-list in _rev_exists</span>
   </div>
   <div class="intervention">
     <span class="state"><span class="pill">Awaiting Review</span></span>
     <span class="id"><a href="https://github.com/pre-commit/pre-commit/pull/3427">#3427</a></span>
-    <span class="age">427d</span>
+    <span class="age">428d</span>
     <span class="title">Fix pre-push after rebase</span>
   </div>
   <div class="intervention">
     <span class="state"><span class="pill">Awaiting Review</span></span>
     <span class="id"><a href="https://github.com/pre-commit/pre-commit/pull/3460">#3460</a></span>
-    <span class="age">371d</span>
+    <span class="age">372d</span>
     <span class="title">fix: Proper way of finding `npm pack` `filename` output.</span>
   </div>
   <div class="intervention">
     <span class="state"><span class="pill">Awaiting Review</span></span>
     <span class="id"><a href="https://github.com/pre-commit/pre-commit/pull/3498">#3498</a></span>
-    <span class="age">298d</span>
+    <span class="age">299d</span>
     <span class="title">Julia: support `language_version`</span>
   </div>
 </div>
@@ -243,8 +243,8 @@ cycle-time range. Thresholds come from the
     <tr>
       <td><span class="pill">Awaiting Review</span></td>
       <td class="num">5</td>
-      <td class="num">298d</td>
-      <td class="num">427d</td>
+      <td class="num">299d</td>
+      <td class="num">428d</td>
       <td class="num">0</td>
       <td class="num">5</td>
       <td class="num">5</td>
@@ -252,8 +252,8 @@ cycle-time range. Thresholds come from the
     <tr>
       <td><span class="pill">Changes Requested</span></td>
       <td class="num">1</td>
-      <td class="num">140d</td>
-      <td class="num">140d</td>
+      <td class="num">141d</td>
+      <td class="num">141d</td>
       <td class="num">0</td>
       <td class="num">1</td>
       <td class="num">1</td>
@@ -291,37 +291,37 @@ or escalate.
 <tbody>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3427">#3427</a></td>
-    <td class="num">427d</td>
+    <td class="num">428d</td>
     <td><span class="pill">Awaiting Review</span></td>
     <td>Fix pre-push after rebase</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3460">#3460</a></td>
-    <td class="num">371d</td>
+    <td class="num">372d</td>
     <td><span class="pill">Awaiting Review</span></td>
     <td>fix: Proper way of finding `npm pack` `filename` output.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3498">#3498</a></td>
-    <td class="num">298d</td>
+    <td class="num">299d</td>
     <td><span class="pill">Awaiting Review</span></td>
     <td>Julia: support `language_version`</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3497">#3497</a></td>
-    <td class="num">298d</td>
+    <td class="num">299d</td>
     <td><span class="pill">Awaiting Review</span></td>
     <td>Julia: copy src files</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3605">#3605</a></td>
-    <td class="num">140d</td>
+    <td class="num">141d</td>
     <td><span class="pill">Changes Requested</span></td>
     <td>use git cat-file -e instead of git rev-list in _rev_exists</td>
   </tr>
   <tr>
     <td><a href="https://github.com/pre-commit/pre-commit/pull/3617">#3617</a></td>
-    <td class="num">98d</td>
+    <td class="num">99d</td>
     <td><span class="pill">Awaiting Review</span></td>
     <td>feature: fetch tag pointing to HEAD in shallow clone</td>
   </tr>
@@ -337,12 +337,12 @@ or escalate.
   <tr>
     <th>Percentile training window</th>
     <td>
-      2026-04-15 → 2026-05-14
+      2026-04-16 → 2026-05-15
       (5 completed PRs)
     </td>
   </tr>
 </table>
-<div class="invocation">uv run flow aging --repo pre-commit/pre-commit --asof 2026-05-15 --workflow &#39;Draft,Awaiting Review,Changes Requested,Approved&#39; --history-start 2026-04-15 --history-end 2026-05-14</div>
+<div class="invocation">uv run flow aging --repo pre-commit/pre-commit --asof 2026-05-16 --workflow &#39;Draft,Awaiting Review,Changes Requested,Approved&#39; --history-start 2026-04-16 --history-end 2026-05-15</div>
 </details>
 
 <details>
@@ -390,8 +390,8 @@ forecast-derived or simulated.
 
 <p><strong>Other notes</strong></p>
 <ul class="footnote-wider">
-  <li>Aging is a snapshot as of May 15, 2026 — not a trend over time.</li>
-  <li>Percentile lines reflect the completed-item distribution from Apr 15, 2026 → May 14, 2026 (5 items). If recent throughput has changed, those checkpoints may have drifted.</li>
+  <li>Aging is a snapshot as of May 16, 2026 — not a trend over time.</li>
+  <li>Percentile lines reflect the completed-item distribution from Apr 16, 2026 → May 15, 2026 (5 items). If recent throughput has changed, those checkpoints may have drifted.</li>
   <li>Items in early workflow states (Open, To Do) often age longest in open-source repos because they&#39;re sitting in an intake queue, not being actively worked. An aged item in &#39;Open&#39; usually means no maintainer has picked it up; an aged item in &#39;In Progress&#39; or &#39;In Review&#39; is more likely a real bottleneck.</li>
   <li>100% of in-flight items are past P95 of recent completers — much higher than the ~5% you&#39;d expect if today&#39;s WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren&#39;t in that sample. The thresholds therefore diverge from — and likely under-represent — true cycle time for this WIP.</li>
 </ul>
