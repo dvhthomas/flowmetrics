@@ -382,20 +382,20 @@ metrics + Jira-equal-citizen support.
 
 ## Open Questions
 
-1. ~~JSON schema versioning~~ — resolved: ship clean.
-2. ~~`closingIssuesReferences` direction~~ — resolved: PR side,
-   signal `github-pr-closes-issue`.
-3. **Item ID format.** `github:owner/repo:pr:42` vs
-   `github:owner/repo#42` vs the existing `#42`. Today's `#42`
-   is ambiguous across repos and sources. The canonical schema
-   wants globally unique. Vote on the prefix scheme.
-4. **Stuck Issues.** An Issue labelled `in-progress` but never
-   linked to a PR — does it count as in-flight Aging? Earlier
-   answer: yes. Confirmed.
-5. **Default for `--include-issues`.** Opt-in (today's default
-   PR-only behaviour) or opt-out (Issues included when
-   `--wip-labels` set)? Default: opt-in for conservatism.
-6. **Whether to do this at all, today.** The Phase 0 rename is
-   small and worth doing on its own. Phases 1-4 are a multi-week
-   refactor. Spec the path, but defer the start until you
-   confirm the appetite.
+All resolved.
+
+1. ~~JSON schema versioning~~ — ship clean. No `.v1` → `.v2`.
+2. ~~`closingIssuesReferences` direction~~ — PR side, signal
+   `github-pr-closes-issue`.
+3. ~~Item ID format~~ — **globally unique**, shape
+   `github:owner/repo:pr:42` / `github:owner/repo:issue:7` /
+   `jira:PROJECT-KEY`. Today's bare `#42` becomes the
+   display-only `WorkItem.short_id` for renderers; the canonical
+   `id` is the globally unique form.
+4. ~~Stuck Issues~~ — counted as in-flight Aging when WIP-labelled.
+5. ~~Default for `--include-issues`~~ — **opt-out** (Issues
+   included by default when `--wip-labels` is set; user passes
+   `--no-include-issues` to suppress). The flag exists so older
+   scripts can pin behaviour, but the new default IS the
+   expected one.
+6. ~~Multi-phase appetite~~ — confirmed, all phases approved.
