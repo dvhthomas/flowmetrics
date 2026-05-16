@@ -1429,3 +1429,37 @@ class TestScatterplotSpec:
             f"Each data row must carry a pre-formatted, human-readable "
             f"date string for the tooltip; got row keys {list(row.keys())}"
         )
+
+    def test_scatterplot_supports_drag_zoom_on_both_axes(self):
+        """Cycle-time data has a wide dynamic range (a deep-tail
+        item at 3999 days flattens everything else into a thin
+        bottom strip). A drag-to-zoom selection bound to the scales
+        lets the reader investigate clusters without re-running the
+        report. Vega-Lite's interval-selection-with-bind:scales
+        gives drag + scroll-zoom on both X (date) and Y (cycle time)
+        for free."""
+        spec = vega_specs.scatterplot_spec(_scatterplot_fixture())
+        circle_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "circle"
+        )
+        params = circle_layer.get("params", [])
+        zoom = next(
+            (p for p in params if p.get("select", {}).get("type") == "interval"),
+            None,
+        )
+        assert zoom is not None, (
+            f"Circle layer must declare an interval-selection param "
+            f"for drag-zoom. Got params={params}"
+        )
+        assert zoom.get("bind") == "scales", (
+            f"Interval selection must bind to scales so drag-zoom "
+            f"updates the chart axes. Got bind={zoom.get('bind')!r}"
+        )
+        encodings = zoom["select"].get("encodings", [])
+        assert "x" in encodings and "y" in encodings, (
+            f"Zoom must cover both X and Y axes — cycle time and date "
+            f"both compress badly without per-axis zoom. Got encodings="
+            f"{encodings}"
+        )

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T10:14:52.362768-06:00",
+  "generated_at": "2026-05-16T10:24:32.349246-06:00",
   "headline": "203 items completed in 30 days; 85% finished within 3.0 days (Apr 16, 2026 -> May 15, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {

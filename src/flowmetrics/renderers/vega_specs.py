@@ -207,6 +207,21 @@ def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
         "mark": {"type": "circle", "size": 70, "opacity": 0.55,
                  "color": "#2b7cff"},
         "data": {"values": point_rows},
+        # Drag a rectangle in the chart to zoom into that range;
+        # scroll-zoom + click-drag pan after. Vega-Lite's
+        # interval-selection-with-bind:scales drives the X and Y
+        # scales directly, so every layer in this spec (circles,
+        # percentile rules, percentile labels) follows the zoom.
+        # Lives on the circle layer (not top-level) because top-level
+        # params on a layered spec produce per-layer copies that clash
+        # on signal names at runtime.
+        "params": [
+            {
+                "name": "scatter_zoom",
+                "select": {"type": "interval", "encodings": ["x", "y"]},
+                "bind": "scales",
+            }
+        ],
         "encoding": {
             "x": {
                 "field": "completed_at",
