@@ -160,3 +160,63 @@ def test_wheel_zoom_works_over_empty_plot_area(
         f"This means bind:scales is not catching wheel events on "
         f"empty plot area. Check view.fill is 'transparent' not null."
     )
+
+
+# ============================================================
+# Render-fidelity regression: catches "vegaEmbed is not defined"
+# script-loading races AND chart-spec errors that leave the
+# container empty.
+# ============================================================
+
+
+@pytest.mark.parametrize("filename,container_ids", [
+    ("scatterplot.html", ["scatterplot-chart"]),
+    ("cfd.html", ["cfd-chart"]),
+    ("forecast-when-done.html", ["whendone-chart"]),
+    ("forecast-how-many.html", ["howmany-chart"]),
+    ("efficiency.html", ["efficiency-chart"]),
+    # aging.html has TWO charts on one page — the bug that motivated
+    # this test was the distribution chart staying blank because
+    # the vega-embed script tag sat between the two inline scripts.
+    ("aging.html", ["aging-chart", "aging-dist-chart"]),
+])
+def test_every_chart_actually_renders_svg(
+    regenerate_samples, filename, container_ids
+):
+    """Each chart container should hold a non-trivial Vega SVG once
+    loaded. Catches:
+      - vegaEmbed runtime errors ("vegaEmbed is not defined" race
+        from script-tag ordering)
+      - spec compile errors that leave the container empty
+      - CDN load failures
+    """
+    html = SAMPLE / filename
+    if not html.exists():
+        pytest.skip(f"{filename} not in sample dir")
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport={"width": 1440, "height": 1500})
+        page_errors: list[str] = []
+        page.on("pageerror", lambda e: page_errors.append(str(e)))
+        page.goto(f"file://{html}")
+        for cid in container_ids:
+            page.wait_for_selector(f"#{cid} svg", timeout=15000)
+        page.wait_for_timeout(1500)
+        # No "vegaEmbed is not defined" or spec-compile errors.
+        relevant = [e for e in page_errors if "vegaEmbed" in e or "Cannot" in e]
+        assert not relevant, (
+            f"{filename}: chart script errored — {relevant}"
+        )
+        # Each container's SVG must have real content (axes + marks).
+        for cid in container_ids:
+            svg_kids = page.evaluate(
+                f"""() => {{
+                    const el = document.querySelector('#{cid} svg');
+                    return el ? el.children.length : 0;
+                }}"""
+            )
+            assert svg_kids >= 2, (
+                f"{filename} / #{cid}: SVG rendered but only "
+                f"{svg_kids} children — chart looks empty."
+            )
+        browser.close()

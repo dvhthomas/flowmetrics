@@ -49,6 +49,15 @@
        5-item band stays visible next to a 365-item band. Sequential
        YlOrRd palette keeps the severity gradient legible in grayscale
        and color-blind safe. ── #}
+{# Vega scripts FIRST so both charts on this page can call
+   vegaEmbed once loaded. Previously the script tags sat between
+   the two charts, so the first inline vegaEmbed call raced the CDN
+   load and threw "vegaEmbed is not defined" — leaving the
+   distribution chart silently blank. #}
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
 <h2>Distribution by percentile band</h2>
 <div id="aging-dist-chart" role="img" aria-label="{{ bar_aria }}"
      class="chart short"></div>
@@ -82,9 +91,6 @@ cycle-time range. Thresholds come from the
 {# ── Interactive chart, named for navigation by heading. ──────────── #}
 <h2>WIP Aging</h2>
 <div id="aging-chart" class="chart tall"></div>
-<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
   vegaEmbed("#aging-chart", {{ vega_spec_json | safe }}, {
     actions: {export: true, source: false, compiled: false, editor: false},

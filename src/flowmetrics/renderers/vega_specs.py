@@ -74,7 +74,28 @@ def _forecast_histogram_spec(
             "x": {
                 "field": "outcome",
                 "type": x_type,
-                "axis": {"title": x_title, "titleFontWeight": "bold"},
+                # Force daily ticks on a temporal x. Vega-Lite's default
+                # picks a tick granularity from the visible span; for the
+                # ~10-day forecast horizon the auto-pick interleaves
+                # dates and 12 PM half-day ticks ("Mon 18  12 PM  Tue 19
+                # 12 PM …"), which is unreadable. UTC scale + daily
+                # tickCount + "%b %d" format gives one tick per day.
+                **(
+                    {
+                        "scale": {"type": "utc"},
+                        "axis": {
+                            "title": x_title,
+                            "titleFontWeight": "bold",
+                            "format": "%b %d",
+                            "labelAngle": 0,
+                            "tickCount": {"interval": "day", "step": 1},
+                        },
+                    }
+                    if x_type == "temporal"
+                    else {
+                        "axis": {"title": x_title, "titleFontWeight": "bold"},
+                    }
+                ),
             },
             "y": {
                 "field": "frequency",

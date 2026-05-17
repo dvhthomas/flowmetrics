@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-17T08:02:57.248299-06:00",
+  "generated_at": "2026-05-17T08:23:44.837804-06:00",
   "headline": "WIP Aging for jira:BIGTOP as of May 17, 2026: 726 in-flight items, 722 already past P85 (84.5d), 722 past P95 (98.4d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {

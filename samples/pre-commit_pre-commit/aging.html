@@ -140,7 +140,7 @@
 <p class="subtitle">
   for <a href="https://github.com/pre-commit/pre-commit">pre-commit/pre-commit</a> ·
   as of May 17, 2026 ·
-  <span class="stamp">generated 2026-05-17 08:02 MDT</span>
+  <span class="stamp">generated 2026-05-17 08:23 MDT</span>
 </p>
 
 
@@ -154,6 +154,10 @@
   item to whoever happens to be assigned: the chart measures the
   system, not the person.
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
 <h2>Distribution by percentile band</h2>
 <div id="aging-dist-chart" role="img" aria-label="Aging distribution by percentile band: Above P95 6 (100%)"
@@ -176,9 +180,6 @@ cycle-time range. Thresholds come from the
 
 <h2>WIP Aging</h2>
 <div id="aging-chart" class="chart tall"></div>
-<script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
   vegaEmbed("#aging-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 360, "padding": {"top": 24, "bottom": 8, "left": 8, "right": 8}, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "rect", "color": "#1a1a1a", "opacity": 0.04}, "data": {"values": [{"current_state": "Draft"}, {"current_state": "Changes Requested"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Cycle-time percentile", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Threshold"}]}}, {"mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 4, "dy": -3, "fontSize": 11, "fontWeight": "bold"}, "data": {"values": [{"pct": "P50", "y": 0.006099537037037037, "label": "P50 (0.0d)"}, {"pct": "P70", "y": 0.7757986111111111, "label": "P70 (0.8d)"}, {"pct": "P85", "y": 1.0534837962962964, "label": "P85 (1.1d)"}, {"pct": "P95", "y": 1.0534837962962964, "label": "P95 (1.1d)"}]}, "encoding": {"y": {"field": "y", "type": "quantitative"}, "text": {"field": "label"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": null}}}, {"mark": {"type": "circle", "size": 60, "opacity": 0.5}, "data": {"values": [{"item_id": "#3617", "title": "feature: fetch tag pointing to HEAD in shallow clone", "current_state": "Awaiting Review", "age_days": 100, "url": "https://github.com/pre-commit/pre-commit/pull/3617"}, {"item_id": "#3605", "title": "use git cat-file -e instead of git rev-list in _rev_exists", "current_state": "Changes Requested", "age_days": 142, "url": "https://github.com/pre-commit/pre-commit/pull/3605"}, {"item_id": "#3498", "title": "Julia: support `language_version`", "current_state": "Awaiting Review", "age_days": 300, "url": "https://github.com/pre-commit/pre-commit/pull/3498"}, {"item_id": "#3497", "title": "Julia: copy src files", "current_state": "Awaiting Review", "age_days": 300, "url": "https://github.com/pre-commit/pre-commit/pull/3497"}, {"item_id": "#3460", "title": "fix: Proper way of finding `npm pack` `filename` output.", "current_state": "Awaiting Review", "age_days": 373, "url": "https://github.com/pre-commit/pre-commit/pull/3460"}, {"item_id": "#3427", "title": "Fix pre-push after rebase", "current_state": "Awaiting Review", "age_days": 429, "url": "https://github.com/pre-commit/pre-commit/pull/3427"}]}, "transform": [{"calculate": "random()", "as": "jitter"}], "params": [{"name": "zoom", "select": {"type": "interval", "encodings": ["y"]}, "bind": "scales"}], "encoding": {"x": {"field": "current_state", "type": "nominal", "axis": {"title": "WIP Stage", "labelAngle": 0, "titleFontWeight": "bold", "titlePadding": 8}, "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"field": "age_days", "type": "quantitative", "axis": {"title": "Age (days)"}}, "xOffset": {"field": "jitter", "type": "quantitative"}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "current_state", "title": "State"}, {"field": "age_days", "title": "Age (d)"}], "href": {"field": "url", "type": "nominal"}}}, {"mark": {"type": "text", "baseline": "bottom", "fontWeight": "bold", "fontSize": 12, "dy": -6}, "data": {"values": [{"current_state": "Draft", "count": 0, "label": "0 · 0%"}, {"current_state": "Awaiting Review", "count": 5, "label": "5 · 83%"}, {"current_state": "Changes Requested", "count": 1, "label": "1 · 17%"}, {"current_state": "Approved", "count": 0, "label": "0 · 0%"}]}, "encoding": {"x": {"field": "current_state", "type": "nominal", "sort": ["Draft", "Awaiting Review", "Changes Requested", "Approved"], "scale": {"domain": ["Draft", "Awaiting Review", "Changes Requested", "Approved"]}}, "y": {"value": 0}, "text": {"field": "label"}}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
