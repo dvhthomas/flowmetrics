@@ -1,31 +1,31 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-16T23:06:36.045550-06:00",
-  "headline": "0.7% flow efficiency across 12 completed items (7 human, 5 bot) over 7 days, May 9, 2026 \u2192 May 15, 2026.",
+  "generated_at": "2026-05-16T23:15:32.942754-06:00",
+  "headline": "0.7% flow efficiency across 10 completed items (7 human, 3 bot) over 7 days, May 10, 2026 \u2192 May 16, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 12,
+    "pr_count": 10,
     "human_pr_count": 7,
-    "bot_pr_count": 5,
-    "portfolio_efficiency": 0.007143882148971047,
-    "median_efficiency": 0.0901500536541069,
-    "mean_efficiency": 0.23588866124046295,
+    "bot_pr_count": 3,
+    "portfolio_efficiency": 0.006624464798567321,
+    "median_efficiency": 0.10826890569973988,
+    "mean_efficiency": 0.27012083392704994,
     "total_cycle": {
-      "seconds": 12355327.0,
-      "hours": 3432.035277777778,
-      "days": 143.0014699074074
+      "seconds": 12237215.0,
+      "hours": 3399.226388888889,
+      "days": 141.63443287037038
     },
     "total_active": {
-      "seconds": 88265.0,
-      "hours": 24.518055555555556,
-      "days": 1.0215856481481482
+      "seconds": 81065.0,
+      "hours": 22.518055555555556,
+      "days": 0.9382523148148149
     },
     "observed_statuses": []
   },
   "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (#14071)  ran 136.9d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (#14071, #14472, #14449) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (#14071, #14472, #14478) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -80,14 +80,6 @@
         "efficiency": 0.17563545884763623
       },
       {
-        "item_id": "#14450",
-        "efficiency": 0.08034638218095791
-      },
-      {
-        "item_id": "#14449",
-        "efficiency": 0.049109213434098166
-      },
-      {
         "item_id": "#14071",
         "efficiency": 0.0016500150750570482
       }
@@ -95,11 +87,11 @@
   },
   "input": {
     "repo": "pytest-dev/pytest",
-    "start": "2026-05-09",
-    "stop": "2026-05-15",
+    "start": "2026-05-10",
+    "stop": "2026-05-16",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": true,
+    "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
@@ -280,44 +272,6 @@
         "author_login": "github-actions"
       },
       {
-        "item_id": "#14450",
-        "title": "build(deps): Bump django from 6.0.4 to 6.0.5 in /testing/plugins_integration",
-        "created_at": "2026-05-08T22:22:44+00:00",
-        "completed_at": "2026-05-09T10:49:30+00:00",
-        "cycle_time": {
-          "seconds": 44806.0,
-          "hours": 12.446111111111112,
-          "days": 0.518587962962963
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.08034638218095791,
-        "is_bot": true,
-        "author_login": "dependabot"
-      },
-      {
-        "item_id": "#14449",
-        "title": "[PR #14443/a481f264 backport][9.0.x] Fix strict options from addopts",
-        "created_at": "2026-05-08T20:40:45+00:00",
-        "completed_at": "2026-05-09T17:02:31+00:00",
-        "cycle_time": {
-          "seconds": 73306.0,
-          "hours": 20.36277777777778,
-          "days": 0.8484490740740741
-        },
-        "active_time": {
-          "seconds": 3600.0,
-          "hours": 1.0,
-          "days": 0.041666666666666664
-        },
-        "efficiency": 0.049109213434098166,
-        "is_bot": true,
-        "author_login": "patchback"
-      },
-      {
         "item_id": "#14071",
         "title": "Deprecate `self` in class-scoped fixtures on base classes (#10819) (#14011)",
         "created_at": "2025-12-28T15:27:52+00:00",
@@ -343,6 +297,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline",
+  "cli_invocation": "uv run flow efficiency --repo pytest-dev/pytest --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

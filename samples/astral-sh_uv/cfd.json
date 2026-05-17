@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-16T23:06:35.223451-06:00",
-  "headline": "CFD for astral-sh/uv Apr 16, 2026 \u2192 May 15, 2026: 589 items arrived, 203 completed, 386 still in flight at end.",
+  "generated_at": "2026-05-16T23:15:31.082939-06:00",
+  "headline": "CFD for astral-sh/uv Apr 17, 2026 \u2192 May 16, 2026: 588 items arrived, 202 completed, 386 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -10,13 +10,13 @@
       "Merged"
     ],
     "samples": 30,
-    "arrivals_at_end": 589,
-    "departures_at_end": 203,
-    "wip_at_start": 349,
+    "arrivals_at_end": 588,
+    "departures_at_end": 202,
+    "wip_at_start": 350,
     "wip_at_end": 386,
     "peak_wip": 386
   },
-  "key_insight": "The largest WIP band at May 15, 2026 is 'Open' with 386 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 16, 2026 is 'Open' with 386 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -37,595 +37,595 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-16",
-        "counts_by_state": {
-          "Open": 351,
-          "Merged": 2
-        }
-      },
-      {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
-          "Open": 361,
-          "Merged": 11
+          "Open": 359,
+          "Merged": 9
         }
       },
       {
         "sampled_on": "2026-04-18",
         "counts_by_state": {
-          "Open": 362,
-          "Merged": 12
+          "Open": 360,
+          "Merged": 10
         }
       },
       {
         "sampled_on": "2026-04-19",
         "counts_by_state": {
-          "Open": 365,
-          "Merged": 13
+          "Open": 363,
+          "Merged": 11
         }
       },
       {
         "sampled_on": "2026-04-20",
         "counts_by_state": {
-          "Open": 394,
-          "Merged": 37
+          "Open": 392,
+          "Merged": 35
         }
       },
       {
         "sampled_on": "2026-04-21",
         "counts_by_state": {
-          "Open": 406,
-          "Merged": 55
+          "Open": 404,
+          "Merged": 53
         }
       },
       {
         "sampled_on": "2026-04-22",
         "counts_by_state": {
-          "Open": 411,
-          "Merged": 59
+          "Open": 409,
+          "Merged": 57
         }
       },
       {
         "sampled_on": "2026-04-23",
         "counts_by_state": {
-          "Open": 420,
-          "Merged": 66
+          "Open": 418,
+          "Merged": 64
         }
       },
       {
         "sampled_on": "2026-04-24",
         "counts_by_state": {
-          "Open": 426,
-          "Merged": 68
+          "Open": 424,
+          "Merged": 66
         }
       },
       {
         "sampled_on": "2026-04-25",
         "counts_by_state": {
-          "Open": 429,
-          "Merged": 69
+          "Open": 427,
+          "Merged": 67
         }
       },
       {
         "sampled_on": "2026-04-26",
         "counts_by_state": {
-          "Open": 431,
-          "Merged": 69
+          "Open": 429,
+          "Merged": 67
         }
       },
       {
         "sampled_on": "2026-04-27",
         "counts_by_state": {
-          "Open": 459,
-          "Merged": 92
+          "Open": 457,
+          "Merged": 90
         }
       },
       {
         "sampled_on": "2026-04-28",
         "counts_by_state": {
-          "Open": 460,
-          "Merged": 93
+          "Open": 458,
+          "Merged": 91
         }
       },
       {
         "sampled_on": "2026-04-29",
         "counts_by_state": {
-          "Open": 472,
-          "Merged": 107
+          "Open": 470,
+          "Merged": 105
         }
       },
       {
         "sampled_on": "2026-04-30",
         "counts_by_state": {
-          "Open": 476,
-          "Merged": 113
+          "Open": 474,
+          "Merged": 111
         }
       },
       {
         "sampled_on": "2026-05-01",
         "counts_by_state": {
-          "Open": 481,
-          "Merged": 113
+          "Open": 479,
+          "Merged": 111
         }
       },
       {
         "sampled_on": "2026-05-02",
         "counts_by_state": {
-          "Open": 483,
-          "Merged": 114
+          "Open": 481,
+          "Merged": 112
         }
       },
       {
         "sampled_on": "2026-05-03",
         "counts_by_state": {
-          "Open": 484,
-          "Merged": 115
+          "Open": 482,
+          "Merged": 113
         }
       },
       {
         "sampled_on": "2026-05-04",
         "counts_by_state": {
-          "Open": 495,
-          "Merged": 128
+          "Open": 493,
+          "Merged": 126
         }
       },
       {
         "sampled_on": "2026-05-05",
         "counts_by_state": {
-          "Open": 510,
-          "Merged": 140
+          "Open": 508,
+          "Merged": 138
         }
       },
       {
         "sampled_on": "2026-05-06",
         "counts_by_state": {
-          "Open": 518,
-          "Merged": 144
+          "Open": 516,
+          "Merged": 142
         }
       },
       {
         "sampled_on": "2026-05-07",
         "counts_by_state": {
-          "Open": 526,
-          "Merged": 150
+          "Open": 524,
+          "Merged": 148
         }
       },
       {
         "sampled_on": "2026-05-08",
         "counts_by_state": {
-          "Open": 531,
-          "Merged": 153
+          "Open": 529,
+          "Merged": 151
         }
       },
       {
         "sampled_on": "2026-05-09",
         "counts_by_state": {
-          "Open": 535,
-          "Merged": 155
+          "Open": 533,
+          "Merged": 153
         }
       },
       {
         "sampled_on": "2026-05-10",
         "counts_by_state": {
-          "Open": 541,
-          "Merged": 158
+          "Open": 539,
+          "Merged": 156
         }
       },
       {
         "sampled_on": "2026-05-11",
         "counts_by_state": {
-          "Open": 559,
-          "Merged": 174
+          "Open": 557,
+          "Merged": 172
         }
       },
       {
         "sampled_on": "2026-05-12",
         "counts_by_state": {
-          "Open": 569,
-          "Merged": 184
+          "Open": 567,
+          "Merged": 182
         }
       },
       {
         "sampled_on": "2026-05-13",
         "counts_by_state": {
-          "Open": 573,
-          "Merged": 189
+          "Open": 571,
+          "Merged": 187
         }
       },
       {
         "sampled_on": "2026-05-14",
         "counts_by_state": {
-          "Open": 581,
-          "Merged": 197
+          "Open": 579,
+          "Merged": 195
         }
       },
       {
         "sampled_on": "2026-05-15",
         "counts_by_state": {
-          "Open": 589,
-          "Merged": 203
+          "Open": 587,
+          "Merged": 201
+        }
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "counts_by_state": {
+          "Open": 588,
+          "Merged": 202
         }
       }
     ],
     "bands": [
       {
-        "sampled_on": "2026-04-16",
-        "state": "Open",
-        "wip_in_state": 349,
-        "entered_at_or_later": 351
-      },
-      {
-        "sampled_on": "2026-04-16",
-        "state": "Merged",
-        "wip_in_state": 2,
-        "entered_at_or_later": 2
-      },
-      {
         "sampled_on": "2026-04-17",
         "state": "Open",
         "wip_in_state": 350,
-        "entered_at_or_later": 361
+        "entered_at_or_later": 359
       },
       {
         "sampled_on": "2026-04-17",
+        "state": "Merged",
+        "wip_in_state": 9,
+        "entered_at_or_later": 9
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Open",
+        "wip_in_state": 350,
+        "entered_at_or_later": 360
+      },
+      {
+        "sampled_on": "2026-04-18",
+        "state": "Merged",
+        "wip_in_state": 10,
+        "entered_at_or_later": 10
+      },
+      {
+        "sampled_on": "2026-04-19",
+        "state": "Open",
+        "wip_in_state": 352,
+        "entered_at_or_later": 363
+      },
+      {
+        "sampled_on": "2026-04-19",
         "state": "Merged",
         "wip_in_state": 11,
         "entered_at_or_later": 11
       },
       {
-        "sampled_on": "2026-04-18",
-        "state": "Open",
-        "wip_in_state": 350,
-        "entered_at_or_later": 362
-      },
-      {
-        "sampled_on": "2026-04-18",
-        "state": "Merged",
-        "wip_in_state": 12,
-        "entered_at_or_later": 12
-      },
-      {
-        "sampled_on": "2026-04-19",
-        "state": "Open",
-        "wip_in_state": 352,
-        "entered_at_or_later": 365
-      },
-      {
-        "sampled_on": "2026-04-19",
-        "state": "Merged",
-        "wip_in_state": 13,
-        "entered_at_or_later": 13
-      },
-      {
         "sampled_on": "2026-04-20",
         "state": "Open",
         "wip_in_state": 357,
-        "entered_at_or_later": 394
+        "entered_at_or_later": 392
       },
       {
         "sampled_on": "2026-04-20",
         "state": "Merged",
-        "wip_in_state": 37,
-        "entered_at_or_later": 37
+        "wip_in_state": 35,
+        "entered_at_or_later": 35
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Open",
         "wip_in_state": 351,
-        "entered_at_or_later": 406
+        "entered_at_or_later": 404
       },
       {
         "sampled_on": "2026-04-21",
         "state": "Merged",
-        "wip_in_state": 55,
-        "entered_at_or_later": 55
+        "wip_in_state": 53,
+        "entered_at_or_later": 53
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Open",
         "wip_in_state": 352,
-        "entered_at_or_later": 411
+        "entered_at_or_later": 409
       },
       {
         "sampled_on": "2026-04-22",
         "state": "Merged",
-        "wip_in_state": 59,
-        "entered_at_or_later": 59
+        "wip_in_state": 57,
+        "entered_at_or_later": 57
       },
       {
         "sampled_on": "2026-04-23",
         "state": "Open",
         "wip_in_state": 354,
-        "entered_at_or_later": 420
+        "entered_at_or_later": 418
       },
       {
         "sampled_on": "2026-04-23",
         "state": "Merged",
-        "wip_in_state": 66,
-        "entered_at_or_later": 66
+        "wip_in_state": 64,
+        "entered_at_or_later": 64
       },
       {
         "sampled_on": "2026-04-24",
         "state": "Open",
         "wip_in_state": 358,
-        "entered_at_or_later": 426
+        "entered_at_or_later": 424
       },
       {
         "sampled_on": "2026-04-24",
         "state": "Merged",
-        "wip_in_state": 68,
-        "entered_at_or_later": 68
+        "wip_in_state": 66,
+        "entered_at_or_later": 66
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Open",
         "wip_in_state": 360,
-        "entered_at_or_later": 429
+        "entered_at_or_later": 427
       },
       {
         "sampled_on": "2026-04-25",
         "state": "Merged",
-        "wip_in_state": 69,
-        "entered_at_or_later": 69
+        "wip_in_state": 67,
+        "entered_at_or_later": 67
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Open",
         "wip_in_state": 362,
-        "entered_at_or_later": 431
+        "entered_at_or_later": 429
       },
       {
         "sampled_on": "2026-04-26",
         "state": "Merged",
-        "wip_in_state": 69,
-        "entered_at_or_later": 69
+        "wip_in_state": 67,
+        "entered_at_or_later": 67
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Open",
         "wip_in_state": 367,
-        "entered_at_or_later": 459
+        "entered_at_or_later": 457
       },
       {
         "sampled_on": "2026-04-27",
         "state": "Merged",
-        "wip_in_state": 92,
-        "entered_at_or_later": 92
+        "wip_in_state": 90,
+        "entered_at_or_later": 90
       },
       {
         "sampled_on": "2026-04-28",
         "state": "Open",
         "wip_in_state": 367,
-        "entered_at_or_later": 460
+        "entered_at_or_later": 458
       },
       {
         "sampled_on": "2026-04-28",
         "state": "Merged",
-        "wip_in_state": 93,
-        "entered_at_or_later": 93
+        "wip_in_state": 91,
+        "entered_at_or_later": 91
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Open",
         "wip_in_state": 365,
-        "entered_at_or_later": 472
+        "entered_at_or_later": 470
       },
       {
         "sampled_on": "2026-04-29",
         "state": "Merged",
-        "wip_in_state": 107,
-        "entered_at_or_later": 107
+        "wip_in_state": 105,
+        "entered_at_or_later": 105
       },
       {
         "sampled_on": "2026-04-30",
         "state": "Open",
         "wip_in_state": 363,
-        "entered_at_or_later": 476
+        "entered_at_or_later": 474
       },
       {
         "sampled_on": "2026-04-30",
         "state": "Merged",
-        "wip_in_state": 113,
-        "entered_at_or_later": 113
+        "wip_in_state": 111,
+        "entered_at_or_later": 111
       },
       {
         "sampled_on": "2026-05-01",
         "state": "Open",
         "wip_in_state": 368,
-        "entered_at_or_later": 481
+        "entered_at_or_later": 479
       },
       {
         "sampled_on": "2026-05-01",
+        "state": "Merged",
+        "wip_in_state": 111,
+        "entered_at_or_later": 111
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Open",
+        "wip_in_state": 369,
+        "entered_at_or_later": 481
+      },
+      {
+        "sampled_on": "2026-05-02",
+        "state": "Merged",
+        "wip_in_state": 112,
+        "entered_at_or_later": 112
+      },
+      {
+        "sampled_on": "2026-05-03",
+        "state": "Open",
+        "wip_in_state": 369,
+        "entered_at_or_later": 482
+      },
+      {
+        "sampled_on": "2026-05-03",
         "state": "Merged",
         "wip_in_state": 113,
         "entered_at_or_later": 113
       },
       {
-        "sampled_on": "2026-05-02",
-        "state": "Open",
-        "wip_in_state": 369,
-        "entered_at_or_later": 483
-      },
-      {
-        "sampled_on": "2026-05-02",
-        "state": "Merged",
-        "wip_in_state": 114,
-        "entered_at_or_later": 114
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Open",
-        "wip_in_state": 369,
-        "entered_at_or_later": 484
-      },
-      {
-        "sampled_on": "2026-05-03",
-        "state": "Merged",
-        "wip_in_state": 115,
-        "entered_at_or_later": 115
-      },
-      {
         "sampled_on": "2026-05-04",
         "state": "Open",
         "wip_in_state": 367,
-        "entered_at_or_later": 495
+        "entered_at_or_later": 493
       },
       {
         "sampled_on": "2026-05-04",
         "state": "Merged",
-        "wip_in_state": 128,
-        "entered_at_or_later": 128
+        "wip_in_state": 126,
+        "entered_at_or_later": 126
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Open",
         "wip_in_state": 370,
-        "entered_at_or_later": 510
+        "entered_at_or_later": 508
       },
       {
         "sampled_on": "2026-05-05",
         "state": "Merged",
-        "wip_in_state": 140,
-        "entered_at_or_later": 140
+        "wip_in_state": 138,
+        "entered_at_or_later": 138
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Open",
         "wip_in_state": 374,
-        "entered_at_or_later": 518
+        "entered_at_or_later": 516
       },
       {
         "sampled_on": "2026-05-06",
         "state": "Merged",
-        "wip_in_state": 144,
-        "entered_at_or_later": 144
+        "wip_in_state": 142,
+        "entered_at_or_later": 142
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Open",
         "wip_in_state": 376,
-        "entered_at_or_later": 526
+        "entered_at_or_later": 524
       },
       {
         "sampled_on": "2026-05-07",
         "state": "Merged",
-        "wip_in_state": 150,
-        "entered_at_or_later": 150
+        "wip_in_state": 148,
+        "entered_at_or_later": 148
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Open",
         "wip_in_state": 378,
-        "entered_at_or_later": 531
+        "entered_at_or_later": 529
       },
       {
         "sampled_on": "2026-05-08",
         "state": "Merged",
-        "wip_in_state": 153,
-        "entered_at_or_later": 153
+        "wip_in_state": 151,
+        "entered_at_or_later": 151
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Open",
         "wip_in_state": 380,
-        "entered_at_or_later": 535
+        "entered_at_or_later": 533
       },
       {
         "sampled_on": "2026-05-09",
         "state": "Merged",
-        "wip_in_state": 155,
-        "entered_at_or_later": 155
+        "wip_in_state": 153,
+        "entered_at_or_later": 153
       },
       {
         "sampled_on": "2026-05-10",
         "state": "Open",
         "wip_in_state": 383,
-        "entered_at_or_later": 541
+        "entered_at_or_later": 539
       },
       {
         "sampled_on": "2026-05-10",
         "state": "Merged",
-        "wip_in_state": 158,
-        "entered_at_or_later": 158
+        "wip_in_state": 156,
+        "entered_at_or_later": 156
       },
       {
         "sampled_on": "2026-05-11",
         "state": "Open",
         "wip_in_state": 385,
-        "entered_at_or_later": 559
+        "entered_at_or_later": 557
       },
       {
         "sampled_on": "2026-05-11",
         "state": "Merged",
-        "wip_in_state": 174,
-        "entered_at_or_later": 174
+        "wip_in_state": 172,
+        "entered_at_or_later": 172
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Open",
         "wip_in_state": 385,
-        "entered_at_or_later": 569
+        "entered_at_or_later": 567
       },
       {
         "sampled_on": "2026-05-12",
         "state": "Merged",
-        "wip_in_state": 184,
-        "entered_at_or_later": 184
+        "wip_in_state": 182,
+        "entered_at_or_later": 182
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Open",
         "wip_in_state": 384,
-        "entered_at_or_later": 573
+        "entered_at_or_later": 571
       },
       {
         "sampled_on": "2026-05-13",
         "state": "Merged",
-        "wip_in_state": 189,
-        "entered_at_or_later": 189
+        "wip_in_state": 187,
+        "entered_at_or_later": 187
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Open",
         "wip_in_state": 384,
-        "entered_at_or_later": 581
+        "entered_at_or_later": 579
       },
       {
         "sampled_on": "2026-05-14",
         "state": "Merged",
-        "wip_in_state": 197,
-        "entered_at_or_later": 197
+        "wip_in_state": 195,
+        "entered_at_or_later": 195
       },
       {
         "sampled_on": "2026-05-15",
         "state": "Open",
         "wip_in_state": 386,
-        "entered_at_or_later": 589
+        "entered_at_or_later": 587
       },
       {
         "sampled_on": "2026-05-15",
         "state": "Merged",
-        "wip_in_state": 203,
-        "entered_at_or_later": 203
+        "wip_in_state": 201,
+        "entered_at_or_later": 201
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "Open",
+        "wip_in_state": 386,
+        "entered_at_or_later": 588
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "Merged",
+        "wip_in_state": 202,
+        "entered_at_or_later": 202
       }
     ]
   },
   "input": {
     "repo": "astral-sh/uv",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
     "workflow": [
       "Open",
       "Merged"
     ],
     "interval_days": 1,
-    "offline": true
+    "offline": false
   },
   "docs": {
     "metrics": "docs/METRICS.md",
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo astral-sh/uv --start 2026-04-16 --stop 2026-05-15 --workflow 'Open,Merged' --interval-days 1 --offline",
+  "cli_invocation": "uv run flow cfd --repo astral-sh/uv --start 2026-04-17 --stop 2026-05-16 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

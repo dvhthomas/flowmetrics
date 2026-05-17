@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-16T23:06:51.931743-06:00",
+  "generated_at": "2026-05-16T23:16:25.462352-06:00",
   "headline": "85% confident at least 0 items finish in the next 15 days (by May 31, 2026).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
@@ -41,55 +41,59 @@
     "histogram": [
       {
         "items": 0,
-        "frequency": 2067
+        "frequency": 2087
       },
       {
         "items": 2,
-        "frequency": 1114
+        "frequency": 1141
       },
       {
         "items": 4,
-        "frequency": 2608
+        "frequency": 2617
       },
       {
         "items": 6,
-        "frequency": 1254
+        "frequency": 1262
       },
       {
         "items": 8,
-        "frequency": 1478
+        "frequency": 1448
       },
       {
         "items": 10,
-        "frequency": 594
+        "frequency": 609
       },
       {
         "items": 12,
-        "frequency": 498
+        "frequency": 500
       },
       {
         "items": 14,
-        "frequency": 174
+        "frequency": 169
       },
       {
         "items": 16,
-        "frequency": 134
+        "frequency": 96
       },
       {
         "items": 18,
-        "frequency": 37
+        "frequency": 42
       },
       {
         "items": 20,
-        "frequency": 33
+        "frequency": 18
       },
       {
         "items": 22,
-        "frequency": 4
+        "frequency": 6
       },
       {
         "items": 24,
-        "frequency": 5
+        "frequency": 4
+      },
+      {
+        "items": 26,
+        "frequency": 1
       }
     ],
     "total_runs": 10000
@@ -98,16 +102,15 @@
     "repo": "jira:BIGTOP",
     "start_date": "2026-05-17",
     "target_date": "2026-05-31",
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "jira_url": "https://issues.apache.org/jira"
   },
   "training": {
-    "window_start": "2026-04-16",
-    "window_end": "2026-05-15",
+    "window_start": "2026-04-17",
+    "window_end": "2026-05-16",
     "daily_throughput": [
-      0,
       0,
       0,
       0,
@@ -136,6 +139,7 @@
       0,
       0,
       2,
+      0,
       0
     ],
     "total_throughput": 10,
@@ -153,6 +157,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline",
+  "cli_invocation": "uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42",
   "logs": []
 }

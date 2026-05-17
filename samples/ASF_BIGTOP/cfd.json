@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-16T23:06:52.836936-06:00",
-  "headline": "CFD for jira:BIGTOP Apr 16, 2026 \u2192 May 15, 2026: 736 items arrived, 17 completed, 719 still in flight at end.",
+  "generated_at": "2026-05-16T23:16:26.270810-06:00",
+  "headline": "CFD for jira:BIGTOP Apr 17, 2026 \u2192 May 16, 2026: 736 items arrived, 17 completed, 719 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -13,11 +13,11 @@
     "samples": 30,
     "arrivals_at_end": 736,
     "departures_at_end": 17,
-    "wip_at_start": 721,
+    "wip_at_start": 722,
     "wip_at_end": 719,
     "peak_wip": 723
   },
-  "key_insight": "The largest WIP band at May 15, 2026 is 'In Progress' with 669 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 16, 2026 is 'In Progress' with 669 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'In Progress'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -38,14 +38,6 @@
   "chart_data": {
     "points": [
       {
-        "sampled_on": "2026-04-16",
-        "counts_by_state": {
-          "In Progress": 728,
-          "Patch Available": 60,
-          "Resolved": 7
-        }
-      },
-      {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
           "In Progress": 729,
@@ -271,6 +263,14 @@
       },
       {
         "sampled_on": "2026-05-15",
+        "counts_by_state": {
+          "In Progress": 736,
+          "Patch Available": 67,
+          "Resolved": 17
+        }
+      },
+      {
+        "sampled_on": "2026-05-16",
         "counts_by_state": {
           "In Progress": 736,
           "Patch Available": 67,
@@ -280,24 +280,6 @@
     ],
     "bands": [
       {
-        "sampled_on": "2026-04-16",
-        "state": "In Progress",
-        "wip_in_state": 668,
-        "entered_at_or_later": 728
-      },
-      {
-        "sampled_on": "2026-04-16",
-        "state": "Patch Available",
-        "wip_in_state": 53,
-        "entered_at_or_later": 60
-      },
-      {
-        "sampled_on": "2026-04-16",
-        "state": "Resolved",
-        "wip_in_state": 7,
-        "entered_at_or_later": 7
-      },
-      {
         "sampled_on": "2026-04-17",
         "state": "In Progress",
         "wip_in_state": 668,
@@ -815,6 +797,24 @@
       },
       {
         "sampled_on": "2026-05-15",
+        "state": "Resolved",
+        "wip_in_state": 17,
+        "entered_at_or_later": 17
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "In Progress",
+        "wip_in_state": 669,
+        "entered_at_or_later": 736
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "Patch Available",
+        "wip_in_state": 50,
+        "entered_at_or_later": 67
+      },
+      {
+        "sampled_on": "2026-05-16",
         "state": "Resolved",
         "wip_in_state": 17,
         "entered_at_or_later": 17
@@ -823,21 +823,21 @@
   },
   "input": {
     "repo": "jira:BIGTOP",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
     "workflow": [
       "In Progress",
       "Patch Available",
       "Resolved"
     ],
     "interval_days": 1,
-    "offline": true
+    "offline": false
   },
   "docs": {
     "metrics": "docs/METRICS.md",
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-16 --stop 2026-05-15 --workflow 'In Progress,Patch Available,Resolved' --interval-days 1 --offline",
+  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-17 --stop 2026-05-16 --workflow 'In Progress,Patch Available,Resolved' --interval-days 1",
   "logs": []
 }

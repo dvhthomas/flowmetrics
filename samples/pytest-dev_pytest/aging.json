@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-16T23:06:38.209408-06:00",
+  "generated_at": "2026-05-16T23:15:37.829311-06:00",
   "headline": "WIP Aging for pytest-dev/pytest as of May 17, 2026: 128 in-flight items, 116 already past P85 (19.6d), 108 past P95 (56.8d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
@@ -17,11 +17,11 @@
     },
     "cycle_time_percentiles_days": {
       "50": 0.7379976851851852,
-      "70": 7.246296296296296,
+      "70": 5.592974537037037,
       "85": 19.617291666666667,
       "95": 56.768055555555556
     },
-    "completed_count_for_percentiles": 42,
+    "completed_count_for_percentiles": 41,
     "aging_distribution": [
       {
         "label": "Below P50",
@@ -33,16 +33,16 @@
       {
         "label": "P50\u2013P70",
         "lower": 0.7379976851851852,
-        "upper": 7.246296296296296,
-        "count": 5,
-        "share": 0.0390625
+        "upper": 5.592974537037037,
+        "count": 4,
+        "share": 0.03125
       },
       {
         "label": "P70\u2013P85",
-        "lower": 7.246296296296296,
+        "lower": 5.592974537037037,
         "upper": 19.617291666666667,
-        "count": 7,
-        "share": 0.0546875
+        "count": 8,
+        "share": 0.0625
       },
       {
         "label": "P85\u2013P95",
@@ -192,7 +192,7 @@
   ],
   "caveats": [
     "Aging is a snapshot as of May 17, 2026 \u2014 not a trend over time.",
-    "Percentile lines reflect the completed-item distribution from Apr 16, 2026 \u2192 May 15, 2026 (42 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Percentile lines reflect the completed-item distribution from Apr 17, 2026 \u2192 May 16, 2026 (41 items). If recent throughput has changed, those checkpoints may have drifted.",
     "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "84% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
@@ -1114,9 +1114,9 @@
       "Changes Requested",
       "Approved"
     ],
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "max_age_days": null
   },
   "docs": {
@@ -1124,6 +1124,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --repo pytest-dev/pytest --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-16 --history-end 2026-05-15 --offline",
+  "cli_invocation": "uv run flow aging --repo pytest-dev/pytest --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-17 --history-end 2026-05-16",
   "logs": []
 }

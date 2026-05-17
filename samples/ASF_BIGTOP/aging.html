@@ -140,7 +140,7 @@
 <p class="subtitle">
   for jira:BIGTOP ·
   as of May 17, 2026 ·
-  <span class="stamp">generated 2026-05-16 23:06 MDT</span>
+  <span class="stamp">generated 2026-05-16 23:16 MDT</span>
 </p>
 
 
@@ -171,7 +171,7 @@
 Each bar counts in-flight PRs whose age sits inside that band's
 cycle-time range. Thresholds come from the
 10 PRs that merged
-2026-04-16 → 2026-05-15: below 21.1d; 21.1–57.4d; 57.4–84.5d; 84.5–98.4d; ≥ 98.4d.
+2026-04-17 → 2026-05-16: below 21.1d; 21.1–57.4d; 57.4–84.5d; 84.5–98.4d; ≥ 98.4d.
 </p>
 
 <h2>WIP Aging</h2>
@@ -622,12 +622,12 @@ or escalate.
   <tr>
     <th>Percentile training window</th>
     <td>
-      2026-04-16 → 2026-05-15
+      2026-04-17 → 2026-05-16
       (10 completed PRs)
     </td>
   </tr>
 </table>
-<div class="invocation">uv run flow aging --jira-url https://issues.apache.org/jira --jira-project BIGTOP --asof 2026-05-17 --workflow &#39;Open,In Progress,Patch Available&#39; --history-start 2026-04-16 --history-end 2026-05-15 --offline</div>
+<div class="invocation">uv run flow aging --jira-url https://issues.apache.org/jira --jira-project BIGTOP --asof 2026-05-17 --workflow &#39;Open,In Progress,Patch Available&#39; --history-start 2026-04-17 --history-end 2026-05-16</div>
 </details>
 
 <details>
@@ -676,7 +676,7 @@ forecast-derived or simulated.
 <p><strong>Other notes</strong></p>
 <ul class="footnote-wider">
   <li>Aging is a snapshot as of May 17, 2026 — not a trend over time.</li>
-  <li>Percentile lines reflect the completed-item distribution from Apr 16, 2026 → May 15, 2026 (10 items). If recent throughput has changed, those checkpoints may have drifted.</li>
+  <li>Percentile lines reflect the completed-item distribution from Apr 17, 2026 → May 16, 2026 (10 items). If recent throughput has changed, those checkpoints may have drifted.</li>
   <li>Items in early workflow states (Open, To Do) often age longest in open-source repos because they&#39;re sitting in an intake queue, not being actively worked. An aged item in &#39;Open&#39; usually means no maintainer has picked it up; an aged item in &#39;In Progress&#39; or &#39;In Review&#39; is more likely a real bottleneck.</li>
   <li>99% of in-flight items are past P95 of recent completers — much higher than the ~5% you&#39;d expect if today&#39;s WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren&#39;t in that sample. The thresholds therefore diverge from — and likely under-represent — true cycle time for this WIP.</li>
 </ul>

@@ -1,19 +1,19 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T23:06:37.394488-06:00",
-  "headline": "42 items completed in 30 days; 85% finished within 19.6 days (Apr 16, 2026 -> May 15, 2026).",
+  "generated_at": "2026-05-16T23:15:37.086591-06:00",
+  "headline": "41 items completed in 30 days; 85% finished within 19.6 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
-    "completed_count": 42,
+    "completed_count": 41,
     "window": {
-      "start": "2026-04-16",
-      "stop": "2026-05-15",
+      "start": "2026-04-17",
+      "stop": "2026-05-16",
       "days": 30
     },
     "cycle_time_percentiles_days": {
       "50": 0.7379976851851852,
-      "70": 7.246296296296296,
+      "70": 5.592974537037037,
       "85": 19.617291666666667,
       "95": 56.768055555555556
     }
@@ -288,13 +288,6 @@
         "url": "https://github.com/pytest-dev/pytest/pull/14375"
       },
       {
-        "item_id": "#14372",
-        "title": "Add `--max-warnings` option to fail test runs",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 7.525868055555556,
-        "url": "https://github.com/pytest-dev/pytest/pull/14372"
-      },
-      {
         "item_id": "#14369",
         "title": " fixtures: fix parametrization losing (static) transitive dependencies from overridden fixtures",
         "completed_at": "2026-05-03",
@@ -333,9 +326,9 @@
   },
   "input": {
     "repo": "pytest-dev/pytest",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
-    "offline": true,
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "docs": {
@@ -343,6 +336,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --repo pytest-dev/pytest --start 2026-04-16 --stop 2026-05-15 --offline",
+  "cli_invocation": "uv run flow scatterplot --repo pytest-dev/pytest --start 2026-04-17 --stop 2026-05-16",
   "logs": []
 }

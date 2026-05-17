@@ -1,24 +1,24 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T23:06:39.909365-06:00",
-  "headline": "244 items completed in 30 days; 85% finished within 13.3 days (Apr 16, 2026 -> May 15, 2026).",
+  "generated_at": "2026-05-16T23:16:05.295336-06:00",
+  "headline": "237 items completed in 30 days; 85% finished within 13.3 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
-    "completed_count": 244,
+    "completed_count": 237,
     "window": {
-      "start": "2026-04-16",
-      "stop": "2026-05-15",
+      "start": "2026-04-17",
+      "stop": "2026-05-16",
       "days": 30
     },
     "cycle_time_percentiles_days": {
-      "50": 1.702199074074074,
+      "50": 1.7873495370370371,
       "70": 5.802604166666667,
-      "85": 13.3496875,
-      "95": 36.517094907407404
+      "85": 13.34388888888889,
+      "95": 36.661203703703706
     }
   },
-  "key_insight": "Median cycle time is 1.7 days; deep-tail P95 is 36.5 days. A new item entering the system has, by definition, an 85% chance of finishing in 13.3 days or less and a 50% chance of finishing in 1.7 days or less.",
+  "key_insight": "Median cycle time is 1.8 days; deep-tail P95 is 36.7 days. A new item entering the system has, by definition, an 85% chance of finishing in 13.3 days or less and a 50% chance of finishing in 1.8 days or less.",
   "next_actions": [
     "Use P85 (13.3d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
     "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
@@ -41,6 +41,13 @@
         "completed_at": "2026-05-15",
         "cycle_time_days": 0.37494212962962964,
         "url": "https://github.com/huggingface/transformers/pull/45988"
+      },
+      {
+        "item_id": "#45983",
+        "title": "bugfix(ci): avoid E2BIG in pr_slow_ci_suggestion ",
+        "completed_at": "2026-05-16",
+        "cycle_time_days": 1.9465046296296296,
+        "url": "https://github.com/huggingface/transformers/pull/45983"
       },
       {
         "item_id": "#45981",
@@ -1282,13 +1289,6 @@
         "url": "https://github.com/huggingface/transformers/pull/45485"
       },
       {
-        "item_id": "#45484",
-        "title": "Minor update",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 0.011770833333333333,
-        "url": "https://github.com/huggingface/transformers/pull/45484"
-      },
-      {
         "item_id": "#45483",
         "title": "[`Conversion Mapping`] Small fixups",
         "completed_at": "2026-04-20",
@@ -1345,32 +1345,11 @@
         "url": "https://github.com/huggingface/transformers/pull/45471"
       },
       {
-        "item_id": "#45463",
-        "title": "Fix response api support ",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 1.2065046296296296,
-        "url": "https://github.com/huggingface/transformers/pull/45463"
-      },
-      {
         "item_id": "#45461",
         "title": "Remove redundant condition checks in `get_image_size` method",
         "completed_at": "2026-04-17",
         "cycle_time_days": 1.9849884259259258,
         "url": "https://github.com/huggingface/transformers/pull/45461"
-      },
-      {
-        "item_id": "#45457",
-        "title": "Allow loading Qwen Thinker 'base' models without generative head",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 0.9965277777777778,
-        "url": "https://github.com/huggingface/transformers/pull/45457"
-      },
-      {
-        "item_id": "#45455",
-        "title": "[`fix`] Make Qwen2_5OmniProcessor warning a lot less noisy via warning_once",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 1.022650462962963,
-        "url": "https://github.com/huggingface/transformers/pull/45455"
       },
       {
         "item_id": "#45454",
@@ -1394,13 +1373,6 @@
         "url": "https://github.com/huggingface/transformers/pull/45448"
       },
       {
-        "item_id": "#45444",
-        "title": "[`fix`] Always early return for non-Mistral models in _patch_mistral_regex",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 1.702199074074074,
-        "url": "https://github.com/huggingface/transformers/pull/45444"
-      },
-      {
         "item_id": "#45443",
         "title": "Raise 400 on model mismatch when `transformers serve` is pinned",
         "completed_at": "2026-04-20",
@@ -1413,13 +1385,6 @@
         "completed_at": "2026-04-22",
         "cycle_time_days": 7.459918981481482,
         "url": "https://github.com/huggingface/transformers/pull/45441"
-      },
-      {
-        "item_id": "#45437",
-        "title": "Fix spurious position_ids warnings for at least 40 architectures",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 1.7953703703703703,
-        "url": "https://github.com/huggingface/transformers/pull/45437"
       },
       {
         "item_id": "#45436",
@@ -1632,13 +1597,6 @@
         "url": "https://github.com/huggingface/transformers/pull/45034"
       },
       {
-        "item_id": "#45018",
-        "title": "Dynamic auto mapping",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 21.015104166666667,
-        "url": "https://github.com/huggingface/transformers/pull/45018"
-      },
-      {
         "item_id": "#44988",
         "title": "typing: rule 15 - checks for tie_word_embeddings presence",
         "completed_at": "2026-04-17",
@@ -1679,13 +1637,6 @@
         "completed_at": "2026-04-22",
         "cycle_time_days": 36.661203703703706,
         "url": "https://github.com/huggingface/transformers/pull/44763"
-      },
-      {
-        "item_id": "#44757",
-        "title": "Add Neuron to auto-compile hardware list",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 30.95369212962963,
-        "url": "https://github.com/huggingface/transformers/pull/44757"
       },
       {
         "item_id": "#44664",
@@ -1747,9 +1698,9 @@
   },
   "input": {
     "repo": "huggingface/transformers",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
-    "offline": true,
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "docs": {
@@ -1757,6 +1708,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --repo huggingface/transformers --start 2026-04-16 --stop 2026-05-15 --offline",
+  "cli_invocation": "uv run flow scatterplot --repo huggingface/transformers --start 2026-04-17 --stop 2026-05-16",
   "logs": []
 }

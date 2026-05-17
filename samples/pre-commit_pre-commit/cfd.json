@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-16T23:06:43.080470-06:00",
-  "headline": "CFD for pre-commit/pre-commit Apr 16, 2026 \u2192 May 15, 2026: 11 items arrived, 5 completed, 6 still in flight at end.",
+  "generated_at": "2026-05-16T23:16:10.392479-06:00",
+  "headline": "CFD for pre-commit/pre-commit Apr 17, 2026 \u2192 May 16, 2026: 11 items arrived, 5 completed, 6 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -16,7 +16,7 @@
     "wip_at_end": 6,
     "peak_wip": 7
   },
-  "key_insight": "The largest WIP band at May 15, 2026 is 'Open' with 6 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
+  "key_insight": "The largest WIP band at May 16, 2026 is 'Open' with 6 items in flight. The thicker that band is on the chart, the more work is queued or in-progress at that stage; the steeper the line bordering it, the faster items are arriving into the stage.",
   "next_actions": [
     "Investigate why items accumulate in 'Open'. Either items are arriving faster than this stage can process, or they're waiting on a downstream resource (reviewers, environments, decisions).",
     "Look for places where one line flattens \u2014 that's a stall in that band.",
@@ -36,13 +36,6 @@
   },
   "chart_data": {
     "points": [
-      {
-        "sampled_on": "2026-04-16",
-        "counts_by_state": {
-          "Open": 6,
-          "Merged": 0
-        }
-      },
       {
         "sampled_on": "2026-04-17",
         "counts_by_state": {
@@ -245,21 +238,16 @@
           "Open": 11,
           "Merged": 5
         }
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "counts_by_state": {
+          "Open": 11,
+          "Merged": 5
+        }
       }
     ],
     "bands": [
-      {
-        "sampled_on": "2026-04-16",
-        "state": "Open",
-        "wip_in_state": 6,
-        "entered_at_or_later": 6
-      },
-      {
-        "sampled_on": "2026-04-16",
-        "state": "Merged",
-        "wip_in_state": 0,
-        "entered_at_or_later": 0
-      },
       {
         "sampled_on": "2026-04-17",
         "state": "Open",
@@ -607,25 +595,37 @@
         "state": "Merged",
         "wip_in_state": 5,
         "entered_at_or_later": 5
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "Open",
+        "wip_in_state": 6,
+        "entered_at_or_later": 11
+      },
+      {
+        "sampled_on": "2026-05-16",
+        "state": "Merged",
+        "wip_in_state": 5,
+        "entered_at_or_later": 5
       }
     ]
   },
   "input": {
     "repo": "pre-commit/pre-commit",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
     "workflow": [
       "Open",
       "Merged"
     ],
     "interval_days": 1,
-    "offline": true
+    "offline": false
   },
   "docs": {
     "metrics": "docs/METRICS.md",
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --repo pre-commit/pre-commit --start 2026-04-16 --stop 2026-05-15 --workflow 'Open,Merged' --interval-days 1 --offline",
+  "cli_invocation": "uv run flow cfd --repo pre-commit/pre-commit --start 2026-04-17 --stop 2026-05-16 --workflow 'Open,Merged' --interval-days 1",
   "logs": []
 }

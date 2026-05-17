@@ -140,7 +140,7 @@
 <p class="subtitle">
   for jira:CASSANDRA ·
   25 items from 2026-05-17 ·
-  <span class="stamp">generated 2026-05-16 23:06 MDT</span>
+  <span class="stamp">generated 2026-05-16 23:16 MDT</span>
 </p>
 <div class="headline">85% confident the next 25 items finish by Jun 8, 2026 (starting May 17, 2026).</div>
 
@@ -159,7 +159,7 @@
 <thead><tr><th>Confidence</th><th>Completion date</th><th>How to use it</th></tr></thead>
 <tbody>
   <tr><td>50%</td><td>2026-06-03</td><td>median outcome — do NOT commit to this</td></tr>
-  <tr><td>70%</td><td>2026-06-05</td><td>internal planning</td></tr>
+  <tr><td>70%</td><td>2026-06-06</td><td>internal planning</td></tr>
   <tr><td>85%</td><td>2026-06-08</td><td>external commitment</td></tr>
   <tr><td>95%</td><td>2026-06-11</td><td>high-stakes commitment</td></tr>
 </tbody>
@@ -171,7 +171,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#whendone-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": "2026-05-22", "frequency": 1}, {"outcome": "2026-05-23", "frequency": 3}, {"outcome": "2026-05-24", "frequency": 17}, {"outcome": "2026-05-25", "frequency": 60}, {"outcome": "2026-05-26", "frequency": 133}, {"outcome": "2026-05-27", "frequency": 239}, {"outcome": "2026-05-28", "frequency": 355}, {"outcome": "2026-05-29", "frequency": 530}, {"outcome": "2026-05-30", "frequency": 688}, {"outcome": "2026-05-31", "frequency": 812}, {"outcome": "2026-06-01", "frequency": 920}, {"outcome": "2026-06-02", "frequency": 939}, {"outcome": "2026-06-03", "frequency": 962}, {"outcome": "2026-06-04", "frequency": 918}, {"outcome": "2026-06-05", "frequency": 751}, {"outcome": "2026-06-06", "frequency": 665}, {"outcome": "2026-06-07", "frequency": 484}, {"outcome": "2026-06-08", "frequency": 448}, {"outcome": "2026-06-09", "frequency": 332}, {"outcome": "2026-06-10", "frequency": 227}, {"outcome": "2026-06-11", "frequency": 179}, {"outcome": "2026-06-12", "frequency": 117}, {"outcome": "2026-06-13", "frequency": 70}, {"outcome": "2026-06-14", "frequency": 56}, {"outcome": "2026-06-15", "frequency": 38}, {"outcome": "2026-06-16", "frequency": 26}, {"outcome": "2026-06-17", "frequency": 12}, {"outcome": "2026-06-18", "frequency": 6}, {"outcome": "2026-06-19", "frequency": 7}, {"outcome": "2026-06-20", "frequency": 4}, {"outcome": "2026-06-21", "frequency": 1}]}, "params": [{"name": "forecast_zoom", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "encoding": {"x": {"field": "outcome", "type": "temporal", "axis": {"title": "Completion date", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "temporal", "title": "Completion date", "format": "%b %d, %Y"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": "2026-06-03", "label": "P50 (2026-06-03)"}, {"pct": "P70", "x": "2026-06-05", "label": "P70 (2026-06-05)"}, {"pct": "P85", "x": "2026-06-08", "label": "P85 (2026-06-08)"}, {"pct": "P95", "x": "2026-06-11", "label": "P95 (2026-06-11)"}]}, "encoding": {"x": {"field": "x", "type": "temporal"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
+  vegaEmbed("#whendone-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": "2026-05-22", "frequency": 1}, {"outcome": "2026-05-23", "frequency": 5}, {"outcome": "2026-05-24", "frequency": 15}, {"outcome": "2026-05-25", "frequency": 53}, {"outcome": "2026-05-26", "frequency": 82}, {"outcome": "2026-05-27", "frequency": 210}, {"outcome": "2026-05-28", "frequency": 320}, {"outcome": "2026-05-29", "frequency": 467}, {"outcome": "2026-05-30", "frequency": 619}, {"outcome": "2026-05-31", "frequency": 764}, {"outcome": "2026-06-01", "frequency": 877}, {"outcome": "2026-06-02", "frequency": 905}, {"outcome": "2026-06-03", "frequency": 845}, {"outcome": "2026-06-04", "frequency": 893}, {"outcome": "2026-06-05", "frequency": 824}, {"outcome": "2026-06-06", "frequency": 680}, {"outcome": "2026-06-07", "frequency": 586}, {"outcome": "2026-06-08", "frequency": 485}, {"outcome": "2026-06-09", "frequency": 362}, {"outcome": "2026-06-10", "frequency": 294}, {"outcome": "2026-06-11", "frequency": 221}, {"outcome": "2026-06-12", "frequency": 187}, {"outcome": "2026-06-13", "frequency": 96}, {"outcome": "2026-06-14", "frequency": 72}, {"outcome": "2026-06-15", "frequency": 52}, {"outcome": "2026-06-16", "frequency": 25}, {"outcome": "2026-06-17", "frequency": 17}, {"outcome": "2026-06-18", "frequency": 15}, {"outcome": "2026-06-19", "frequency": 15}, {"outcome": "2026-06-20", "frequency": 5}, {"outcome": "2026-06-21", "frequency": 5}, {"outcome": "2026-06-22", "frequency": 2}, {"outcome": "2026-06-23", "frequency": 1}]}, "params": [{"name": "forecast_zoom", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "encoding": {"x": {"field": "outcome", "type": "temporal", "axis": {"title": "Completion date", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "temporal", "title": "Completion date", "format": "%b %d, %Y"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": "2026-06-03", "label": "P50 (2026-06-03)"}, {"pct": "P70", "x": "2026-06-06", "label": "P70 (2026-06-06)"}, {"pct": "P85", "x": "2026-06-08", "label": "P85 (2026-06-08)"}, {"pct": "P95", "x": "2026-06-11", "label": "P95 (2026-06-11)"}]}, "encoding": {"x": {"field": "x", "type": "temporal"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -190,21 +190,21 @@
   <tr><th>Repo</th><td>jira:CASSANDRA</td></tr>
   <tr><th>Items to complete</th><td>25</td></tr>
   <tr><th>Forecast start</th><td>2026-05-17</td></tr>
-  <tr><th>Training window</th><td>2026-04-16 → 2026-05-15
-      (30 days, 43 items)</td></tr>
+  <tr><th>Training window</th><td>2026-04-17 → 2026-05-16
+      (30 days, 42 items)</td></tr>
   <tr><th>Monte Carlo runs</th><td>10,000</td></tr>
   <tr><th>RNG seed</th><td>42</td></tr>
 </table>
-<div class="invocation">uv run flow forecast when-done --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --items 25 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline</div>
+<div class="invocation">uv run flow forecast when-done --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --items 25 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42</div>
 </details>
 
 <details>
 <summary>Training window detail</summary>
 <table>
-  <tr><th>Window</th><td>2026-04-16 → 2026-05-15
+  <tr><th>Window</th><td>2026-04-17 → 2026-05-16
       (30 days)</td></tr>
-  <tr><th>Total throughput (items)</th><td class="num">43</td></tr>
-  <tr><th>Average throughput / day</th><td class="num">1.43</td></tr>
+  <tr><th>Total throughput (items)</th><td class="num">42</td></tr>
+  <tr><th>Average throughput / day</th><td class="num">1.40</td></tr>
   <tr><th>Zero-throughput days</th><td class="num">9 of 30</td></tr>
 </table>
 </details>

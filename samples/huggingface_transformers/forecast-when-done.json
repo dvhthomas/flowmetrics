@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-16T23:06:39.042407-06:00",
+  "generated_at": "2026-05-16T23:16:02.145338-06:00",
   "headline": "85% confident the next 25 items finish by May 21, 2026 (starting May 17, 2026).",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
@@ -9,7 +9,7 @@
       "50": "2026-05-20",
       "70": "2026-05-20",
       "85": "2026-05-21",
-      "95": "2026-05-22"
+      "95": "2026-05-23"
     },
     "reading": "forward \u2014 higher confidence means a later date",
     "horizon": {
@@ -19,7 +19,7 @@
       "reading": "Forecast horizon is within the training window \u2014 relatively trusted. Shorter is better."
     }
   },
-  "key_insight": "Median outcome is May 20, 2026. 95% confidence is May 22, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
+  "key_insight": "Median outcome is May 20, 2026. 95% confidence is May 23, 2026. The gap between 50% and 85% is the wait-cost of being predictable \u2014 wider gap = more daily-throughput variance.",
   "next_actions": [
     "Commit externally on the 85% date (May 21, 2026), not the 50% date (May 20, 2026).",
     "Re-run weekly to track drift in the forecast."
@@ -40,54 +40,54 @@
     "histogram": [
       {
         "date": "2026-05-17",
-        "frequency": 317
+        "frequency": 334
       },
       {
         "date": "2026-05-18",
-        "frequency": 1420
+        "frequency": 1335
       },
       {
         "date": "2026-05-19",
-        "frequency": 3049
+        "frequency": 2861
       },
       {
         "date": "2026-05-20",
-        "frequency": 2502
+        "frequency": 2488
       },
       {
         "date": "2026-05-21",
-        "frequency": 1515
+        "frequency": 1532
       },
       {
         "date": "2026-05-22",
-        "frequency": 704
+        "frequency": 802
       },
       {
         "date": "2026-05-23",
-        "frequency": 312
+        "frequency": 380
       },
       {
         "date": "2026-05-24",
-        "frequency": 121
+        "frequency": 172
       },
       {
         "date": "2026-05-25",
-        "frequency": 42
+        "frequency": 68
       },
       {
         "date": "2026-05-26",
-        "frequency": 10
+        "frequency": 21
       },
       {
         "date": "2026-05-27",
-        "frequency": 4
+        "frequency": 5
       },
       {
         "date": "2026-05-28",
-        "frequency": 3
+        "frequency": 1
       },
       {
-        "date": "2026-05-31",
+        "date": "2026-05-29",
         "frequency": 1
       }
     ],
@@ -97,16 +97,15 @@
     "repo": "huggingface/transformers",
     "items": 25,
     "start_date": "2026-05-17",
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-16",
-    "window_end": "2026-05-15",
+    "window_start": "2026-04-17",
+    "window_end": "2026-05-16",
     "daily_throughput": [
-      8,
       8,
       0,
       0,
@@ -135,10 +134,11 @@
       14,
       15,
       11,
-      6
+      6,
+      1
     ],
-    "total_throughput": 244,
-    "avg_throughput_per_day": 8.133333333333333,
+    "total_throughput": 237,
+    "avg_throughput_per_day": 7.9,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 26,
     "zero_throughput_days": 6
@@ -152,6 +152,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline",
+  "cli_invocation": "uv run flow forecast when-done --repo huggingface/transformers --items 25 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42",
   "logs": []
 }

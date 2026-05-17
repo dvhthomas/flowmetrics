@@ -1,13 +1,13 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-16T23:06:46.958896-06:00",
+  "generated_at": "2026-05-16T23:16:19.912974-06:00",
   "headline": "85% confident the next 25 items finish by Jun 8, 2026 (starting May 17, 2026).",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
     "percentiles": {
       "50": "2026-06-03",
-      "70": "2026-06-05",
+      "70": "2026-06-06",
       "85": "2026-06-08",
       "95": "2026-06-11"
     },
@@ -44,122 +44,130 @@
       },
       {
         "date": "2026-05-23",
-        "frequency": 3
+        "frequency": 5
       },
       {
         "date": "2026-05-24",
-        "frequency": 17
+        "frequency": 15
       },
       {
         "date": "2026-05-25",
-        "frequency": 60
+        "frequency": 53
       },
       {
         "date": "2026-05-26",
-        "frequency": 133
+        "frequency": 82
       },
       {
         "date": "2026-05-27",
-        "frequency": 239
+        "frequency": 210
       },
       {
         "date": "2026-05-28",
-        "frequency": 355
+        "frequency": 320
       },
       {
         "date": "2026-05-29",
-        "frequency": 530
+        "frequency": 467
       },
       {
         "date": "2026-05-30",
-        "frequency": 688
+        "frequency": 619
       },
       {
         "date": "2026-05-31",
-        "frequency": 812
+        "frequency": 764
       },
       {
         "date": "2026-06-01",
-        "frequency": 920
+        "frequency": 877
       },
       {
         "date": "2026-06-02",
-        "frequency": 939
+        "frequency": 905
       },
       {
         "date": "2026-06-03",
-        "frequency": 962
+        "frequency": 845
       },
       {
         "date": "2026-06-04",
-        "frequency": 918
+        "frequency": 893
       },
       {
         "date": "2026-06-05",
-        "frequency": 751
+        "frequency": 824
       },
       {
         "date": "2026-06-06",
-        "frequency": 665
+        "frequency": 680
       },
       {
         "date": "2026-06-07",
-        "frequency": 484
+        "frequency": 586
       },
       {
         "date": "2026-06-08",
-        "frequency": 448
+        "frequency": 485
       },
       {
         "date": "2026-06-09",
-        "frequency": 332
+        "frequency": 362
       },
       {
         "date": "2026-06-10",
-        "frequency": 227
+        "frequency": 294
       },
       {
         "date": "2026-06-11",
-        "frequency": 179
+        "frequency": 221
       },
       {
         "date": "2026-06-12",
-        "frequency": 117
+        "frequency": 187
       },
       {
         "date": "2026-06-13",
-        "frequency": 70
+        "frequency": 96
       },
       {
         "date": "2026-06-14",
-        "frequency": 56
+        "frequency": 72
       },
       {
         "date": "2026-06-15",
-        "frequency": 38
+        "frequency": 52
       },
       {
         "date": "2026-06-16",
-        "frequency": 26
+        "frequency": 25
       },
       {
         "date": "2026-06-17",
-        "frequency": 12
+        "frequency": 17
       },
       {
         "date": "2026-06-18",
-        "frequency": 6
+        "frequency": 15
       },
       {
         "date": "2026-06-19",
-        "frequency": 7
+        "frequency": 15
       },
       {
         "date": "2026-06-20",
-        "frequency": 4
+        "frequency": 5
       },
       {
         "date": "2026-06-21",
+        "frequency": 5
+      },
+      {
+        "date": "2026-06-22",
+        "frequency": 2
+      },
+      {
+        "date": "2026-06-23",
         "frequency": 1
       }
     ],
@@ -169,16 +177,15 @@
     "repo": "jira:CASSANDRA",
     "items": 25,
     "start_date": "2026-05-17",
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "jira_url": "https://issues.apache.org/jira"
   },
   "training": {
-    "window_start": "2026-04-16",
-    "window_end": "2026-05-15",
+    "window_start": "2026-04-17",
+    "window_end": "2026-05-16",
     "daily_throughput": [
-      2,
       5,
       1,
       0,
@@ -207,10 +214,11 @@
       1,
       2,
       1,
+      1,
       0
     ],
-    "total_throughput": 43,
-    "avg_throughput_per_day": 1.4333333333333333,
+    "total_throughput": 42,
+    "avg_throughput_per_day": 1.4,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 5,
     "zero_throughput_days": 9
@@ -224,6 +232,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --items 25 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline",
+  "cli_invocation": "uv run flow forecast when-done --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --items 25 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42",
   "logs": []
 }

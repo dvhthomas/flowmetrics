@@ -140,16 +140,16 @@
 <p class="subtitle">
   for <a href="https://github.com/pytest-dev/pytest">pytest-dev/pytest</a> ·
   25 items from 2026-05-17 ·
-  <span class="stamp">generated 2026-05-16 23:06 MDT</span>
+  <span class="stamp">generated 2026-05-16 23:15 MDT</span>
 </p>
-<div class="headline">85% confident the next 25 items finish by Jun 9, 2026 (starting May 17, 2026).</div>
+<div class="headline">85% confident the next 25 items finish by Jun 10, 2026 (starting May 17, 2026).</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.</div>
 
 <div class="horizon green">
 <strong>Forecast horizon:</strong>
-23 days ahead, training window is 30 days
+24 days ahead, training window is 30 days
 (0.8× the window). Forecast horizon is within the training window — relatively trusted. Shorter is better.
 </div>
 
@@ -158,10 +158,10 @@
 <table>
 <thead><tr><th>Confidence</th><th>Completion date</th><th>How to use it</th></tr></thead>
 <tbody>
-  <tr><td>50%</td><td>2026-06-03</td><td>median outcome — do NOT commit to this</td></tr>
-  <tr><td>70%</td><td>2026-06-06</td><td>internal planning</td></tr>
-  <tr><td>85%</td><td>2026-06-09</td><td>external commitment</td></tr>
-  <tr><td>95%</td><td>2026-06-13</td><td>high-stakes commitment</td></tr>
+  <tr><td>50%</td><td>2026-06-04</td><td>median outcome — do NOT commit to this</td></tr>
+  <tr><td>70%</td><td>2026-06-07</td><td>internal planning</td></tr>
+  <tr><td>85%</td><td>2026-06-10</td><td>external commitment</td></tr>
+  <tr><td>95%</td><td>2026-06-14</td><td>high-stakes commitment</td></tr>
 </tbody>
 </table>
 
@@ -171,7 +171,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#whendone-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": "2026-05-22", "frequency": 2}, {"outcome": "2026-05-23", "frequency": 13}, {"outcome": "2026-05-24", "frequency": 30}, {"outcome": "2026-05-25", "frequency": 83}, {"outcome": "2026-05-26", "frequency": 177}, {"outcome": "2026-05-27", "frequency": 274}, {"outcome": "2026-05-28", "frequency": 396}, {"outcome": "2026-05-29", "frequency": 514}, {"outcome": "2026-05-30", "frequency": 627}, {"outcome": "2026-05-31", "frequency": 713}, {"outcome": "2026-06-01", "frequency": 780}, {"outcome": "2026-06-02", "frequency": 803}, {"outcome": "2026-06-03", "frequency": 786}, {"outcome": "2026-06-04", "frequency": 801}, {"outcome": "2026-06-05", "frequency": 659}, {"outcome": "2026-06-06", "frequency": 630}, {"outcome": "2026-06-07", "frequency": 517}, {"outcome": "2026-06-08", "frequency": 464}, {"outcome": "2026-06-09", "frequency": 404}, {"outcome": "2026-06-10", "frequency": 285}, {"outcome": "2026-06-11", "frequency": 243}, {"outcome": "2026-06-12", "frequency": 186}, {"outcome": "2026-06-13", "frequency": 140}, {"outcome": "2026-06-14", "frequency": 123}, {"outcome": "2026-06-15", "frequency": 87}, {"outcome": "2026-06-16", "frequency": 68}, {"outcome": "2026-06-17", "frequency": 51}, {"outcome": "2026-06-18", "frequency": 45}, {"outcome": "2026-06-19", "frequency": 43}, {"outcome": "2026-06-20", "frequency": 24}, {"outcome": "2026-06-21", "frequency": 6}, {"outcome": "2026-06-22", "frequency": 13}, {"outcome": "2026-06-23", "frequency": 4}, {"outcome": "2026-06-24", "frequency": 3}, {"outcome": "2026-06-25", "frequency": 2}, {"outcome": "2026-06-26", "frequency": 1}, {"outcome": "2026-06-27", "frequency": 1}, {"outcome": "2026-06-29", "frequency": 1}, {"outcome": "2026-07-02", "frequency": 1}]}, "params": [{"name": "forecast_zoom", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "encoding": {"x": {"field": "outcome", "type": "temporal", "axis": {"title": "Completion date", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "temporal", "title": "Completion date", "format": "%b %d, %Y"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": "2026-06-03", "label": "P50 (2026-06-03)"}, {"pct": "P70", "x": "2026-06-06", "label": "P70 (2026-06-06)"}, {"pct": "P85", "x": "2026-06-09", "label": "P85 (2026-06-09)"}, {"pct": "P95", "x": "2026-06-13", "label": "P95 (2026-06-13)"}]}, "encoding": {"x": {"field": "x", "type": "temporal"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
+  vegaEmbed("#whendone-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 320, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65, "size": 18}, "data": {"values": [{"outcome": "2026-05-22", "frequency": 1}, {"outcome": "2026-05-23", "frequency": 9}, {"outcome": "2026-05-24", "frequency": 30}, {"outcome": "2026-05-25", "frequency": 77}, {"outcome": "2026-05-26", "frequency": 172}, {"outcome": "2026-05-27", "frequency": 254}, {"outcome": "2026-05-28", "frequency": 367}, {"outcome": "2026-05-29", "frequency": 465}, {"outcome": "2026-05-30", "frequency": 577}, {"outcome": "2026-05-31", "frequency": 666}, {"outcome": "2026-06-01", "frequency": 769}, {"outcome": "2026-06-02", "frequency": 788}, {"outcome": "2026-06-03", "frequency": 751}, {"outcome": "2026-06-04", "frequency": 751}, {"outcome": "2026-06-05", "frequency": 675}, {"outcome": "2026-06-06", "frequency": 641}, {"outcome": "2026-06-07", "frequency": 572}, {"outcome": "2026-06-08", "frequency": 485}, {"outcome": "2026-06-09", "frequency": 387}, {"outcome": "2026-06-10", "frequency": 336}, {"outcome": "2026-06-11", "frequency": 273}, {"outcome": "2026-06-12", "frequency": 242}, {"outcome": "2026-06-13", "frequency": 168}, {"outcome": "2026-06-14", "frequency": 152}, {"outcome": "2026-06-15", "frequency": 112}, {"outcome": "2026-06-16", "frequency": 77}, {"outcome": "2026-06-17", "frequency": 63}, {"outcome": "2026-06-18", "frequency": 50}, {"outcome": "2026-06-19", "frequency": 19}, {"outcome": "2026-06-20", "frequency": 13}, {"outcome": "2026-06-21", "frequency": 19}, {"outcome": "2026-06-22", "frequency": 10}, {"outcome": "2026-06-23", "frequency": 8}, {"outcome": "2026-06-24", "frequency": 5}, {"outcome": "2026-06-25", "frequency": 3}, {"outcome": "2026-06-26", "frequency": 6}, {"outcome": "2026-06-27", "frequency": 4}, {"outcome": "2026-06-28", "frequency": 1}, {"outcome": "2026-07-03", "frequency": 1}, {"outcome": "2026-07-05", "frequency": 1}]}, "params": [{"name": "forecast_zoom", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "encoding": {"x": {"field": "outcome", "type": "temporal", "axis": {"title": "Completion date", "titleFontWeight": "bold"}}, "y": {"field": "frequency", "type": "quantitative", "axis": {"title": "Simulation frequency", "titleFontWeight": "bold"}}, "tooltip": [{"field": "outcome", "type": "temporal", "title": "Completion date", "format": "%b %d, %Y"}, {"field": "frequency", "title": "Runs"}]}}, {"mark": {"type": "rule"}, "data": {"values": [{"pct": "P50", "x": "2026-06-04", "label": "P50 (2026-06-04)"}, {"pct": "P70", "x": "2026-06-07", "label": "P70 (2026-06-07)"}, {"pct": "P85", "x": "2026-06-10", "label": "P85 (2026-06-10)"}, {"pct": "P95", "x": "2026-06-14", "label": "P95 (2026-06-14)"}]}, "encoding": {"x": {"field": "x", "type": "temporal"}, "color": {"field": "pct", "type": "ordinal", "sort": ["P50", "P70", "P85", "P95"], "scale": {"scheme": "yelloworangered"}, "legend": {"title": "Confidence", "orient": "right"}}, "strokeDash": {"condition": {"test": "datum.pct === 'P85'", "value": [1, 0]}, "value": [6, 4]}, "size": {"condition": {"test": "datum.pct === 'P85'", "value": 4}, "value": 2}, "tooltip": [{"field": "label", "title": "Confidence"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -190,22 +190,22 @@
   <tr><th>Repo</th><td>pytest-dev/pytest</td></tr>
   <tr><th>Items to complete</th><td>25</td></tr>
   <tr><th>Forecast start</th><td>2026-05-17</td></tr>
-  <tr><th>Training window</th><td>2026-04-16 → 2026-05-15
-      (30 days, 42 items)</td></tr>
+  <tr><th>Training window</th><td>2026-04-17 → 2026-05-16
+      (30 days, 41 items)</td></tr>
   <tr><th>Monte Carlo runs</th><td>10,000</td></tr>
   <tr><th>RNG seed</th><td>42</td></tr>
 </table>
-<div class="invocation">uv run flow forecast when-done --repo pytest-dev/pytest --items 25 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline</div>
+<div class="invocation">uv run flow forecast when-done --repo pytest-dev/pytest --items 25 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42</div>
 </details>
 
 <details>
 <summary>Training window detail</summary>
 <table>
-  <tr><th>Window</th><td>2026-04-16 → 2026-05-15
+  <tr><th>Window</th><td>2026-04-17 → 2026-05-16
       (30 days)</td></tr>
-  <tr><th>Total throughput (items)</th><td class="num">42</td></tr>
-  <tr><th>Average throughput / day</th><td class="num">1.40</td></tr>
-  <tr><th>Zero-throughput days</th><td class="num">13 of 30</td></tr>
+  <tr><th>Total throughput (items)</th><td class="num">41</td></tr>
+  <tr><th>Average throughput / day</th><td class="num">1.37</td></tr>
+  <tr><th>Zero-throughput days</th><td class="num">14 of 30</td></tr>
 </table>
 </details>
 
@@ -213,11 +213,11 @@
 <summary>About this report</summary>
 <p><strong>What this shows.</strong> Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.</p>
 
-<p><strong>Key insight.</strong> Median outcome is Jun 3, 2026. 95% confidence is Jun 13, 2026. The gap between 50% and 85% is the wait-cost of being predictable — wider gap = more daily-throughput variance.</p>
+<p><strong>Key insight.</strong> Median outcome is Jun 4, 2026. 95% confidence is Jun 14, 2026. The gap between 50% and 85% is the wait-cost of being predictable — wider gap = more daily-throughput variance.</p>
 
 <p><strong>Next actions</strong></p>
 <ol class="compact-prose">
-  <li>Commit externally on the 85% date (Jun 9, 2026), not the 50% date (Jun 3, 2026).</li>
+  <li>Commit externally on the 85% date (Jun 10, 2026), not the 50% date (Jun 4, 2026).</li>
   <li>Re-run weekly to track drift in the forecast.</li>
 </ol>
 

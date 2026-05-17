@@ -468,6 +468,17 @@ def cfd(
     "--cache-dir", type=click.Path(path_type=Path), default=DEFAULT_CACHE_DIR, show_default=True
 )
 @click.option("--offline/--online", default=False)
+@click.option(
+    "--include-issues/--no-include-issues",
+    default=False,
+    help=(
+        "GitHub-only. When set, also fetch closed Issues and plot them "
+        "alongside PRs. For Issues closed by a merged PR, the cycle "
+        "time uses the PR's mergedAt (the stitched 'done' instant), "
+        "not the Issue's own closedAt. Surfaces longer-tailed work "
+        "items that PRs alone miss."
+    ),
+)
 @_FORMAT_OPTION
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
@@ -479,6 +490,7 @@ def scatterplot(
     stop: str | None,
     cache_dir: Path,
     offline: bool,
+    include_issues: bool,
     fmt: str,
     output: Path | None,
     verbose: bool,
@@ -511,6 +523,11 @@ def scatterplot(
         offline=offline,
     )
 
+    if include_issues and not repo:
+        raise click.UsageError(
+            "--include-issues is GitHub-only (Issues are a GitHub concept)."
+        )
+
     def build() -> ScatterplotReport:
         from .percentiles import chart_percentiles
         items = src.fetch_for_percentile_training(start_d, stop_d)
@@ -531,6 +548,38 @@ def scatterplot(
                 url=it.url,
             ))
             cycle_days.append(cycle)
+
+        if include_issues:
+            # Layer in Issues closed in window. Cycle time uses the
+            # stitched PR-merge timestamp when an Issue was closed by
+            # a PR (the causal "done" instant), per github_issues parser.
+            from .cache import FileCache
+            from .sources.github import GitHubClient, resolve_token
+            from .sources.github_issues import fetch_issues_closed_in_window
+            client = GitHubClient(
+                cache=FileCache(cache_dir),
+                read_only=offline,
+                token=resolve_token() if not offline else None,
+            )
+            try:
+                entries = fetch_issues_closed_in_window(repo, start_d, stop_d, client=client)
+            finally:
+                client.close()
+            for stream_item, _txs in entries:
+                if stream_item.completed_at is None:
+                    continue
+                cycle = (
+                    (stream_item.completed_at - stream_item.created_at).total_seconds()
+                    / 86400
+                )
+                points.append(ScatterplotPoint(
+                    item_id=stream_item.item_id,
+                    title=stream_item.title,
+                    completed_at=stream_item.completed_at.date(),
+                    cycle_time_days=cycle,
+                    url=stream_item.url,
+                ))
+                cycle_days.append(cycle)
 
         percentiles = chart_percentiles(cycle_days) if cycle_days else {
             50: 0.0, 70: 0.0, 85: 0.0, 95: 0.0

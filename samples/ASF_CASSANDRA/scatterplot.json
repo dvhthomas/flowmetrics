@@ -1,26 +1,26 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T23:06:47.873957-06:00",
-  "headline": "43 items completed in 30 days; 85% finished within 1148.6 days (Apr 16, 2026 -> May 15, 2026).",
+  "generated_at": "2026-05-16T23:16:20.737949-06:00",
+  "headline": "42 items completed in 30 days; 85% finished within 893.0 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
-    "completed_count": 43,
+    "completed_count": 42,
     "window": {
-      "start": "2026-04-16",
-      "stop": "2026-05-15",
+      "start": "2026-04-17",
+      "stop": "2026-05-16",
       "days": 30
     },
     "cycle_time_percentiles_days": {
-      "50": 31.934965277777778,
-      "70": 151.3204861111111,
-      "85": 1148.6280208333333,
+      "50": 27.010625,
+      "70": 118.95561342592593,
+      "85": 893.0306944444444,
       "95": 2543.5004166666668
     }
   },
-  "key_insight": "Median cycle time is 31.9 days; deep-tail P95 is 2543.5 days. A new item entering the system has, by definition, an 85% chance of finishing in 1148.6 days or less and a 50% chance of finishing in 31.9 days or less.",
+  "key_insight": "Median cycle time is 27.0 days; deep-tail P95 is 2543.5 days. A new item entering the system has, by definition, an 85% chance of finishing in 893.0 days or less and a 50% chance of finishing in 27.0 days or less.",
   "next_actions": [
-    "Use P85 (1148.6d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
+    "Use P85 (893.0d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
     "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
   ],
   "caveats": [
@@ -35,20 +35,6 @@
   },
   "chart_data": {
     "points": [
-      {
-        "item_id": "CASSANDRA-16403",
-        "title": "Python 3 compatibility for Cassandra 3",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 1907.6839351851852,
-        "url": "https://issues.apache.org/jira/browse/CASSANDRA-16403"
-      },
-      {
-        "item_id": "CASSANDRA-19777",
-        "title": "Update doc page for how-to commit with more intro",
-        "completed_at": "2026-04-16",
-        "cycle_time_days": 638.2433449074074,
-        "url": "https://issues.apache.org/jira/browse/CASSANDRA-19777"
-      },
       {
         "item_id": "CASSANDRA-21263",
         "title": "Fix intermittent QuickTheories exhaustion in WriteWarningsSnapshotTest property tests",
@@ -335,14 +321,21 @@
         "completed_at": "2026-05-14",
         "cycle_time_days": 31.934965277777778,
         "url": "https://issues.apache.org/jira/browse/CASSANDRA-21301"
+      },
+      {
+        "item_id": "CASSANDRA-19151",
+        "title": "Add an offline cluster metadata tool for disaster recovery scenarios",
+        "completed_at": "2026-05-15",
+        "cycle_time_days": 893.0306944444444,
+        "url": "https://issues.apache.org/jira/browse/CASSANDRA-19151"
       }
     ]
   },
   "input": {
     "repo": "jira:CASSANDRA",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
-    "offline": true,
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
+    "offline": false,
     "jira_url": "https://issues.apache.org/jira"
   },
   "docs": {
@@ -350,6 +343,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-16 --stop 2026-05-15 --offline",
+  "cli_invocation": "uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-17 --stop 2026-05-16",
   "logs": []
 }

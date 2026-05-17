@@ -1,2 +1,2 @@
-CFD for CalcMark/go-calcmark Apr 16, 2026 -> May 15, 2026: 20 items arrived, 18 completed, 2 still in
+CFD for CalcMark/go-calcmark Apr 17, 2026 -> May 16, 2026: 20 items arrived, 18 completed, 2 still in
 flight at end.

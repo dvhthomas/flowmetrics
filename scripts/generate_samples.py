@@ -55,6 +55,12 @@ class Repo:
     cache_subdir: str = "github"
     cfd_workflow: str | None = None
     aging_workflow: str | None = None
+    # When True, the scatterplot run gets `--include-issues` so closed
+    # Issues are plotted alongside merged PRs. For Issues closed by a
+    # PR-merge, the cycle time uses the PR's mergedAt (stitched 'done'
+    # instant), exposing the Issue-discussion phase that PR-only views
+    # invisibly truncate. GitHub-only.
+    stitch_issues_in_scatterplot: bool = False
 
 
 # Default GitHub PR aging workflow — driven by `isDraft` + `reviewDecision`,
@@ -103,6 +109,12 @@ REPOS: list[Repo] = [
         cli_args=["--repo", "CalcMark/go-calcmark"],
         cfd_workflow=GITHUB_CFD_WORKFLOW,
         aging_workflow=GITHUB_AGING_WORKFLOW,
+        # The Issue+PR stitched demo. This repo's workflow uses an Issue
+        # for the work request and a PR for the implementation; with
+        # --include-issues the scatterplot surfaces both populations and
+        # uses the PR-merge timestamp for stitched cycle times (so the
+        # discussion phase is included, not silently truncated).
+        stitch_issues_in_scatterplot=True,
     ),
     Repo(
         slug="ASF/CASSANDRA",
@@ -474,6 +486,8 @@ def _produce_one_repo(
         "--start", history_start, "--stop", history_end,
         *common_cache,
     ]
+    if repo.stitch_issues_in_scatterplot:
+        common_scatterplot.append("--include-issues")
     commands: list[tuple[list[str], str]] = [
         (common_efficiency, "efficiency"),
         (common_when_done, "forecast-when-done"),

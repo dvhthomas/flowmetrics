@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-16T23:06:35.644256-06:00",
-  "headline": "WIP Aging for astral-sh/uv as of May 17, 2026: 388 in-flight items, 382 already past P85 (3.0d), 370 past P95 (9.5d).",
+  "generated_at": "2026-05-16T23:15:31.473744-06:00",
+  "headline": "WIP Aging for astral-sh/uv as of May 17, 2026: 388 in-flight items, 384 already past P85 (3.0d), 370 past P95 (9.5d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 388,
@@ -16,40 +16,40 @@
       "Approved": 1
     },
     "cycle_time_percentiles_days": {
-      "50": 0.4316435185185185,
-      "70": 0.8311921296296296,
-      "85": 3.01775462962963,
+      "50": 0.41181712962962963,
+      "70": 0.8309027777777778,
+      "85": 2.9687847222222223,
       "95": 9.541979166666666
     },
-    "completed_count_for_percentiles": 203,
+    "completed_count_for_percentiles": 202,
     "aging_distribution": [
       {
         "label": "Below P50",
         "lower": null,
-        "upper": 0.4316435185185185,
+        "upper": 0.41181712962962963,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "P50\u2013P70",
-        "lower": 0.4316435185185185,
-        "upper": 0.8311921296296296,
+        "lower": 0.41181712962962963,
+        "upper": 0.8309027777777778,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "P70\u2013P85",
-        "lower": 0.8311921296296296,
-        "upper": 3.01775462962963,
-        "count": 6,
-        "share": 0.015463917525773196
+        "lower": 0.8309027777777778,
+        "upper": 2.9687847222222223,
+        "count": 4,
+        "share": 0.010309278350515464
       },
       {
         "label": "P85\u2013P95",
-        "lower": 3.01775462962963,
+        "lower": 2.9687847222222223,
         "upper": 9.541979166666666,
-        "count": 12,
-        "share": 0.030927835051546393
+        "count": 14,
+        "share": 0.03608247422680412
       },
       {
         "label": "Above P95",
@@ -65,8 +65,8 @@
         "count": 134,
         "median_age_days": 137,
         "oldest_age_days": 719,
-        "at_risk_p50_to_p85": 1,
-        "past_p85": 133,
+        "at_risk_p50_to_p85": 0,
+        "past_p85": 134,
         "past_p95": 132
       },
       {
@@ -74,8 +74,8 @@
         "count": 248,
         "median_age_days": 150,
         "oldest_age_days": 634,
-        "at_risk_p50_to_p85": 5,
-        "past_p85": 243,
+        "at_risk_p50_to_p85": 4,
+        "past_p85": 244,
         "past_p95": 235
       },
       {
@@ -170,7 +170,7 @@
       }
     ]
   },
-  "key_insight": "382 item(s) have aged past the P85 cycle time (3.0d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #3889, #6374, #6791. Concentrate decision-making here.",
+  "key_insight": "384 item(s) have aged past the P85 cycle time (3.0d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #3889, #6374, #6791. Concentrate decision-making here.",
   "next_actions": [
     "370 item(s) past P95 (9.5d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Awaiting Review' with 248 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",
@@ -178,7 +178,7 @@
   ],
   "caveats": [
     "Aging is a snapshot as of May 17, 2026 \u2014 not a trend over time.",
-    "Percentile lines reflect the completed-item distribution from Apr 16, 2026 \u2192 May 15, 2026 (203 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Percentile lines reflect the completed-item distribution from Apr 17, 2026 \u2192 May 16, 2026 (202 items). If recent throughput has changed, those checkpoints may have drifted.",
     "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "95% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
@@ -2920,9 +2920,9 @@
       "Changes Requested",
       "Approved"
     ],
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "max_age_days": null
   },
   "docs": {
@@ -2930,6 +2930,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --repo astral-sh/uv --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-16 --history-end 2026-05-15 --offline",
+  "cli_invocation": "uv run flow aging --repo astral-sh/uv --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-17 --history-end 2026-05-16",
   "logs": []
 }

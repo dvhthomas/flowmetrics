@@ -1,0 +1,114 @@
+{
+  "data": {
+    "search": {
+      "pageInfo": {
+        "hasNextPage": false,
+        "endCursor": null
+      },
+      "issueCount": 3,
+      "nodes": [
+        {
+          "number": 133,
+          "title": "fix(lsp): NL completion items carry wrong functionName + signature help missing for NL syntax",
+          "createdAt": "2026-04-12T06:23:49Z",
+          "closedAt": "2026-04-12T15:48:37Z",
+          "url": "https://github.com/CalcMark/go-calcmark/issues/133",
+          "author": {
+            "login": "dvhthomas"
+          },
+          "labels": {
+            "nodes": [
+              {
+                "name": "bug"
+              }
+            ]
+          },
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "LabeledEvent",
+                "createdAt": "2026-04-12T06:23:53Z",
+                "label": {
+                  "name": "bug"
+                }
+              },
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-12T15:48:37Z"
+              }
+            ]
+          },
+          "closedByPullRequestsReferences": {
+            "nodes": [
+              {
+                "number": 134,
+                "mergedAt": "2026-04-12T15:48:35Z",
+                "url": "https://github.com/CalcMark/go-calcmark/pull/134",
+                "state": "MERGED"
+              }
+            ]
+          }
+        },
+        {
+          "number": 131,
+          "title": "feat: expose structured parameter types in LSP completion and signature help",
+          "createdAt": "2026-04-10T01:22:22Z",
+          "closedAt": "2026-04-10T20:34:38Z",
+          "url": "https://github.com/CalcMark/go-calcmark/issues/131",
+          "author": {
+            "login": "dvhthomas"
+          },
+          "labels": {
+            "nodes": []
+          },
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-04-10T20:34:38Z"
+              }
+            ]
+          },
+          "closedByPullRequestsReferences": {
+            "nodes": [
+              {
+                "number": 132,
+                "mergedAt": "2026-04-10T20:34:37Z",
+                "url": "https://github.com/CalcMark/go-calcmark/pull/132",
+                "state": "MERGED"
+              }
+            ]
+          }
+        },
+        {
+          "number": 160,
+          "title": "compound: rate diagnostic does not hint at the % typo",
+          "createdAt": "2026-05-11T15:55:53Z",
+          "closedAt": "2026-05-14T18:43:40Z",
+          "url": "https://github.com/CalcMark/go-calcmark/issues/160",
+          "author": {
+            "login": "dvhthomas"
+          },
+          "labels": {
+            "nodes": []
+          },
+          "timelineItems": {
+            "nodes": [
+              {
+                "__typename": "ClosedEvent",
+                "createdAt": "2026-05-14T18:43:40Z"
+              }
+            ]
+          },
+          "closedByPullRequestsReferences": {
+            "nodes": []
+          }
+        }
+      ]
+    },
+    "rateLimit": {
+      "remaining": 5000,
+      "cost": 1
+    }
+  }
+}

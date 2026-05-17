@@ -1,14 +1,14 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T23:06:42.652613-06:00",
-  "headline": "5 items completed in 30 days; 85% finished within 1.1 days (Apr 16, 2026 -> May 15, 2026).",
+  "generated_at": "2026-05-16T23:16:10.027434-06:00",
+  "headline": "5 items completed in 30 days; 85% finished within 1.1 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
     "completed_count": 5,
     "window": {
-      "start": "2026-04-16",
-      "stop": "2026-05-15",
+      "start": "2026-04-17",
+      "stop": "2026-05-16",
       "days": 30
     },
     "cycle_time_percentiles_days": {
@@ -74,9 +74,9 @@
   },
   "input": {
     "repo": "pre-commit/pre-commit",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
-    "offline": true,
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "docs": {
@@ -84,6 +84,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --repo pre-commit/pre-commit --start 2026-04-16 --stop 2026-05-15 --offline",
+  "cli_invocation": "uv run flow scatterplot --repo pre-commit/pre-commit --start 2026-04-17 --stop 2026-05-16",
   "logs": []
 }

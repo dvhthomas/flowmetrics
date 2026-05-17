@@ -1,25 +1,25 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-16T23:06:38.603514-06:00",
-  "headline": "2.7% flow efficiency across 55 completed items (53 human, 2 bot) over 7 days, May 9, 2026 \u2192 May 15, 2026.",
+  "generated_at": "2026-05-16T23:15:42.444482-06:00",
+  "headline": "2.7% flow efficiency across 56 completed items (54 human, 2 bot) over 7 days, May 10, 2026 \u2192 May 16, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
-    "pr_count": 55,
-    "human_pr_count": 53,
+    "pr_count": 56,
+    "human_pr_count": 54,
     "bot_pr_count": 2,
-    "portfolio_efficiency": 0.02681710836071274,
-    "median_efficiency": 0.1293092676942649,
-    "mean_efficiency": 0.3770640217916157,
+    "portfolio_efficiency": 0.02700156577551007,
+    "median_efficiency": 0.12284196868123248,
+    "mean_efficiency": 0.37154755868016,
     "total_cycle": {
-      "seconds": 37509637.0,
-      "hours": 10419.343611111111,
-      "days": 434.1393171296296
+      "seconds": 37677815.0,
+      "hours": 10466.059722222222,
+      "days": 436.08582175925926
     },
     "total_active": {
-      "seconds": 1005900.0,
-      "hours": 279.4166666666667,
-      "days": 11.64236111111111
+      "seconds": 1017360.0,
+      "hours": 282.6,
+      "days": 11.775
     },
     "observed_statuses": []
   },
@@ -46,6 +46,10 @@
       {
         "item_id": "#45988",
         "efficiency": 0.4131193085352678
+      },
+      {
+        "item_id": "#45983",
+        "efficiency": 0.06814208755009574
       },
       {
         "item_id": "#45981",
@@ -267,11 +271,11 @@
   },
   "input": {
     "repo": "huggingface/transformers",
-    "start": "2026-05-09",
-    "stop": "2026-05-15",
+    "start": "2026-05-10",
+    "stop": "2026-05-16",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": true,
+    "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
@@ -298,6 +302,25 @@
         "efficiency": 0.4131193085352678,
         "is_bot": false,
         "author_login": "ArjunSrivastava1"
+      },
+      {
+        "item_id": "#45983",
+        "title": "bugfix(ci): avoid E2BIG in pr_slow_ci_suggestion ",
+        "created_at": "2026-05-14T19:24:45+00:00",
+        "completed_at": "2026-05-16T18:07:43+00:00",
+        "cycle_time": {
+          "seconds": 168178.0,
+          "hours": 46.71611111111111,
+          "days": 1.9465046296296296
+        },
+        "active_time": {
+          "seconds": 11460.0,
+          "hours": 3.183333333333333,
+          "days": 0.1326388888888889
+        },
+        "efficiency": 0.06814208755009574,
+        "is_bot": false,
+        "author_login": "tarekziade"
       },
       {
         "item_id": "#45981",
@@ -1332,6 +1355,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --repo huggingface/transformers --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline",
+  "cli_invocation": "uv run flow efficiency --repo huggingface/transformers --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }

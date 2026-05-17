@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.when_done.v1",
   "command": "forecast when-done",
-  "generated_at": "2026-05-16T23:06:33.887003-06:00",
+  "generated_at": "2026-05-16T23:15:28.219747-06:00",
   "headline": "85% confident the next 25 items finish by May 23, 2026 (starting May 17, 2026).",
   "definition": "Monte Carlo forecast of when N items will finish, drawing daily throughput samples from the training window. The histogram is the distribution of simulated completion dates; percentile lines mark confidence thresholds. Read forward: higher confidence = later date.",
   "summary": {
@@ -40,55 +40,55 @@
     "histogram": [
       {
         "date": "2026-05-18",
-        "frequency": 1463
+        "frequency": 1452
       },
       {
         "date": "2026-05-19",
-        "frequency": 1896
+        "frequency": 1913
       },
       {
         "date": "2026-05-20",
-        "frequency": 1898
+        "frequency": 1980
       },
       {
         "date": "2026-05-21",
-        "frequency": 1778
+        "frequency": 1716
       },
       {
         "date": "2026-05-22",
-        "frequency": 1307
+        "frequency": 1203
       },
       {
         "date": "2026-05-23",
-        "frequency": 824
+        "frequency": 817
       },
       {
         "date": "2026-05-24",
-        "frequency": 441
+        "frequency": 456
       },
       {
         "date": "2026-05-25",
-        "frequency": 215
+        "frequency": 255
       },
       {
         "date": "2026-05-26",
-        "frequency": 110
+        "frequency": 120
       },
       {
         "date": "2026-05-27",
-        "frequency": 42
+        "frequency": 59
       },
       {
         "date": "2026-05-28",
-        "frequency": 15
+        "frequency": 19
       },
       {
         "date": "2026-05-29",
-        "frequency": 8
+        "frequency": 9
       },
       {
         "date": "2026-05-30",
-        "frequency": 3
+        "frequency": 1
       }
     ],
     "total_runs": 10000
@@ -97,16 +97,15 @@
     "repo": "astral-sh/uv",
     "items": 25,
     "start_date": "2026-05-17",
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "training": {
-    "window_start": "2026-04-16",
-    "window_end": "2026-05-15",
+    "window_start": "2026-04-17",
+    "window_end": "2026-05-16",
     "daily_throughput": [
-      2,
       9,
       1,
       1,
@@ -135,10 +134,11 @@
       10,
       5,
       8,
-      6
+      6,
+      1
     ],
-    "total_throughput": 203,
-    "avg_throughput_per_day": 6.766666666666667,
+    "total_throughput": 202,
+    "avg_throughput_per_day": 6.733333333333333,
     "min_throughput_per_day": 0,
     "max_throughput_per_day": 24,
     "zero_throughput_days": 2
@@ -152,6 +152,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast when-done --repo astral-sh/uv --items 25 --start-date 2026-05-17 --history-start 2026-04-16 --history-end 2026-05-15 --runs 10000 --seed 42 --offline",
+  "cli_invocation": "uv run flow forecast when-done --repo astral-sh/uv --items 25 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42",
   "logs": []
 }

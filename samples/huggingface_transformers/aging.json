@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-16T23:06:40.766898-06:00",
-  "headline": "WIP Aging for huggingface/transformers as of May 17, 2026: 1000 in-flight items, 947 already past P85 (13.3d), 872 past P95 (36.5d).",
+  "generated_at": "2026-05-16T23:16:06.118622-06:00",
+  "headline": "WIP Aging for huggingface/transformers as of May 17, 2026: 1000 in-flight items, 947 already past P85 (13.3d), 872 past P95 (36.7d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 1000,
@@ -16,23 +16,23 @@
       "Changes Requested": 6
     },
     "cycle_time_percentiles_days": {
-      "50": 1.702199074074074,
+      "50": 1.7873495370370371,
       "70": 5.802604166666667,
-      "85": 13.3496875,
-      "95": 36.517094907407404
+      "85": 13.34388888888889,
+      "95": 36.661203703703706
     },
-    "completed_count_for_percentiles": 244,
+    "completed_count_for_percentiles": 237,
     "aging_distribution": [
       {
         "label": "Below P50",
         "lower": null,
-        "upper": 1.702199074074074,
+        "upper": 1.7873495370370371,
         "count": 0,
         "share": 0.0
       },
       {
         "label": "P50\u2013P70",
-        "lower": 1.702199074074074,
+        "lower": 1.7873495370370371,
         "upper": 5.802604166666667,
         "count": 22,
         "share": 0.022
@@ -40,20 +40,20 @@
       {
         "label": "P70\u2013P85",
         "lower": 5.802604166666667,
-        "upper": 13.3496875,
+        "upper": 13.34388888888889,
         "count": 31,
         "share": 0.031
       },
       {
         "label": "P85\u2013P95",
-        "lower": 13.3496875,
-        "upper": 36.517094907407404,
+        "lower": 13.34388888888889,
+        "upper": 36.661203703703706,
         "count": 75,
         "share": 0.075
       },
       {
         "label": "Above P95",
-        "lower": 36.517094907407404,
+        "lower": 36.661203703703706,
         "upper": null,
         "count": 872,
         "share": 0.872
@@ -186,13 +186,13 @@
   },
   "key_insight": "947 item(s) have aged past the P85 cycle time (13.3d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: #35517, #35515, #35535. Concentrate decision-making here.",
   "next_actions": [
-    "872 item(s) past P95 (36.5d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
+    "872 item(s) past P95 (36.7d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Awaiting Review' with 717 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",
     "Re-check daily; Aging is a leading indicator of forecast slip."
   ],
   "caveats": [
     "Aging is a snapshot as of May 17, 2026 \u2014 not a trend over time.",
-    "Percentile lines reflect the completed-item distribution from Apr 16, 2026 \u2192 May 15, 2026 (244 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Percentile lines reflect the completed-item distribution from Apr 17, 2026 \u2192 May 16, 2026 (237 items). If recent throughput has changed, those checkpoints may have drifted.",
     "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "87% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
@@ -7218,9 +7218,9 @@
       "Changes Requested",
       "Approved"
     ],
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "max_age_days": null
   },
   "docs": {
@@ -7228,6 +7228,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --repo huggingface/transformers --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-16 --history-end 2026-05-15 --offline",
+  "cli_invocation": "uv run flow aging --repo huggingface/transformers --asof 2026-05-17 --workflow 'Draft,Awaiting Review,Changes Requested,Approved' --history-start 2026-04-17 --history-end 2026-05-16",
   "logs": []
 }

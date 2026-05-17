@@ -1,26 +1,26 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-16T23:06:45.196576-06:00",
-  "headline": "18 items completed in 30 days; 85% finished within 0.9 days (Apr 16, 2026 -> May 15, 2026).",
+  "generated_at": "2026-05-16T23:16:15.778583-06:00",
+  "headline": "26 items completed in 30 days; 85% finished within 14.8 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
-    "completed_count": 18,
+    "completed_count": 26,
     "window": {
-      "start": "2026-04-16",
-      "stop": "2026-05-15",
+      "start": "2026-04-17",
+      "stop": "2026-05-16",
       "days": 30
     },
     "cycle_time_percentiles_days": {
-      "50": 0.0010763888888888889,
-      "70": 0.023541666666666666,
-      "85": 0.8535648148148148,
-      "95": 1.0318287037037037
+      "50": 0.023541666666666666,
+      "70": 1.1613888888888888,
+      "85": 14.847905092592592,
+      "95": 34.79913194444445
     }
   },
-  "key_insight": "Median cycle time is 0.0 days; deep-tail P95 is 1.0 days. A new item entering the system has, by definition, an 85% chance of finishing in 0.9 days or less and a 50% chance of finishing in 0.0 days or less.",
+  "key_insight": "Median cycle time is 0.0 days; deep-tail P95 is 34.8 days. A new item entering the system has, by definition, an 85% chance of finishing in 14.8 days or less and a 50% chance of finishing in 0.0 days or less.",
   "next_actions": [
-    "Use P85 (0.9d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
+    "Use P85 (14.8d) as the external commitment for new work \u2014 promising P50 builds a 50% miss rate into the plan.",
     "Re-check at the end of each iteration to spot trends; a rising P85 over consecutive windows means the system is slowing down."
   ],
   "caveats": [
@@ -160,14 +160,70 @@
         "completed_at": "2026-04-18",
         "cycle_time_days": 0.0004398148148148148,
         "url": "https://github.com/CalcMark/go-calcmark/pull/138"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:160",
+        "title": "compound: rate diagnostic does not hint at the % typo",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 3.1165162037037035,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/160"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:146",
+        "title": "feat: Period conversion expressions (in/as)",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 14.847905092592592,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/146"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:144",
+        "title": "Period arithmetic semantics \u2014 define Period \u2212 Period, Period + Duration, equality",
+        "completed_at": "2026-04-30",
+        "cycle_time_days": 1.1613888888888888,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/144"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:143",
+        "title": "Period vs Duration in function arguments \u2014 should `over Q1` reject or coerce?",
+        "completed_at": "2026-04-30",
+        "cycle_time_days": 1.161736111111111,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/143"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:140",
+        "title": "Period literals (Q/FQ/FY/CY) + first-class `end of`/`start of` operators",
+        "completed_at": "2026-04-30",
+        "cycle_time_days": 1.2606828703703703,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/140"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:130",
+        "title": "fix: convert_rate completion snippet uses wrong parameter examples",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 34.79913194444445,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/130"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:129",
+        "title": "Footnote references don't resolve across text/calculation block boundaries",
+        "completed_at": "2026-05-14",
+        "cycle_time_days": 35.66494212962963,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/129"
+      },
+      {
+        "item_id": "github:CalcMark/go-calcmark:issue:126",
+        "title": "feat: DateSpan type \u2014 period membership, as fiscal/calendar conversion",
+        "completed_at": "2026-04-30",
+        "cycle_time_days": 23.14412037037037,
+        "url": "https://github.com/CalcMark/go-calcmark/issues/126"
       }
     ]
   },
   "input": {
     "repo": "CalcMark/go-calcmark",
-    "start": "2026-04-16",
-    "stop": "2026-05-15",
-    "offline": true,
+    "start": "2026-04-17",
+    "stop": "2026-05-16",
+    "offline": false,
     "jira_url": null
   },
   "docs": {
@@ -175,6 +231,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --repo CalcMark/go-calcmark --start 2026-04-16 --stop 2026-05-15 --offline",
+  "cli_invocation": "uv run flow scatterplot --repo CalcMark/go-calcmark --start 2026-04-17 --stop 2026-05-16",
   "logs": []
 }

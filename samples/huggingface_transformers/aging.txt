@@ -1,2 +1,2 @@
 WIP Aging for huggingface/transformers as of May 17, 2026: 1000 in-flight items, 947 already past 
-P85 (13.3d), 872 past P95 (36.5d).
+P85 (13.3d), 872 past P95 (36.7d).

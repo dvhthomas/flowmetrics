@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-16T23:06:50.184736-06:00",
-  "headline": "WIP Aging for jira:CASSANDRA as of May 17, 2026: 3191 in-flight items, 2229 already past P85 (1148.6d), 1585 past P95 (2543.5d).",
+  "generated_at": "2026-05-16T23:16:22.741546-06:00",
+  "headline": "WIP Aging for jira:CASSANDRA as of May 17, 2026: 3191 in-flight items, 2446 already past P85 (893.0d), 1585 past P95 (2543.5d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 3191,
@@ -22,40 +22,40 @@
       "Ready to Commit": 4
     },
     "cycle_time_percentiles_days": {
-      "50": 31.934965277777778,
-      "70": 151.3204861111111,
-      "85": 1148.6280208333333,
+      "50": 27.010625,
+      "70": 118.95561342592593,
+      "85": 893.0306944444444,
       "95": 2543.5004166666668
     },
-    "completed_count_for_percentiles": 43,
+    "completed_count_for_percentiles": 42,
     "aging_distribution": [
       {
         "label": "Below P50",
         "lower": null,
-        "upper": 31.934965277777778,
-        "count": 52,
-        "share": 0.01629583202757756
+        "upper": 27.010625,
+        "count": 46,
+        "share": 0.014415543716703227
       },
       {
         "label": "P50\u2013P70",
-        "lower": 31.934965277777778,
-        "upper": 151.3204861111111,
-        "count": 118,
-        "share": 0.036979003447195236
+        "lower": 27.010625,
+        "upper": 118.95561342592593,
+        "count": 100,
+        "share": 0.031338138514572234
       },
       {
         "label": "P70\u2013P85",
-        "lower": 151.3204861111111,
-        "upper": 1148.6280208333333,
-        "count": 792,
-        "share": 0.2481980570354121
+        "lower": 118.95561342592593,
+        "upper": 893.0306944444444,
+        "count": 599,
+        "share": 0.18771544970228768
       },
       {
         "label": "P85\u2013P95",
-        "lower": 1148.6280208333333,
+        "lower": 893.0306944444444,
         "upper": 2543.5004166666668,
-        "count": 644,
-        "share": 0.20181761203384518
+        "count": 861,
+        "share": 0.26982137261046696
       },
       {
         "label": "Above P95",
@@ -71,8 +71,8 @@
         "count": 843,
         "median_age_days": 828,
         "oldest_age_days": 4175,
-        "at_risk_p50_to_p85": 528,
-        "past_p85": 278,
+        "at_risk_p50_to_p85": 441,
+        "past_p85": 370,
         "past_p95": 25
       },
       {
@@ -80,8 +80,8 @@
         "count": 2027,
         "median_age_days": 3376,
         "oldest_age_days": 5882,
-        "at_risk_p50_to_p85": 237,
-        "past_p85": 1786,
+        "at_risk_p50_to_p85": 148,
+        "past_p85": 1876,
         "past_p95": 1480
       },
       {
@@ -89,8 +89,8 @@
         "count": 118,
         "median_age_days": 1658,
         "oldest_age_days": 4758,
-        "at_risk_p50_to_p85": 44,
-        "past_p85": 71,
+        "at_risk_p50_to_p85": 34,
+        "past_p85": 81,
         "past_p95": 31
       },
       {
@@ -98,8 +98,8 @@
         "count": 99,
         "median_age_days": 991,
         "oldest_age_days": 4129,
-        "at_risk_p50_to_p85": 57,
-        "past_p85": 39,
+        "at_risk_p50_to_p85": 40,
+        "past_p85": 56,
         "past_p95": 20
       },
       {
@@ -107,8 +107,8 @@
         "count": 34,
         "median_age_days": 1146,
         "oldest_age_days": 3726,
-        "at_risk_p50_to_p85": 15,
-        "past_p85": 16,
+        "at_risk_p50_to_p85": 13,
+        "past_p85": 18,
         "past_p95": 3
       },
       {
@@ -229,7 +229,7 @@
       }
     ]
   },
-  "key_insight": "2229 item(s) have aged past the P85 cycle time (1148.6d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: CASSANDRA-967, CASSANDRA-2356, CASSANDRA-2443. Concentrate decision-making here.",
+  "key_insight": "2446 item(s) have aged past the P85 cycle time (893.0d) \u2014 items in this band have a high chance of missing the 85% forecast. Oldest: CASSANDRA-967, CASSANDRA-2356, CASSANDRA-2443. Concentrate decision-making here.",
   "next_actions": [
     "1585 item(s) past P95 (2543.5d): decide explicitly to expedite, split, or drop. They are now outliers in your own historical distribution.",
     "Biggest WIP column is 'Open' with 2027 item(s). Investigate this stage \u2014 either work is arriving faster than it can leave, or items are waiting on a downstream resource (reviewers, environments, decisions).",
@@ -237,7 +237,7 @@
   ],
   "caveats": [
     "Aging is a snapshot as of May 17, 2026 \u2014 not a trend over time.",
-    "Percentile lines reflect the completed-item distribution from Apr 16, 2026 \u2192 May 15, 2026 (43 items). If recent throughput has changed, those checkpoints may have drifted.",
+    "Percentile lines reflect the completed-item distribution from Apr 17, 2026 \u2192 May 16, 2026 (42 items). If recent throughput has changed, those checkpoints may have drifted.",
     "Items in early workflow states (Open, To Do) often age longest in open-source repos because they're sitting in an intake queue, not being actively worked. An aged item in 'Open' usually means no maintainer has picked it up; an aged item in 'In Progress' or 'In Review' is more likely a real bottleneck.",
     "50% of in-flight items are past P95 of recent completers \u2014 much higher than the ~5% you'd expect if today's WIP looked like recent history. The P85/P95 thresholds are derived only from items that have already finished, so long-running items still in flight aren't in that sample. The thresholds therefore diverge from \u2014 and likely under-represent \u2014 true cycle time for this WIP."
   ],
@@ -22602,9 +22602,9 @@
       "Review In Progress",
       "Ready to Commit"
     ],
-    "history_start": "2026-04-16",
-    "history_end": "2026-05-15",
-    "offline": true,
+    "history_start": "2026-04-17",
+    "history_end": "2026-05-16",
+    "offline": false,
     "max_age_days": null
   },
   "docs": {
@@ -22612,6 +22612,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --asof 2026-05-17 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit' --history-start 2026-04-16 --history-end 2026-05-15 --offline",
+  "cli_invocation": "uv run flow aging --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --asof 2026-05-17 --workflow 'Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit' --history-start 2026-04-17 --history-end 2026-05-16",
   "logs": []
 }

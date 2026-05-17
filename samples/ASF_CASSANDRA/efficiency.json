@@ -1,20 +1,20 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-16T23:06:46.504652-06:00",
-  "headline": "0.0% flow efficiency across 6 completed items over 7 days, May 9, 2026 \u2192 May 15, 2026.",
+  "generated_at": "2026-05-16T23:16:17.821131-06:00",
+  "headline": "0.0% flow efficiency across 6 completed items over 7 days, May 10, 2026 \u2192 May 16, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
     "pr_count": 6,
     "human_pr_count": 6,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 2.8487999095538086e-05,
+    "portfolio_efficiency": 2.5101899229347498e-06,
     "median_efficiency": 0.0,
     "mean_efficiency": 0.00044565791551026034,
     "total_cycle": {
-      "seconds": 7447522.0,
-      "hours": 2068.7561111111113,
-      "days": 86.1981712962963
+      "seconds": 84521493.0,
+      "hours": 23478.1925,
+      "days": 978.2580208333334
     },
     "total_active": {
       "seconds": 212.165,
@@ -23,6 +23,7 @@
     },
     "observed_statuses": [
       "In Progress",
+      "Needs Committer",
       "Open",
       "Patch Available",
       "Ready to Commit",
@@ -31,9 +32,9 @@
       "Triage Needed"
     ]
   },
-  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-21245)  ran 52.0d and dominates the ratio.",
+  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (CASSANDRA-19151)  ran 893.0d and dominates the ratio.",
   "next_actions": [
-    "Inspect the three slowest PRs (CASSANDRA-21245, CASSANDRA-21301, CASSANDRA-21355) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (CASSANDRA-19151, CASSANDRA-21245, CASSANDRA-21301) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -51,10 +52,6 @@
   },
   "chart_data": {
     "per_pr_efficiency": [
-      {
-        "item_id": "CASSANDRA-21355",
-        "efficiency": 0.0
-      },
       {
         "item_id": "CASSANDRA-21364",
         "efficiency": 0.0
@@ -74,16 +71,20 @@
       {
         "item_id": "CASSANDRA-21301",
         "efficiency": 0.0
+      },
+      {
+        "item_id": "CASSANDRA-19151",
+        "efficiency": 0.0
       }
     ]
   },
   "input": {
     "repo": "jira:CASSANDRA",
-    "start": "2026-05-09",
-    "stop": "2026-05-15",
+    "start": "2026-05-10",
+    "stop": "2026-05-16",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
-    "offline": true,
+    "offline": false,
     "active_statuses": [
       "In Development",
       "In Progress"
@@ -92,25 +93,6 @@
   },
   "result": {
     "per_pr": [
-      {
-        "item_id": "CASSANDRA-21355",
-        "title": "Accord: Clean Shutdown/Restart, Rebootstrap, et al",
-        "created_at": "2026-05-08T20:52:50+00:00",
-        "completed_at": "2026-05-09T20:10:51+00:00",
-        "cycle_time": {
-          "seconds": 83881.0,
-          "hours": 23.30027777777778,
-          "days": 0.9708449074074074
-        },
-        "active_time": {
-          "seconds": 0.0,
-          "hours": 0.0,
-          "days": 0.0
-        },
-        "efficiency": 0.0,
-        "is_bot": false,
-        "author_login": "benedict"
-      },
       {
         "item_id": "CASSANDRA-21364",
         "title": "Add ability to skip post-checkout submodule init with BUILD_OFFLINE env var",
@@ -205,6 +187,25 @@
         "efficiency": 0.0,
         "is_bot": false,
         "author_login": "maoling"
+      },
+      {
+        "item_id": "CASSANDRA-19151",
+        "title": "Add an offline cluster metadata tool for disaster recovery scenarios",
+        "created_at": "2023-12-04T13:11:33+00:00",
+        "completed_at": "2026-05-15T13:55:45+00:00",
+        "cycle_time": {
+          "seconds": 77157852.0,
+          "hours": 21432.736666666668,
+          "days": 893.0306944444444
+        },
+        "active_time": {
+          "seconds": 0.0,
+          "hours": 0.0,
+          "days": 0.0
+        },
+        "efficiency": 0.0,
+        "is_bot": false,
+        "author_login": "ifesdjeen"
       }
     ]
   },
@@ -213,6 +214,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-09 --stop 2026-05-15 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline",
+  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0",
   "logs": []
 }
