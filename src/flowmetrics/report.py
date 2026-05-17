@@ -228,12 +228,12 @@ class ScatterplotPoint:
     `completed_at` is when the item finished (= completed_at for GitHub
     PRs, resolved at for Jira issues). `cycle_time_days` is the
     elapsed time from creation to completion. `item_id` / `title` /
-    `pr_url` carry display + drill-down context."""
+    `url` carry display + drill-down context."""
     item_id: str
     title: str
     completed_at: date
     cycle_time_days: float
-    pr_url: str | None = None
+    url: str | None = None
 
 
 @dataclass(frozen=True)

@@ -17,6 +17,8 @@ from __future__ import annotations
 from datetime import UTC, date, datetime, timedelta
 from typing import ClassVar
 
+import pytest
+
 from flowmetrics.aging import (
     AgingItem,
     compute_aging,
@@ -177,6 +179,26 @@ class TestAgingItemFields:
         assert out[0].title == "t-BIGTOP-42"
 
 
+class TestAgingItemUsesCanonicalUrl:
+    """Per SPEC Phase 0: AgingItem's drill-down link field is named
+    `url`, matching WorkItem.url and ScatterplotPoint.url — a single
+    canonical name. The old `pr_url` name leaked GitHub-PR semantics
+    into the canonical type."""
+
+    def test_field_is_named_url_not_pr_url(self):
+        item = AgingItem(
+            item_id="x",
+            title="x",
+            current_state="In Progress",
+            age_days=3,
+            url="https://example.com/x",
+        )
+        assert item.url == "https://example.com/x"
+        # Old name must AttributeError.
+        with pytest.raises(AttributeError):
+            _ = item.pr_url  # type: ignore[attr-defined]
+
+
 class TestPrUrl:
     """Aging items carry a per-item URL so the interactive chart can
     make each circle clickable. The URL comes directly from the
@@ -193,7 +215,7 @@ class TestPrUrl:
             )
         ]
         out = compute_aging(items, asof=date(2026, 5, 12))
-        assert out[0].pr_url is None
+        assert out[0].url is None
 
     def test_pr_url_inherits_from_workitem_url(self):
         items = [
@@ -212,8 +234,8 @@ class TestPrUrl:
         ]
         out = compute_aging(items, asof=date(2026, 5, 12))
         by_id = {it.item_id: it for it in out}
-        assert by_id["#42"].pr_url == "https://github.com/acme/widget/pull/42"
-        assert by_id["BIGTOP-42"].pr_url == "https://issues.apache.org/jira/browse/BIGTOP-42"
+        assert by_id["#42"].url == "https://github.com/acme/widget/pull/42"
+        assert by_id["BIGTOP-42"].url == "https://issues.apache.org/jira/browse/BIGTOP-42"
 
 
 class TestMaxAgeFilter:
@@ -493,7 +515,7 @@ class TestTopInterventions:
             title=f"PR {item_id}",
             current_state=state,
             age_days=age,
-            pr_url=url,
+            url=url,
         )
 
     def test_returns_one_oldest_past_p85_per_state(self):
@@ -594,7 +616,7 @@ class TestTopInterventions:
         out = top_interventions(
             items=items, workflow=("Approved",), percentiles=self.PCT
         )
-        assert out[0]["pr_url"] == "https://x/1"
+        assert out[0]["url"] == "https://x/1"
 
     def test_unknown_state_does_not_crash_and_is_skipped(self):
         """If an item's current_state isn't in the workflow tuple

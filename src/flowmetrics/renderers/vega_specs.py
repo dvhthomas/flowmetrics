@@ -181,7 +181,7 @@ def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
             "cycle_time_days": pt.cycle_time_days,
             "item_id": pt.item_id,
             "title": pt.title,
-            "pr_url": pt.pr_url,
+            "url": pt.url,
         }
         for pt in report.points
     ]
@@ -245,7 +245,7 @@ def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
                 {"field": "completed_label", "type": "nominal",
                  "title": "Completed"},
             ],
-            "href": {"field": "pr_url", "type": "nominal"},
+            "href": {"field": "url", "type": "nominal"},
         },
     }
 
@@ -578,7 +578,7 @@ def efficiency_spec(report: EfficiencyReport) -> dict[str, Any]:
             "efficiency_pct": round(p.efficiency * 100, 1),
             "is_bot": p.is_bot,
             "band": _fe_band(p.efficiency * 100, p.is_bot),
-            "pr_url": _url(p.item_id),
+            "url": _url(p.item_id),
         }
         for p in per_pr
     ]
@@ -620,7 +620,7 @@ def efficiency_spec(report: EfficiencyReport) -> dict[str, Any]:
                 {"field": "cycle_hours", "title": "Cycle (h)"},
                 {"field": "active_hours", "title": "Active (h)"},
             ],
-            "href": {"field": "pr_url", "type": "nominal"},
+            "href": {"field": "url", "type": "nominal"},
         },
     }
 
@@ -672,7 +672,7 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
             "title": it.title,
             "current_state": it.current_state,
             "age_days": it.age_days,
-            "pr_url": it.pr_url,
+            "url": it.url,
         }
         for it in report.items
     ]
@@ -744,7 +744,7 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
                 {"field": "current_state", "title": "State"},
                 {"field": "age_days", "title": "Age (d)"},
             ],
-            "href": {"field": "pr_url", "type": "nominal"},
+            "href": {"field": "url", "type": "nominal"},
         },
     }
 

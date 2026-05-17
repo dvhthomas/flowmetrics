@@ -103,8 +103,8 @@ cycle-time range. Thresholds come from the
   <div class="intervention">
     <span class="state"><span class="pill">{{ iv.current_state }}</span></span>
     <span class="id">
-      {%- if iv.pr_url -%}
-        <a href="{{ iv.pr_url }}">{{ iv.item_id }}</a>
+      {%- if iv.url -%}
+        <a href="{{ iv.url }}">{{ iv.item_id }}</a>
       {%- else -%}
         {{ iv.item_id }}
       {%- endif -%}
@@ -185,8 +185,8 @@ or escalate.
 {% for it in past_p85_top %}
   <tr>
     <td>
-      {%- if it.pr_url -%}
-        <a href="{{ it.pr_url }}">{{ it.item_id }}</a>
+      {%- if it.url -%}
+        <a href="{{ it.url }}">{{ it.item_id }}</a>
       {%- else -%}
         {{ it.item_id }}
       {%- endif -%}

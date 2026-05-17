@@ -62,8 +62,8 @@ finishing in that time or less.
 {% for p in slowest %}
   <div class="intervention">
     <span class="id">
-      {%- if p.pr_url -%}
-        <a href="{{ p.pr_url }}">{{ p.item_id }}</a>
+      {%- if p.url -%}
+        <a href="{{ p.url }}">{{ p.item_id }}</a>
       {%- else -%}
         {{ p.item_id }}
       {%- endif -%}

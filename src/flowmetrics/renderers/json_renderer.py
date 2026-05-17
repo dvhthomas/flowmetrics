@@ -337,7 +337,7 @@ def _render_aging(report: AgingReport) -> dict[str, Any]:
                     "title": it.title,
                     "current_state": it.current_state,
                     "age_days": it.age_days,
-                    "pr_url": it.pr_url,
+                    "url": it.url,
                 }
                 for it in report.items
             ],
@@ -419,7 +419,7 @@ def _render_scatterplot(report: ScatterplotReport) -> dict[str, Any]:
                     "title": p.title,
                     "completed_at": p.completed_at.isoformat(),
                     "cycle_time_days": p.cycle_time_days,
-                    "pr_url": p.pr_url,
+                    "url": p.url,
                 }
                 for p in points
             ],

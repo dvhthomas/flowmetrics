@@ -528,7 +528,7 @@ def scatterplot(
                 title=it.title,
                 completed_at=it.completed_at.date(),
                 cycle_time_days=cycle,
-                pr_url=it.url,
+                url=it.url,
             ))
             cycle_days.append(cycle)
 

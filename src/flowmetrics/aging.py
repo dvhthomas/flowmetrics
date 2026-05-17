@@ -27,7 +27,7 @@ class AgingItem:
     # Optional deep-link to the underlying issue/PR — populated by the
     # caller via the `url_for` argument to `compute_aging`. Used by the
     # interactive HTML chart's `href` channel; None disables click-through.
-    pr_url: str | None = None
+    url: str | None = None
 
 
 def compute_aging(
@@ -64,7 +64,7 @@ def compute_aging(
                 title=item.title,
                 current_state=current,
                 age_days=age_days,
-                pr_url=item.url,
+                url=item.url,
             )
         )
     return out
@@ -226,7 +226,7 @@ def top_interventions(
                     "title": it.title,
                     "current_state": it.current_state,
                     "age_days": it.age_days,
-                    "pr_url": it.pr_url,
+                    "url": it.url,
                 }
             )
             if len(out) >= _GLOBAL_INTERVENTION_CAP:

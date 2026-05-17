@@ -485,7 +485,7 @@ class TestCfdJson:
 
 
 class TestAgingJson:
-    """Aging JSON includes per-item pr_url when populated so the
+    """Aging JSON includes per-item url when populated so the
     interactive HTML chart can wire click-to-PR; absent on Jira."""
 
     @staticmethod
@@ -513,24 +513,24 @@ class TestAgingJson:
                     title="Fix bug",
                     current_state="Awaiting Review",
                     age_days=3,
-                    pr_url="https://github.com/acme/widget/pull/42",
+                    url="https://github.com/acme/widget/pull/42",
                 ),
                 AgingItem(
                     item_id="#7",
                     title="Add feature",
                     current_state="Approved",
                     age_days=1,
-                    pr_url=None,
+                    url=None,
                 ),
             ]
         )
         payload = json.loads(json_renderer.render(report))
         items = payload["chart_data"]["items"]
         by_id = {it["item_id"]: it for it in items}
-        assert by_id["#42"]["pr_url"] == "https://github.com/acme/widget/pull/42"
+        assert by_id["#42"]["url"] == "https://github.com/acme/widget/pull/42"
         # None must round-trip as JSON null, not be omitted (consistent
         # schema means downstream readers can rely on the key existing).
-        assert by_id["#7"]["pr_url"] is None
+        assert by_id["#7"]["url"] is None
 
 
 class TestAgingMaxAgeJson:
@@ -690,7 +690,7 @@ class TestAgingJsonDiagnostics:
             title=f"PR {n}",
             current_state=state,
             age_days=age,
-            pr_url=url,
+            url=url,
         )
 
     def test_per_state_diagnostic_in_summary(self):
@@ -720,7 +720,7 @@ class TestAgingJsonDiagnostics:
         ivs = payload["summary"]["top_interventions"]
         # Rightmost-first ordering: State B first.
         assert ivs[0]["current_state"] == "State B"
-        assert ivs[0]["pr_url"] == "https://x/2"
+        assert ivs[0]["url"] == "https://x/2"
         assert ivs[1]["current_state"] == "State A"
 
 

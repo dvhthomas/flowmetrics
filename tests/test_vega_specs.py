@@ -48,13 +48,13 @@ def _aging_report(items: list[AgingItem]) -> AgingReport:
     )
 
 
-def _item(item_id: str, state: str, age: int, pr_url: str | None = None) -> AgingItem:
+def _item(item_id: str, state: str, age: int, url: str | None = None) -> AgingItem:
     return AgingItem(
         item_id=item_id,
         title=f"PR {item_id}",
         current_state=state,
         age_days=age,
-        pr_url=pr_url,
+        url=url,
     )
 
 
@@ -165,7 +165,7 @@ class TestAgingSpec:
 
     def test_data_values_carry_items_with_required_fields(self):
         items = [
-            _item("#1", "Awaiting Review", 3, pr_url="https://x/1"),
+            _item("#1", "Awaiting Review", 3, url="https://x/1"),
             _item("#2", "Approved", 10),
         ]
         spec = vega_specs.aging_spec(_aging_report(items))
@@ -184,7 +184,7 @@ class TestAgingSpec:
         v1 = next(v for v in values if v["item_id"] == "#1")
         assert v1["age_days"] == 3
         assert v1["current_state"] == "Awaiting Review"
-        assert v1["pr_url"] == "https://x/1"
+        assert v1["url"] == "https://x/1"
         assert v1["title"] == "PR #1"
 
     def test_circles_have_tooltip_and_href_channels(self):
@@ -204,7 +204,7 @@ class TestAgingSpec:
         tooltip_fields = {t["field"] for t in enc["tooltip"]}
         assert {"item_id", "title", "age_days", "current_state"} <= tooltip_fields
         # Click navigates to the PR URL (Vega-Lite's `href` channel).
-        assert enc["href"]["field"] == "pr_url"
+        assert enc["href"]["field"] == "url"
 
     def test_x_axis_is_titled_wip_stage(self):
         """The X axis names workflow stages, not 'current_state' (raw
@@ -765,7 +765,7 @@ class TestEfficiencySpec:
         tooltip_fields = {t["field"] for t in enc["tooltip"]}
         assert {"item_id", "title", "efficiency_pct", "cycle_hours"} <= tooltip_fields
         # Click → PR URL.
-        assert enc["href"]["field"] == "pr_url"
+        assert enc["href"]["field"] == "url"
 
 
 # ---------------------------------------------------------------------------
@@ -1367,12 +1367,12 @@ def _scatterplot_fixture():
             ScatterplotPoint(
                 item_id="#1", title="alpha",
                 completed_at=date(2026, 4, 20),
-                cycle_time_days=3.5, pr_url="https://x/1",
+                cycle_time_days=3.5, url="https://x/1",
             ),
             ScatterplotPoint(
                 item_id="#2", title="beta",
                 completed_at=date(2026, 5, 1),
-                cycle_time_days=10.0, pr_url=None,
+                cycle_time_days=10.0, url=None,
             ),
         ],
         cycle_time_percentiles={50: 5.0, 70: 7.0, 85: 9.0, 95: 12.0},
