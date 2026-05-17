@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-17T17:14:14.548469-06:00",
+  "generated_at": "2026-05-17T17:17:36.248169-06:00",
   "headline": "2.8% flow efficiency across 49 completed items (39 human, 10 bot) over 7 days, May 10, 2026 \u2192 May 16, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {

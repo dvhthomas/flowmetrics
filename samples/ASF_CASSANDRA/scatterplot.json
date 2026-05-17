@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-17T17:14:29.638430-06:00",
+  "generated_at": "2026-05-17T17:17:52.609439-06:00",
   "headline": "42 items completed in 30 days; median 27.0d, P85 893.0d (wide spread \u2014 deep tail of backlog cleanups skews P85).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-17T17:14:24.197867-06:00",
+  "generated_at": "2026-05-17T17:17:46.467990-06:00",
   "headline": "WIP Aging for pre-commit/pre-commit as of May 17, 2026: 6 in-flight items, 6 already past P85 (1.1d), 6 past P95 (1.1d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-17T17:14:23.076767-06:00",
+  "generated_at": "2026-05-17T17:17:45.283179-06:00",
   "headline": "Forecast too uncertain \u2014 85% of simulations produced zero completions in the next 15 days (by May 31, 2026). Median is 2 items; consider a wider training window.",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {

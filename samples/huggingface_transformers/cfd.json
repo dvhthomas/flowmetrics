@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-17T17:14:21.213158-06:00",
+  "generated_at": "2026-05-17T17:17:43.266316-06:00",
   "headline": "CFD for huggingface/transformers Apr 17, 2026 \u2192 May 16, 2026: 155 items arrived, 103 completed, 52 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {

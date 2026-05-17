@@ -916,17 +916,6 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
                 "axis": {
                     "title": "WIP Stage", "labelAngle": 0,
                     "titleFontWeight": "bold", "titlePadding": 8,
-                    # Vertical grid lines at every band boundary so
-                    # the eye reads each WIP stage as its own column.
-                    # `tickBand: "extent"` puts grid lines at band
-                    # edges; without it they'd sit at band centers
-                    # (under the data dots) and disappear. Darker
-                    # gray (`#999`) and 1.5-px stroke so they're
-                    # legible against the dot density.
-                    "grid": True,
-                    "gridColor": "#999",
-                    "gridWidth": 1.5,
-                    "tickBand": "extent",
                 },
                 "sort": list(report.input.workflow),
                 # Force every workflow state to appear on the axis, even
@@ -974,31 +963,41 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
     workflow_list = list(report.input.workflow)
     shaded_states = workflow_list[::2]
 
-    # Vertical separators at every band boundary. Implemented via
-    # the x-axis grid (with `tickBand: "extent"` to put grid lines
-    # at band edges, not centers). This is the cleaner Vega-Lite
-    # idiom than a separate rule-mark layer — keeps the data-mark
-    # x scale untouched and avoids field-name-mismatch landmines.
+    # Vertical separators at every band boundary. Explicit rule marks
+    # at bandPosition=1.0 (right edge of each non-final band) draw a
+    # vertical seam between adjacent columns.
     #
-    # The data shape `separator_rows` is still computed and exposed
-    # via `_aging_layers(..., separator_layer=...)` for the test
-    # suite, but the visual separator now lives on the axis instead
-    # of a sibling layer. When the workflow has only one stage,
-    # there are no boundaries to draw and the grid stays disabled.
+    # CRITICAL: the field name on the rule's x encoding must match the
+    # other layers' x.field (`current_state`) so Vega-Lite unifies the
+    # x scale across layers. A different field name silently creates a
+    # second scale and the rules render at wrong positions (or trigger
+    # 'Cannot read properties of undefined' if the layer's encoding
+    # combinations don't compile).
+    #
+    # `boundary_after` is the test-facing alias carrying the same data
+    # — the test suite identifies this layer by that field name. We
+    # include both in each row so the test can find the layer AND
+    # Vega-Lite can resolve the x scale.
     separator_rows = [
-        {"boundary_after": state} for state in workflow_list[:-1]
+        {"current_state": s, "boundary_after": s} for s in workflow_list[:-1]
     ]
     separator_layer: dict[str, Any] | None = None
     if separator_rows:
-        # Sentinel layer carrying the boundary_after data for tests
-        # (no mark; never rendered — but TestAgingColumnSeparators
-        # asserts the count). Marked invisible by an empty `transform`
-        # filter that produces no rows.
         separator_layer = {
-            "mark": {"type": "rule", "opacity": 0},
+            "mark": {
+                "type": "rule",
+                "color": "#666", "strokeWidth": 1.5, "opacity": 0.6,
+            },
             "data": {"values": separator_rows},
-            "transform": [{"filter": "false"}],
-            "encoding": {},
+            "encoding": {
+                "x": {
+                    "field": "current_state",
+                    "type": "nominal",
+                    "sort": workflow_list,
+                    "scale": {"domain": workflow_list},
+                    "bandPosition": 1.0,
+                },
+            },
         }
     # NB: the field name must match the other layers' x.field
     # (`current_state`), not the more-obvious `state`. Vega-Lite
