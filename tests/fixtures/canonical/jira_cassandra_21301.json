@@ -1,0 +1,115 @@
+{
+  "issues": [
+    {
+      "changelog": {
+        "histories": [
+          {
+            "created": "2026-05-11T17:32:14.168+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "from": "10722",
+                "fromString": "Triage Needed",
+                "to": "1",
+                "toString": "Open"
+              }
+            ]
+          },
+          {
+            "created": "2026-05-11T17:32:24.331+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "from": "1",
+                "fromString": "Open",
+                "to": "10002",
+                "toString": "Patch Available"
+              }
+            ]
+          },
+          {
+            "created": "2026-05-11T17:32:32.766+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "from": "10002",
+                "fromString": "Patch Available",
+                "to": "10723",
+                "toString": "Review In Progress"
+              }
+            ]
+          },
+          {
+            "created": "2026-05-14T10:54:09.293+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "from": "10723",
+                "fromString": "Review In Progress",
+                "to": "10221",
+                "toString": "Ready to Commit"
+              }
+            ]
+          },
+          {
+            "created": "2026-05-14T11:25:51.703+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "from": "10221",
+                "fromString": "Ready to Commit",
+                "to": "5",
+                "toString": "Resolved"
+              }
+            ]
+          }
+        ],
+        "maxResults": 104,
+        "startAt": 0,
+        "total": 5
+      },
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "fields": {
+        "summary": "add AGENTS.md and CLAUDE.md",
+        "created": "2026-04-12T12:59:30.000+0000",
+        "resolutiondate": "2026-05-14T11:25:51.000+0000",
+        "status": {
+          "description": "A resolution has been taken, and it is awaiting verification by reporter. From here issues are either reopened, or are closed.",
+          "iconUrl": "https://issues.apache.org/jira/images/icons/statuses/resolved.png",
+          "id": "5",
+          "name": "Resolved",
+          "self": "https://issues.apache.org/jira/rest/api/2/status/5",
+          "statusCategory": {
+            "colorName": "green",
+            "id": 3,
+            "key": "done",
+            "name": "Done",
+            "self": "https://issues.apache.org/jira/rest/api/2/statuscategory/3"
+          }
+        },
+        "reporter": {
+          "active": true,
+          "avatarUrls": {
+            "16x16": "https://issues.apache.org/jira/secure/useravatar?size=xsmall&ownerId=maoling&avatarId=32024",
+            "24x24": "https://issues.apache.org/jira/secure/useravatar?size=small&ownerId=maoling&avatarId=32024",
+            "32x32": "https://issues.apache.org/jira/secure/useravatar?size=medium&ownerId=maoling&avatarId=32024",
+            "48x48": "https://issues.apache.org/jira/secure/useravatar?ownerId=maoling&avatarId=32024"
+          },
+          "displayName": "Ling Mao",
+          "key": "maoling",
+          "name": "maoling",
+          "self": "https://issues.apache.org/jira/rest/api/2/user?username=maoling",
+          "timeZone": "Asia/Shanghai"
+        }
+      },
+      "id": "13647854",
+      "key": "CASSANDRA-21301",
+      "self": "https://issues.apache.org/jira/rest/api/2/issue/13647854"
+    }
+  ]
+}
