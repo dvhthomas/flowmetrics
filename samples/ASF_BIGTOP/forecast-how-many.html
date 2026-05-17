@@ -138,11 +138,11 @@
 <body>
 <h1>Forecast how many items finish by 2026-05-31</h1>
 <p class="subtitle">
-  for jira:BIGTOP ·
+  for BIGTOP ·
   2026-05-17 → 2026-05-31 ·
-  <span class="stamp">generated 2026-05-17 15:32 MDT</span>
+  <span class="stamp">generated 2026-05-17 17:14 MDT</span>
 </p>
-<div class="headline">85% confident at least 0 items finish in the next 15 days (by May 31, 2026).</div>
+<div class="headline">Forecast too uncertain — 85% of simulations produced zero completions in the next 15 days (by May 31, 2026). Median is 4 items; consider a wider training window.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.</div>
@@ -187,14 +187,14 @@
 <details>
 <summary>Reproduce this report</summary>
 <table>
-  <tr><th>Repo</th><td>jira:BIGTOP</td></tr>
+  <tr><th>Repo</th><td>BIGTOP</td></tr>
   <tr><th>Forecast window</th><td>2026-05-17 → 2026-05-31</td></tr>
   <tr><th>Training window</th><td>2026-04-17 → 2026-05-16
       (30 days, 10 items)</td></tr>
   <tr><th>Monte Carlo runs</th><td>10,000</td></tr>
   <tr><th>RNG seed</th><td>42</td></tr>
 </table>
-<div class="invocation">uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42 --offline</div>
+<div class="invocation">uv run flow forecast how-many --repo BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42 --offline</div>
 </details>
 
 <details>

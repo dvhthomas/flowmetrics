@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-17T15:32:20.764423-06:00",
-  "headline": "WIP Aging for jira:BIGTOP as of May 17, 2026: 726 in-flight items, 722 already past P85 (84.5d), 722 past P95 (98.4d).",
+  "generated_at": "2026-05-17T17:14:34.642004-06:00",
+  "headline": "WIP Aging for BIGTOP as of May 17, 2026: 726 in-flight items, 722 already past P85 (84.5d), 722 past P95 (98.4d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {
     "in_flight_count": 726,
@@ -5262,7 +5262,7 @@
     ]
   },
   "input": {
-    "repo": "jira:BIGTOP",
+    "repo": "BIGTOP",
     "asof": "2026-05-17",
     "workflow": [
       "Open",
@@ -5279,6 +5279,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow aging --jira-url https://issues.apache.org/jira --jira-project BIGTOP --asof 2026-05-17 --workflow 'Open,In Progress,Patch Available' --history-start 2026-04-17 --history-end 2026-05-16 --offline",
+  "cli_invocation": "uv run flow aging --repo BIGTOP --asof 2026-05-17 --workflow 'Open,In Progress,Patch Available' --history-start 2026-04-17 --history-end 2026-05-16 --offline",
   "logs": []
 }

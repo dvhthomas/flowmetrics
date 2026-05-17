@@ -404,6 +404,35 @@ class TestInterpretHowMany:
         text = " ".join(i.caveats).upper()
         assert "BACKWARD" in text or "BACKWARDS" in text or "FEWER" in text.upper()
 
+    def test_headline_flags_insufficient_signal_when_p85_is_zero(self):
+        """When throughput is too low the P85 floor is 0 items. The
+        bare 'at least 0 items' headline is mathematically true but
+        uselessly vacuous — it communicates 'no information,' not
+        'we delivered nothing.' Reframe explicitly."""
+        input_ = HowManyInput(
+            "acme/widget",
+            date(2026, 5, 11), date(2026, 5, 25),
+            date(2026, 4, 11), date(2026, 5, 10),
+            False,
+        )
+        training = _training([0] * 28 + [1, 1], date(2026, 4, 11), date(2026, 5, 10))
+        hist = build_histogram([0, 0, 0, 0, 1, 1, 2])
+        # P85 = 0 — most simulations produced zero items.
+        percentiles = {50: 1, 70: 0, 85: 0, 95: 0}
+        i = interpret_how_many(input_, training, hist, percentiles)
+        # The 'at least 0' phrasing is too easy to misread. The reframe
+        # should name 'insufficient' or similar.
+        assert "at least 0 items" not in i.headline.lower(), (
+            f"headline must not read 'at least 0 items': got {i.headline!r}"
+        )
+        # And should convey low signal.
+        low_signal_words = ("insufficient", "too uncertain", "not enough",
+                            "no commitment", "too low")
+        text_low = i.headline.lower()
+        assert any(w in text_low for w in low_signal_words), (
+            f"headline should signal low-throughput situation; got {i.headline!r}"
+        )
+
     def test_long_horizon_warning(self):
         # Forecast 60 days from 30 days of history → narrative should flag it
         input_ = HowManyInput(

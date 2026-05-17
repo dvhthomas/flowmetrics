@@ -1,2 +1,2 @@
-WIP Aging for jira:CASSANDRA as of May 17, 2026: 3191 in-flight items, 2446 already past P85 
-(893.0d), 1585 past P95 (2543.5d).
+WIP Aging for CASSANDRA as of May 17, 2026: 3191 in-flight items, 2446 already past P85 (893.0d), 
+1585 past P95 (2543.5d).

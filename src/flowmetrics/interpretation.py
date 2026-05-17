@@ -224,10 +224,22 @@ def interpret_how_many(
 
     days = (input.target_date - input.start_date).days + 1
     day_word = "day" if days == 1 else "days"
-    headline = (
-        f"85% confident at least {p85} items finish in the next {days} {day_word} "
-        f"(by {_prose_date(input.target_date)})."
-    )
+    if p85 == 0:
+        # P85 = 0 means most simulations produced no completions — the
+        # forecast is too uncertain to commit to ANY specific count.
+        # Reframe explicitly so the headline doesn't read as "we'll
+        # deliver zero." Median is still a useful realistic target.
+        headline = (
+            f"Forecast too uncertain — 85% of simulations produced zero "
+            f"completions in the next {days} {day_word} (by "
+            f"{_prose_date(input.target_date)}). Median is {p50} items; "
+            f"consider a wider training window."
+        )
+    else:
+        headline = (
+            f"85% confident at least {p85} items finish in the next {days} {day_word} "
+            f"(by {_prose_date(input.target_date)})."
+        )
 
     key_insight = (
         f"Median outcome is {p50} items; 95% commitment floor is {p95}. Higher confidence "
@@ -566,11 +578,23 @@ def interpret_scatterplot(
     p50 = percentiles.get(50, 0.0)
     p85 = percentiles.get(85, 0.0)
     p95 = percentiles.get(95, 0.0)
-    headline = (
-        f"{len(points)} items completed in {window_days} {day_word}; "
-        f"85% finished within {p85:.1f} days "
-        f"({_prose_date(input.start)} -> {_prose_date(input.stop)})."
-    )
+    # When P85 is >5x the median, the deep tail is dominating the
+    # percentile — usually a sign of backlog cleanup (year-old tickets
+    # finally resolved) mixed in with normal recent work. Surface BOTH
+    # numbers in the headline so the reader doesn't take the P85 at face
+    # value as 'normal team flow.'
+    if p50 > 0 and p85 > 5 * p50:
+        headline = (
+            f"{len(points)} items completed in {window_days} {day_word}; "
+            f"median {p50:.1f}d, P85 {p85:.1f}d "
+            f"(wide spread — deep tail of backlog cleanups skews P85)."
+        )
+    else:
+        headline = (
+            f"{len(points)} items completed in {window_days} {day_word}; "
+            f"85% finished within {p85:.1f} days "
+            f"({_prose_date(input.start)} -> {_prose_date(input.stop)})."
+        )
     key_insight = (
         f"Median cycle time is {p50:.1f} days; deep-tail P95 is "
         f"{p95:.1f} days. A new item entering the system has, by "

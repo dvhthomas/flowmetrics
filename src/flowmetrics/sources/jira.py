@@ -68,7 +68,14 @@ class JiraSource:
 
     @property
     def label(self) -> str:
-        return f"jira:{self.project}"
+        # User-facing repo identifier. Returns just the project name
+        # (e.g. "CASSANDRA") — the `jira:` prefix was internal
+        # namespacing that leaked into headlines and read poorly
+        # ("WIP Aging for jira:CASSANDRA …"). The canonical work-item
+        # IDs still carry the prefix internally (`jira:CASSANDRA:issue:N`)
+        # for cross-source disambiguation; this label is purely the
+        # human-readable name.
+        return self.project
 
     def _client(self) -> httpx.Client:
         if self.http_client is not None:

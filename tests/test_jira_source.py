@@ -291,10 +291,16 @@ class TestStatusIntervalExtraction:
 
 
 class TestLabel:
-    def test_label_combines_jira_and_project(self, tmp_path):
+    def test_label_is_just_the_project_name(self, tmp_path):
+        """The label is shown in chart headlines ('WIP Aging for X
+        as of …'). The bare project name reads cleanly; the prior
+        `jira:X` prefix leaked internal namespacing into the user
+        view."""
         source = JiraSource(
             base_url="https://issues.apache.org/jira",
             project="BIGTOP",
             cache=FileCache(tmp_path),
         )
-        assert "BIGTOP" in source.label
+        assert source.label == "BIGTOP"
+        # And explicitly: no internal namespace prefix.
+        assert "jira:" not in source.label

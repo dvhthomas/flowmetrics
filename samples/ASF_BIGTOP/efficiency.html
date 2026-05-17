@@ -138,11 +138,11 @@
 <body>
 <h1>Flow efficiency</h1>
 <p class="subtitle">
-  for jira:BIGTOP ·
+  for BIGTOP ·
   2026-05-10 → 2026-05-16 ·
-  <span class="stamp">generated 2026-05-17 15:32 MDT</span>
+  <span class="stamp">generated 2026-05-17 17:14 MDT</span>
 </p>
-<div class="headline">0.1% flow efficiency across 2 completed items over 7 days, May 10, 2026 → May 16, 2026.</div>
+<div class="headline">90.5% flow efficiency across 2 completed items over 7 days, May 10, 2026 → May 16, 2026.</div>
 
 
 <div class="definition"><strong>What this shows.</strong> Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as Σ active ÷ Σ cycle across every merged PR in the window — totals first, so one short PR cannot inflate the system-level number.</div>
@@ -164,7 +164,7 @@ them moves the portfolio number more than improving a typical PR.
   <div class="intervention">
     <span class="id"><a href="https://issues.apache.org/jira/browse/BIGTOP-4515">BIGTOP-4515</a></span>
     <span class="age">98.4d</span>
-    <span class="state"><span class="pill">FE 0.1%</span></span>
+    <span class="state"><span class="pill">FE 95.8%</span></span>
     <span class="title">Upgrade HBase to 2.6.5</span>
   </div>
   <div class="intervention">
@@ -180,7 +180,7 @@ them moves the portfolio number more than improving a typical PR.
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 <script>
-  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "BIGTOP-4528", "title": "conf-select is missing", "cycle_hours": 139.32, "active_hours": 1.0, "efficiency_pct": 0.7, "is_bot": false, "band": "\u003c 10% (slow)", "url": null}, {"item_id": "BIGTOP-4515", "title": "Upgrade HBase to 2.6.5", "cycle_hours": 2360.99, "active_hours": 1.5, "efficiency_pct": 0.1, "is_bot": false, "band": "\u003c 10% (slow)", "url": null}]}, "params": [{"name": "efficiency_zoom", "select": {"type": "interval", "encodings": ["x"]}, "bind": "scales"}], "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 0.1, "label": "Portfolio FE: 0.1%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
+  vegaEmbed("#efficiency-chart", {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "width": "container", "height": 120, "background": "transparent", "config": {"view": {"fill": "transparent", "stroke": "#e5e5e5", "strokeWidth": 1}}, "layer": [{"mark": {"type": "bar", "height": {"band": 0.8}}, "data": {"values": [{"item_id": "BIGTOP-4528", "title": "conf-select is missing", "cycle_hours": 139.32, "active_hours": 1.0, "efficiency_pct": 0.7, "is_bot": false, "band": "\u003c 10% (slow)", "url": null}, {"item_id": "BIGTOP-4515", "title": "Upgrade HBase to 2.6.5", "cycle_hours": 2360.99, "active_hours": 2261.08, "efficiency_pct": 95.8, "is_bot": false, "band": "≥ 50% (healthy)", "url": null}]}, "params": [{"name": "efficiency_zoom", "select": {"type": "interval", "encodings": ["x"]}, "bind": "scales"}], "encoding": {"y": {"field": "item_id", "type": "nominal", "axis": {"title": null, "labelLimit": 80, "labelFontSize": 10}, "sort": {"field": "efficiency_pct", "order": "ascending"}}, "x": {"field": "efficiency_pct", "type": "quantitative", "axis": {"title": "Flow efficiency (%)", "titleFontWeight": "bold"}, "scale": {"domain": [0, 100]}}, "color": {"field": "band", "type": "nominal", "scale": {"domain": ["\u003c 10% (slow)", "10–50%", "≥ 50% (healthy)", "bot"], "range": ["#cc3333", "#d4a72c", "#2ca02c", "#bbbbbb"]}, "legend": {"title": "FE band", "orient": "right"}}, "tooltip": [{"field": "item_id", "title": "ID"}, {"field": "title", "title": "Title"}, {"field": "efficiency_pct", "title": "FE %"}, {"field": "cycle_hours", "title": "Cycle (h)"}, {"field": "active_hours", "title": "Active (h)"}], "href": {"field": "url", "type": "nominal"}}}, {"mark": {"type": "rule", "color": "#2b7cff", "size": 2, "strokeDash": [6, 4]}, "data": {"values": [{"portfolio_pct": 90.5, "label": "Portfolio FE: 90.5%"}]}, "encoding": {"x": {"field": "portfolio_pct", "type": "quantitative"}, "tooltip": [{"field": "label"}]}}]}, {
     actions: {export: true, source: false, compiled: false, editor: false},
     renderer: "svg"
   }).catch(function(err) {
@@ -209,18 +209,18 @@ up the way they drag this bar's count up.
 <thead><tr><th>#</th><th>Cycle</th><th>Active</th><th>FE</th><th>Title</th></tr></thead>
 <tbody>
   <tr>
-    <td><a href="https://issues.apache.org/jira/browse/BIGTOP-4515">BIGTOP-4515</a></td>
-    <td class="num">98.4d</td>
-    <td class="num">1.5h</td>
-    <td class="num">0.1%</td>
-    <td>Upgrade HBase to 2.6.5</td>
-  </tr>
-  <tr>
     <td><a href="https://issues.apache.org/jira/browse/BIGTOP-4528">BIGTOP-4528</a></td>
     <td class="num">5.8d</td>
     <td class="num">1.0h</td>
     <td class="num">0.7%</td>
     <td>conf-select is missing</td>
+  </tr>
+  <tr>
+    <td><a href="https://issues.apache.org/jira/browse/BIGTOP-4515">BIGTOP-4515</a></td>
+    <td class="num">98.4d</td>
+    <td class="num">94.2d</td>
+    <td class="num">95.8%</td>
+    <td>Upgrade HBase to 2.6.5</td>
   </tr>
 </tbody>
 </table>
@@ -276,12 +276,12 @@ FE.
 <details>
 <summary>Reproduce this report</summary>
 <table>
-  <tr><th>Repo</th><td>jira:BIGTOP</td></tr>
+  <tr><th>Repo</th><td>BIGTOP</td></tr>
   <tr><th>Window</th><td>2026-05-10 → 2026-05-16</td></tr>
   <tr><th>Active-time gap</th><td>4.0h</td></tr>
   <tr><th>Min cluster</th><td>30.0min</td></tr>
 </table>
-<div class="invocation">uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline</div>
+<div class="invocation">uv run flow efficiency --repo BIGTOP --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline</div>
 </details>
 
 <details>
@@ -297,15 +297,15 @@ is a different question from "how efficient is our system overall".
 For decisions about where wait time is leaking, use the portfolio
 number in the headline; these two are listed for completeness.</p>
 <table>
-  <tr><th>Median per-PR FE</th><td class="num">0.4%</td></tr>
-  <tr><th>Mean per-PR FE</th><td class="num">0.4%</td></tr>
+  <tr><th>Median per-PR FE</th><td class="num">48.2%</td></tr>
+  <tr><th>Mean per-PR FE</th><td class="num">48.2%</td></tr>
 </table>
 
-<p><strong>Key insight.</strong> This is in the typical 5-15% range for knowledge work — most clock time is wait, not active. Slowest PR (BIGTOP-4515)  ran 98.4d and dominates the ratio.</p>
+<p><strong>Key insight.</strong> Portfolio FE of 90.5% is unusually high — verify the data. Common causes: dependabot automation, tiny version-bump PRs that merge in minutes, or stale draft handling. Cross-check by sampling a few PRs by hand.</p>
 
 <p><strong>Next actions</strong></p>
 <ol class="compact-prose">
-  <li>Inspect the three slowest PRs (BIGTOP-4515, BIGTOP-4528) — they likely sat in review queue.</li>
+  <li>Inspect the three slowest PRs (BIGTOP-4528) — they likely sat in review queue.</li>
   <li>Compare to the previous 2-4 weeks to spot a trend.</li>
   <li>Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself.</li>
 </ol>

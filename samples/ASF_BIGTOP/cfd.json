@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-17T15:32:20.296946-06:00",
-  "headline": "CFD for jira:BIGTOP Apr 17, 2026 \u2192 May 16, 2026: 736 items arrived, 17 completed, 719 still in flight at end.",
+  "generated_at": "2026-05-17T17:14:34.178037-06:00",
+  "headline": "CFD for BIGTOP Apr 17, 2026 \u2192 May 16, 2026: 736 items arrived, 17 completed, 719 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -822,7 +822,7 @@
     ]
   },
   "input": {
-    "repo": "jira:BIGTOP",
+    "repo": "BIGTOP",
     "start": "2026-04-17",
     "stop": "2026-05-16",
     "workflow": [
@@ -838,6 +838,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-17 --stop 2026-05-16 --workflow 'In Progress,Patch Available,Resolved' --interval-days 1 --offline",
+  "cli_invocation": "uv run flow cfd --repo BIGTOP --start 2026-04-17 --stop 2026-05-16 --workflow 'In Progress,Patch Available,Resolved' --interval-days 1 --offline",
   "logs": []
 }

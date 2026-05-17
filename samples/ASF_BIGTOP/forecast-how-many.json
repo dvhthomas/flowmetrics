@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-17T15:32:19.471602-06:00",
-  "headline": "85% confident at least 0 items finish in the next 15 days (by May 31, 2026).",
+  "generated_at": "2026-05-17T17:14:33.350781-06:00",
+  "headline": "Forecast too uncertain \u2014 85% of simulations produced zero completions in the next 15 days (by May 31, 2026). Median is 4 items; consider a wider training window.",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
     "percentiles": {
@@ -99,7 +99,7 @@
     "total_runs": 10000
   },
   "input": {
-    "repo": "jira:BIGTOP",
+    "repo": "BIGTOP",
     "start_date": "2026-05-17",
     "target_date": "2026-05-31",
     "history_start": "2026-04-17",
@@ -157,6 +157,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow forecast how-many --jira-url https://issues.apache.org/jira --jira-project BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42 --offline",
+  "cli_invocation": "uv run flow forecast how-many --repo BIGTOP --target-date 2026-05-31 --start-date 2026-05-17 --history-start 2026-04-17 --history-end 2026-05-16 --runs 10000 --seed 42 --offline",
   "logs": []
 }

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.scatterplot.v1",
   "command": "scatterplot",
-  "generated_at": "2026-05-17T15:32:19.858773-06:00",
+  "generated_at": "2026-05-17T17:14:33.734154-06:00",
   "headline": "10 items completed in 30 days; 85% finished within 84.5 days (Apr 17, 2026 -> May 16, 2026).",
   "definition": "Each dot is one completed item: x = completion date, y = cycle time (days from creation to completion). Horizontal percentile lines mark probability thresholds \u2014 a new item entering the system has an 85% chance of finishing in P85 days or less, by definition of the percentile.",
   "summary": {
@@ -108,7 +108,7 @@
     ]
   },
   "input": {
-    "repo": "jira:BIGTOP",
+    "repo": "BIGTOP",
     "start": "2026-04-17",
     "stop": "2026-05-16",
     "offline": true,
@@ -119,6 +119,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow scatterplot --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-04-17 --stop 2026-05-16 --offline",
+  "cli_invocation": "uv run flow scatterplot --repo BIGTOP --start 2026-04-17 --stop 2026-05-16 --offline",
   "logs": []
 }

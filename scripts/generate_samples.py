@@ -80,6 +80,12 @@ class Repo:
     # → Changes Requested → Approved lifecycle. rust-lang/rust uses
     # `S-waiting-on-author,S-waiting-on-review,S-waiting-on-bors` etc.
     aging_wip_labels: str | None = None
+    # Per-repo `--active-statuses` for the EFFICIENCY command (Jira
+    # only — GitHub falls back to event clustering). Defaults to the
+    # CLI's `In Progress,In Development` set which matches generic
+    # workflows; rich Jira workflows (Cassandra) need a wider list
+    # covering every status the team considers active.
+    efficiency_active_statuses: str | None = None
 
 
 # Default GitHub PR aging workflow — driven by `isDraft` + `reviewDecision`,
@@ -213,6 +219,15 @@ REPOS: list[Repo] = [
         # because aging-in-intake is a useful signal regardless.
         cfd_workflow="In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved",
         aging_workflow="Triage Needed,Open,In Progress,Patch Available,Review In Progress,Ready to Commit",
+        # Efficiency active set — Cassandra's workflow uses several
+        # statuses that all represent "actively being worked":
+        # In Progress (development), Patch Available (review queue),
+        # Review In Progress (reviewing), Ready to Commit (just before
+        # merge). Default `In Progress,In Development` alone misses
+        # most items.
+        efficiency_active_statuses=(
+            "In Progress,Patch Available,Review In Progress,Ready to Commit"
+        ),
     ),
     Repo(
         slug="ASF/BIGTOP",
@@ -232,6 +247,9 @@ REPOS: list[Repo] = [
         # counts as WIP.
         cfd_workflow="In Progress,Patch Available,Resolved",
         aging_workflow="Open,In Progress,Patch Available",
+        # Same wider active set as Cassandra; BIGTOP shares the
+        # workflow vocabulary.
+        efficiency_active_statuses="In Progress,Patch Available",
     ),
 ]
 
@@ -553,6 +571,10 @@ def _produce_one_repo(
         if repo.exclude_stale_days is not None else []
     )
 
+    active_status_args = (
+        ["--active-statuses", repo.efficiency_active_statuses]
+        if repo.efficiency_active_statuses is not None else []
+    )
     common_efficiency = [
         "efficiency",
         *source_args,
@@ -560,6 +582,7 @@ def _produce_one_repo(
         *common_cache,
         *stitch_args,
         *gap_args,
+        *active_status_args,
     ]
     history_start = (
         datetime.strptime(history_end, "%Y-%m-%d").replace(tzinfo=UTC).date() - timedelta(days=29)

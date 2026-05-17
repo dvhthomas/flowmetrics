@@ -1,1 +1,2 @@
-673 items completed in 30 days; 85% finished within 17.8 days (Apr 17, 2026 -> May 16, 2026).
+673 items completed in 30 days; median 1.7d, P85 17.8d (wide spread -- deep tail of backlog cleanups 
+skews P85).

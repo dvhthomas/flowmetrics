@@ -1,34 +1,34 @@
 {
   "schema": "flowmetrics.efficiency.v1",
   "command": "efficiency",
-  "generated_at": "2026-05-17T15:32:18.499193-06:00",
-  "headline": "0.1% flow efficiency across 2 completed items over 7 days, May 10, 2026 \u2192 May 16, 2026.",
+  "generated_at": "2026-05-17T17:14:32.404568-06:00",
+  "headline": "90.5% flow efficiency across 2 completed items over 7 days, May 10, 2026 \u2192 May 16, 2026.",
   "definition": "Portfolio flow efficiency: the share of cycle time that was actively worked on, versus waiting in review or other queues. Computed as \u03a3 active \u00f7 \u03a3 cycle across every merged PR in the window \u2014 totals first, so one short PR cannot inflate the system-level number.",
   "summary": {
     "pr_count": 2,
     "human_pr_count": 2,
     "bot_pr_count": 0,
-    "portfolio_efficiency": 0.0009998789035550138,
-    "median_efficiency": 0.0039066312780626925,
-    "mean_efficiency": 0.0039066312780626925,
+    "portfolio_efficiency": 0.9047230938697424,
+    "median_efficiency": 0.48243144270049865,
+    "mean_efficiency": 0.48243144270049865,
     "total_cycle": {
       "seconds": 9001090.0,
       "hours": 2500.302777777778,
       "days": 104.17928240740741
     },
     "total_active": {
-      "seconds": 9000.0,
-      "hours": 2.5,
-      "days": 0.10416666666666667
+      "seconds": 8143493.993,
+      "hours": 2262.0816647222223,
+      "days": 94.25340269675925
     },
     "observed_statuses": [
       "Open",
       "Patch Available"
     ]
   },
-  "key_insight": "This is in the typical 5-15% range for knowledge work \u2014 most clock time is wait, not active. Slowest PR (BIGTOP-4515)  ran 98.4d and dominates the ratio.",
+  "key_insight": "Portfolio FE of 90.5% is unusually high \u2014 verify the data. Common causes: dependabot automation, tiny version-bump PRs that merge in minutes, or stale draft handling. Cross-check by sampling a few PRs by hand.",
   "next_actions": [
-    "Inspect the three slowest PRs (BIGTOP-4515, BIGTOP-4528) \u2014 they likely sat in review queue.",
+    "Inspect the three slowest PRs (BIGTOP-4528) \u2014 they likely sat in review queue.",
     "Compare to the previous 2-4 weeks to spot a trend.",
     "Look at where the wait time concentrates (pre-first-review, post-approval, blocked) rather than setting a target on the number itself."
   ],
@@ -52,20 +52,20 @@
       },
       {
         "item_id": "BIGTOP-4515",
-        "efficiency": 0.0006353275284006112
+        "efficiency": 0.9576849503732725
       }
     ]
   },
   "input": {
-    "repo": "jira:BIGTOP",
+    "repo": "BIGTOP",
     "start": "2026-05-10",
     "stop": "2026-05-16",
     "gap_hours": 4.0,
     "min_cluster_minutes": 30.0,
     "offline": true,
     "active_statuses": [
-      "In Development",
-      "In Progress"
+      "In Progress",
+      "Patch Available"
     ],
     "jira_url": "https://issues.apache.org/jira"
   },
@@ -101,11 +101,11 @@
           "days": 98.37445601851852
         },
         "active_time": {
-          "seconds": 5400.0,
-          "hours": 1.5,
-          "days": 0.0625
+          "seconds": 8139893.993,
+          "hours": 2261.0816647222223,
+          "days": 94.2117360300926
         },
-        "efficiency": 0.0006353275284006112,
+        "efficiency": 0.9576849503732725,
         "is_bot": false,
         "author_login": "iwasakims"
       }
@@ -116,6 +116,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow efficiency --jira-url https://issues.apache.org/jira --jira-project BIGTOP --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline",
+  "cli_invocation": "uv run flow efficiency --repo BIGTOP --start 2026-05-10 --stop 2026-05-16 --gap-hours 4.0 --min-cluster-minutes 30.0 --offline",
   "logs": []
 }

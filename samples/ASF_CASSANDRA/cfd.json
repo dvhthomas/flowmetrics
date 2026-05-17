@@ -1,8 +1,8 @@
 {
   "schema": "flowmetrics.cfd.v1",
   "command": "cfd",
-  "generated_at": "2026-05-17T15:32:16.761980-06:00",
-  "headline": "CFD for jira:CASSANDRA Apr 17, 2026 \u2192 May 16, 2026: 3233 items arrived, 111 completed, 3122 still in flight at end.",
+  "generated_at": "2026-05-17T17:14:30.621450-06:00",
+  "headline": "CFD for CASSANDRA Apr 17, 2026 \u2192 May 16, 2026: 3233 items arrived, 111 completed, 3122 still in flight at end.",
   "definition": "Stacked-area chart of items by workflow step over time. The top line counts every item that has ever entered the system; the bottom line counts items finished. The vertical gap at any sample date is items still in flight (WIP). Includes carry-over items that were already open at window start AND items still open at window end \u2014 so the chart shows real WIP, not just items that both arrived and finished inside the window.",
   "summary": {
     "workflow": [
@@ -1244,7 +1244,7 @@
     ]
   },
   "input": {
-    "repo": "jira:CASSANDRA",
+    "repo": "CASSANDRA",
     "start": "2026-04-17",
     "stop": "2026-05-16",
     "workflow": [
@@ -1262,6 +1262,6 @@
     "forecast": "docs/FORECAST.md",
     "decisions": "docs/DECISIONS.md"
   },
-  "cli_invocation": "uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project CASSANDRA --start 2026-04-17 --stop 2026-05-16 --workflow 'In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1 --offline",
+  "cli_invocation": "uv run flow cfd --repo CASSANDRA --start 2026-04-17 --stop 2026-05-16 --workflow 'In Progress,Patch Available,Review In Progress,Ready to Commit,Resolved' --interval-days 1 --offline",
   "logs": []
 }
