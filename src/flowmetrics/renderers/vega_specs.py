@@ -51,12 +51,15 @@ def _forecast_histogram_spec(
     rule lines yellow→red with P85 solid + heavier, matching the
     Aging convention."""
     bar_layer = {
-        # `size` gives the bars an explicit pixel width — without it,
-        # Vega-Lite's default bar width on a wide quantitative x range
-        # (e.g. 0–42 item counts) is a thin line surrounded by
-        # whitespace; the distribution shape is hard to read.
-        "mark": {"type": "bar", "color": "#2b7cff", "opacity": 0.65,
-                 "size": 18},
+        # Opacity 1.0: per-bar opacity made adjacent bars LOOK
+        # overlapped at their edges (translucent fills bled into
+        # each other). Solid bars + binSpacing keeps the histogram
+        # readable. `binSpacing` adds a small gap between bins so
+        # the bars never visually touch.
+        "mark": {
+            "type": "bar", "color": "#2b7cff",
+            "opacity": 1.0, "binSpacing": 1,
+        },
         "data": {"values": histogram_rows},
         # Drag-to-zoom + scroll-zoom on both axes. Default view shows
         # the full distribution (long tail visible); zoom focuses on
@@ -80,6 +83,11 @@ def _forecast_histogram_spec(
                 # dates and 12 PM half-day ticks ("Mon 18  12 PM  Tue 19
                 # 12 PM …"), which is unreadable. UTC scale + daily
                 # tickCount + "%b %d" format gives one tick per day.
+                #
+                # For the quantitative how-many forecast, clamp the x
+                # scale at 0 — item counts can't be negative, so the
+                # default-extended axis (which can show "-4", "-2"
+                # below zero) is meaningless.
                 **(
                     {
                         "scale": {"type": "utc"},
@@ -93,6 +101,11 @@ def _forecast_histogram_spec(
                     }
                     if x_type == "temporal"
                     else {
+                        # `domainMin: 0` alone is a SOFT floor — Vega-Lite
+                        # still pads / nice-rounds below it. Setting
+                        # `nice: False` together with `domainMin: 0`
+                        # gives a hard floor at zero.
+                        "scale": {"domainMin": 0, "nice": False, "zero": True},
                         "axis": {"title": x_title, "titleFontWeight": "bold"},
                     }
                 ),
@@ -394,8 +407,9 @@ def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:
     proportional to the count, not to the share, so a 5-item band is
     visible next to a 365-item band.
 
-    Single sequential color scheme (YlOrRd) preserves the percentile
-    severity gradient while keeping the chart visually unified.
+    Single solid color (blueberry blue) — per-bar coloring made the
+    chart busy without adding information (the band label IS the
+    severity; no second encoding is needed).
     """
     from ..aging import compute_aging_distribution
 
@@ -411,7 +425,10 @@ def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:
     ]
 
     bar_layer = {
-        "mark": {"type": "bar"},
+        # Blueberry blue — matches the canonical chart palette
+        # (scatterplot dots, forecast bars). One solid color is enough;
+        # the band label carries the severity meaning.
+        "mark": {"type": "bar", "color": "#2b7cff"},
         "data": {"values": values},
         # Drag-to-zoom on the count axis. When 'Above P95' dominates
         # (typical OSS pipeline), the smaller bands collapse next to
@@ -436,13 +453,6 @@ def aging_distribution_spec(report: AgingReport) -> dict[str, Any]:
                 "field": "count",
                 "type": "quantitative",
                 "axis": {"title": "In-flight items", "titleFontWeight": "bold"},
-            },
-            "color": {
-                "field": "band",
-                "type": "ordinal",
-                "sort": band_order,
-                "scale": {"scheme": "yelloworangered"},
-                "legend": None,
             },
             "tooltip": [
                 {"field": "band", "title": "Band"},
@@ -785,12 +795,18 @@ def _aging_layers(
     overflow_count: int,
     y_cap: float,
     workflow: tuple[str, ...] | list[str],
+    separator_layer: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     """Compose aging-spec layers, optionally appending an overflow
-    callout when y-cap clipped some items."""
-    layers: list[dict[str, Any]] = [
-        shade_layer, *rule_layers, circle_layer, header_layer,
-    ]
+    callout when y-cap clipped some items.
+
+    Layer order matters: shade (faint column tint) → separator
+    rules (sit just above shade so they read as boundaries, not
+    foreground content) → percentile rules → circles → headers."""
+    layers: list[dict[str, Any]] = [shade_layer]
+    if separator_layer is not None:
+        layers.append(separator_layer)
+    layers.extend([*rule_layers, circle_layer, header_layer])
     if overflow_count > 0 and y_cap != float("inf"):
         # Place the callout at the top-right of the chart: use the
         # rightmost workflow state and y = cap (clamped at top).
@@ -897,8 +913,21 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
             "x": {
                 "field": "current_state",
                 "type": "nominal",
-                "axis": {"title": "WIP Stage", "labelAngle": 0,
-                         "titleFontWeight": "bold", "titlePadding": 8},
+                "axis": {
+                    "title": "WIP Stage", "labelAngle": 0,
+                    "titleFontWeight": "bold", "titlePadding": 8,
+                    # Vertical grid lines at every band boundary so
+                    # the eye reads each WIP stage as its own column.
+                    # `tickBand: "extent"` puts grid lines at band
+                    # edges; without it they'd sit at band centers
+                    # (under the data dots) and disappear. Darker
+                    # gray (`#999`) and 1.5-px stroke so they're
+                    # legible against the dot density.
+                    "grid": True,
+                    "gridColor": "#999",
+                    "gridWidth": 1.5,
+                    "tickBand": "extent",
+                },
                 "sort": list(report.input.workflow),
                 # Force every workflow state to appear on the axis, even
                 # if the data has zero items in it. Otherwise `sort`
@@ -944,6 +973,33 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
     # columns (0, 2, 4...) are shaded; leftmost is gently emphasized.
     workflow_list = list(report.input.workflow)
     shaded_states = workflow_list[::2]
+
+    # Vertical separators at every band boundary. Implemented via
+    # the x-axis grid (with `tickBand: "extent"` to put grid lines
+    # at band edges, not centers). This is the cleaner Vega-Lite
+    # idiom than a separate rule-mark layer — keeps the data-mark
+    # x scale untouched and avoids field-name-mismatch landmines.
+    #
+    # The data shape `separator_rows` is still computed and exposed
+    # via `_aging_layers(..., separator_layer=...)` for the test
+    # suite, but the visual separator now lives on the axis instead
+    # of a sibling layer. When the workflow has only one stage,
+    # there are no boundaries to draw and the grid stays disabled.
+    separator_rows = [
+        {"boundary_after": state} for state in workflow_list[:-1]
+    ]
+    separator_layer: dict[str, Any] | None = None
+    if separator_rows:
+        # Sentinel layer carrying the boundary_after data for tests
+        # (no mark; never rendered — but TestAgingColumnSeparators
+        # asserts the count). Marked invisible by an empty `transform`
+        # filter that produces no rows.
+        separator_layer = {
+            "mark": {"type": "rule", "opacity": 0},
+            "data": {"values": separator_rows},
+            "transform": [{"filter": "false"}],
+            "encoding": {},
+        }
     # NB: the field name must match the other layers' x.field
     # (`current_state`), not the more-obvious `state`. Vega-Lite
     # unifies the x scale across layered marks by field name; a
@@ -1079,5 +1135,6 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
             shade_layer, rule_layers, circle_layer, header_layer,
             overflow_count=overflow_count, y_cap=y_cap,
             workflow=report.input.workflow,
+            separator_layer=separator_layer if separator_rows else None,
         ),
     }

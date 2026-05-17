@@ -110,18 +110,26 @@ class TestAgingDistributionSpec:
         assert "items" in encoding["x"]["axis"]["title"].lower() or \
                "count" in encoding["x"]["axis"]["title"].lower()
 
-    def test_color_uses_single_sequential_scheme(self):
-        """Single color scheme (sequential YlOrRd) — the percentile
-        gradient is intrinsic, severity rises with darker shade. Not
-        five different unrelated colors."""
+    def test_bars_use_single_solid_color(self):
+        """User preference: one solid color across all bars (blueberry
+        blue). The band label IS the severity meaning; coloring each
+        bar differently added visual noise without adding information.
+
+        The chart-canonical bar color used elsewhere (forecast
+        histogram, scatter dots) is `#2b7cff`. This chart shares it
+        so the chart family reads as one palette."""
         spec = vega_specs.aging_distribution_spec(self._report([1, 5, 60]))
         bar_layer = spec["layer"][0] if "layer" in spec else spec
-        color = bar_layer["encoding"]["color"]
-        scale = color.get("scale", {})
-        # Either a sequential `scheme` or an explicit ordered range
-        # that walks one hue family — both satisfy "single scheme".
-        assert "scheme" in scale, (
-            f"Expected a single sequential color scheme, got {scale}"
+        mark = bar_layer["mark"]
+        assert isinstance(mark, dict), (
+            "mark must be a dict carrying the explicit color, not a string shorthand"
+        )
+        assert mark.get("color") == "#2b7cff", (
+            f"expected blueberry-blue #2b7cff, got {mark.get('color')!r}"
+        )
+        # No per-band color encoding any more — bars share the mark color.
+        assert "color" not in bar_layer["encoding"], (
+            "per-band color encoding should be removed when all bars share one color"
         )
 
 
@@ -343,14 +351,19 @@ class TestAgingSpec:
     def test_percentile_rules_consolidated_in_one_layer_with_color_encoding(self):
         """All four percentile thresholds share one rule layer so a
         single color scale (yellow-low-risk → red-high-risk) can encode
-        them. Four separate layers can't share a color legend."""
+        them. Four separate layers can't share a color legend.
+
+        Other rule layers (column separators) coexist — identified by
+        data shape: percentile rule rows carry a `pct` field; column
+        separators carry `boundary_after`."""
         spec = vega_specs.aging_spec(_aging_report([_item("#1", "Awaiting Review", 100)]))
         rule_layers = [
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "rule"
+            and any("pct" in v for v in layer.get("data", {}).get("values", []))
         ]
-        # Exactly one rule layer, containing all four percentile rows.
+        # Exactly one percentile-rule layer, containing all four rows.
         assert len(rule_layers) == 1
         rule_layer = rule_layers[0]
         rows = rule_layer["data"]["values"]
@@ -374,6 +387,7 @@ class TestAgingSpec:
             layer for layer in spec["layer"]
             if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
                 else layer["mark"]) == "rule"
+            and any("pct" in v for v in layer.get("data", {}).get("values", []))
         )
         enc = rule_layer["encoding"]
         # `strokeDash` is conditional on the pct field — non-dashed
@@ -1326,12 +1340,11 @@ class TestHowManySpec:
         ys = {row["x"] for row in rule_layer["data"]["values"]}
         assert ys == {18, 22, 25, 28}
 
-    def test_bars_have_substantial_width_for_quantitative_x(self):
-        """With a quantitative x and a wide range (e.g. 0-42 items)
-        Vega-Lite's default bar width is a thin line — most of the
-        chart becomes whitespace and the distribution shape is hard
-        to read. Force a chunkier minimum so each bar fills its
-        column's slot."""
+    def test_bars_do_not_visually_overlap(self):
+        """With a quantitative x and integer item counts, adjacent bars
+        sit at unit-spaced positions. Previous version used opacity 0.65
+        which made overlapping edges visually bleed into each other.
+        Solid bars + `binSpacing: 1` keeps every bar visually distinct."""
         spec = vega_specs.how_many_spec(_how_many_fixture())
         bar_layer = next(
             layer for layer in spec["layer"]
@@ -1339,12 +1352,35 @@ class TestHowManySpec:
                 else layer["mark"]) == "bar"
         )
         mark = bar_layer["mark"]
-        # Either explicit width via `mark.size` OR a width binding that
-        # widens automatically (e.g. `binSpacing: 0` + `bin`); we use
-        # the explicit-size pattern.
-        assert "size" in mark or "width" in mark, (
-            f"Forecast bars need an explicit minimum width to be "
-            f"readable; got mark={mark}"
+        # Opacity must be solid (no edge-bleed between bars).
+        assert mark.get("opacity", 1.0) >= 1.0 - 1e-9, (
+            f"bar opacity should be 1.0 to prevent visual overlap; "
+            f"got opacity={mark.get('opacity')}"
+        )
+        # Either explicit spacing OR a width hint keeps bars distinct.
+        assert "binSpacing" in mark or "size" in mark or "width" in mark, (
+            f"bars need either binSpacing, size, or width to stay "
+            f"visually distinct; got mark={mark}"
+        )
+
+    def test_quantitative_x_does_not_extend_below_zero(self):
+        """Item counts can't be negative — forecast x axis must clamp
+        at 0. Default Vega-Lite extends ~5% below the data min, which
+        for a how-many forecast produces tick labels at -4, -2, 0, 2…
+        which is meaningless."""
+        spec = vega_specs.how_many_spec(_how_many_fixture())
+        bar_layer = next(
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "bar"
+        )
+        scale = bar_layer["encoding"]["x"].get("scale", {})
+        domain_min = scale.get("domainMin")
+        if domain_min is None and "domain" in scale:
+            domain_min = scale["domain"][0]
+        assert domain_min == 0, (
+            f"x scale must clamp at 0 for the how-many forecast; "
+            f"got domain spec={scale}"
         )
 
 
@@ -1731,3 +1767,80 @@ class TestAgingYCapWithOverflow:
                    for t in annotation_texts), (
             f"expected 3-items-above-cap annotation; got {annotation_texts}"
         )
+
+
+class TestAgingColumnSeparators:
+    """User feedback: 'the boundary between WIP steps is not clear.
+    There should be a clear vertical separator make the distinction
+    between each stage on the x-axes very clear.'
+
+    Spec gets an explicit `rule` layer with one vertical line at every
+    band boundary (N-1 separators for N stages). Color subtle so they
+    don't fight the data, but visible enough to anchor the eye."""
+
+    def test_aging_has_separator_layer_with_correct_count(self):
+        workflow = ("State A", "State B", "State C", "State D")
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=workflow,
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=[_item("#1", "State A", 10), _item("#2", "State C", 15)],
+            cycle_time_percentiles={50: 5.0, 70: 7.0, 85: 9.0, 95: 12.0},
+            completed_count=100,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        spec = vega_specs.aging_spec(report)
+        # Look for a layer that draws vertical rules between columns.
+        # Identify by: mark.type==rule, data has a `boundary_after`
+        # field equal to a workflow state (everything except last).
+        separator_layers = [
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "rule"
+            and "data" in layer
+            and any("boundary_after" in v for v in layer.get("data", {}).get("values", []))
+        ]
+        assert len(separator_layers) == 1, (
+            f"expected exactly one separator-rule layer; got {len(separator_layers)}"
+        )
+        boundaries = separator_layers[0]["data"]["values"]
+        # N-1 separators for N stages.
+        assert len(boundaries) == len(workflow) - 1
+        # Each boundary names the state on its left (so Vega-Lite can
+        # use bandPosition=1 to draw at the right edge of that band).
+        assert [b["boundary_after"] for b in boundaries] == list(workflow[:-1])
+
+    def test_single_stage_workflow_has_no_separators(self):
+        """Edge case: one stage means no boundaries to draw."""
+        report = AgingReport(
+            input=AgingInput(
+                repo="acme/widget",
+                asof=date(2026, 5, 14),
+                workflow=("Solo",),
+                history_start=date(2026, 4, 14),
+                history_end=date(2026, 5, 13),
+                offline=False,
+            ),
+            items=[_item("#1", "Solo", 10)],
+            cycle_time_percentiles={50: 5.0, 70: 7.0, 85: 9.0, 95: 12.0},
+            completed_count=10,
+            interpretation=_interp(),
+            generated_at=datetime(2026, 5, 14, 12, 0, tzinfo=UTC),
+        )
+        spec = vega_specs.aging_spec(report)
+        separator_layers = [
+            layer for layer in spec["layer"]
+            if (layer["mark"].get("type") if isinstance(layer["mark"], dict)
+                else layer["mark"]) == "rule"
+            and "data" in layer
+            and any("boundary_after" in v for v in layer.get("data", {}).get("values", []))
+        ]
+        # Either no layer at all, or one with zero rows — both fine.
+        if separator_layers:
+            assert separator_layers[0]["data"]["values"] == []

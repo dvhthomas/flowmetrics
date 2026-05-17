@@ -1053,12 +1053,17 @@ class TestAgingHtmlDistributionAtTop:
         assert "P85–P95" in out
         assert "Above P95" in out
 
-    def test_distribution_table_appears_before_the_chart(self):
-        """The situation snapshot goes at the top — above the chart."""
+    def test_wip_aging_chart_appears_before_distribution(self):
+        """User preference: WIP Aging scatter is the primary signal
+        (every in-flight item placed by stage + age); the
+        distribution histogram is a supporting summary view that
+        belongs below it."""
         out = html_renderer.render(_aging_report_with_distribution())
-        i_dist = out.index("Above P95")
         i_chart = out.index('id="aging-chart"')
-        assert i_dist < i_chart
+        i_dist = out.index("Above P95")
+        assert i_chart < i_dist, (
+            "WIP Aging chart should render before the distribution band"
+        )
 
     def test_per_state_table_appears_after_the_chart(self):
         """Drilldown comes after the chart, not before it."""

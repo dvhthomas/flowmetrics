@@ -58,6 +58,22 @@
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
+{# ── Interactive chart, named for navigation by heading. Order:
+   the WIP Aging scatter comes FIRST because it's the primary signal
+   (every in-flight item placed by stage + age); the distribution
+   histogram is a summary view that supports it. ──────────────── #}
+<h2>WIP Aging</h2>
+<div id="aging-chart" class="chart tall"></div>
+<script>
+  vegaEmbed("#aging-chart", {{ vega_spec_json | safe }}, {
+    actions: {export: true, source: false, compiled: false, editor: false},
+    renderer: "svg"
+  }).catch(function(err) {
+    document.getElementById("aging-chart").innerText =
+      "Interactive chart failed to render: " + err;
+  });
+</script>
+
 <h2>Distribution by percentile band</h2>
 <div id="aging-dist-chart" role="img" aria-label="{{ bar_aria }}"
      class="chart short"></div>
@@ -87,19 +103,6 @@ cycle-time range. Thresholds come from the
 {{ report.input.max_age_days }}d.
 {% endif %}
 </p>
-
-{# ── Interactive chart, named for navigation by heading. ──────────── #}
-<h2>WIP Aging</h2>
-<div id="aging-chart" class="chart tall"></div>
-<script>
-  vegaEmbed("#aging-chart", {{ vega_spec_json | safe }}, {
-    actions: {export: true, source: false, compiled: false, editor: false},
-    renderer: "svg"
-  }).catch(function(err) {
-    document.getElementById("aging-chart").innerText =
-      "Interactive chart failed to render: " + err;
-  });
-</script>
 
 {# ── Next actions: oldest past-P85 per state, rightmost-first. ────── #}
 {% if top_interventions %}
