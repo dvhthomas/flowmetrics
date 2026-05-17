@@ -1,0 +1,80 @@
+{
+  "_comment": "Synthetic-but-realistic Issue+PR stitched workflow. Models a typical OSS flow: Issue opened with 'bug' label → triaged → a PR is opened referencing it → PR review approves → PR merges, which CLOSES the issue. The canonical stream represents the ISSUE's journey, with the closing PR's merge event landing on the Issue's stream as SIGNAL_GITHUB_PR_CLOSES_ISSUE. The PR itself has its own work_item row but the same item_id namespace.",
+  "workflow": {
+    "stages": ["Open", "Triaged", "In Progress", "Review", "Done"],
+    "wip_set": ["Triaged", "In Progress", "Review"]
+  },
+  "work_items": [
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "title": "Pagination breaks for repos with >5000 stars",
+      "url": "https://github.com/acme/widget/issues/101",
+      "created_at": "2026-04-01T09:00:00Z",
+      "completed_at": "2026-04-19T14:32:18Z"
+    },
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "title": "Fix repo pagination cursor handling",
+      "url": "https://github.com/acme/widget/pull/215",
+      "created_at": "2026-04-10T16:45:00Z",
+      "completed_at": "2026-04-19T14:32:18Z"
+    }
+  ],
+  "transitions": [
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "entered_at": "2026-04-01T09:00:00Z",
+      "stage": "Open",
+      "signal": "github-issue-created"
+    },
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "entered_at": "2026-04-02T11:20:00Z",
+      "stage": "Triaged",
+      "signal": "github-label-added"
+    },
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "entered_at": "2026-04-10T16:45:00Z",
+      "stage": "In Progress",
+      "signal": "github-pr-created"
+    },
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "entered_at": "2026-04-15T13:00:00Z",
+      "stage": "Review",
+      "signal": "github-pr-ready-for-review"
+    },
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "entered_at": "2026-04-19T14:32:18Z",
+      "stage": "Done",
+      "signal": "github-pr-closes-issue"
+    },
+
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "entered_at": "2026-04-10T16:45:00Z",
+      "stage": "Open",
+      "signal": "github-pr-created"
+    },
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "entered_at": "2026-04-15T13:00:00Z",
+      "stage": "Review",
+      "signal": "github-pr-ready-for-review"
+    },
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "entered_at": "2026-04-19T14:30:01Z",
+      "stage": "Review",
+      "signal": "github-pr-review-approved"
+    },
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "entered_at": "2026-04-19T14:32:18Z",
+      "stage": "Done",
+      "signal": "github-pr-merged"
+    }
+  ]
+}

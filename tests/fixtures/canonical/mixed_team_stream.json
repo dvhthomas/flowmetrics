@@ -1,0 +1,85 @@
+{
+  "_comment": "Mixed-source team stream. Combines: a GitHub Issue+PR stitched journey (one issue closed by a PR), a standalone GitHub PR with no linked Issue, a Jira issue with five status changes, and an in-flight Jira issue that is still on the board. Demonstrates that the canonical model can hold a heterogeneous team's portfolio with one WorkflowDef per source-team flavor.",
+  "workflows": {
+    "github_issue": {
+      "stages": ["Open", "Triaged", "In Progress", "Review", "Done"],
+      "wip_set": ["Triaged", "In Progress", "Review"]
+    },
+    "github_pr": {
+      "stages": ["Open", "Review", "Merge Queue", "Merged"],
+      "wip_set": ["Open", "Review", "Merge Queue"]
+    },
+    "jira": {
+      "stages": ["Triage Needed", "Open", "In Progress", "Patch Available", "Review In Progress", "Ready to Commit", "Resolved"],
+      "wip_set": ["Open", "In Progress", "Patch Available", "Review In Progress", "Ready to Commit"]
+    }
+  },
+  "work_items": [
+    {
+      "item_id": "github:acme/widget:issue:101",
+      "title": "Pagination breaks for repos with >5000 stars",
+      "url": "https://github.com/acme/widget/issues/101",
+      "source": "github_issue",
+      "created_at": "2026-04-01T09:00:00Z",
+      "completed_at": "2026-04-19T14:32:18Z"
+    },
+    {
+      "item_id": "github:acme/widget:pr:215",
+      "title": "Fix repo pagination cursor handling",
+      "url": "https://github.com/acme/widget/pull/215",
+      "source": "github_pr",
+      "created_at": "2026-04-10T16:45:00Z",
+      "completed_at": "2026-04-19T14:32:18Z"
+    },
+    {
+      "item_id": "github:acme/widget:pr:217",
+      "title": "Drop python 3.9 from CI matrix",
+      "url": "https://github.com/acme/widget/pull/217",
+      "source": "github_pr",
+      "created_at": "2026-05-02T10:11:00Z",
+      "completed_at": "2026-05-04T18:00:00Z"
+    },
+    {
+      "item_id": "github:acme/widget:issue:108",
+      "title": "Investigate flaky integration tests",
+      "url": "https://github.com/acme/widget/issues/108",
+      "source": "github_issue",
+      "created_at": "2026-05-05T08:00:00Z",
+      "completed_at": null
+    },
+    {
+      "item_id": "jira:CASSANDRA:21301",
+      "title": "add AGENTS.md and CLAUDE.md",
+      "url": "https://issues.apache.org/jira/browse/CASSANDRA-21301",
+      "source": "jira",
+      "created_at": "2026-04-12T12:59:30Z",
+      "completed_at": "2026-05-14T11:25:51Z"
+    }
+  ],
+  "transitions": [
+    {"item_id": "github:acme/widget:issue:101", "entered_at": "2026-04-01T09:00:00Z", "stage": "Open",        "signal": "github-issue-created"},
+    {"item_id": "github:acme/widget:issue:101", "entered_at": "2026-04-02T11:20:00Z", "stage": "Triaged",     "signal": "github-label-added"},
+    {"item_id": "github:acme/widget:issue:101", "entered_at": "2026-04-10T16:45:00Z", "stage": "In Progress", "signal": "github-pr-created"},
+    {"item_id": "github:acme/widget:issue:101", "entered_at": "2026-04-15T13:00:00Z", "stage": "Review",      "signal": "github-pr-ready-for-review"},
+    {"item_id": "github:acme/widget:issue:101", "entered_at": "2026-04-19T14:32:18Z", "stage": "Done",        "signal": "github-pr-closes-issue"},
+
+    {"item_id": "github:acme/widget:pr:215", "entered_at": "2026-04-10T16:45:00Z", "stage": "Open",     "signal": "github-pr-created"},
+    {"item_id": "github:acme/widget:pr:215", "entered_at": "2026-04-15T13:00:00Z", "stage": "Review",   "signal": "github-pr-ready-for-review"},
+    {"item_id": "github:acme/widget:pr:215", "entered_at": "2026-04-19T14:32:18Z", "stage": "Merged",   "signal": "github-pr-merged"},
+
+    {"item_id": "github:acme/widget:pr:217", "entered_at": "2026-05-02T10:11:00Z", "stage": "Open",     "signal": "github-pr-created"},
+    {"item_id": "github:acme/widget:pr:217", "entered_at": "2026-05-02T15:30:00Z", "stage": "Review",   "signal": "github-pr-ready-for-review"},
+    {"item_id": "github:acme/widget:pr:217", "entered_at": "2026-05-04T17:55:00Z", "stage": "Merge Queue", "signal": "github-label-added"},
+    {"item_id": "github:acme/widget:pr:217", "entered_at": "2026-05-04T18:00:00Z", "stage": "Merged",   "signal": "github-pr-merged"},
+
+    {"item_id": "github:acme/widget:issue:108", "entered_at": "2026-05-05T08:00:00Z", "stage": "Open",     "signal": "github-issue-created"},
+    {"item_id": "github:acme/widget:issue:108", "entered_at": "2026-05-08T10:00:00Z", "stage": "Triaged",  "signal": "github-label-added"},
+
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-04-12T12:59:30Z", "stage": "Triage Needed",       "signal": "jira-issue-created"},
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-05-11T17:32:14Z", "stage": "Open",                "signal": "jira-status-changed"},
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-05-11T17:32:24Z", "stage": "Patch Available",     "signal": "jira-status-changed"},
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-05-11T17:32:32Z", "stage": "Review In Progress",  "signal": "jira-status-changed"},
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-05-14T10:54:09Z", "stage": "Ready to Commit",     "signal": "jira-status-changed"},
+    {"item_id": "jira:CASSANDRA:21301", "entered_at": "2026-05-14T11:25:51Z", "stage": "Resolved",            "signal": "jira-resolved"}
+  ]
+}
