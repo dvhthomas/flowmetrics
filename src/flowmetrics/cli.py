@@ -1043,3 +1043,71 @@ def forecast_how_many(
         )
 
     _dispatch(fmt, output, build, verbose=verbose)
+
+
+# ---------------------------------------------------------------------------
+# Warehouse: `flow materialise <name>` — Slice 1.
+# ---------------------------------------------------------------------------
+
+
+@cli.command(short_help="Materialise a contract — fetch + write Parquet")
+@click.argument("name", type=str)
+@click.option(
+    "--data-dir",
+    type=click.Path(path_type=Path),
+    default=Path("./data"),
+    show_default=True,
+    help="Directory where work_items/, transitions/, runs/ Parquet land.",
+)
+@click.option(
+    "--contracts-dir",
+    type=click.Path(path_type=Path),
+    default=Path("./contracts"),
+    show_default=True,
+    help="Directory holding contract YAML files (one file per contract).",
+)
+@click.option(
+    "--cache-dir",
+    type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR,
+    show_default=True,
+    help="Source-API response cache (read by GitHub/Jira adapters).",
+)
+@click.option(
+    "--offline/--online",
+    default=False,
+    help="Offline reads cache only; online hits the source API on miss.",
+)
+def materialise(
+    name: str,
+    data_dir: Path,
+    contracts_dir: Path,
+    cache_dir: Path,
+    offline: bool,
+) -> None:
+    """Fetch + canonicalise + write Parquet for one contract.
+
+    Invoked by external cron / systemd-timer / k8s CronJob. Exits 0
+    on success, non-zero on any failure. Operators see the error in
+    cron mail or systemd journal.
+    """
+    from .contract import ContractError, load_contract
+    from .materialise import materialise as run_materialise
+
+    try:
+        contract = load_contract(name, contracts_dir)
+    except ContractError as exc:
+        click.echo(f"error: {exc}", err=True)
+        sys.exit(2)
+
+    manifest = run_materialise(
+        contract=contract,
+        data_dir=data_dir,
+        cache_dir=cache_dir,
+        offline=offline,
+    )
+    click.echo(
+        f"materialised {manifest.contract_id} (run_id={manifest.run_id}): "
+        f"{manifest.items_fetched} items in "
+        f"{(manifest.completed_at - manifest.started_at).total_seconds():.1f}s"
+    )
