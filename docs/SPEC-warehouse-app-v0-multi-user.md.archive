@@ -1,0 +1,1495 @@
+# SPEC: flowmetrics warehouse app (v0)
+
+> **Status.** Draft v0 — load-bearing decisions marked with **[D-N]**.
+> Open questions tracked in §13. Iterate against this; don't build from
+> it yet.
+
+> **Defaults committed for the v0 draft** (each is revisitable; called
+> out so review focuses on what to flip, not what's missing):
+>
+> - **[D-1]** Deployment tier: small team server (Tier 2). Single-user
+>   laptop (Tier 1) is a subset, supported but not the primary mode.
+> - **[D-2]** Auth: OIDC against the team's existing identity provider,
+>   with a local-account fallback for solo / homelab installs.
+> - **[D-3]** First user: generic — designed to be configurable rather
+>   than tuned for one team. Ships with example contracts.
+> - **[D-4]** Source auth: GitHub App + Jira OAuth 2.0 by default. PAT
+>   supported only in single-user mode (Tier 1) and explicitly
+>   discouraged in docs for any shared deployment.
+> - **[D-5]** Agent API: read-only by default. Writes (refresh trigger,
+>   contract edit) require a separate confirmation flow that LLMs
+>   cannot transparently complete.
+
+---
+
+## 1. Goals & non-goals
+
+### Goals
+
+1. **Move flow-metrics computation off interactive runtime.** ETL ingests
+   from GitHub/Jira on a schedule, materialises Parquet, and exits. The
+   runtime serves charts, MCS forecasts, and agent queries by reading
+   that Parquet — never by calling GitHub/Jira during a request.
+2. **Make slicing dynamic.** Team, initiative, risk class, severity,
+   epic, time window — all queryable from one fact table without
+   re-fetching anything.
+3. **Make MCS fast.** Sub-second forecast responses at standard sample
+   sizes (10k simulations). The slow part of MCS — gathering the
+   training distribution — moves into ETL.
+4. **Make secrets hard to leak.** Token storage, request lifecycle,
+   error handling, and logs all designed so that a stolen container
+   image or a leaked log file cannot exfiltrate a GitHub/Jira token.
+5. **Make agents first-class consumers.** OpenAPI-documented JSON API
+   that LLM-driven tools can call, with read-only-by-default safety.
+
+### Non-goals (v1)
+
+- Multi-tenant SaaS. One installation = one organisation's data.
+- Real-time / second-by-second metrics. The metric is a leading
+  indicator measured at standup cadence; minute-granular doesn't add
+  value.
+- Replacing GitHub Insights / LinearB / Jellyfish at feature parity.
+  The point is the Vacanti-grade contract + agent-readability, not a
+  marketplace product.
+- Custom dashboard builder. v1 ships a fixed set of report types; the
+  agent API lets users build their own UI if they need one.
+- Mobile-native UI. The web app is desktop-first; responsive but not
+  optimised for phones.
+
+---
+
+## 2. Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                       Browser / Agents                          │
+│  ─────────────────────────────────────────────────────────────  │
+│  HTMX pages with Vega-Lite charts        |  LLM-driven tools     │
+└────────────────────────────────┬────────────────┬───────────────┘
+                                 │ HTTPS          │ HTTPS / OAuth
+                                 ▼                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       RUNTIME SERVICE                            │
+│                       (FastAPI, uvicorn)                         │
+│  ─────────────────────────────────────────────────────────────  │
+│  /                  HTMX pages                                  │
+│  /api/v1            JSON API (OpenAPI 3.1)                      │
+│  /admin             contract editor, refresh trigger            │
+│  /auth              OIDC callback / local login                 │
+│                                                                  │
+│  Reads only. Never calls GitHub/Jira. Hot in memory:            │
+│    • DuckDB connection (pooled)                                 │
+│    • Throughput index (pre-computed per contract)               │
+│    • Contract YAML (parsed, validated)                          │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │ reads Parquet
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    DATA LAYER (Parquet store)                   │
+│  ─────────────────────────────────────────────────────────────  │
+│  /data/                                                          │
+│    work_items/    contract_id=X/year=Y/month=M/items.parquet    │
+│    transitions/   contract_id=X/year=Y/month=M/items.parquet    │
+│    throughput/    contract_id=X/scope=S/throughput.parquet      │
+│    contracts/     {hash}.yaml + {hash}.metadata.json            │
+│    runs/          contract_id=X/run_id=…/manifest.json          │
+└────────────────────────────────▲────────────────────────────────┘
+                                 │ writes Parquet (atomic rename)
+                                 │
+┌─────────────────────────────────────────────────────────────────┐
+│                       ETL SERVICE                                │
+│                       (APScheduler in-process,                  │
+│                        OR external cron + CLI)                  │
+│  ─────────────────────────────────────────────────────────────  │
+│  For each contract on its schedule:                              │
+│    1. Fetch scope from GitHub/Jira (cached, paginated)          │
+│    2. Replay event stream against contract stages               │
+│    3. Build work_items + transitions rows                       │
+│    4. Compute throughput index for forecast scopes              │
+│    5. Atomic write to Parquet (write .tmp + rename)             │
+│    6. Append run manifest                                       │
+│                                                                  │
+│  Holds secrets in memory only for fetch duration.               │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │ HTTPS
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  GitHub API (GraphQL + REST)      |    Jira API (REST)          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Why the ETL / Runtime split is load-bearing
+
+- **Different performance envelopes.** ETL is IO-bound, rate-limited,
+  minutes-to-hours per refresh. Runtime is CPU-bound, must respond in
+  ≤1s. Coupling them means runtime inherits ETL latency; splitting
+  them means runtime never touches the network.
+- **Different failure modes.** Rate-limit throttling, API outages, and
+  authentication failures all live in ETL. Runtime continues serving
+  the last successful snapshot regardless.
+- **Different scaling.** N teams = N ETL schedules (parallel,
+  independent). One runtime serves them all.
+- **Different security postures.** ETL holds secrets; runtime doesn't.
+  An attacker who compromises the runtime cannot exfiltrate tokens
+  because they're not there.
+- **Replayability.** Re-deriving the fact table from cached raw API
+  responses is local and fast. Re-fetching from GitHub is slow and
+  rate-limit-bounded. The split makes the difference auditable.
+
+### Deployment topologies
+
+The split allows three deployment shapes from the same codebase:
+
+1. **Bundled** — single Docker container, ETL runs in-process via
+   APScheduler. Simplest. Default. Works for everything up to ~20
+   contracts on daily refresh.
+2. **Split processes** — same image, two deployments: `flow-runtime`
+   and `flow-etl`. ETL has secret-store access; runtime doesn't.
+3. **Kubernetes-native** — runtime as a Deployment, ETL as a CronJob.
+   Same image, different commands. Independent scaling, independent
+   restart, secrets injected only into the CronJob.
+
+---
+
+## 3. Personas
+
+| Persona | Reads | Writes | Notes |
+|---|---|---|---|
+| **Engineer** | Dashboards for their team | nothing | Daily-standup user |
+| **Team lead** | Per-team slice; per-initiative slice | refresh trigger | Weekly retro user |
+| **Org admin** | All contracts, all dashboards | contract YAML, token rotation | Quarterly + on-change user |
+| **LLM agent** | JSON API read endpoints | nothing in v1 | Triggered by chat tools |
+| **Engineering exec** | Cross-team rollups | nothing | Monthly review user |
+
+The contract editor is the only frequent admin write path. Token rotation
+and contract changes are infrequent but high-trust.
+
+---
+
+## 4. Data model
+
+### 4.1 `work_items` (fact table)
+
+One row per piece of work. Columns derived from event replay + contract
+metadata mapping. Hive-partitioned by `contract_id` and year/month for
+prune-on-read.
+
+| Group | Column | Type | Source |
+|---|---|---|---|
+| Identity | `source` | enum | github / jira |
+| | `repo` | string | for URL only — not a primary slice |
+| | `item_id` | string | PR# / issue# / jira-key |
+| | `item_type` | string | pr / issue / epic / story / … |
+| | `title` | string | |
+| | `url` | string | |
+| | `author` | string | login or accountId |
+| | `is_bot` | bool | derived from contract exclusions |
+| Lifecycle | `created_at` | timestamp | |
+| | `completed_at` | timestamp | null if in-flight |
+| | `closed_at` | timestamp | may differ from `completed_at` |
+| | `cycle_time_days` | double | derived |
+| | `age_days` | double | now − created_at for in-flight |
+| Stage durations | `time_in_<stage>_h` | double | one column per contract stage |
+| | `total_active_h` | double | Σ wip-stage durations |
+| | `total_wait_h` | double | Σ non-wip-stage durations |
+| | `flow_efficiency` | double | active / (active + wait) |
+| Phase durations | `pickup_time_h` | double | PR open → first non-author review |
+| | `review_time_h` | double | first review → merge |
+| | `post_approval_wait_h` | double | last approval → merge |
+| Slicing metadata | `team` | string | from contract metadata mapping |
+| | `initiative` | string | |
+| | `risk_class` | string | |
+| | `severity` | string | |
+| | `area` | string | |
+| | `release` | string | |
+| | `epic_key` | string | parent epic / closing issue |
+| | `linked_keys` | list[string] | cross-source links |
+| Activity | `commit_count` | int | |
+| | `review_count` | int | |
+| | `comment_count` | int | |
+| | `changes_requested_count` | int | |
+| | `last_activity_at` | timestamp | |
+| Provenance | `contract_id` | string | hash of contract YAML |
+| | `materialised_at` | timestamp | when ETL produced this row |
+| | `run_id` | string | ETL run that produced this row |
+
+### 4.2 `stage_transitions` (long table)
+
+Source of truth for per-stage durations. The fact table's `time_in_*`
+columns are derived from this; the contract can change without
+re-fetching from GitHub/Jira.
+
+| Column | Type |
+|---|---|
+| `source` | enum |
+| `item_id` | string |
+| `entered_at` | timestamp |
+| `exited_at` | timestamp (null if still in stage) |
+| `stage` | string |
+| `is_wip` | bool |
+| `signal` | string (which event drove the transition) |
+| `contract_id` | string |
+
+### 4.3 Throughput — computed on demand, cached in memory
+
+Earlier drafts pre-computed a `throughput_index` Parquet table per
+named scope. That was wrong: **the runtime must support dynamic
+windowing and slicing** (e.g. "past 14d for team-a + team-b"), so
+pre-computing every (scope × window) combination is combinatorial.
+
+Instead, throughput for MCS is computed **on demand** from the fact
+table:
+
+```sql
+-- pseudocode; the runtime constructs this from filter+window params
+SELECT date_trunc('day', completed_at) AS d, COUNT(*) AS completions
+FROM work_items
+WHERE contract_id = $contract
+  AND completed_at BETWEEN $training_start AND $training_end
+  AND team IN ('platform', 'data')
+  AND NOT is_bot
+GROUP BY d
+ORDER BY d
+```
+
+DuckDB scans a 100k-item fact table for one contract + window + filter
+in ~5–20ms. The MCS step (`np.random.choice` from the resulting array)
+adds another ~10ms. Total runtime forecast cost: well within the
+80ms p50 budget without any pre-computation.
+
+**Caching.** Throughput arrays are keyed by `(contract_id, filter_hash,
+training_window)` and held in a process-local LRU. Cache key includes
+the contract's `run_id` so the cache invalidates automatically when
+ETL writes a new run for that contract.
+
+**When pre-computation might be needed.** If/when a single contract's
+fact table grows past ~1M items, or a deployment supports many
+concurrent forecast users with diverse slices that defeat the LRU,
+revisit pre-computing per-day completions denormalised by the most
+common slice dimensions. Tracked under §13 open questions.
+
+### 4.4 Contracts (config artifacts)
+
+YAML files stored in `data/contracts/`, hashed for identity. Loaded
+into memory at startup; reloaded on file mtime change without restart.
+
+See §5.
+
+### 4.4.1 Contracts vs Views — the two axes of "configuration"
+
+Two completely different lifecycles. Worth naming so they don't get
+conflated:
+
+| Aspect | **Contract** | **View** |
+|---|---|---|
+| Lifetime | Durable; weeks to months | Ephemeral; one query / one UI interaction |
+| Defines | Stages, metadata extraction, exclusions, scope of what ETL fetches | Time window + slice filters for *this* read |
+| Who edits | Admins / team leads | Anyone running a query, every interaction |
+| How edited | YAML in `data/contracts/` (or admin UI form) | URL params, UI controls, API filter args |
+| Triggers | ETL re-run (next scheduled or manual refresh) | Nothing — pure read from existing Parquet |
+| Versioning | Hashed; old data preserved under old hash | Not versioned (it's a query, not state) |
+| Examples | "We added a Design stage" / "Drop dependabot" | "Show me last 14 days, teams a+b" |
+
+**The runtime guarantee.** Any report, any forecast, any aggregation
+accepts a (window, filter) pair and operates on that slice without
+touching the contract. The contract defines *what was fetched and
+how it's parsed*; the view defines *what the user wants to see right
+now*.
+
+This separation is what makes the UI feel responsive: users can
+change windows and toggle team filters all day without invoking ETL
+or rewriting YAML. Contract editing — the slow path — is a separate,
+admin-gated UX.
+
+### 4.4.2 View shape
+
+A view is just a parameter bag, never persisted as state (in v1).
+The canonical shape, used by API params and UI controls:
+
+```python
+@dataclass(frozen=True)
+class View:
+    contract_id: str
+    # Time window
+    since: date | None              # default: contract's history_window_days
+    until: date | None              # default: today
+    training_window_days: int = 30  # for forecasts; user-tunable in UI
+    # Slice filters — any column on work_items is filterable
+    filters: dict[str, list[str]]   # e.g. {"team": ["a", "b"], "severity": ["1"]}
+    excludes: dict[str, list[str]]  # negative filters
+    # Behaviour
+    include_in_flight: bool = True
+    include_bots: bool = False      # bots excluded by default
+```
+
+All filters compose conjunctively (`AND`); within one filter key the
+values are disjunctive (`team IN (a, b)`).
+
+### 4.4.3 Saved views (deferred to v2)
+
+Common views might warrant naming: "weekly platform retro,"
+"quarterly initiative roll-up." v2 can persist `SavedView` records in
+DuckDB with a slug, owner, and the parameter bag. v1 ships URL-
+parameterised views only — share-by-link is good enough.
+
+### 4.5 ETL run manifest
+
+For each ETL run, a JSON manifest:
+
+```json
+{
+  "run_id": "01HXKZ…",
+  "contract_id": "sha256:…",
+  "started_at": "...",
+  "completed_at": "...",
+  "scope_query_count": 12,
+  "api_calls": {"github": 47, "jira": 0},
+  "rate_limit_remaining": 4731,
+  "items_fetched": 312,
+  "items_updated": 47,
+  "errors": [...]
+}
+```
+
+Used for observability and for the admin UI's "last refresh" panel.
+
+---
+
+## 5. Contract format
+
+```yaml
+contract:
+  name: acme-platform-team
+  version: 3
+  description: |
+    Platform team's PR-driven workflow. Inherits org-base for stage
+    taxonomy; overrides metadata extraction for our labelling
+    conventions.
+  inherits: org-base
+
+  scope:
+    source: github
+    query: "org:acme is:pr is:merged repo:acme/svc-a repo:acme/svc-b"
+    # OR for Jira:
+    # source: jira
+    # project: PLATFORM
+    # jql: 'project = PLATFORM AND statusCategory = Done'
+
+  stages:
+    - { name: Triage,        query: "label:triage",            wip: false }
+    - { name: Design Doing,  query: "label:design/doing",      wip: true  }
+    - { name: Design Done,   query: "label:design/done",       wip: false }
+    - { name: Build Doing,   query: "label:build/doing",       wip: true  }
+    - { name: Build Done,    query: "label:build/done",        wip: false }
+    - { name: In Review,     query: "is:open review:none",     wip: false }
+    - { name: Approved,      query: "is:open review:approved", wip: false }
+    - { name: Merged,        query: "is:merged",               wip: false }
+
+  metadata:
+    team:
+      strategy: label_pattern
+      pattern: "team-(.+)"
+      default: "unowned"
+    initiative:
+      strategy: label_pattern
+      pattern: "initiative-(.+)"
+    risk_class:
+      strategy: label_values
+      values: ["expedite", "fixed-date", "intangible", "standard"]
+      default: "standard"
+    severity:
+      strategy: label_pattern
+      pattern: "sev-(\\d+)"
+
+  exclusions:
+    - "user:dependabot[bot]"
+    - "user:renovate[bot]"
+    - "label:duplicate"
+    - "created:<2024-01-01"
+
+  refresh:
+    schedule: "0 6 * * *"     # daily 06:00 UTC
+    in_flight_max_age_days: 180
+    history_window_days: 90
+
+  forecast_scopes:
+    - { name: team_overall,        filter: {} }
+    - { name: by_initiative,       group_by: initiative }
+    - { name: by_severity,         filter: { severity: ["1","2"] } }
+```
+
+### Supported predicate vocabulary
+
+Stages and exclusions accept a constrained subset of GitHub search
+syntax — the subset whose history we can replay locally from timeline
+events:
+
+| Predicate | Replayed via |
+|---|---|
+| `label:X` | LabeledEvent / UnlabeledEvent |
+| `is:open` / `is:closed` | ClosedEvent / ReopenedEvent |
+| `is:draft` | ReadyForReview / ConvertToDraft |
+| `is:merged` | MergedEvent |
+| `assignee:X` | AssignedEvent / UnassignedEvent |
+| `review:approved` / `review:changes_requested` / `review:none` | PullRequestReview state |
+| `user:X` | item.author (static) |
+| `created:<date` / `>date` | item.created_at (static) |
+| Conjunctions (`AND`, space) | local conjunction |
+| Negations (`-label:X`) | local negation |
+
+**Unsupported:** `comments:>N`, `reactions:>N`, full-text search, regex
+on title. Use these in `scope_query` (current-state filter) but not in
+stage predicates (need history).
+
+### Inheritance & override resolution
+
+When a contract has `inherits: org-base`:
+
+- Org-base's stages provide the **stage taxonomy**.
+- Child contract can **redefine the query** for an inherited stage,
+  but not rename it (stable column names across teams).
+- Child contract can **add stages** at the end; insertion order matters
+  for stage assignment.
+- Child contract can **add metadata extractors** but cannot remove ones
+  defined in the parent (so cross-team queries on `team` work
+  uniformly).
+- Multiple matches at stage assignment: **rightmost stage in declared
+  order wins**. Same rule as our current label workflow.
+
+### Validation
+
+The contract is validated at load time:
+
+- All stage queries use only supported predicates.
+- Stage names are unique.
+- Metadata extractor strategies are recognised (`label_pattern`,
+  `label_values`, `assignee`, `field`).
+- Exclusions are valid scope-query predicates.
+- `inherits` resolves to a real contract.
+
+Invalid contracts are rejected with line-level error messages. ETL
+refuses to run; runtime continues serving the last good contract.
+
+---
+
+## 6. ETL service
+
+### 6.1 Pipeline
+
+For each contract on its schedule:
+
+```
+fetch_scope     → list of WorkItem source nodes (paginated from GH/Jira)
+↓
+replay_events   → list of (item, stage_transitions[]) per item, derived
+                  locally from the fetched event timeline + contract
+                  stage predicates
+↓
+build_facts     → flatten to one row per item with derived columns
+↓
+apply_metadata  → extract team/initiative/risk_class/… per contract.metadata
+↓
+apply_exclusions → mark or drop excluded rows
+↓
+compute_throughput → for each forecast_scope, daily completion counts
+↓
+materialise      → atomic write to Parquet (write .tmp, rename)
+↓
+manifest         → write run summary to runs/
+```
+
+### 6.2 Scheduling
+
+`APScheduler` (in-process) with per-contract cron expression. Defaults:
+
+- `refresh.schedule: "0 6 * * *"` — daily 06:00 UTC
+- Staggered start times automatically applied (no two contracts start at
+  the exact same minute, even if their cron strings would).
+- Refresh can be triggered manually from `/admin` (requires admin role).
+
+### 6.3 Refresh tiering
+
+| Tier | Items | Refresh policy |
+|---|---|---|
+| **Frozen** | `completed_at < window_start` and `contract_id` unchanged | Read from existing Parquet, never re-fetched, never re-derived |
+| **Closed-recent** | `completed_at` within last `history_window_days` | Re-derived from cache (events may have been backfilled) |
+| **In-flight** | `completed_at is null` | Re-fetched and re-derived |
+
+Cache key includes `(scope_query, window, source)`. Cached responses are
+permanent for closed windows; in-flight items use a fresh fetch every
+refresh.
+
+### 6.4 Source authentication
+
+| Source | Tier 1 (laptop) | Tier 2 (team server) |
+|---|---|---|
+| GitHub | PAT in OS keyring | **GitHub App + installation token**; private key in secret store |
+| Jira | PAT in OS keyring | **OAuth 2.0**; refresh token in secret store |
+
+Tokens are read into memory exactly once per ETL run; never logged,
+never serialised to disk. ETL records the GitHub App installation
+ID + last token rotation date in the run manifest for audit.
+
+### 6.5 Rate-limit handling
+
+GitHub: each query reports its cost; ETL backs off when remaining
+budget < 200 points. Jira: REST is request-counted; ETL applies
+exponential backoff on 429.
+
+ETL never blocks the runtime when throttled — it logs, completes what
+it can, and writes a partial run manifest. Next scheduled run picks up.
+
+### 6.6 Failure modes
+
+| Failure | Behaviour |
+|---|---|
+| One contract's scope query fails (invalid syntax) | Skip that contract; log; runtime continues serving last good snapshot |
+| GitHub rate limit | Wait for reset OR complete partial run + retry next schedule |
+| Jira auth expired | Retry once with refresh token; if refresh fails, mark contract degraded; admin UI surfaces it |
+| Schema-drift in source (new event type) | Unknown event type → ignored with WARN log; doesn't fail the run |
+| Parquet write fails partway | `.tmp` files cleaned up on next run start; never leaves a partial in place |
+
+---
+
+## 7. Runtime service
+
+### 7.1 Performance budget
+
+Non-functional requirements drive the implementation choices below.
+
+| Operation | p50 budget | p99 budget |
+|---|---|---|
+| Dashboard page render (server-side, HTMX) | 100ms | 400ms |
+| Single-slice chart query (DuckDB scan + aggregate) | 50ms | 200ms |
+| MCS forecast at 10k sims, 30-day horizon | 80ms | 250ms |
+| JSON API response | 80ms | 300ms |
+
+All measured cold-cache assuming a 100k-item fact table. Hot-cache is
+faster.
+
+### 7.2 Query layer
+
+- **DuckDB embedded** opened once per process; connection re-used.
+- Hive-partitioned reads — DuckDB prunes irrelevant `contract_id` and
+  `year=…/month=…` partitions automatically.
+- Common aggregations pushed down to DuckDB (no row materialisation in
+  Python for chart data).
+- Polars used for any custom transforms that don't fit cleanly in SQL
+  (zero-copy interop with DuckDB).
+- No ORM. SQL strings are parametrised and live in a query module;
+  static analysis catches injection at lint time.
+
+### 7.3 MCS engine
+
+The performance-critical operation. Three optimisations stack:
+
+1. **Pre-computed throughput index** (built in ETL). Runtime never
+   computes daily counts from the fact table during a forecast.
+2. **Vectorised sampling** via numpy:
+   ```python
+   completions = throughput[contract_id, scope_hash]   # cached array
+   sims = np.random.choice(completions, size=(n_sims, n_days)).sum(axis=1)
+   percentiles = np.percentile(sims, [50, 70, 85, 95])
+   ```
+3. **Process-local cache** of throughput arrays keyed by
+   `(contract_id, scope_hash, training_window)`. Cache invalidated when
+   ETL writes a new run manifest for that contract (file watcher).
+
+Result: forecast response time is dominated by JSON serialisation, not
+computation. The runtime can serve 100+ concurrent forecast requests on
+a laptop-class machine.
+
+### 7.4 Web UI
+
+- **HTMX + server-rendered Jinja templates.** No SPA build step, no
+  state management library, no separate front-end repo.
+- **Vega-Lite embedded via CDN script tags** — same as current
+  flowmetrics report rendering.
+- **Page inventory (v1):**
+  - `/` — landing: list of contracts, last-refresh status, links to
+    each
+  - `/contracts/<id>` — per-contract dashboard with all report types
+  - `/contracts/<id>/efficiency` — efficiency drill-down + per-item
+    table
+  - `/contracts/<id>/aging` — WIP aging with hover-detail
+  - `/contracts/<id>/forecast` — MCS forecasts; date and count
+  - `/contracts/<id>/scatterplot`
+  - `/contracts/<id>/cfd`
+  - `/contracts/<id>/items/<source>/<item_id>` — single-item lineage
+    (the explainability view)
+  - `/admin` — contract editor, refresh trigger, token rotation
+  - `/admin/contracts/<id>/edit` — YAML editor with syntax+schema
+    validation
+- **Server-side rendering** keeps page load <400ms p99. Interactivity
+  (zoom, filter, drill-down) is HTMX swaps, not client state.
+
+### 7.5 The "explain why this item is in this stage" view
+
+For the contract to be trustworthy, every fact-table row must explain
+itself. Per-item page shows:
+
+- Current stage + why (which event drove the most recent transition)
+- Full transition history (one row per stage entry with timestamp and
+  signal)
+- All metadata extractions and which event/label produced each
+- All exclusions evaluated (passed/failed each one)
+- Direct link back to GitHub/Jira for ground truth
+
+This is what makes the contract debuggable. Without it, the contract
+is a fancier black box.
+
+---
+
+## 8. API surface
+
+### 8.1 Design principles (Hyrum-aware)
+
+These principles govern every endpoint in this spec. Cite them in PR
+review when an endpoint design drifts.
+
+1. **Contract first.** The schema is the spec. Implementation follows.
+   FastAPI route handlers reference typed Pydantic models; OpenAPI
+   3.1 is generated from those types, not hand-written.
+2. **Hyrum's Law applies.** Any observable behaviour — field order,
+   error message text, response timing, undocumented quirks —
+   becomes a commitment once agents and dashboards depend on it.
+   Design implications:
+   - Be intentional about what you expose. If a field is in the
+     response, it's a contract.
+   - Don't leak implementation details (DuckDB error stacks, file
+     paths, internal IDs that aren't stable across runs).
+   - Plan deprecation at design time. See §8.7.
+   - Tests aren't a defense — agents will depend on things the tests
+     don't check.
+3. **One-Version Rule.** No `/api/v2` alongside `/api/v1`. Extend
+   `v1` additively. A new major version exists only when a breaking
+   change is forced and a 6-month deprecation window has elapsed.
+4. **Validate at boundaries only.** Pydantic parses every request
+   body and every query-string params dict. Internal code trusts
+   those typed objects; no defensive re-validation. Source-fetched
+   data (GitHub/Jira) is validated where it lands in the canonical
+   model.
+5. **Prefer addition over modification.** New fields are optional.
+   Existing field types don't change. Existing fields don't get
+   removed without deprecation.
+6. **Predictable naming** (locked):
+   - URL paths: plural nouns, no verbs (`/work-items`, not `/getItems`).
+   - Path segments: kebab-case (`work-items`, `forecast-when-done`).
+   - Query params: snake_case (`since`, `training_window_days`).
+   - JSON field names: snake_case (`cycle_time_days`, `created_at`).
+   - Boolean fields: `is_*` / `has_*` / `can_*` prefix.
+   - Timestamps: RFC 3339 in UTC, field suffix `_at`.
+   - Durations: numeric with unit-suffixed name (`pickup_time_h`,
+     `cycle_time_days`).
+   - Enum values: snake_case (`in_progress`, `changes_requested`),
+     matching the values used in the data layer.
+
+### 8.1.1 What IS a commitment, and what is NOT
+
+Naming the two categories explicitly because the Hyrum's-Law trap is
+real. The credibility rule (§6 in `SPEC.md`) says tests assert the
+human-readable strings; the API design rule says don't let those
+strings become an agent contract.
+
+**Commitments (frozen; change = breaking):**
+
+- URL paths, HTTP methods, status codes, error `type` URIs.
+- Field names, field types, enum values, units.
+- The set of fields in any successful response.
+- The set and meaning of standard view params.
+- Pagination model (cursor opacity, ordering guarantees).
+- Authentication mechanism, header names, token formats.
+
+**NOT commitments (free to change without versioning):**
+
+- The exact prose of `headline`, `key_insight`, `next_actions[]`,
+  and `caveats[]` strings. These are for human display.
+- The order of items in `next_actions[]` and `caveats[]` arrays
+  (treat as set semantics).
+- Field order in JSON objects (semantically irrelevant; JSON spec).
+- Whitespace inside HTML responses.
+- Internal IDs that aren't documented (run IDs are documented;
+  internal DuckDB row IDs are not).
+- Server-rendered HTML page structure (HTMX-driven, may change).
+- Performance numbers (the budget in §7.1 is a target, not a
+  contract).
+
+### 8.1.2 The headline / structured-fields separation
+
+A direct consequence of 8.1.1. Reports today emit prose like
+`"85% confident at least 12 items finish in the next 14 days (by
+May 31, 2026)"`. Tests assert the prose. But agents that scrape the
+prose to drive automation freeze the wording.
+
+The API response carries both:
+
+```json
+{
+  "headline": "85% confident at least 12 items finish in the next 14 days (by May 31, 2026).",
+  "headline_template": "{confidence}% confident at least {count} items finish in the next {days} {day_word} (by {target_date}).",
+  "headline_values": {
+    "confidence": 85,
+    "count": 12,
+    "days": 14,
+    "day_word": "days",
+    "target_date": "2026-05-31"
+  }
+}
+```
+
+**Rule for clients:**
+- **Human UIs** render `headline` directly. May change between
+  releases for clarity; not a contract.
+- **Agents and automation** read `headline_values` and (optionally)
+  re-render via `headline_template`. The values are typed and stable;
+  the template strings are stable per major version.
+
+Same pattern applies to `key_insight`, every entry in `next_actions[]`,
+and every entry in `caveats[]`. All carry a parallel structured form.
+
+### 8.2 Shape & envelope
+
+OpenAPI 3.1, generated by FastAPI from typed Pydantic models. All
+endpoints under `/api/v1`. Versioning policy in §8.8; deprecation in
+§8.9.
+
+Every successful response carries a standard envelope:
+
+```json
+{
+  "data": <endpoint-specific payload>,
+  "meta": {
+    "contract_id": "sha256:abc123…",
+    "contract_version": 3,
+    "run_id": "01HXKZ…",
+    "materialised_at": "2026-05-18T06:01:23Z",
+    "view": {
+      "since": "2026-04-18",
+      "until": "2026-05-18",
+      "filters": {"team": ["platform", "data"]},
+      "excludes": {},
+      "training_window_days": 30
+    },
+    "request_id": "01HY3M…"
+  }
+}
+```
+
+- `meta` is structurally identical across every endpoint. Agents can
+  detect staleness via `materialised_at`; correlate logs via
+  `request_id`; reproduce a query via `view`.
+- List-shaped responses additionally carry `pagination` (see §8.5).
+- `data` is the only field whose shape varies per endpoint.
+
+### 8.3 Endpoints (v1)
+
+Every read endpoint accepts the **standard view params** — they define
+the slice and window for that query. None of them imply or trigger a
+contract change.
+
+**Standard view params (apply to every read endpoint):**
+
+| Param | Type | Default | Meaning |
+|---|---|---|---|
+| `since` | date | `today - contract.history_window_days` | window start |
+| `until` | date | today | window end |
+| `training_window_days` | int | 30 | for forecasts |
+| `filter[<col>]` | repeatable string | none | e.g. `?filter[team]=a&filter[team]=b` |
+| `exclude[<col>]` | repeatable string | none | negative filter |
+| `include_in_flight` | bool | true | include items with `completed_at is null` |
+| `include_bots` | bool | false | include `is_bot=true` rows |
+
+```
+# Reads — view params apply to all
+GET   /api/v1/contracts                           list contracts
+GET   /api/v1/contracts/{id}                      contract details + last run
+GET   /api/v1/contracts/{id}/work-items           filtered list (+ standard view params)
+        ?limit=…&cursor=…
+GET   /api/v1/contracts/{id}/work-items/{src}/{itemid}
+        full item detail + stage lineage
+GET   /api/v1/contracts/{id}/aggregate
+        ?metric=cycle_time|flow_efficiency|throughput
+        &group_by=team|initiative|severity
+        &percentile=50,70,85,95
+        + standard view params
+GET   /api/v1/contracts/{id}/forecast/when-done
+        ?items=N&start=DATE
+        + standard view params (filter[team]=…, etc.)
+        + training_window_days
+GET   /api/v1/contracts/{id}/forecast/how-many
+        ?days=N&start=DATE
+        + standard view params
+        + training_window_days
+GET   /api/v1/contracts/{id}/cfd
+        + standard view params
+
+# Discovery (helps UIs build slice controls)
+GET   /api/v1/contracts/{id}/dimensions
+        → {team: [...], initiative: [...], severity: [...], ...}
+        Distinct values for each metadata column, for populating filter widgets.
+
+# Admin (write) — requires admin role; never triggered by view changes
+POST  /api/v1/contracts/{id}/refresh              trigger ETL run
+PUT   /api/v1/contracts/{id}                      update contract YAML
+POST  /api/v1/contracts/{id}:validate             dry-run validation
+DELETE /api/v1/contracts/{id}
+```
+
+The `/dimensions` endpoint exists so the UI can build dropdowns and
+filter widgets without hard-coding column values. It's a cheap
+`SELECT DISTINCT` per metadata column, cached per `(contract_id, run_id)`.
+
+### 8.4 Errors
+
+Single error envelope, RFC 7807 (Problem Details for HTTP APIs):
+
+```json
+{
+  "type": "https://flowmetrics.example/errors/validation",
+  "title": "Validation failed",
+  "status": 422,
+  "detail": "Field 'since' must be a date earlier than 'until'.",
+  "instance": "/api/v1/contracts/abc/work-items?since=2026-06-01&until=2026-05-01",
+  "code": "VIEW_WINDOW_INVERTED",
+  "field_errors": {
+    "since": ["must be earlier than 'until'"]
+  },
+  "request_id": "01HY3M…"
+}
+```
+
+**Required fields**: `type`, `title`, `status`, `code`, `request_id`.
+**Optional fields**: `detail`, `instance`, `field_errors`, plus any
+per-error-type extensions documented in OpenAPI.
+
+The `code` is the machine-readable identifier and IS a commitment
+(§8.1.1): agents may switch on it. The `title` and `detail` are
+human-readable and may evolve.
+
+**Status code policy:**
+
+| Status | Use |
+|---|---|
+| 400 | Malformed request (un-parseable JSON, missing required field) |
+| 401 | Not authenticated |
+| 403 | Authenticated but not authorised for this resource |
+| 404 | Resource not found OR (deliberately) hidden from this caller |
+| 409 | Conflict (concurrent contract edit; version mismatch) |
+| 422 | Validated as syntactically OK but semantically wrong (`since > until`, unknown enum value, unsupported predicate in stage query) |
+| 429 | Rate-limited |
+| 500 | Internal error — body MUST NOT include stack traces, file paths, or DuckDB error text. Generic `code: INTERNAL_ERROR` + `request_id` only. |
+| 503 | Service degraded (no successful contract run available; ETL is processing a refresh) |
+
+**Token redaction.** A logging+response middleware scrubs anything
+matching `gh[ps]_[a-zA-Z0-9_]+`, JWT triplets, or
+`Authorization:.*` substrings from `detail` and any nested error
+context. Tested in `tests/test_error_redaction_component.py`.
+
+### 8.5 Pagination
+
+Cursor-based, opaque to clients:
+
+```
+GET /api/v1/contracts/{id}/work-items?limit=50&cursor=eyJsYXN0X2lkIjoidWlkLW9wYXF1ZSJ9
+```
+
+Response envelope adds `pagination` to `meta`:
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "contract_id": "...",
+    "pagination": {
+      "next_cursor": "eyJsYXN0X2lkIjoiMTIzNCJ9",
+      "has_more": true,
+      "limit": 50,
+      "total_estimate": 1247
+    },
+    "...": "..."
+  }
+}
+```
+
+**Commitments:**
+- `next_cursor` is opaque (base64 of internal state); clients
+  MUST NOT parse or construct it.
+- Cursor stability: a cursor returned by run N is valid for
+  subsequent reads against run N. After a new ETL run produces a
+  newer `run_id` for the contract, cursors from the older run remain
+  valid but may skip newly-added items or include items that have
+  changed.
+- `limit` default 50, max 500. Larger limits are rejected with 422.
+- `total_estimate` is approximate (DuckDB count over the filtered
+  set, sampled if expensive). NOT a contract — agents needing exact
+  totals must paginate to exhaustion.
+- Ordering is stable within a single pagination traversal (by
+  `(completed_at DESC, item_id ASC)` for work-items; documented per
+  endpoint).
+
+### 8.6 Conventions for agents
+
+- All list endpoints support `limit` + opaque `cursor`-style pagination.
+- All time fields are RFC 3339 timestamps in UTC.
+- Numeric metrics include units in the field name (`cycle_time_days`,
+  `pickup_time_h`).
+- Every response embeds the `meta` envelope (§8.2) so agents can
+  detect stale data and reproduce queries.
+- Errors follow §8.4. Token-bearing fields are scrubbed by middleware.
+- Headlines and prose strings: see §8.1.2 — agents parse
+  `*_values` and `*_template`, never the free-form prose.
+
+### 8.7 Agent safety
+
+- **Read endpoints** are GET-only, idempotent, safe for any LLM tool to
+  invoke speculatively.
+- **Write endpoints** are POST/PUT/DELETE, require admin role, and
+  return a `confirmation_token` rather than executing immediately.
+  Final mutation requires a second call with the token within 60s.
+  This pattern is deliberately not transparently completable by a
+  naïve agent loop; it requires explicit human approval.
+- **Rate limits** per API key (separate from GitHub limits): 100
+  req/min default, 10 req/min on forecast endpoints (since they're
+  CPU-heavier).
+
+### 8.8 Versioning policy (One-Version Rule)
+
+We maintain exactly one major API version at a time. `/api/v1` until
+an incompatible change is forced; then `/api/v2` with a 6-month
+co-existence window during which both are served and `/api/v1` returns
+a `Sunset` header (RFC 8594) + `Deprecation` header (RFC 9745).
+
+**Non-breaking changes** (allowed in-version, no version bump):
+- Adding new optional fields to request/response.
+- Adding new endpoints.
+- Adding new enum values to fields whose Pydantic model uses
+  `extra='ignore'` semantics (clients must already tolerate unknown
+  values).
+- Adding new query params with sensible defaults.
+- Tightening validation errors (returning more specific `code` for
+  cases that previously returned a generic one).
+
+**Breaking changes** (require new major version):
+- Removing or renaming any committed field (§8.1.1).
+- Changing the type or units of an existing field.
+- Removing an endpoint or path segment.
+- Changing the meaning of an enum value.
+- Changing pagination semantics.
+- Changing the structure of the `meta` envelope.
+- Changing the URL of an existing endpoint.
+
+### 8.9 Deprecation procedure
+
+When deprecation is unavoidable:
+
+1. **Announce** in a release note + the `Deprecation` header on the
+   affected endpoint, with `Sunset: <date>` ≥ 6 months out.
+2. **Add the replacement** alongside the deprecated form, NOT in
+   place of it.
+3. **Mirror behaviour** for the deprecation window — both endpoints
+   work, returning structurally compatible data where possible.
+4. **Trace usage.** Log requests to the deprecated endpoint with
+   `api_key_id` + `request_id`. Admin dashboard surfaces a "still in
+   use by" list before sunset.
+5. **Remove only after** the sunset date AND the trace shows zero
+   usage in the last 30 days. If usage persists, extend the sunset.
+
+Deprecation is a write event, recorded in the `audit.duckdb` log.
+
+---
+
+## 9. Security & threat model
+
+### 9.1 Threat actors
+
+| Actor | Capability | Concerns |
+|---|---|---|
+| External attacker (network) | Hit the public web endpoint | Auth bypass, SSRF via contract edits, token exfil through error messages |
+| Authenticated user (unprivileged) | Use the web UI as a normal team member | Privilege escalation, data exfil beyond their team scope |
+| Malicious agent | Has an API key (acquired legitimately or stolen) | Trigger expensive operations, exfil via aggregations |
+| Compromised container | Has filesystem + memory access on the host | Token theft from memory, secret-store keys, Parquet exfil |
+| Disgruntled admin | Has full system access | Out of scope for v1 — assume admin honesty |
+
+### 9.2 Token storage (per deployment tier)
+
+| Tier | GitHub | Jira | Local users |
+|---|---|---|---|
+| **Tier 1** (laptop) | OS keyring | OS keyring | n/a — single user |
+| **Tier 2** (team server) | GitHub App private key in env var (mounted from secret manager) | OAuth refresh token in env var (mounted from secret manager) | bcrypt hashes in DuckDB `users` table |
+
+Tokens are read into memory **only** during an ETL run. They never
+appear in:
+- Log files (logger middleware redacts anything matching `gh[ps]_*` or
+  JWT-shaped strings)
+- Parquet files (no source attribute is ever extracted into a column
+  that could hold secret material — explicit allow-list of attributes)
+- API responses (error sanitiser replaces token-shaped substrings with
+  `[REDACTED]`)
+- Process titles or argv (CLI accepts secrets via env or stdin only)
+
+### 9.3 Network egress
+
+- ETL allow-list: `api.github.com`, the configured Jira host, OIDC
+  IdP. Any other outbound HTTP is blocked at the application layer.
+- Contract YAML cannot specify arbitrary URLs (no webhooks, no
+  user-supplied fetch targets in v1). SSRF surface area is therefore
+  near-zero.
+
+### 9.4 Authentication & authorisation
+
+**Authentication:**
+- **Tier 1**: no auth (single user on `127.0.0.1`).
+- **Tier 2 default**: OIDC against a configured IdP. Sessions are
+  short-lived (8h), refresh via OIDC silent re-auth.
+- **Tier 2 fallback**: local user accounts in `data/users.duckdb`,
+  argon2 password hashing, optional TOTP.
+
+**Authorisation:**
+- Three roles: **viewer**, **editor**, **admin**.
+- **viewer**: read-only access to all `/api/v1/*` GET endpoints and all
+  `/contracts/*` web pages.
+- **editor**: can edit contract YAML they own (matched by `owner_team`
+  field in contract metadata).
+- **admin**: full access including token rotation and contract
+  deletion.
+
+**API keys:**
+- Personal API keys (32-byte random, stored hashed) for agent access.
+- Keys are scoped: a key can be read-only or read-write, and can be
+  scoped to specific contracts.
+- Keys are displayed exactly once on creation; never retrievable.
+
+### 9.5 CSRF / XSS / injection
+
+- CSRF tokens on every state-changing form post.
+- `Content-Security-Policy` headers blocking inline scripts except the
+  Vega-Lite CDN bundle.
+- All user-supplied content rendered through Jinja's autoescape.
+- SQL queries are parametrised; query module enforces this.
+- Contract YAML is parsed with `yaml.safe_load` (no custom tags).
+
+### 9.6 Logging
+
+- Structured logs (JSON, one line per event) to stdout.
+- Redaction middleware applied to **all** log output before write.
+- No bodies of API responses logged; only metadata (path, status,
+  latency, user_id, contract_id).
+- Audit log for admin actions (contract edit, token rotation, user
+  creation) stored separately in `data/audit.duckdb`.
+
+### 9.7 Backups
+
+The Parquet store is the backup unit. `data/` rsync'd nightly to a
+cold-storage location. The contracts directory is also version-
+controlled in a git repo (separate from the application source).
+
+Secrets are **not** backed up by the application. Secret-manager
+backup is the deployer's responsibility (whatever they're already
+doing for their other systems).
+
+---
+
+## 10. Deployment topology
+
+### 10.1 Bundled (default Tier 2 install)
+
+One container:
+
+```
+flowmetrics:latest
+  ENTRYPOINT: uvicorn flowmetrics.app:app
+  CMD: --host 0.0.0.0 --port 8000
+  ENV:
+    FLOW_DATA_DIR=/data
+    FLOW_CONTRACTS_DIR=/data/contracts
+    FLOW_OIDC_ISSUER=https://idp.example.com
+    FLOW_OIDC_CLIENT_ID=…
+    FLOW_OIDC_CLIENT_SECRET=…   (from secret manager)
+    FLOW_GITHUB_APP_ID=…
+    FLOW_GITHUB_APP_PRIVATE_KEY=…   (from secret manager)
+    FLOW_JIRA_CLIENT_ID=…
+    FLOW_JIRA_CLIENT_SECRET=…   (from secret manager)
+  VOLUMES:
+    /data
+```
+
+Reverse proxy (Caddy / nginx) terminates TLS, forwards to `:8000`.
+
+### 10.2 Split (Kubernetes-native)
+
+```
+Deployment: flow-runtime          (replicas: 1)
+  CMD: uvicorn flowmetrics.app:app
+  ENV: (no source secrets — read-only)
+  Volumes: read-only mount of /data
+
+CronJob: flow-etl                 (schedule: "0 * * * *")
+  CMD: flow etl run --all-contracts
+  ENV: (source secrets injected here only)
+  Volumes: read-write mount of /data
+```
+
+ETL secrets are never present in the runtime pod's environment.
+
+### 10.3 Local dev (Tier 1)
+
+```
+uv run flow serve
+# Runs both ETL (APScheduler) and runtime in one process
+# Tokens from OS keyring
+# Binds 127.0.0.1:8000 only
+# No auth (single user)
+```
+
+---
+
+## 11. Operations
+
+### 11.1 Observability
+
+- `/healthz` — process liveness (no auth).
+- `/readyz` — readiness: returns 503 if no contract has a successful
+  run within `2 × refresh.schedule` interval.
+- `/metrics` — Prometheus-format runtime metrics: request count by
+  endpoint, response time histograms, ETL last-run age per contract,
+  DuckDB query times, MCS request rate.
+- ETL run manifest accessible at `/admin/runs/<contract_id>` for
+  per-run inspection.
+
+### 11.2 Schema evolution
+
+- Adding a column to `work_items` → Parquet handles natively (old rows
+  read as NULL).
+- Adding a stage to a contract → next ETL run produces new column on
+  rows for that contract; rows from other contracts remain NULL.
+- Renaming a stage → ETL rebuilds from `stage_transitions` (cheap).
+  Downstream tooling expecting the old column name breaks — surfaced
+  in CI via the runtime's typed query module.
+- Removing a stage → row's `time_in_<stage>_h` column remains as a
+  historical artefact; new ETL runs write NULL.
+
+### 11.3 Re-derivation
+
+When a contract changes:
+
+1. Old contract's Parquet rows are not rewritten (immutable history).
+2. New `contract_id` (= new hash) gets its own partition.
+3. UI shows both contract versions; current-data queries use the
+   active one. Historical comparison queries can union across.
+
+Re-deriving the full warehouse from raw cache + new contract takes
+seconds (no network IO).
+
+### 11.4 Runbook scenarios
+
+- **"Forecast is stale"** — check ETL run manifest for that contract;
+  re-trigger from `/admin` if needed.
+- **"GitHub API failures"** — inspect last run manifest's error list;
+  often a rate-limit; resolves on next schedule.
+- **"Contract change crashed runtime"** — runtime continues serving
+  last good contract; admin UI shows the validation error inline.
+- **"Token rotation"** — admin UI button rotates GitHub App / Jira
+  OAuth credentials; old credentials revoked at the provider.
+
+---
+
+## 12. Out of scope (v1)
+
+Explicit list — these are real asks that we deliberately defer.
+
+- **Multi-tenancy.** One install = one org's data. Tenant isolation,
+  per-tenant secret stores, row-level security all deferred.
+- **Real-time / webhook-driven updates.** Refresh is cron-only.
+  Webhook listeners considered for v2.
+- **Custom dashboard builder.** v1 ships fixed report types. Users who
+  need custom views use the JSON API.
+- **Mobile-first UI.** Responsive but not optimised for phones.
+- **Alerting / notifications.** No "FE dropped below 10%" emails.
+  Consumers integrate the API.
+- **PR-level recommendations.** No "this PR should be split"
+  suggestions. We surface data, not prescription.
+- **Source adapters beyond GitHub / Jira.** GitLab, ADO, Linear all
+  deferred to v2+.
+- **Historical migration from another tool.** We start fresh from the
+  configured scope window.
+
+---
+
+## 13. Open questions
+
+These need answers (or explicit deferral) before implementation
+starts:
+
+1. **OIDC IdP shape for Tier 2.** Do we ship configurations for the
+   common ones (Okta, Google Workspace, Azure AD, Authentik), or just
+   a generic OIDC client and let the deployer figure it out?
+2. **Local user fallback in Tier 2.** Is "OIDC OR local accounts"
+   needed, or "OIDC only" for shared deploys with local-only for
+   solo? The first is more code; the second is cleaner.
+3. **Contract editor UX.** YAML textarea with schema validation
+   (simplest, lowest-value-add) vs structured form builder (higher
+   work, much more accessible). Probably YAML for v0, form builder
+   tracked separately.
+4. **First-class agent use cases.** What specific agent prompts are
+   we designing for? "Show me last week's flow efficiency for the
+   platform team" — straightforward. "What should we work on next" —
+   prescriptive, out of scope. We need a target prompt list to
+   validate the API shape against.
+5. **Storage scale ceiling.** Is local-disk Parquet enough, or do we
+   plan for S3-compatible object storage from day 1? DuckDB reads
+   both transparently; choice affects backup story only.
+6. **Bootstrapping the org-base contract.** On first install, do we
+   ship a sensible default contract, or require the admin to create
+   one from scratch? Default is friendlier; depends on whether we
+   want a guided onboarding flow.
+7. **MCS scope cardinality.** A contract with 5 forecast scopes × 4
+   common slices = 20 throughput indexes pre-computed per refresh.
+   Manageable. A contract with high-cardinality `group_by initiative`
+   (50 initiatives) blows up to 50+ indexes. Cap or compute-on-demand?
+8. **Schema for the items page lineage view.** What exactly does the
+   "why is this item in this stage" explanation look like as data?
+   Per-item explainability JSON might want its own table.
+
+---
+
+## 14. Migration from current flowmetrics CLI
+
+The current CLI commands (`flow efficiency`, `flow aging`, etc.) keep
+working in v1, repointed at the warehouse:
+
+- Each command reads from `data/work_items` + `data/transitions`
+  rather than fetching from GitHub.
+- If no warehouse data is found, the CLI falls back to direct fetch
+  (current behaviour) and prints a warning recommending `flow init`.
+- `flow init` is a new command that creates a default contract for a
+  given repo and runs an initial ETL pass.
+- `flow serve` starts the web app.
+
+Existing scripts (`scripts/generate_samples.py`) become contract
+producers: each `Repo` entry maps to a generated contract YAML.
+
+---
+
+## 15. v1 milestone & sequencing — vertical slices
+
+**Principle.** Every slice ends with *a working page a human can open
+in a browser and use to make a decision*. No "build the perfect data
+layer in isolation, then put a UI on it" sequencing. Each slice
+exercises the full stack — source → ETL → Parquet → DuckDB → API →
+HTML — at narrow scope, and widens from there.
+
+Acceptance for each slice is **"a human can do X in a browser within
+N seconds and the answer is honest."** Not test coverage, not
+architectural purity.
+
+---
+
+### Slice 1 — One chart from real data, end to end
+
+**Goal.** A user runs `uv run flow serve`, opens `localhost:8000`,
+and sees a cycle-time scatterplot for one hardcoded GitHub repo. No
+controls yet, no auth, no contract editor.
+
+**Touched layers:**
+- Source adapter: existing GitHub fetcher
+- ETL: minimum viable — fetch completed PRs in a fixed window, write
+  one `work_items.parquet`
+- Storage: Parquet on local disk (no partitioning yet)
+- Runtime: FastAPI process, one route, DuckDB scan, Jinja template
+  with Vega-Lite embed
+- Contract: hardcoded in code; no YAML yet
+
+**Acceptance.** Open the URL, see real PR data on a scatterplot with
+P50/P85 reference lines. Page renders in under 1 second.
+
+**Deliberately excluded.** Aging, CFD, forecast, filters, multiple
+repos, contract YAML, auth, deployment.
+
+---
+
+### Slice 2 — Window controls + a second report
+
+**Goal.** Same page now has a "since / until" date picker. Cycle-time
+scatterplot updates when the user changes the window. Add aging chart
+on the same page.
+
+**Touched layers:**
+- Runtime: HTMX swaps on form change; second DuckDB query
+- ETL: also write `stage_transitions.parquet` (needed for aging /
+  in-flight detection)
+- Contract: still hardcoded
+
+**Acceptance.** User drags the date window and both charts re-render
+inside 500ms. Aging chart shows in-flight items with reference
+percentile lines.
+
+---
+
+### Slice 3 — Metadata extraction + team filter
+
+**Goal.** Page has a "filter by team" multi-select widget. Selecting
+teams updates all charts. Item rows expose `team` column derived from
+PR labels.
+
+**Touched layers:**
+- Contract: introduce YAML format with `metadata.team` extraction
+  (label pattern). Contract is still file-based, edited by hand for
+  this slice.
+- ETL: re-run pipeline reads contract, populates `team` column
+- Runtime: `/dimensions` endpoint feeds the widget; filter param wired
+  through DuckDB query
+
+**Acceptance.** User checks "platform" and "data" in the filter
+widget, charts redraw showing only items from those teams.
+
+---
+
+### Slice 4 — Forecast (MCS) with same controls
+
+**Goal.** New "Forecast" page using identical window + filter
+controls. Renders the when-done and how-many distributions for the
+selected slice.
+
+**Touched layers:**
+- Runtime: MCS endpoint, on-demand throughput from fact table, numpy
+  sampling, Vega-Lite histogram
+- Performance: validate the 80ms p50 budget against a real fact
+  table; cache throughput arrays per (filter, window) tuple
+
+**Acceptance.** "Given the last 30 days for team=platform, when will
+the next 25 items finish?" — chart and percentile table render in
+under 1 second.
+
+---
+
+### Slice 5 — Second source (Jira) on the same page
+
+**Goal.** Same UI, but pointed at a Jira project. Validate that the
+contract abstraction holds across sources. Optionally: a contract
+that mixes Jira issues with GitHub PRs via stitching.
+
+**Touched layers:**
+- Source adapter: existing Jira adapter wired into the new ETL
+- ETL: contract scope can be Jira; new contract YAML for it
+- Runtime: source-agnostic — already works because all queries hit
+  the same fact-table schema
+
+**Acceptance.** Point the runtime at a Cassandra-flavoured contract;
+same UI shows Jira-driven flow metrics. Cross-source filter ("show me
+items where `linked_keys` is non-empty") works.
+
+---
+
+### Slice 6 — Contract editing UI + refresh trigger
+
+**Goal.** Admin can edit the contract YAML in the browser, validate
+it, and trigger an ETL refresh. No more SSH'ing to edit files.
+
+**Touched layers:**
+- Runtime: admin page, YAML textarea with client-side schema hints
+  (server-side validation is authoritative)
+- ETL: validation endpoint runs the parser; refresh endpoint queues
+  an APScheduler job
+- Auth: introduce *minimal* auth — single admin password via env var.
+  Real OIDC arrives in slice 7.
+
+**Acceptance.** Admin tweaks the contract (e.g. adds a new exclusion),
+clicks "validate" (gets line-level errors if any), clicks "save,"
+clicks "refresh now," watches the run manifest update, and sees the
+charts reflect the change.
+
+---
+
+### Slice 7 — Multi-user auth + JSON API
+
+**Goal.** Real team-shared deployment. OIDC login, role gating
+(viewer/editor/admin), JSON API for agents. Same UI, same data —
+properly access-controlled.
+
+**Touched layers:**
+- Auth: OIDC flow against a configured IdP; sessions; local-account
+  fallback
+- Authorisation: role middleware; per-contract `owner_team` semantics
+- API: same DuckDB queries exposed as documented JSON endpoints; API
+  key management page
+- Logging: redaction middleware comes online here (sensitive material
+  starts existing in this slice)
+
+**Acceptance.** A team member logs in via SSO and sees the same
+charts. An agent with a read-only API key can call `/api/v1/...`
+endpoints and get JSON. An LLM tool cannot trigger a contract change
+or refresh without explicit human approval.
+
+---
+
+### Slice 8 — Hardening + production deployment
+
+**Goal.** Move the GitHub PAT off the laptop. GitHub App + Jira OAuth
+2.0 wired in. CSP, CSRF, rate limits, audit log. Docker image with
+the split-process topology supported. Threat-model walkthrough
+documented.
+
+**Touched layers:**
+- Source auth: replace PATs with installation tokens / OAuth flow
+- Security middleware: CSRF, CSP, redaction, rate limits all enabled
+  by default (some were stub-only in earlier slices)
+- Deployment: Dockerfile, docker-compose for local, Kubernetes
+  manifests for split topology
+- Ops: `/healthz`, `/readyz`, `/metrics`, audit log
+
+**Acceptance.** The whole thing runs in Kubernetes with secrets
+injected from a secret manager. Runtime pod has no source credentials
+in its environment. Threat-model checklist in §9 is walked through
+and signed off.
+
+---
+
+### Why this order
+
+- **Slice 1 forces commitment to the architecture early.** If the
+  ETL/runtime split is wrong, you find out before writing the
+  contract parser, not after.
+- **Each slice is independently shippable** in the sense that it
+  produces a screenshot you could show someone.
+- **Auth is deferred** until there's something worth protecting. Slice
+  6 introduces a single admin password because that's the first slice
+  where there's a state-changing UI; full OIDC arrives in slice 7
+  when there are multi-user scenarios.
+- **Hardening is the last slice on purpose** — not because security
+  is unimportant, but because the threat surface is concrete only
+  after the feature surface exists. Walking the threat model against
+  a stub UI would produce a checklist that doesn't match the real
+  system.
+
+### What's deliberately NOT a slice
+
+- "Refactor the canonical model" — happens inside slices as needed.
+- "Write 100% test coverage" — not a deliverable.
+- "Build the perfect contract editor" — Slice 6 ships YAML-textarea;
+  better editor is v2.
+- "Migrate samples to the new pipeline" — samples script keeps
+  working; warehouse path is parallel until proven.
+
+### Sequencing the work inside each slice
+
+Within a slice, the order is always:
+
+1. **Walk the slice as a user** — describe the click path and the
+   resulting page out loud before writing any code.
+2. **Stub the page first** — Jinja template with fake data so the
+   shape is concrete.
+3. **Wire the runtime endpoint** — return that fake data shape from a
+   DuckDB query against an existing or synthetic Parquet.
+4. **Wire the ETL** to produce the real Parquet.
+5. **Replace fakes with real data top-to-bottom.**
+6. **Refactor** — the TDD refactor step, applied to the slice as a
+   whole.
+
+This sequence keeps the human-facing artifact (the page) in front of
+the technical work, not behind it.
+
+---
+
+**End of v0 draft.** Pull at any thread — defaults, scope, security
+model, API shape, sequencing. The goal of this draft is to be specific
+enough that disagreement is concrete.
