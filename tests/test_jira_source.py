@@ -254,9 +254,12 @@ class TestStatusIntervalExtraction:
         )
         items = source.fetch_completed_in_window(start, stop)
         item = items[0]
-        # Status intervals reconstruct the issue's status timeline
+        # Status intervals reconstruct the issue's status timeline. Two
+        # changelog transitions (Open→In Progress, In Progress→Resolved)
+        # produce three intervals: the original Open window, the In
+        # Progress window, and the terminal Resolved interval.
         statuses = [(iv.status, iv.start, iv.end) for iv in item.status_intervals]
-        assert len(statuses) == 2
+        assert len(statuses) == 3
         assert statuses[0] == (
             "Open",
             datetime(2026, 5, 4, 9, 0, tzinfo=UTC),
@@ -267,6 +270,81 @@ class TestStatusIntervalExtraction:
             datetime(2026, 5, 5, 9, 0, tzinfo=UTC),
             datetime(2026, 5, 8, 9, 0, tzinfo=UTC),
         )
+        assert statuses[2] == (
+            "Resolved",
+            datetime(2026, 5, 8, 9, 0, tzinfo=UTC),
+            datetime(2026, 5, 8, 9, 0, tzinfo=UTC),
+        )
+
+    def test_completed_issue_records_terminal_resolved_interval(self, tmp_path):
+        """Fidelity bug found on real CASSANDRA-16403 and CASSANDRA-21301.
+
+        When an issue's last changelog entry is X → Resolved (or any
+        terminal status), the canonical record currently STOPS at X and
+        never records that the issue actually entered the terminal stage.
+        Effects:
+          - CFD's Resolved band must fall back to completed_at (it does,
+            in build_cfd) — but the stream-based current_stage_at() does
+            NOT have this fallback, so any chart migrated to the stream
+            path will undercount the terminal stage.
+          - Vacanti's `aging` and `current_stage` queries return the
+            previous status for completed items, which is wrong.
+
+        The GitHub side (`pr_lifecycle_intervals`) already appends a
+        zero-length terminal Merged interval. Jira should mirror that.
+        """
+        cache = FileCache(tmp_path)
+        base_url = "https://issues.apache.org/jira"
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
+        jql = (
+            'project = "BIGTOP" AND resolutiondate >= "2026-05-04" '
+            'AND resolutiondate <= "2026-05-10" AND statusCategory = Done '
+            "ORDER BY resolutiondate ASC"
+        )
+        response = {
+            "startAt": 0, "maxResults": 100, "total": 1,
+            "issues": [
+                _issue(
+                    key="BIGTOP-101",
+                    created="2026-05-04T09:00:00.000+0000",
+                    resolved="2026-05-08T09:00:00.000+0000",
+                    histories=[
+                        {
+                            "created": "2026-05-05T09:00:00.000+0000",
+                            "items": [{
+                                "field": "status",
+                                "fromString": "Open",
+                                "toString": "In Progress",
+                            }],
+                        },
+                        {
+                            "created": "2026-05-08T09:00:00.000+0000",
+                            "items": [{
+                                "field": "status",
+                                "fromString": "In Progress",
+                                "toString": "Resolved",
+                            }],
+                        },
+                    ],
+                ),
+            ],
+        }
+        _seed_jira(cache, base_url=base_url, jql=jql, response=response)
+        source = JiraSource(
+            base_url=base_url, project="BIGTOP", cache=cache,
+            read_only=True, http_client=_no_network_client(),
+        )
+        item = source.fetch_completed_in_window(start, stop)[0]
+        statuses = [iv.status for iv in item.status_intervals]
+        assert "Resolved" in statuses, (
+            "canonical record dropped terminal Resolved interval; "
+            f"got statuses={statuses}"
+        )
+        # The Resolved interval should be the last one and start at the
+        # transition that landed in Resolved.
+        last = item.status_intervals[-1]
+        assert last.status == "Resolved"
+        assert last.start == datetime(2026, 5, 8, 9, 0, tzinfo=UTC)
 
     def test_no_status_history_yields_empty_intervals(self, tmp_path):
         cache = FileCache(tmp_path)

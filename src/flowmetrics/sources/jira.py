@@ -256,6 +256,15 @@ def _issue_to_work_item(
             prev_status = to_status
         current_status = status_changes[-1][2]  # toString of last transition
 
+    # Completed items: record the terminal status (e.g. "Resolved") so
+    # stream consumers see that the issue entered its final stage. The
+    # GitHub PR-lifecycle deriver does the same for "Merged".
+    if resolved is not None and current_status is not None:
+        terminal_start = intervals[-1].end if intervals else created
+        intervals.append(
+            StatusInterval(terminal_start, resolved, current_status)
+        )
+
     if in_flight_asof is not None:
         # In-flight items: append a final interval representing the
         # currently-occupied status, ending at `asof`. If there were no

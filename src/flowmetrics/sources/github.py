@@ -62,7 +62,7 @@ query($q: String!, $first: Int!, $after: String) {
           nodes {
             __typename
             ... on PullRequestCommit { commit { committedDate } }
-            ... on PullRequestReview { submittedAt }
+            ... on PullRequestReview { submittedAt state }
             ... on IssueComment { createdAt }
             ... on PullRequestReviewThread {
               comments(first: 1) { nodes { createdAt } }

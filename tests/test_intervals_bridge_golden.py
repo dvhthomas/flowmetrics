@@ -40,6 +40,9 @@ class TestRealJiraGolden:
         wi = _load_workitem()
         # Pinned shape — if Jira adapter changes interval-building, we
         # want a loud failure here so we can re-examine the bridge.
+        # The final 'Resolved' interval is the terminal stage recorded
+        # at resolution time; without it, stream consumers couldn't
+        # tell that the issue actually entered its terminal stage.
         stages = [iv.status for iv in wi.status_intervals]
         assert stages == [
             "Triage Needed",
@@ -47,6 +50,7 @@ class TestRealJiraGolden:
             "Patch Available",
             "Review In Progress",
             "Ready to Commit",
+            "Resolved",
         ]
         assert wi.completed_at is not None  # resolved
         assert wi.url == "https://issues.apache.org/jira/browse/CASSANDRA-21301"

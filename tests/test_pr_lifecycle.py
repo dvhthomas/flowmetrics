@@ -129,3 +129,35 @@ class TestPrLifecycleIntervals:
         intervals = pr_lifecycle_intervals(node)
         stages = [iv.status for iv in intervals]
         assert stages == ["Awaiting Review", "Merged"]
+
+
+class TestPrSearchQueryRequestsReviewState:
+    """Regression — fidelity bug found on real astral-sh/uv PR #19417.
+
+    pr_lifecycle_intervals reads `ti["state"]` for PullRequestReview
+    items, but PR_SEARCH_QUERY only asked for `submittedAt`. The result:
+    every real APPROVED / CHANGES_REQUESTED review came back with
+    `state=None` and was silently dropped, so CFD/aging charts that
+    segment by lifecycle phase missed the Approved and Changes Requested
+    bands entirely.
+
+    The Approved column on a CFD is one of Vacanti's primary signals
+    (post-approval wait = the bottleneck on review-blocked teams).
+    Dropping it is not a cosmetic miss.
+    """
+
+    def test_query_requests_review_state(self):
+        from flowmetrics.sources.github import PR_SEARCH_QUERY
+        # The fragment must request `state` alongside `submittedAt`;
+        # without it the GraphQL response will only carry submittedAt
+        # and `ti.get("state")` is None at runtime.
+        assert "PullRequestReview { submittedAt state }" in PR_SEARCH_QUERY \
+            or "PullRequestReview { state submittedAt }" in PR_SEARCH_QUERY \
+            or ("... on PullRequestReview" in PR_SEARCH_QUERY and "state" in (
+                # narrow the search to the PullRequestReview fragment
+                PR_SEARCH_QUERY.split("... on PullRequestReview", 1)[1].split("}", 1)[0]
+            )), (
+                "PR_SEARCH_QUERY's PullRequestReview fragment must request "
+                "`state` — otherwise pr_lifecycle_intervals can't distinguish "
+                "APPROVED / CHANGES_REQUESTED / COMMENTED."
+            )

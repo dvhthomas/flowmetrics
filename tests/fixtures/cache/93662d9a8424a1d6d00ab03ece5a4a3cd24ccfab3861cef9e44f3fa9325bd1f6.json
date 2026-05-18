@@ -44,6 +44,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-10T23:57:54Z"
               },
               {
@@ -189,6 +190,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-08T21:38:40Z"
               },
               {
@@ -204,10 +206,12 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-08T22:29:41Z"
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-08T22:30:09Z"
               }
             ],
@@ -294,6 +298,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-09T05:13:48Z"
               },
               {
@@ -369,6 +374,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-08T21:28:04Z"
               },
               {
@@ -456,6 +462,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T23:54:54Z"
               },
               {
@@ -506,6 +513,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T15:47:43Z"
               },
               {
@@ -551,6 +559,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T15:52:52Z"
               },
               {
@@ -615,6 +624,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-10T18:28:26Z"
               },
               {
@@ -666,10 +676,12 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T15:33:02Z"
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T15:35:29Z"
               },
               {
@@ -740,6 +752,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-06T22:51:31Z"
               },
               {
@@ -757,6 +770,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T04:50:26Z"
               },
               {
@@ -784,6 +798,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-09T22:47:40Z"
               },
               {
@@ -821,6 +836,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-06T18:54:02Z"
               },
               {
@@ -958,6 +974,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-06T16:08:05Z"
               },
               {
@@ -1022,6 +1039,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-07T05:01:22Z"
               },
               {
@@ -1073,6 +1091,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T18:57:50Z"
               },
               {
@@ -1083,6 +1102,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T18:58:45Z"
               },
               {
@@ -1121,6 +1141,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T18:23:10Z"
               },
               {
@@ -1206,6 +1227,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T16:44:26Z"
               },
               {
@@ -1265,6 +1287,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T14:44:27Z"
               },
               {
@@ -1341,6 +1364,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T15:28:48Z"
               },
               {
@@ -1505,10 +1529,12 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T04:55:44Z"
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-05T04:55:57Z"
               },
               {
@@ -1874,6 +1900,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-04T17:46:19Z"
               },
               {
@@ -2077,6 +2104,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-04T18:25:38Z"
               },
               {
@@ -2386,6 +2414,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-03T20:35:52Z"
               },
               {
@@ -2503,6 +2532,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-04-25T22:28:07Z"
               },
               {
@@ -2514,6 +2544,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-04-26T12:06:37Z"
               },
               {
@@ -2600,6 +2631,7 @@
               },
               {
                 "__typename": "PullRequestReview",
+                "state": null,
                 "submittedAt": "2026-05-04T21:51:01Z"
               },
               {
