@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.aging.v1",
   "command": "aging",
-  "generated_at": "2026-05-17T17:17:47.916867-06:00",
+  "generated_at": "2026-05-17T17:23:51.274412-06:00",
   "headline": "WIP Aging for rust-lang/rust as of May 17, 2026: 868 in-flight items, 732 already past P85 (17.8d), 508 past P95 (74.5d).",
   "definition": "Each dot is one in-flight item, placed in the column of its current workflow state at a height equal to its Age (days since entering the workflow). Percentile lines come from the cycle times of recently completed items \u2014 read horizontally as risk thresholds: an item aging past P85 likely misses its forecast.",
   "summary": {

@@ -1,6 +1,6 @@
 # Sample reports
 
-_Generated 2026-05-17 23:17:35 UTC_
+_Generated 2026-05-18 14:08:40 UTC_
 
 Open the `.html` files directly in a browser — no server needed; Vega-Lite loads from CDN via plain `<script>` tags.
 
@@ -64,9 +64,9 @@ _Rust compiler — large, label-driven OSS workflow with rich S-* state labels (
 
 | Report | Formats |
 | --- | --- |
-| Efficiency | [html](rust-lang_rust/efficiency.html) · [txt](rust-lang_rust/efficiency.txt) · [json](rust-lang_rust/efficiency.json) |
-| WWIBD: Date | [html](rust-lang_rust/forecast-when-done.html) · [txt](rust-lang_rust/forecast-when-done.txt) · [json](rust-lang_rust/forecast-when-done.json) |
-| WWIBD: How Many | [html](rust-lang_rust/forecast-how-many.html) · [txt](rust-lang_rust/forecast-how-many.txt) · [json](rust-lang_rust/forecast-how-many.json) |
+| Efficiency | _n/a_ |
+| WWIBD: Date | _n/a_ |
+| WWIBD: How Many | _n/a_ |
 | Cycle-time scatterplot | [html](rust-lang_rust/scatterplot.html) · [txt](rust-lang_rust/scatterplot.txt) · [json](rust-lang_rust/scatterplot.json) |
 | CFD | _n/a_ |
 | Aging WIP | [html](rust-lang_rust/aging.html) · [txt](rust-lang_rust/aging.txt) · [json](rust-lang_rust/aging.json) |

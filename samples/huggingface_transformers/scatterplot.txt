@@ -1,2 +1,1 @@
-237 items completed in 30 days; median 1.8d, P85 13.3d (wide spread -- deep tail of backlog cleanups 
-skews P85).
+237 items completed in 30 days; median 1.8d, P85 13.3d (wide spread -- long tail skews P85).

@@ -1,7 +1,7 @@
 {
   "schema": "flowmetrics.forecast.how_many.v1",
   "command": "forecast how-many",
-  "generated_at": "2026-05-17T17:17:42.382194-06:00",
+  "generated_at": "2026-05-17T17:23:45.725104-06:00",
   "headline": "85% confident at least 93 items finish in the next 15 days (by May 31, 2026).",
   "definition": "Monte Carlo forecast of how many items finish by a target date. The histogram is the distribution of simulated item counts; percentile lines mark confidence thresholds. Read BACKWARD: higher confidence = FEWER items, a more conservative commitment.",
   "summary": {
