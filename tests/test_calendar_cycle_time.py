@@ -1,106 +1,118 @@
-"""Cycle-time definition: Vacanti's "+1 day", applied to the
-floating-point datetime duration.
+"""Cycle-time definition: Vacanti's strict calendar-day formula.
 
-    CT = (completed_at - created_at) + 1 day
+    CT = FD - SD + 1
 
-Vacanti's argument for the "+1" (Actionable Agile Metrics for
-Predictability, 10th Anniversary Edition, p. 59): when a PBI
-starts and finishes on the same day, you would never say it
-took zero days to complete. The "+1" exists to reflect that.
+where SD and FD are the calendar DATES of `created_at` and
+`completed_at` (UTC). Same-day work = 1 day. Yesterday-to-today =
+2 days. Inclusive of both endpoints — "we'd never say it took
+zero days to complete" (Vacanti, Actionable Agile Metrics for
+Predictability, 10th Anniversary Edition, p. 59).
 
-We preserve sub-day precision in the duration term — a PR
-that ran from Tuesday 12:00 to Wednesday 15:00 (27 hours) is
-2.125d, not 2.0d. The minimum legal value is therefore 1.0d
-(zero-duration work still counts as a day); same-day work
-lands in [1.0, 2.0); cross-midnight work lands in [1.0,
-∞) depending on the actual time elapsed, with the +1 day
-applied on top of the floating-point duration.
+This is a whole-day metric. The exact wall-clock elapsed time
+(hours and minutes between events) is still available on the
+lifecycle/timeline component, which reads the raw datetime
+timestamps from the transitions Parquet — but the cycle-time
+column itself is integer days. Earlier iterations of this codebase
+tried `(elapsed_datetime) + 1 day` which preserved sub-day
+precision; the user reverted to the strict whole-day formula
+because cycle time is reported per-day everywhere it's used
+(forecasting, percentile checks, throughput cadence).
 
-Two earlier interpretations have been retired:
-  - "floor at 1.0" (clamps everything below 1.0 to 1.0) —
-    the +1 added to the duration already guarantees ≥1 for
-    valid data, with no information loss.
-  - "calendar-day count, integer" (FD.date() - SD.date() + 1) —
-    too coarse; collapses sub-day signal Vacanti's percentile
-    work benefits from.
-
-These tests pin the contract.
+The single source of truth lives in `materialise.cycle_time_days`;
+the column is read straight from Parquet by every UI consumer.
+`test_cycle_time_function_is_defined_exactly_once` enforces that.
 """
 
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from pathlib import Path
 
 from flowmetrics.materialise import cycle_time_days
 
 
 class TestCycleTimeDays:
-    def test_same_day_short_pr_is_just_over_one_day(self):
-        """A 64-minute PR is (64/1440)d + 1d ≈ 1.044d.
+    def test_same_day_pr_is_one_day(self):
+        """Vacanti: same calendar day → 0 + 1 = 1.
 
-        Above the 1.0 minimum (so "we would never say zero
-        time") but still close to it (because only 64 minutes
-        actually elapsed)."""
+        A 64-minute PR opened and merged on May 04 reports 1d.
+        Sub-day elapsed time doesn't enter the formula — only the
+        calendar dates do."""
         created = datetime(2026, 5, 4, 11, 0, tzinfo=UTC)
         completed = datetime(2026, 5, 4, 12, 4, tzinfo=UTC)
-        result = cycle_time_days(created, completed)
-        assert result is not None
-        # 64 minutes = 0.04444…d ; + 1d = 1.04444…d
-        assert abs(result - (1.0 + 64 / 1440)) < 1e-9, (
-            f"same-day 64-min PR must be ≈ 1.044d (= 1 + 64/1440); "
-            f"got {result}"
-        )
-        # And explicitly: above the 1.0 floor, below 2.0.
-        assert 1.0 < result < 2.0
+        assert cycle_time_days(created, completed) == 1.0
 
-    def test_two_minute_pr_across_midnight_is_just_over_one_day(self):
-        """Calendar boundary crossed but only 2 minutes elapsed.
-        Duration is 2/1440 ≈ 0.0014d; + 1d ≈ 1.0014d.
+    def test_two_minute_pr_across_midnight_is_two_days(self):
+        """Calendar boundary crossed → 2 calendar days.
 
-        The +1 doesn't double-count the midnight crossing —
-        we're adding *one* day, not "one day per date crossed"."""
+        Wall-clock elapsed is 2 minutes; the formula doesn't care.
+        SD = May 04, FD = May 05; CT = 1 + 1 = 2."""
         created = datetime(2026, 5, 4, 23, 59, tzinfo=UTC)
         completed = datetime(2026, 5, 5, 0, 1, tzinfo=UTC)
-        result = cycle_time_days(created, completed)
-        assert result is not None
-        assert abs(result - (1.0 + 2 / 1440)) < 1e-9
+        assert cycle_time_days(created, completed) == 2.0
 
     def test_zero_duration_is_exactly_one_day(self):
-        """A PR that opened and merged at the exact same moment
-        is the minimum legal value: 0 + 1 = 1.0d."""
+        """A PR that opened and merged at the exact same moment is
+        the minimum legal value: same date → 0 + 1 = 1.0d."""
         created = datetime(2026, 5, 4, 11, 0, tzinfo=UTC)
-        result = cycle_time_days(created, created)
-        assert result == 1.0
+        assert cycle_time_days(created, created) == 1.0
 
-    def test_week_long_pr_is_fractional(self):
-        """8 days 6 hours of duration → 8.25 + 1 = 9.25d.
+    def test_week_long_pr_counts_every_calendar_day_inclusive(self):
+        """Apr 26 → May 04: 8 calendar days difference, +1 = 9 days.
 
-        The +1 sits on top of the floating-point duration,
-        so even multi-day PRs are fractional whenever the
-        sub-day component is non-zero."""
+        The sub-day component (the PR ran from 9 AM to 3 PM on the
+        last day — 6 extra hours) doesn't add to the count. Whole
+        days only."""
         created = datetime(2026, 4, 26, 9, 0, tzinfo=UTC)
         completed = datetime(2026, 5, 4, 15, 0, tzinfo=UTC)
-        result = cycle_time_days(created, completed)
-        assert result is not None
-        assert abs(result - 9.25) < 1e-9
+        assert cycle_time_days(created, completed) == 9.0
 
     def test_in_flight_returns_none(self):
         created = datetime(2026, 5, 4, 9, 0, tzinfo=UTC)
         assert cycle_time_days(created, None) is None
 
-    def test_tuesday_noon_to_wednesday_3pm_is_two_and_an_eighth(self):
-        """27 hours = 1.125d duration; + 1d = 2.125d.
-
-        The earlier "1.125d" answer dropped the Vacanti +1;
-        the earlier "2.0d" answer threw away the sub-day
-        precision. This is the synthesis: keep the precision,
-        add the day."""
+    def test_tuesday_to_wednesday_is_two_days(self):
+        """Vacanti's canonical example: Jan 01 → Jan 02 = 2 days.
+        Crossed one calendar boundary; +1 for the inclusive count."""
         # 2026-05-05 is a Tuesday.
         created = datetime(2026, 5, 5, 12, 0, tzinfo=UTC)
         completed = datetime(2026, 5, 6, 15, 0, tzinfo=UTC)
-        result = cycle_time_days(created, completed)
-        assert result is not None
-        assert abs(result - 2.125) < 1e-9
+        assert cycle_time_days(created, completed) == 2.0
+
+    def test_result_is_always_integer_valued(self):
+        """The column type is DOUBLE for storage consistency, but
+        every legal value is whole. This invariant is what
+        downstream tools (forecasting, percentile checks) rely on."""
+        cases = [
+            # (created, completed, expected)
+            (
+                datetime(2026, 5, 4, 0, 0, tzinfo=UTC),
+                datetime(2026, 5, 4, 23, 59, tzinfo=UTC),
+                1.0,
+            ),
+            (
+                datetime(2026, 5, 4, 23, 59, tzinfo=UTC),
+                datetime(2026, 5, 5, 0, 0, tzinfo=UTC),
+                2.0,
+            ),
+            (
+                datetime(2026, 4, 1, 9, 0, tzinfo=UTC),
+                datetime(2026, 4, 15, 15, 30, tzinfo=UTC),
+                15.0,  # 14 + 1
+            ),
+        ]
+        for created, completed, expected in cases:
+            result = cycle_time_days(created, completed)
+            assert result is not None
+            assert result == int(result), (
+                f"cycle_time_days must be integer-valued for "
+                f"created={created}, completed={completed}; "
+                f"got {result}"
+            )
+            assert result == expected, (
+                f"created={created}, completed={completed}: "
+                f"expected {expected}, got {result}"
+            )
 
     def test_cycle_time_function_is_defined_exactly_once(self):
         """Single source of truth: `cycle_time_days` is defined in
@@ -112,14 +124,10 @@ class TestCycleTimeDays:
 
         This guards against the regression by scanning the codebase
         for a `def cycle_time_days(` outside materialise.py. The
-        formula's specific `+ 1 day` Vacanti adjustment is too easy
-        to "helpfully" re-implement; the test forbids that.
+        formula's specific Vacanti adjustment is too easy to
+        "helpfully" re-implement; the test forbids that.
         """
-        from pathlib import Path
-
-        src_root = (
-            Path(__file__).parent.parent / "src" / "flowmetrics"
-        )
+        src_root = Path(__file__).parent.parent / "src" / "flowmetrics"
         offenders: list[tuple[str, int, str]] = []
         for path in src_root.rglob("*.py"):
             if "__pycache__" in path.parts:
@@ -132,24 +140,21 @@ class TestCycleTimeDays:
         assert not offenders, (
             "`def cycle_time_days(` defined OUTSIDE materialise.py — "
             "the function must exist in exactly one place. UI "
-            "consumers read the stored column instead. "
-            "Offenders:\n"
+            "consumers read the stored column instead. Offenders:\n"
             + "\n".join(f"  {p}:{ln}: {ll}" for p, ln, ll in offenders)
         )
 
     def test_completion_before_creation_surfaces_bad_data(self):
         """If a source-data bug delivers completed < created, the
-        +1 still gets applied, but the negative duration term
-        produces a value < 1.0 — which is impossible for valid
-        data (valid minimum is exactly 1.0). Anything below 1.0
-        is the "bad data" zone."""
+        formula yields a non-positive value. Valid minimum is 1.0;
+        anything below 1.0 (zero or negative) is the impossible
+        zone — downstream code can flag those as data quality."""
         created = datetime(2026, 5, 6, 12, 0, tzinfo=UTC)
         completed = datetime(2026, 5, 5, 12, 0, tzinfo=UTC)
         result = cycle_time_days(created, completed)
         assert result is not None
-        # -1d + 1d = 0.0
+        # FD - SD + 1 = -1 + 1 = 0
         assert result < 1.0, (
-            f"completion before creation should land in the "
-            f"sub-1.0 'impossible' zone so the bad data surfaces; "
-            f"got {result}"
+            f"completion before creation must land in the sub-1.0 "
+            f"'impossible' zone so bad data surfaces; got {result}"
         )

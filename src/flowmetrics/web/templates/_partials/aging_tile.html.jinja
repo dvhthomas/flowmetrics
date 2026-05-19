@@ -1,0 +1,26 @@
+{# Aging chart tile.
+
+   mode='tile'   → dashboard cell with "Details →" link
+   mode='detail' → standalone page (no Details link)
+#}
+{%- set chart_container_id = "aging-chart" -%}
+{%- set chart_height = 480 if mode == 'detail' else 320 -%}
+
+<section id="aging-tile" class="metric">
+  <header class="metric-header">
+    <div class="metric-header-controls">
+      <button class="reset-btn"
+              type="button"
+              hx-get="/api/internal/aging?contract={{ contract.name }}{% if data.asof_iso %}&asof={{ data.asof_iso }}{% endif %}"
+              hx-target="#{{ chart_container_id }}"
+              hx-swap="outerHTML"
+              title="Re-load this chart">↻ Reset</button>
+      {% if mode == 'tile' %}
+        <a class="details-link"
+           href="/contracts/{{ contract.name }}/metrics/aging">Details →</a>
+      {% endif %}
+    </div>
+  </header>
+
+  {% include "_partials/aging_chart_fragment.html.jinja" %}
+</section>

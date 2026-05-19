@@ -192,29 +192,36 @@ CREATE TEMPORARY TABLE transitions (
 def cycle_time_days(
     created_at: datetime, completed_at: datetime | None
 ) -> float | None:
-    """Cycle time in days, with Vacanti's "+1" applied to the
-    floating-point duration.
+    """Cycle time in calendar days, per Vacanti's strict formula:
 
-        CT = (completed_at - created_at) + 1 day
+        CT = FD - SD + 1
 
-    Vacanti's argument for the "+1": you'd never say a same-day
-    PBI took zero days to complete (Actionable Agile Metrics for
-    Predictability, 10th Anniversary Edition, p. 59). We add a
-    day on top of the actual duration rather than rounding to a
-    calendar grid — sub-day precision survives, and the minimum
-    legal value is exactly 1.0d (zero-duration work).
+    where SD and FD are the UTC calendar dates of `created_at` and
+    `completed_at`. Same-day work = 1 day; next-day = 2 days; etc.
+    Inclusive of both endpoints — "we'd never say it took zero
+    days to complete" (Vacanti, Actionable Agile Metrics for
+    Predictability, 10th Anniversary Edition, p. 59).
 
-    Returns None for in-flight items. Negative durations (when a
-    source-data bug delivers completed < created) produce values
-    below 1.0, which is the "impossible" zone for valid data —
-    downstream code can flag sub-1.0 values as suspect.
+    The result is always integer-valued (stored as float for
+    column-type consistency). Sub-day precision is deliberately
+    discarded — cycle time is a per-day metric everywhere it's
+    used (forecasting, percentile commitments, throughput). The
+    raw timestamps remain available on the transitions Parquet so
+    the lifecycle / timeline component can still draw an accurate
+    second-resolution gantt.
+
+    Returns None for in-flight items. A `completed_at` whose date
+    is on-or-before `created_at` produces a non-positive result —
+    that's the "bad data" zone (valid minimum is 1.0d). Surfaced
+    rather than clamped so source-data corruption is visible.
 
     See tests/test_calendar_cycle_time.py for the contract.
     """
     if completed_at is None:
         return None
-    duration_days = (completed_at - created_at).total_seconds() / 86400.0
-    return duration_days + 1.0
+    sd = created_at.date()
+    fd = completed_at.date()
+    return float((fd - sd).days + 1)
 
 
 def _work_item_row(item, contract: Contract, run_id: str, materialised_at: datetime):

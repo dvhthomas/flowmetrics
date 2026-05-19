@@ -41,7 +41,10 @@ import pytest
 import yaml
 from click.testing import CliRunner
 
+from datetime import date
+
 from flowmetrics.cli import cli
+from flowmetrics.web.components.aging import render as render_aging
 from flowmetrics.web.components.cycle_time import render as render_cycle_time
 from flowmetrics.web.components.throughput import render as render_throughput
 
@@ -88,11 +91,16 @@ def warehouse() -> duckdb.DuckDBPyConnection:
     assert res.exit_code == 0, res.output
 
     con = duckdb.connect(":memory:")
-    glob = (data_dir / "work_items" / "**" / "*.parquet").as_posix()
-    con.execute(
-        f"CREATE VIEW work_items AS "
-        f"SELECT * FROM read_parquet('{glob}', hive_partitioning = true)"
-    )
+    # Aging reads from both fact tables (work_items for the
+    # in-flight set + percentile thresholds; transitions for the
+    # current-state lookup). Register both so every component's
+    # spec can be rendered for the audit.
+    for kind in ("work_items", "transitions"):
+        glob = (data_dir / kind / "**" / "*.parquet").as_posix()
+        con.execute(
+            f"CREATE VIEW {kind} AS "
+            f"SELECT * FROM read_parquet('{glob}', hive_partitioning = true)"
+        )
     yield con
     con.close()
 
@@ -114,7 +122,20 @@ def _collect_component_specs(warehouse) -> list[tuple[str, dict]]:
                 render_throughput(warehouse, "astral-uv-week").vega_spec_json()
             ),
         ),
-        # Future: add aging, cfd, forecast, etc. as they land.
+        (
+            "aging",
+            json.loads(
+                # Pick an asof inside the fixture window so the
+                # in-flight set is non-empty and the spec is
+                # representative of a real render.
+                render_aging(
+                    warehouse,
+                    "astral-uv-week",
+                    asof=date(2026, 5, 6),
+                ).vega_spec_json()
+            ),
+        ),
+        # Future: add cfd, forecast, etc. as they land.
     ]
 
 

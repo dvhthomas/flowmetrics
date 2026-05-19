@@ -17,4 +17,11 @@
   {% with mode = 'tile', data = throughput %}
     {% include "_partials/throughput_tile.html.jinja" %}
   {% endwith %}
+
+  {% with summary = {"title": "Aging WIP", "headline": aging.headline} %}
+    {% include "_partials/metric_summary.html.jinja" %}
+  {% endwith %}
+  {% with mode = 'tile', data = aging %}
+    {% include "_partials/aging_tile.html.jinja" %}
+  {% endwith %}
 {% endblock %}

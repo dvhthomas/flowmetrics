@@ -1,0 +1,55 @@
+{% extends "_base.html.jinja" %}
+
+{% block content %}
+  {% with summary = {"title": "Aging WIP", "headline": aging.headline} %}
+    {% include "_partials/metric_summary.html.jinja" %}
+  {% endwith %}
+
+  {% with mode = 'detail', data = aging %}
+    {% include "_partials/aging_tile.html.jinja" %}
+  {% endwith %}
+
+  {% with data = work_items %}
+    {% include "_partials/work_items_table.html.jinja" %}
+  {% endwith %}
+
+  <section class="detail-extras">
+    <h2>How to read this</h2>
+    <p>
+      Each point is one <em>in-flight</em> work item (started but
+      not yet completed at the as-of date), positioned at its
+      current workflow state on the x-axis and elapsed age in days
+      on the y-axis. The dashed reference lines are commitment
+      thresholds from completed-item cycle times: P50, P85
+      (Vacanti's external commitment), and P95 (high-stakes).
+      An item aged past P85 is statistically likely to miss the
+      forecast.
+    </p>
+
+    <h2>Caveats</h2>
+    <ul>
+      <li>The as-of date defaults to today (UTC). Pass
+        <code>?asof=YYYY-MM-DD</code> for a historical view.</li>
+      <li>Reference lines come from the same percentile distribution
+        the cycle-time chart shows — they don't update with the
+        as-of date, only with the underlying completed-item data.</li>
+    </ul>
+
+    <h2>Methodology</h2>
+    <p>
+      Per Vacanti, <em>Actionable Agile Metrics for Predictability</em>,
+      10th Anniversary Edition: in-flight items are those created
+      on or before the as-of date with no completion (or a
+      completion strictly after the as-of date). Age = (asof −
+      created_at.date()) in calendar days. Current state is the
+      latest stage entered at or before the as-of date.
+    </p>
+
+    <h2>Actions</h2>
+    <p><em>Reserved for future "now what?" suggestions — pull the
+       oldest item into the standup, flag stalled work, etc.
+       Empty in v1.</em></p>
+  </section>
+
+  <a class="back-link" href="/contracts/{{ contract.name }}/">← Back to dashboard</a>
+{% endblock %}

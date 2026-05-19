@@ -9,16 +9,16 @@
     {% include "_partials/metric_summary.html.jinja" %}
   {% endwith %}
 
-  {# Cycle time strip: surface the metric prominently so the
-     viewer can reconcile the chart's wall-clock span ("about 1/3
-     of a day") with the metric the work-items table reports
-     ("1.41d"). Both numbers are correct; they measure different
-     things. The "+ 1 day" annotation makes the Vacanti adjustment
-     visible. #}
+  {# Cycle time strip: surface both numbers — the per-day metric
+     the rest of the system uses (Vacanti's `FD - SD + 1`, whole
+     calendar days, both endpoints inclusive) AND the wall-clock
+     elapsed time the timeline above shows. Reconciles the two so
+     a viewer doesn't read "1d" on the metric and "10 hours" on
+     the chart and wonder which is right. #}
   <div class="lifecycle-metric-strip">
     <span class="lifecycle-metric-strip-label">Cycle time</span>
-    <span class="lifecycle-metric-strip-value">{{ "%.2f"|format(data.cycle_time_days) }}d</span>
-    <span class="lifecycle-metric-strip-formula">elapsed {{ data.elapsed_display }} + 1 day (Vacanti)</span>
+    <span class="lifecycle-metric-strip-value">{{ data.cycle_time_days|int }}d</span>
+    <span class="lifecycle-metric-strip-formula">elapsed {{ data.elapsed_display }} · calendar days, ends inclusive (Vacanti)</span>
   </div>
 
   {% if data.is_chartable %}

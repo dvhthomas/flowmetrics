@@ -881,6 +881,140 @@ class TestThroughputOnDashboard:
             assert forbidden not in html.lower()
 
 
+class TestAgingOnDashboard:
+    """Slice 3: aging is the third metric on the dashboard, sitting
+    below throughput. Vacanti's Aging WIP — in-flight items at the
+    asof date, plotted by current state (x) and age in days (y),
+    with P50/P85/P95 reference lines from completed cycle times.
+
+    The fixture has zero in-flight items at today's asof (everything
+    in May 4–10 has long since completed by 2026-05-19+). Default
+    render is therefore the empty case; tests that need real points
+    pass `?asof=2026-05-06` to view aging mid-week.
+    """
+
+    def test_dashboard_renders_aging_tile_with_zero_items_by_default(
+        self, server_url: str, page: Page
+    ):
+        """Default asof is today UTC. The fixture's items completed
+        weeks ago, so the dashboard's aging tile is empty (0
+        in-flight items) — empty state is a "no items in flight"
+        message, not a chart, since Vega-Lite can't draw a nominal
+        x-axis with zero values."""
+        page.goto(server_url + "/contracts/astral-uv-week/")
+        page.wait_for_selector("#aging-tile", timeout=10000)
+        # No SVG; explicit empty-state message.
+        expect(page.locator("#aging-tile .aging-empty")).to_be_visible()
+        # Summary headline calls out the zero state.
+        summary = page.locator(
+            ".metric-summary", has_text="Aging WIP"
+        ).first
+        expect(summary).to_be_visible()
+        text = summary.inner_text()
+        assert "0 in-flight" in text, (
+            f"empty-state summary must say '0 in-flight items'; "
+            f"got {text!r}"
+        )
+
+    def test_aging_detail_with_historical_asof_renders_in_flight_dots(
+        self, server_url: str, page: Page
+    ):
+        """`?asof=2026-05-06` makes items completed May 7–10 appear
+        as in-flight at that asof. The chart must draw at least one
+        point mark for them.
+
+        Vega-Lite renders point marks as `<path>` elements under a
+        `g.role-mark.mark-symbol` group. Don't match unqualified
+        `.mark-point`; it doesn't exist in v5's SVG output."""
+        page.goto(
+            server_url
+            + "/contracts/astral-uv-week/metrics/aging?asof=2026-05-06"
+        )
+        page.wait_for_selector("#aging-tile svg", timeout=10000)
+        page.wait_for_timeout(400)
+        n_points = page.evaluate(
+            """() => document.querySelectorAll(
+                '#aging-tile svg g.role-mark.mark-symbol path'
+            ).length"""
+        )
+        assert n_points >= 1, (
+            f"at asof=2026-05-06 the fixture has ≥1 in-flight item; "
+            f"chart drew {n_points} point marks"
+        )
+
+    def test_aging_detail_page_carries_metric_name_in_header(
+        self, server_url: str, page: Page
+    ):
+        page.goto(
+            server_url + "/contracts/astral-uv-week/metrics/aging"
+        )
+        page.wait_for_selector("#aging-tile", timeout=10000)
+        header_text = page.locator(".site-header").inner_text()
+        assert "Aging WIP" in header_text
+
+    def test_aging_chart_includes_three_percentile_threshold_lines(
+        self, server_url: str, page: Page
+    ):
+        """Three rule marks for P50/P85/P95 thresholds. Labels live
+        in the metric-summary headline (not as in-chart text) since
+        anchoring text at the right edge of a layered nominal-x
+        chart was unreliable across Vega-Lite versions."""
+        page.goto(
+            server_url
+            + "/contracts/astral-uv-week/metrics/aging?asof=2026-05-06"
+        )
+        page.wait_for_selector("#aging-tile svg", timeout=10000)
+        page.wait_for_timeout(500)
+        # Scope to `.role-mark` so we don't catch axis-grid /
+        # axis-tick / axis-domain `<g class="mark-rule …">` groups,
+        # which Vega-Lite also tags with `mark-rule`.
+        n_rules = page.evaluate(
+            """() => document.querySelectorAll(
+                '#aging-tile svg g.role-mark.mark-rule line'
+            ).length"""
+        )
+        assert n_rules == 3, (
+            f"expected 3 percentile rule lines (P50/P85/P95); "
+            f"got {n_rules}"
+        )
+        # The percentile values are still named in the metric-summary
+        # headline above the chart.
+        summary = page.locator(
+            ".metric-summary", has_text="Aging WIP"
+        ).first
+        text = summary.inner_text()
+        for label in ("P50", "P85", "P95"):
+            assert label in text, (
+                f"metric-summary must name {label!r}; got {text!r}"
+            )
+
+    def test_aging_tile_details_link_uses_contract_scoped_url(
+        self, server_url: str, page: Page
+    ):
+        page.goto(server_url + "/contracts/astral-uv-week/")
+        page.wait_for_selector("#aging-tile", timeout=10000)
+        link = page.locator("#aging-tile a:has-text('Details')")
+        href = link.get_attribute("href")
+        assert href and href.startswith(
+            "/contracts/astral-uv-week/metrics/aging"
+        ), f"aging Details → must link to contract-scoped URL; got {href!r}"
+
+    def test_aging_fragment_endpoint_supports_asof_param(
+        self, server_url: str, page: Page
+    ):
+        response = page.request.get(
+            server_url
+            + "/api/internal/aging?contract=astral-uv-week&asof=2026-05-06"
+        )
+        assert response.status == 200
+        html = response.text()
+        assert "aging-chart" in html
+        assert "vegaEmbed" in html
+        # No page chrome.
+        for forbidden in ("<!doctype html", "site-header", "filter-bar"):
+            assert forbidden not in html.lower()
+
+
 class TestSiteBrandLink:
     """The "flowmetrics" brand text in the site header is a link to
     the home page (`/`). Standard web convention; lets the user
@@ -1219,10 +1353,13 @@ class TestWorkItemsFragmentEndpoint:
         # cycle_time_days inside <td class="num">.
         import re
 
+        # Cycle time is whole-day integer per Vacanti's strict
+        # formula — match either bare integers or legacy decimal
+        # form so the test survives display-format tweaks.
         nums = [
             float(m.group(1))
             for m in re.finditer(
-                r'<td class="num">([0-9]+\.[0-9]+)</td>', html
+                r'<td class="num">([0-9]+(?:\.[0-9]+)?)</td>', html
             )
         ]
         assert nums, "expected at least one numeric cycle-time cell"
@@ -1419,29 +1556,29 @@ class TestLifecyclePage:
         self, server_url: str, page: Page
     ):
         """User-reported confusion: the gantt's time axis shows
-        wall-clock elapsed time (e.g. ~10 hours for #19330) but
-        the work-items table shows 1.41d for the same PR. Both
-        are correct — the gantt shows elapsed; the table shows
-        Vacanti's (elapsed + 1 day) metric. The lifecycle page
-        must surface BOTH numbers so the reconciliation is
-        visible without reading the source."""
+        wall-clock elapsed time, but the work-items table shows
+        the cycle-time metric. The lifecycle page must surface
+        BOTH numbers so the reconciliation is visible.
+
+        #19330 spans 2026-05-08 19:20 UTC → 2026-05-09 05:13 UTC
+        — crosses midnight UTC, so the whole-day Vacanti formula
+        gives `(May 09 - May 08) + 1 = 2d`. Elapsed wall-clock is
+        ~10 hours."""
         page.goto(server_url + "/contracts/astral-uv-week/items/19330")
         page.wait_for_selector(".lifecycle-metric-strip", timeout=10000)
         strip = page.locator(".lifecycle-metric-strip").inner_text()
-        # Cycle time value (Vacanti metric) — same as the table.
-        assert "1.41d" in strip, (
-            f"strip must show the same cycle_time the table does "
-            f"(1.41d for #19330); got {strip!r}"
+        assert "2d" in strip, (
+            f"strip must show #19330's cycle time as 2d "
+            f"(May 08 → May 09 UTC); got {strip!r}"
         )
-        # Elapsed wall-clock (what the gantt's time axis shows).
-        # #19330's events span 9h 53m — assert the strip names it.
+        # Elapsed wall-clock (~9h 53m for #19330) — the gantt span.
         assert "9h" in strip, (
             f"strip must show the wall-clock elapsed ('9h Mm' for "
             f"#19330); got {strip!r}"
         )
-        # The "+1 day" annotation makes the Vacanti adjustment visible.
-        assert "+ 1 day" in strip or "+1 day" in strip, (
-            f"strip should explain the +1 day Vacanti adjustment; "
+        # The "calendar days" annotation explains the Vacanti rule.
+        assert "calendar days" in strip, (
+            f"strip should explain the calendar-days formula; "
             f"got {strip!r}"
         )
 

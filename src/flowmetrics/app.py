@@ -26,6 +26,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 
+from .web.components.aging import render as render_aging
 from .web.components.cycle_time import render as render_cycle_time
 from .web.components.lifecycle import (
     ItemNotFound,
@@ -85,6 +86,19 @@ def create_app(
         auth_dep = [Depends(_require_auth)]
     else:
         auth_dep = []
+
+    def _parse_asof(value: str | None):
+        """`?asof=YYYY-MM-DD` → `date(YYYY, MM, DD)`. `None` or
+        invalid → `None` (the component defaults to today UTC).
+        Defensive: don't 400 on a bad query param, just fall back."""
+        if not value:
+            return None
+        from datetime import date
+
+        try:
+            return date.fromisoformat(value)
+        except ValueError:
+            return None
 
     def _ensure_contract_exists(name: str) -> None:
         """Confirm a contract YAML exists; otherwise 404 with a clear
@@ -177,6 +191,7 @@ def create_app(
         with _open_warehouse() as con:
             cycle_time = render_cycle_time(con, contract_id)
             throughput = render_throughput(con, contract_id)
+            aging = render_aging(con, contract_id)
         return templates.TemplateResponse(
             request,
             "dashboard.html.jinja",
@@ -187,6 +202,7 @@ def create_app(
                 "view": {"since": None, "until": None},
                 "cycle_time": cycle_time,
                 "throughput": throughput,
+                "aging": aging,
             },
         )
 
@@ -281,6 +297,57 @@ def create_app(
             {
                 "data": throughput,
                 "chart_height": 280,
+                "contract": {"name": contract},
+            },
+        )
+
+    @app.get(
+        "/contracts/{contract_id}/metrics/aging",
+        response_class=HTMLResponse,
+        dependencies=auth_dep,
+    )
+    def aging_detail(
+        request: Request,
+        contract_id: str,
+        asof: str | None = None,
+    ) -> HTMLResponse:
+        _ensure_contract_exists(contract_id)
+        asof_date = _parse_asof(asof)
+        with _open_warehouse() as con:
+            aging = render_aging(con, contract_id, asof=asof_date)
+            work_items = render_work_items_table(con, contract_id)
+        return templates.TemplateResponse(
+            request,
+            "aging_detail.html.jinja",
+            {
+                "title": f"Aging WIP — {contract_id}",
+                "metric_name": "Aging WIP",
+                "contract": {"name": contract_id},
+                "available_contracts": _available_contracts(),
+                "view": {"since": None, "until": None},
+                "aging": aging,
+                "work_items": work_items,
+            },
+        )
+
+    @app.get(
+        "/api/internal/aging",
+        response_class=HTMLResponse,
+        dependencies=auth_dep,
+    )
+    def aging_fragment(
+        request: Request, contract: str, asof: str | None = None
+    ) -> HTMLResponse:
+        _ensure_contract_exists(contract)
+        asof_date = _parse_asof(asof)
+        with _open_warehouse() as con:
+            aging = render_aging(con, contract, asof=asof_date)
+        return templates.TemplateResponse(
+            request,
+            "_partials/aging_chart_fragment.html.jinja",
+            {
+                "data": aging,
+                "chart_height": 320,
                 "contract": {"name": contract},
             },
         )

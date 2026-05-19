@@ -1,0 +1,52 @@
+{# Aging chart fragment: chart container + Vega-Lite embed.
+   Used inside the tile partial AND returned from
+   `/api/internal/aging` as the HTMX swap payload.
+
+   Empty in-flight set (which is the common case for historical
+   fixtures or contracts where all work is complete) gets a
+   compact "nothing in flight" message instead of a chart — Vega
+   can't size a nominal x-axis with zero values and produces a
+   confusing blank canvas with just percentile lines.
+
+   Required context:
+     data           — AgingData (provides vega_spec_json())
+     chart_height   — int pixels (~320 for tile, ~480 for detail)
+#}
+{%- set chart_container_id = "aging-chart" -%}
+{%- set _h = chart_height|default(320) -%}
+
+<div id="{{ chart_container_id }}" class="metric-chart"
+     data-chart-height="{{ _h }}">
+  {% if data.count == 0 %}
+    <p class="aging-empty">
+      No items in flight as of {{ data.asof_display }} (UTC).
+    </p>
+  {% endif %}
+</div>
+{% if data.count > 0 %}
+<script>
+  (function () {
+    // Mirror the throughput/cycle-time pattern: finalize the
+    // previous Vega view at this container before re-embedding so
+    // listeners + data references don't accumulate across HTMX
+    // reset cycles.
+    if (window.__flowmetricsAgingView) {
+      try { window.__flowmetricsAgingView.finalize(); }
+      catch (e) { /* finalize is best-effort */ }
+      window.__flowmetricsAgingView = null;
+    }
+
+    const spec = {{ data.vega_spec_json() | safe }};
+    spec.height = {{ _h }};
+    vegaEmbed("#{{ chart_container_id }}", window.applyTheme(spec), {
+      actions: false,
+      renderer: "svg"
+    }).then(function (res) {
+      window.__flowmetricsAgingView = res.view;
+    }).catch(function (err) {
+      const el = document.getElementById("{{ chart_container_id }}");
+      el.innerText = "Chart render failed: " + err;
+    });
+  })();
+</script>
+{% endif %}
