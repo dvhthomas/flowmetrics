@@ -1,21 +1,40 @@
 {# Compact summary card — used when a chart would be noise.
 
-   The trivial case: an item with one stage (two events — created
-   and finished). A gantt with a single bar adds no information the
-   text doesn't already convey, so we render a summary instead.
+   Two shapes:
+   1. One-stage item (2 events = created → finished). Gantt would
+      be one bar; the summary captures the same info as text.
+   2. Zero-stage item (1 event = freshly created, still in the
+      first stage, no transitions yet). Common for open PRs that
+      haven't moved. We show what stage they're stuck in + when
+      they landed there. Without this branch the `data.stages[0]`
+      access on line below crashed with "tuple has no element 0".
 
    Required context:
-     data — LifecycleData. Uses data.stages[0] + data.terminal_stage.
+     data — LifecycleData.
 #}
-{%- set s = data.stages[0] -%}
-<div class="lifecycle-summary">
-  <div class="lifecycle-summary-duration">
-    <span class="lifecycle-summary-duration-value">{{ s.duration_display }}</span>
-    <span class="lifecycle-summary-duration-label">in {{ s.stage }}</span>
+{% if data.stages %}
+  {%- set s = data.stages[0] -%}
+  <div class="lifecycle-summary">
+    <div class="lifecycle-summary-duration">
+      <span class="lifecycle-summary-duration-value">{{ s.duration_display }}</span>
+      <span class="lifecycle-summary-duration-label">in {{ s.stage }}</span>
+    </div>
+    <div class="lifecycle-summary-flow">
+      <span class="lifecycle-summary-from">{{ s.entered_at_display }}</span>
+      <span class="lifecycle-summary-arrow" aria-hidden="true">→</span>
+      <span class="lifecycle-summary-to">{{ data.terminal_stage }} · {{ s.exited_at_display }}</span>
+    </div>
   </div>
-  <div class="lifecycle-summary-flow">
-    <span class="lifecycle-summary-from">{{ s.entered_at_display }}</span>
-    <span class="lifecycle-summary-arrow" aria-hidden="true">→</span>
-    <span class="lifecycle-summary-to">{{ data.terminal_stage }} · {{ s.exited_at_display }}</span>
+{% elif data.events %}
+  {# Zero-stage = one event. Item entered its current state and
+     hasn't moved. Render where it landed + when. #}
+  {%- set e = data.events[0] -%}
+  <div class="lifecycle-summary">
+    <div class="lifecycle-summary-duration">
+      <span class="lifecycle-summary-duration-value">Still in {{ e.stage }}</span>
+    </div>
+    <div class="lifecycle-summary-flow">
+      <span class="lifecycle-summary-from">Entered {{ e.entered_at_display }}</span>
+    </div>
   </div>
-</div>
+{% endif %}
