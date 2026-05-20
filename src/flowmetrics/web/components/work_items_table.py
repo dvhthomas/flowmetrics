@@ -182,6 +182,7 @@ def render(
     page: int = 1,
     page_size: int = DEFAULT_PAGE_SIZE,
     columns: tuple[Column, ...] | None = None,
+    wip_states: tuple[str, ...] | None = None,
 ) -> WorkItemsTableData:
     """Read a page of rows for the contract.
 
@@ -236,6 +237,36 @@ def render(
         else ""
     )
 
+    # When the table is scoped to in-flight items AND the
+    # contract declares WIP states, mirror the aging-chart
+    # filter: only items whose CURRENT state (latest transition
+    # at or before asof) is in `wip_states`. Without this, the
+    # table over-collects — Cassandra's chart shows 322 WIP
+    # items but the table would page through all 3000+ items
+    # still in any open state (incl. backlog like Triage Needed).
+    wip_join = ""
+    wip_clause = ""
+    wip_params: list = []
+    if in_flight_at and wip_states:
+        placeholders = ",".join("?" for _ in wip_states)
+        # Subquery: for each item, latest transition stage
+        # at or before asof. DuckDB's QUALIFY filters the
+        # window output without an explicit CTE.
+        wip_join = (
+            " JOIN ("
+            "   SELECT item_id, source, stage AS current_state "
+            "   FROM transitions "
+            "   WHERE contract_id = ? "
+            "     AND CAST(entered_at AS DATE) <= CAST(? AS DATE) "
+            "   QUALIFY ROW_NUMBER() OVER ("
+            "     PARTITION BY item_id, source "
+            "     ORDER BY entered_at DESC"
+            "   ) = 1"
+            " ) cs USING (item_id, source)"
+        )
+        wip_params = [contract_name, in_flight_at]
+        wip_clause = f" AND cs.current_state IN ({placeholders}) "
+
     # Build the WHERE clause + params once, used by both the
     # total-count query and the data query.
     where_clause = (
@@ -245,20 +276,21 @@ def render(
         "  AND (? = '' OR lower(title) LIKE ?) "
         "  AND (? = '' OR CAST(completed_at AS DATE) = CAST(? AS DATE)) "
         f"  {in_flight_filter} "
+        f"  {wip_clause}"
     )
     pattern = f"%{(q or '').lower()}%"
     completed_on_arg = completed_on or ""
-    where_params: list = [
-        contract_name,
-        q or "", pattern,
-        completed_on_arg, completed_on_arg,
-    ]
+    where_params: list = [*wip_params, contract_name,
+                           q or "", pattern,
+                           completed_on_arg, completed_on_arg]
     if in_flight_at:
         where_params.extend([in_flight_at, in_flight_at])
+    if in_flight_at and wip_states:
+        where_params.extend(list(wip_states))
 
     # Total matching rows — feeds the pager.
     total_count = con.execute(
-        "SELECT count(*) FROM work_items" + where_clause,
+        "SELECT count(*) FROM work_items" + wip_join + where_clause,
         where_params,
     ).fetchone()[0]
 
@@ -268,6 +300,7 @@ def render(
         "SELECT source, item_id, title, url, "
         "       created_at, completed_at, cycle_time_days "
         "FROM work_items"
+        + wip_join
         + where_clause
         + f"ORDER BY {sql_column} {order}, item_id ASC "
         + "LIMIT ? OFFSET ?"

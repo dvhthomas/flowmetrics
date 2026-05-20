@@ -1,0 +1,6 @@
+{% with summary = {"title": "Cumulative Flow", "headline": data.headline} %}
+  {% include "_partials/metric_summary.html.jinja" %}
+{% endwith %}
+{% with mode = 'tile', data = data %}
+  {% include "_partials/cfd_tile.html.jinja" %}
+{% endwith %}

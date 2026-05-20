@@ -454,26 +454,12 @@ def create_app(
         )
 
     def _dashboard(request: Request, workflow_id: str) -> HTMLResponse:
-        # Dashboard is metric-overview only; the per-item table
-        # belongs to the metric detail pages.
+        # Dashboard returns immediately — no chart data computed
+        # here. Each tile lazy-loads via HTMX
+        # `/api/internal/dashboard-tile/{metric}` so the page
+        # paints fast and tiles fill in as their server-side
+        # renders complete.
         view = _open_view(workflow_id, request)
-        # Dashboard forecast previews use simple defaults — 20
-        # items for When-Done, 7-day horizon for How-Many. The
-        # interactive sliders live on the forecast detail page.
-        today_utc = datetime.now(UTC).date()
-        with view.warehouse() as con:
-            cycle_time = view.render_cycle_time(con)
-            throughput = view.render_throughput(con)
-            aging = view.render_aging(con)
-            cfd = view.render_cfd(con)
-            forecast_when_done = view.render_forecast_when_done(
-                con, items=20, start_date=today_utc,
-            )
-            forecast_how_many = view.render_forecast_how_many(
-                con,
-                start_date=today_utc,
-                end_date=today_utc + timedelta(days=6),
-            )
         return templates.TemplateResponse(
             request,
             "dashboard.html.jinja",
@@ -482,14 +468,53 @@ def create_app(
                 "contract": view.template_context(),
                 "available_contracts": _available_contracts(),
                 "view": {"since": None, "until": None},
-                "cycle_time": cycle_time,
-                "throughput": throughput,
-                "aging": aging,
-                "cfd": cfd,
-                "forecast_when_done": forecast_when_done,
-                "forecast_how_many": forecast_how_many,
             },
         )
+
+    @app.get(
+        "/api/internal/dashboard-tile/{metric}",
+        response_class=HTMLResponse,
+        dependencies=auth_dep,
+    )
+    def dashboard_tile(
+        request: Request, metric: str, workflow: str,
+    ) -> HTMLResponse:
+        """HTMX-served per-metric tile (headline + chart). The
+        dashboard renders only stubs; each tile fetches itself.
+        The query string carries `view_from/to` + `ref_from/to`
+        so the windows propagate to the tile's renders."""
+        view = _open_view(workflow, request)
+        today_utc = datetime.now(UTC).date()
+        ctx: dict = {"contract": view.template_context()}
+        with view.warehouse() as con:
+            if metric == "cycle-time":
+                ctx["data"] = view.render_cycle_time(con)
+                tpl = "_partials/dashboard_tile_cycle_time.html.jinja"
+            elif metric == "throughput":
+                ctx["data"] = view.render_throughput(con)
+                tpl = "_partials/dashboard_tile_throughput.html.jinja"
+            elif metric == "aging":
+                ctx["data"] = view.render_aging(con)
+                tpl = "_partials/dashboard_tile_aging.html.jinja"
+            elif metric == "cfd":
+                ctx["data"] = view.render_cfd(con)
+                tpl = "_partials/dashboard_tile_cfd.html.jinja"
+            elif metric == "forecast":
+                ctx["forecast_when_done"] = view.render_forecast_when_done(
+                    con, items=20, start_date=today_utc,
+                )
+                ctx["forecast_how_many"] = view.render_forecast_how_many(
+                    con,
+                    start_date=today_utc,
+                    end_date=today_utc + timedelta(days=6),
+                )
+                tpl = "_partials/dashboard_tile_forecast.html.jinja"
+            else:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"unknown metric {metric!r}",
+                )
+        return templates.TemplateResponse(request, tpl, ctx)
 
     # Two route declarations both delegating to `_dashboard`.
     # `/workflows/{id}` is the minimum URL; `/workflows/{id}/{slug}`
@@ -637,6 +662,10 @@ def create_app(
                 in_flight_at=aging.asof_iso,
                 sort="created_at",
                 direction="asc",
+                wip_states=(
+                    view.contract.states.wip
+                    if view.contract.states else None
+                ),
             )
         return templates.TemplateResponse(
             request,
@@ -977,6 +1006,10 @@ def create_app(
                 sort=sort_key,
                 direction=direction_key,
                 page=page_int,
+                wip_states=(
+                    view.contract.states.wip
+                    if view.contract.states else None
+                ),
             )
         return templates.TemplateResponse(
             request,

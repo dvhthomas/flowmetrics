@@ -1,0 +1,6 @@
+{% with summary = {"title": "Throughput", "headline": data.headline} %}
+  {% include "_partials/metric_summary.html.jinja" %}
+{% endwith %}
+{% with mode = 'tile', data = data %}
+  {% include "_partials/throughput_tile.html.jinja" %}
+{% endwith %}

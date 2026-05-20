@@ -1,65 +1,29 @@
 {% extends "_base.html.jinja" %}
 
 {% block content %}
-  {# Landing page is metric-overview only. Per-item drill-down
-     (work-items table, lifecycle pages) lives behind the
-     "Details →" link on each tile. #}
-  {% with summary = {"title": "Cycle time", "headline": cycle_time.headline} %}
-    {% include "_partials/metric_summary.html.jinja" %}
-  {% endwith %}
-  {% with mode = 'tile', data = cycle_time %}
-    {% include "_partials/cycle_time_tile.html.jinja" %}
-  {% endwith %}
+  {# Each metric tile lazy-loads via HTMX from
+     `/api/internal/dashboard-tile/{metric}`. The dashboard route
+     returns instantly with these stubs; tiles fill in as their
+     server-side renders complete. Per-tile failures don't block
+     the page.
 
-  {% with summary = {"title": "Throughput", "headline": throughput.headline} %}
-    {% include "_partials/metric_summary.html.jinja" %}
-  {% endwith %}
-  {% with mode = 'tile', data = throughput %}
-    {% include "_partials/throughput_tile.html.jinja" %}
-  {% endwith %}
+     `request.url.query` carries view_from/to + ref_from/to so the
+     windows the operator selected propagate to each tile. #}
+  {%- set q = request.url.query -%}
+  {%- set qs = ('&' + q) if q else '' -%}
 
-  {% with summary = {"title": "Aging WIP", "headline": aging.headline} %}
-    {% include "_partials/metric_summary.html.jinja" %}
-  {% endwith %}
-  {% with mode = 'tile', data = aging %}
-    {% include "_partials/aging_tile.html.jinja" %}
-  {% endwith %}
-
-  {% with summary = {"title": "Cumulative Flow", "headline": cfd.headline} %}
-    {% include "_partials/metric_summary.html.jinja" %}
-  {% endwith %}
-  {% with mode = 'tile', data = cfd %}
-    {% include "_partials/cfd_tile.html.jinja" %}
-  {% endwith %}
-
-  {# Forecast preview — two static charts with sensible defaults
-     (20-item backlog, 7-day horizon). Interactive sliders live
-     on the forecast detail page. #}
-  {% with summary = {"title": "Forecast", "headline": "Monte Carlo previews — defaults: 20-item backlog, 7-day horizon. Open the detail page for interactive sliders."} %}
-    {% include "_partials/metric_summary.html.jinja" %}
-  {% endwith %}
-  <section class="metric">
-    <header class="metric-header">
-      <a class="details-link"
-         href="/workflows/{{ contract.name }}/metrics/forecast">Details →</a>
-    </header>
-    <div class="forecast-grid">
-      <section class="forecast-panel">
-        <header class="forecast-panel-header">
-          <h3>When will 20 items be done?</h3>
-        </header>
-        {% with data = forecast_when_done, chart_height = 220 %}
-          {% include "_partials/forecast_when_done_chart_fragment.html.jinja" %}
-        {% endwith %}
-      </section>
-      <section class="forecast-panel">
-        <header class="forecast-panel-header">
-          <h3>How many will be done in 7 days?</h3>
-        </header>
-        {% with data = forecast_how_many, chart_height = 220 %}
-          {% include "_partials/forecast_how_many_chart_fragment.html.jinja" %}
-        {% endwith %}
-      </section>
-    </div>
-  </section>
+  {% for slug, label in [
+    ('cycle-time', 'Cycle time'),
+    ('throughput', 'Throughput'),
+    ('aging', 'Aging WIP'),
+    ('cfd', 'Cumulative Flow'),
+    ('forecast', 'Forecast'),
+  ] %}
+    <section class="metric metric-loading"
+             hx-get="/api/internal/dashboard-tile/{{ slug }}?workflow={{ contract.name }}{{ qs }}"
+             hx-trigger="load"
+             hx-swap="outerHTML">
+      <p class="metric-loading-text">Loading {{ label }}…</p>
+    </section>
+  {% endfor %}
 {% endblock %}

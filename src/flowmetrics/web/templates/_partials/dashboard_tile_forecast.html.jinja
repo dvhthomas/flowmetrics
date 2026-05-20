@@ -1,0 +1,27 @@
+{% with summary = {"title": "Forecast", "headline": "Monte Carlo previews — defaults: 20-item backlog, 7-day horizon. Open the detail page for interactive sliders."} %}
+  {% include "_partials/metric_summary.html.jinja" %}
+{% endwith %}
+<section class="metric">
+  <header class="metric-header">
+    <a class="details-link"
+       href="/workflows/{{ contract.name }}/metrics/forecast">Details →</a>
+  </header>
+  <div class="forecast-grid">
+    <section class="forecast-panel">
+      <header class="forecast-panel-header">
+        <h3>When will 20 items be done?</h3>
+      </header>
+      {% with data = forecast_when_done, chart_height = 220 %}
+        {% include "_partials/forecast_when_done_chart_fragment.html.jinja" %}
+      {% endwith %}
+    </section>
+    <section class="forecast-panel">
+      <header class="forecast-panel-header">
+        <h3>How many will be done in 7 days?</h3>
+      </header>
+      {% with data = forecast_how_many, chart_height = 220 %}
+        {% include "_partials/forecast_how_many_chart_fragment.html.jinja" %}
+      {% endwith %}
+    </section>
+  </div>
+</section>

@@ -1,0 +1,9 @@
+{# Lazy-loaded dashboard tile for Cycle time. Returned by
+   `/api/internal/dashboard-tile/cycle-time`. HTMX swaps the
+   outerHTML of the placeholder stub on the dashboard. #}
+{% with summary = {"title": "Cycle time", "headline": data.headline} %}
+  {% include "_partials/metric_summary.html.jinja" %}
+{% endwith %}
+{% with mode = 'tile', data = data %}
+  {% include "_partials/cycle_time_tile.html.jinja" %}
+{% endwith %}

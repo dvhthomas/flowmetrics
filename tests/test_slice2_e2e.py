@@ -1105,9 +1105,14 @@ class TestWorkflowUrls:
     """
 
     def test_dashboard_at_workflows_id(self, server_url: str, page: Page):
+        """Dashboard now lazy-loads tiles via HTMX. The initial
+        response carries STUBS that fetch each metric tile from
+        `/api/internal/dashboard-tile/{metric}`. Assert the
+        stub URLs are present; the final chart tile id
+        (`cycle-time-tile`) appears after HTMX swaps."""
         r = page.request.get(server_url + "/workflows/astral-uv-week")
         assert r.status == 200
-        assert "cycle-time-tile" in r.text()
+        assert "dashboard-tile/cycle-time" in r.text()
 
     def test_dashboard_with_slug_also_routes(
         self, server_url: str, page: Page
@@ -1117,7 +1122,7 @@ class TestWorkflowUrls:
             server_url + "/workflows/astral-uv-week/astral-sh-uv"
         )
         assert r.status == 200
-        assert "cycle-time-tile" in r.text()
+        assert "dashboard-tile/cycle-time" in r.text()
 
     def test_metric_pages_under_workflows(
         self, server_url: str, page: Page
