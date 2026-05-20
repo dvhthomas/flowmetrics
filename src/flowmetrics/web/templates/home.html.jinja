@@ -1,0 +1,35 @@
+{% extends "_base.html.jinja" %}
+
+{% block filter_bar %}{# no filter bar on the home page — no workflow context #}{% endblock %}
+
+{% block content %}
+  <section class="home-intro">
+    <h1>Workflows</h1>
+    <p class="home-subtitle">
+      Pick a workflow to view its flow metrics. Each entry is a
+      contract YAML under <code>contracts/</code>.
+    </p>
+  </section>
+
+  {% if available_contracts %}
+    <ul class="home-workflow-list">
+      {% for name in available_contracts %}
+        <li class="home-workflow-item">
+          <a class="home-workflow-link" href="/workflows/{{ name }}">
+            <span class="home-workflow-name">{{ name }}</span>
+            <span class="home-workflow-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="aging-empty">
+      <strong class="aging-empty-headline">No workflows yet.</strong>
+      <span class="aging-empty-sub">
+        Add a contract YAML under <code>contracts/</code> and
+        run <code>flow materialise &lt;name&gt;</code> to
+        populate the warehouse.
+      </span>
+    </p>
+  {% endif %}
+{% endblock %}

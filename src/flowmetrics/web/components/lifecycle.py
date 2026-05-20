@@ -184,10 +184,19 @@ def render(
     # lifecycle has no truncation point.
     if header_completed_at is not None:
         completed_aware = attach_utc(header_completed_at)
+        # Compare at second-precision: the completion event's
+        # transition often has microsecond-level offset from the
+        # work_item's completed_at (Jira returns one timestamp at
+        # ms resolution, the API records both fields separately).
+        # Without truncating to seconds we'd drop the very event
+        # that marked completion — leaving the lifecycle with 0
+        # stages and crashing the summary template.
+        completed_seconds = completed_aware.replace(microsecond=0)
         rows = [
             (entered_at, stage, signal)
             for entered_at, stage, signal in rows
-            if attach_utc(entered_at) <= completed_aware
+            if attach_utc(entered_at).replace(microsecond=0)
+            <= completed_seconds
         ]
 
     events: list[LifecycleEvent] = []

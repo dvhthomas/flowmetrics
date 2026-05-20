@@ -32,7 +32,19 @@
     </table>
   {% endif %}
   <div id="{{ chart_container_id }}" class="metric-chart"
-       data-chart-height="{{ _h }}"></div>
+       data-chart-height="{{ _h }}">
+    {% if not data.histogram %}
+      <p class="aging-empty">
+        <strong class="aging-empty-headline">Not enough throughput history to forecast.</strong>
+        <span class="aging-empty-sub">
+          Monte Carlo needs daily completion counts inside the
+          reference period. Widen the reference window above, or
+          run `flow materialise` to refresh.
+        </span>
+      </p>
+    {% endif %}
+  </div>
+  {% if data.histogram %}
   <script>
     (function () {
       if (window.__flowmetricsForecastHowManyView) {
@@ -63,4 +75,5 @@
       });
     })();
   </script>
+  {% endif %}
 </div>

@@ -195,6 +195,43 @@ class TestLifecyclePostCompletionTruncation:
             f"{data.stages[-1].exited_at_iso}"
         )
 
+    def test_terminal_transition_with_microsecond_offset_is_kept(
+        self, synth_warehouse
+    ):
+        """Real-world data: the completion event's transition can
+        land microseconds AFTER the work_item's completed_at
+        timestamp (the two fields come from separate API calls
+        with mismatched precision — Jira returns one at second
+        resolution, the other at ms). A strict `entered_at <=
+        completed_at` truncation drops the very event that marked
+        completion, leaving the lifecycle with 0 stages — and a
+        crash in the summary template that assumes stages[0].
+
+        Compare at second-precision instead. Pin a synthetic item
+        where the resolved transition is 37µs after completed_at;
+        the lifecycle must still record 2 events / 1 stage."""
+        from datetime import datetime as _dt
+        synth_warehouse.execute(
+            "INSERT INTO work_items VALUES "
+            "('demo', 'jira', '#x1', 'Test', NULL,"
+            " '2024-12-27 05:43:25', '2025-04-05 05:01:30', 100.0)"
+        )
+        synth_warehouse.execute(
+            "INSERT INTO transitions VALUES "
+            "('demo', 'jira', '#x1', '2024-12-27 05:43:25', "
+            "'Triage Needed', 'jira-issue-created'),"
+            "('demo', 'jira', '#x1', '2025-04-05 05:01:30.037', "
+            "'Resolved', 'jira-resolved')"
+        )
+        from flowmetrics.web.components.lifecycle import render
+        data = render(synth_warehouse, "demo", "jira", "#x1")
+        assert len(data.events) == 2, (
+            f"completion-event transition with microsecond offset "
+            f"must NOT be truncated; got {len(data.events)} events"
+        )
+        assert len(data.stages) == 1
+        assert data.stages[0].stage == "Triage Needed"
+
     def test_in_flight_items_keep_all_events(self, synth_warehouse):
         """Truncation only applies to COMPLETED items. Item #2
         has completed_at=NULL and 3 transitions — all 3 must

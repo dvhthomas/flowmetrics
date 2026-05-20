@@ -109,27 +109,35 @@ class TestFilterBarWindows:
     def test_inputs_default_to_30_day_view_and_14_day_reference(
         self, server_url: str, page: Page
     ):
-        """No query params → both windows fall back to today-UTC
-        anchored defaults: 30-day view, 14-day reference."""
+        """No query params → both windows populate with defaults:
+        30-day view, 14-day reference. Anchored to the latest
+        completion date in the warehouse (so defaults always
+        produce non-empty charts), with fallback to today UTC
+        for empty warehouses."""
+        from datetime import date as _date, timedelta
         page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector("input[name='view_from']")
-
-        today = datetime.now(UTC).date()
-        from datetime import timedelta
-        # Defaults: from = today - (N-1), to = today (inclusive).
-        view_from_default = (today - timedelta(days=29)).isoformat()
-        view_to_default = today.isoformat()
-        ref_from_default = (today - timedelta(days=13)).isoformat()
-        ref_to_default = today.isoformat()
 
         def _val(name: str) -> str:
             return page.evaluate(
                 f"() => document.querySelector(\"input[name='{name}']\").value"
             )
-        assert _val("view_from") == view_from_default
-        assert _val("view_to") == view_to_default
-        assert _val("ref_from") == ref_from_default
-        assert _val("ref_to") == ref_to_default
+        view_from = _date.fromisoformat(_val("view_from"))
+        view_to = _date.fromisoformat(_val("view_to"))
+        ref_from = _date.fromisoformat(_val("ref_from"))
+        ref_to = _date.fromisoformat(_val("ref_to"))
+
+        # View window: 30 days inclusive.
+        assert (view_to - view_from).days == 29
+        # Reference period: 14 days inclusive.
+        assert (ref_to - ref_from).days == 13
+        # Both windows end on the SAME anchor (data-max date).
+        assert view_to == ref_to
+        # Anchor should be inside the fixture's window (May 4-10, 2026).
+        assert _date(2026, 5, 4) <= view_to <= _date(2026, 5, 10), (
+            f"default anchor should be the data-max completion date "
+            f"(within May 4-10, 2026 for the fixture); got {view_to}"
+        )
 
     def test_url_params_override_defaults_in_inputs(
         self, server_url: str, page: Page

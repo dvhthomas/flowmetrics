@@ -159,13 +159,19 @@ class TestWorkflowSwitcher:
         page_text = page.locator("body").inner_text()
         assert "beta-workflow" in page_text
 
-    def test_switcher_preserves_metric_sub_route(
+    def test_switcher_hidden_on_metric_detail_pages(
         self, server_url: str, page: Page
     ):
-        """Switching workflow from a metric-detail URL lands on
-        the same metric in the new workflow — not the dashboard.
-        Without this, every switch loses the viewer's context."""
+        """The workflow switcher only appears on the workflow's
+        dashboard (`/workflows/{id}`). Detail pages rely on the
+        header breadcrumb to navigate back; cluttering them with
+        a switcher implies you'd want to switch mid-investigation,
+        which isn't the natural flow."""
         page.goto(server_url + "/workflows/alpha-workflow/metrics/cycle-time")
-        page.wait_for_selector("select[name='workflow']:not([disabled])")
-        page.select_option("select[name='workflow']", "beta-workflow")
-        page.wait_for_url("**/workflows/beta-workflow/metrics/cycle-time**")
+        page.wait_for_selector(".filter-bar")
+        # Switcher not present on detail pages.
+        count = page.locator("select[name='workflow']").count()
+        assert count == 0, (
+            f"workflow switcher should be hidden on metric detail "
+            f"pages; found {count} select element(s)"
+        )

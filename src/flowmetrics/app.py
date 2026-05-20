@@ -163,13 +163,36 @@ class WorkflowView:
         # the old _workflow_slug/_workflow_system_label helpers
         # had.
         self.contract = load_contract(workflow_id, contracts_dir)
-        # Parse the two user-facing windows from the request's
-        # query params. Defaults (30-day view, 14-day reference)
-        # are anchored to today UTC and applied per-request.
-        today_utc = datetime.now(UTC).date()
-        self.view_window, self.reference_period = parse_windows(
-            dict(query or {}), today=today_utc,
+        # Anchor default windows to the data's most recent
+        # completion when available — defaults should produce
+        # non-empty charts even when the contract's data window
+        # is months old. Falls back to today UTC for fresh
+        # installs with no data yet.
+        anchor = (
+            self._latest_completion_date()
+            or datetime.now(UTC).date()
         )
+        self.view_window, self.reference_period = parse_windows(
+            dict(query or {}), today=anchor,
+        )
+
+    def _latest_completion_date(self):
+        """Most recent completed_at in this workflow's warehouse,
+        or None when the warehouse has no completions yet."""
+        try:
+            con = open_warehouse(self._data_dir)
+        except duckdb.IOException:
+            return None
+        try:
+            row = con.execute(
+                "SELECT max(CAST(completed_at AS DATE)) "
+                "FROM work_items "
+                "WHERE contract_id = ? AND completed_at IS NOT NULL",
+                [self.id],
+            ).fetchone()
+            return row[0] if row and row[0] else None
+        finally:
+            con.close()
 
     @contextmanager
     def warehouse(self):
@@ -184,11 +207,12 @@ class WorkflowView:
 
     def template_context(self) -> dict:
         """Template-side context for "what workflow is this":
-        id, source-system display name, decorative slug, plus
-        the current view/reference windows for the filter bar."""
+        id, decorative slug, plus the current view/reference
+        windows for the filter bar. The source-system label
+        was dropped from the header — viewer doesn't need to be
+        told the source per metric."""
         return {
             "name": self.id,
-            "system": self._system_label(),
             "slug": self._slug(),
             "view_from": self.view_window.from_.isoformat(),
             "view_to": self.view_window.to.isoformat(),
@@ -203,11 +227,6 @@ class WorkflowView:
         if c.source == "jira" and c.jira_project:
             return c.jira_project.lower()
         return self.id
-
-    def _system_label(self) -> str:
-        return {"github": "GitHub", "jira": "Jira"}.get(
-            self.contract.source, self.contract.source
-        )
 
     # ---- render orchestration ------------------------------------
 
@@ -374,15 +393,23 @@ def create_app(
     def _available_contracts() -> list[str]:
         return sorted(p.stem for p in contracts_dir.glob("*.yaml"))
 
-    # `/` redirects to the first contract's dashboard. Once Slice 6
-    # adds the contract switcher UI this becomes the contract picker;
-    # for v1 it's just a convenience for single-contract installs.
-    @app.get("/", include_in_schema=False)
-    def root_redirect():
-        from fastapi.responses import RedirectResponse
-
-        return RedirectResponse(
-            url=f"/workflows/{_first_contract_or_404()}", status_code=307
+    @app.get("/", response_class=HTMLResponse, include_in_schema=False)
+    def home(request: Request) -> HTMLResponse:
+        """Landing page — lists every contract under contracts_dir
+        as a link to its dashboard. The brand link in the header
+        always lands here so the operator can pivot between
+        workflows without dropping into a specific one first."""
+        return templates.TemplateResponse(
+            request,
+            "home.html.jinja",
+            {
+                "title": "flowmetrics",
+                "available_contracts": _available_contracts(),
+                # Empty contract dict keeps `_base.html.jinja`
+                # header / filter-bar guards happy without
+                # implying a current workflow.
+                "contract": None,
+            },
         )
 
     @app.get(
@@ -430,11 +457,23 @@ def create_app(
         # Dashboard is metric-overview only; the per-item table
         # belongs to the metric detail pages.
         view = _open_view(workflow_id, request)
+        # Dashboard forecast previews use simple defaults — 20
+        # items for When-Done, 7-day horizon for How-Many. The
+        # interactive sliders live on the forecast detail page.
+        today_utc = datetime.now(UTC).date()
         with view.warehouse() as con:
             cycle_time = view.render_cycle_time(con)
             throughput = view.render_throughput(con)
             aging = view.render_aging(con)
             cfd = view.render_cfd(con)
+            forecast_when_done = view.render_forecast_when_done(
+                con, items=20, start_date=today_utc,
+            )
+            forecast_how_many = view.render_forecast_how_many(
+                con,
+                start_date=today_utc,
+                end_date=today_utc + timedelta(days=6),
+            )
         return templates.TemplateResponse(
             request,
             "dashboard.html.jinja",
@@ -447,6 +486,8 @@ def create_app(
                 "throughput": throughput,
                 "aging": aging,
                 "cfd": cfd,
+                "forecast_when_done": forecast_when_done,
+                "forecast_how_many": forecast_how_many,
             },
         )
 

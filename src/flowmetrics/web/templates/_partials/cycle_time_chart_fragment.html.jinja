@@ -10,7 +10,19 @@
 {%- set _h = chart_height|default(320) -%}
 
 <div id="{{ chart_container_id }}" class="metric-chart"
-     data-chart-height="{{ _h }}"></div>
+     data-chart-height="{{ _h }}">
+  {% if data.item_count == 0 %}
+    <p class="aging-empty">
+      <strong class="aging-empty-headline">No completed items in this window.</strong>
+      <span class="aging-empty-sub">
+        Try widening the view (or reference period) using the
+        controls above — defaults are the most-recent 30 days
+        of view and 14 days of reference.
+      </span>
+    </p>
+  {% endif %}
+</div>
+{% if data.item_count > 0 %}
 <script>
   (function () {
     // Finalize the previous View at this container to free its
@@ -47,3 +59,4 @@
     });
   })();
 </script>
+{% endif %}

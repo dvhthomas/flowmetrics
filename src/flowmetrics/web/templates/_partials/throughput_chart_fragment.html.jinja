@@ -16,7 +16,18 @@
 {%- set _h = chart_height|default(280) -%}
 
 <div id="{{ chart_container_id }}" class="metric-chart"
-     data-chart-height="{{ _h }}"></div>
+     data-chart-height="{{ _h }}">
+  {% if not data.daily %}
+    <p class="aging-empty">
+      <strong class="aging-empty-headline">No completed items in this window.</strong>
+      <span class="aging-empty-sub">
+        Widen the view window using the controls above, or
+        confirm `flow materialise` has run recently.
+      </span>
+    </p>
+  {% endif %}
+</div>
+{% if data.daily %}
 <script>
   (function () {
     // HTMX outerHTML-swaps this whole fragment on Reset. Vega
@@ -71,3 +82,4 @@
     });
   })();
 </script>
+{% endif %}

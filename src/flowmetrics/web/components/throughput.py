@@ -217,8 +217,17 @@ def render(
 
     # Dict keyed by date for O(1) lookup during the enumeration.
     by_date: dict[date, int] = {d: int(n) for d, n in rows}
-    first_d = min(by_date)
-    last_d = max(by_date)
+    # Span the view window when one's been chosen — Vacanti says
+    # throughput averages cover the chosen PERIOD, not just the
+    # observed-completion span. A 30-day view with 4 completion
+    # days should average over 30, not 4. Without a view, fall
+    # back to the data-derived range.
+    if view is not None:
+        first_d = view.from_
+        last_d = view.to
+    else:
+        first_d = min(by_date)
+        last_d = max(by_date)
 
     # Enumerate every calendar date in [first_d, last_d]. Zero-count
     # days fill in for dates with no completions — Vacanti's rule.

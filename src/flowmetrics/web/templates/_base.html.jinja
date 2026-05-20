@@ -152,6 +152,18 @@
       background: var(--surface);
       padding: 0.1875rem 0.4375rem;
       border-radius: 0.25rem;
+      text-decoration: none;
+    }
+    /* `a.stamp` is a clickable breadcrumb back to the workflow's
+       dashboard — make it visibly tappable. */
+    header.site-header a.stamp:hover {
+      color: var(--fg);
+      background: var(--border);
+    }
+    /* The current page's chip — looks the same but isn't a link. */
+    header.site-header .stamp--current {
+      color: var(--fg);
+      background: var(--border);
     }
     header.site-header .header-sep {
       color: var(--border);
@@ -164,6 +176,48 @@
       font-size: 1.0625rem;
       letter-spacing: -0.005em;
       color: var(--fg);
+    }
+
+    /* ─────── Home page (workflow picker) ─────── */
+    .home-intro {
+      margin: 1.4rem 0 1rem 0;
+    }
+    .home-intro h1 {
+      font-family: var(--head-font);
+      font-weight: 600;
+      font-size: 1.5rem;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.3rem 0;
+    }
+    .home-subtitle {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      margin: 0;
+    }
+    .home-workflow-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0;
+    }
+    .home-workflow-item {
+      margin: 0;
+      border-bottom: 0.0625rem solid var(--border);
+    }
+    .home-workflow-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0.3rem;
+      color: var(--fg);
+      text-decoration: none;
+      font-family: var(--mono-font);
+      font-size: 0.9375rem;
+    }
+    .home-workflow-link:hover {
+      background: var(--surface);
+    }
+    .home-workflow-arrow {
+      color: var(--muted);
     }
 
     /* ─────── Filter bar ─────── */
@@ -913,12 +967,15 @@
     <div class="container">
       <a class="brand" href="/">flowmetrics</a>
       {% if contract %}
-        {% if contract.system %}
-          <span class="header-sep" aria-hidden="true">·</span>
-          <span class="stamp stamp--system">{{ contract.system }}</span>
-        {% endif %}
         <span class="header-sep" aria-hidden="true">·</span>
-        <span class="stamp">{{ contract.name }}</span>
+        {# Workflow name is a link to the workflow's dashboard,
+           UNLESS we're already on that page (in which case it
+           reads as the current breadcrumb). #}
+        {% if metric_name %}
+          <a class="stamp" href="/workflows/{{ contract.name }}">{{ contract.name }}</a>
+        {% else %}
+          <span class="stamp stamp--current">{{ contract.name }}</span>
+        {% endif %}
       {% endif %}
       {% if metric_name %}
         <span class="header-sep" aria-hidden="true">·</span>
@@ -930,6 +987,10 @@
   {% block filter_bar %}
   <nav class="filter-bar" aria-label="Filters">
     <div class="container">
+      {# The workflow switcher only renders on the workflow's
+         home page (the dashboard, where `metric_name` is unset).
+         Detail pages use the breadcrumb to navigate. #}
+      {% if not metric_name %}
       <label>Workflow
         <select name="workflow"
                 onchange="(function(s){
@@ -947,6 +1008,7 @@
           {% endfor %}
         </select>
       </label>
+      {% endif %}
       <form method="get" class="filter-bar-form" aria-label="Window controls">
         <fieldset class="filter-window">
           <legend>View window <span class="filter-hint">— chart x-axes (inclusive)</span></legend>

@@ -158,7 +158,7 @@ def server_url(tmp_path_factory):
 
 class TestDashboardCycleTimeTile:
     def test_dashboard_renders_vega_svg(self, server_url: str, page: Page):
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         # The Vega-Lite chart embeds inside a div with id cycle-time-tile.
         # Wait for the SVG to actually draw, not just for the container div.
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
@@ -167,7 +167,7 @@ class TestDashboardCycleTimeTile:
     def test_dashboard_chart_axes_say_completion_date_and_cycle_time(
         self, server_url: str, page: Page
     ):
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
         # Vega-Lite labels the axes from spec; assert the labels are
         # the human-meaningful ones the slice promised.
@@ -194,7 +194,7 @@ class TestDashboardCycleTimeTile:
         only SVG <text> nodes via page.evaluate (Playwright's
         inner_text doesn't extract SVG text reliably).
         """
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
         page.wait_for_timeout(500)  # let Vega finish drawing
         svg_texts: list[str] = page.evaluate(
@@ -217,7 +217,7 @@ class TestDashboardCycleTimeTile:
         """Forty-three PRs in the fixture window. The chart MUST render
         marks (not just axes). Test the chart is non-empty by counting
         rendered point marks."""
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
         # Vega-Lite renders point marks as <path> or <circle> under
         # the .mark-symbol class. Empty SVG = bug.
@@ -229,7 +229,7 @@ class TestDashboardCycleTimeTile:
     def test_dashboard_has_details_link_to_detail_page(
         self, server_url: str, page: Page
     ):
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         link = page.locator("#cycle-time-tile a:has-text('Details')")
         expect(link).to_be_visible()
         href = link.get_attribute("href")
@@ -249,7 +249,7 @@ class TestDashboardCycleTimeTile:
         """
         import re
 
-        page.goto(server_url + "/")
+        page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
         page.wait_for_timeout(500)
         svg_texts: list[str] = page.evaluate(
@@ -1194,20 +1194,30 @@ class TestWorkflowUrls:
             f"filter bar must not say 'Contract'; got {bar!r}"
         )
 
-    def test_site_header_includes_system_and_workflow(
+    def test_header_workflow_chip_links_to_dashboard_on_detail_pages(
         self, server_url: str, page: Page
     ):
-        """Header carries both the upstream system (GitHub / Jira)
-        and the workflow name — distinct concepts the prior single
-        'contract name' chip conflated."""
-        page.goto(server_url + "/workflows/astral-uv-week")
+        """Header on a metric detail page: the workflow chip is a
+        link back to the workflow dashboard, the metric name is
+        the current (non-link) breadcrumb. The 'system' chip
+        (GitHub / Jira) was dropped — viewer doesn't need to be
+        told the source per metric."""
+        page.goto(
+            server_url + "/workflows/astral-uv-week/metrics/cycle-time"
+        )
         page.wait_for_selector(".site-header", timeout=10000)
         text = page.locator(".site-header").inner_text()
-        assert "astral-uv-week" in text, (
-            f"header must include the workflow name; got {text!r}"
+        assert "astral-uv-week" in text
+        assert "Cycle time" in text
+        # The workflow chip is a real <a> on a detail page.
+        href = page.evaluate(
+            "() => document.querySelector(\".site-header a.stamp\")"
+            ".getAttribute(\"href\")"
         )
-        assert "GitHub" in text or "github" in text, (
-            f"header must include the upstream system; got {text!r}"
+        assert href == "/workflows/astral-uv-week"
+        # And the system chip is NOT shown.
+        assert "GitHub" not in text and "github" not in text, (
+            f"system chip (GitHub/Jira) should be hidden in header; got {text!r}"
         )
 
 
