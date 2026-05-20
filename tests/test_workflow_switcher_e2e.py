@@ -126,36 +126,29 @@ def server_url(tmp_path_factory):
 
 
 class TestWorkflowSwitcher:
-    def test_dropdown_is_enabled_and_lists_all_workflows(
+    def test_home_lists_all_workflows_as_links(
         self, server_url: str, page: Page
     ):
-        page.goto(server_url + "/workflows/alpha-workflow")
-        select = page.locator("select[name='workflow']")
-        expect(select).to_be_visible()
-        # Must NOT be disabled — that was the slice 2 placeholder
-        # behaviour and is the whole bug this test guards.
-        is_disabled = page.evaluate(
-            "() => document.querySelector(\"select[name='workflow']\").disabled"
+        """The home page is the workflow picker — lists every
+        contract under contracts_dir as a link to its dashboard.
+        The picker dropdown was replaced by this list."""
+        page.goto(server_url + "/")
+        page.wait_for_selector("ul.home-workflow-list")
+        hrefs = page.evaluate(
+            "() => Array.from(document.querySelectorAll('a.home-workflow-link'))"
+            ".map(a => a.getAttribute('href'))"
         )
-        assert is_disabled is False, (
-            "workflow select must be enabled so users can switch"
-        )
-        options = page.evaluate(
-            "() => Array.from(document.querySelectorAll(\"select[name='workflow'] option\")).map(o => o.value)"
-        )
-        assert "alpha-workflow" in options
-        assert "beta-workflow" in options
+        assert "/workflows/alpha-workflow" in hrefs
+        assert "/workflows/beta-workflow" in hrefs
 
-    def test_selecting_a_different_workflow_navigates_there(
+    def test_clicking_a_workflow_link_navigates_to_its_dashboard(
         self, server_url: str, page: Page
     ):
-        page.goto(server_url + "/workflows/alpha-workflow")
-        page.wait_for_selector("select[name='workflow']:not([disabled])")
-        page.select_option("select[name='workflow']", "beta-workflow")
-        page.wait_for_url("**/workflows/beta-workflow**")
-        # The contract chip in the page header should now read
-        # beta-workflow — confirms a real re-render, not just URL
-        # change.
+        page.goto(server_url + "/")
+        page.locator(
+            "a.home-workflow-link[href='/workflows/beta-workflow']"
+        ).click()
+        page.wait_for_url("**/workflows/beta-workflow")
         page_text = page.locator("body").inner_text()
         assert "beta-workflow" in page_text
 

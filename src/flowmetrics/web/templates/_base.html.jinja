@@ -287,9 +287,36 @@
     .filter-bar-form {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem 1rem;
+      gap: 0.5rem 0.75rem;
       align-items: center;
       width: 100%;
+    }
+    .filter-compact {
+      display: inline-flex;
+      gap: 0.3rem;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.8125rem;
+    }
+    .filter-compact select,
+    .filter-compact input {
+      font-size: 0.8125rem;
+      padding: 0.15rem 0.4rem;
+    }
+    .filter-advanced {
+      flex-basis: 100%;
+      margin-top: 0.3rem;
+    }
+    .filter-advanced summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.78125rem;
+      list-style: revert;
+    }
+    .filter-advanced summary:hover { color: var(--fg); }
+    .filter-advanced > p {
+      margin: 0.3rem 0;
+      font-size: 0.78125rem;
     }
     .filter-window {
       border: 0.0625rem solid var(--border);
@@ -298,7 +325,7 @@
       display: inline-flex;
       gap: 0.6rem;
       align-items: center;
-      margin: 0;
+      margin: 0.2rem 0.5rem 0.2rem 0;
     }
     .filter-window legend {
       color: var(--fg);
@@ -329,6 +356,22 @@
       text-decoration: none;
     }
     .filter-reset:hover { color: var(--fg); text-decoration: underline; }
+    .filter-stale-banner {
+      flex-basis: 100%;
+      margin: 0 0 0.3rem 0;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8125rem;
+      color: var(--fg);
+      background: var(--surface);
+      border-left: 0.25rem solid var(--p-500);
+      border-radius: 0.25rem;
+    }
+    .filter-stale-banner code {
+      background: var(--white);
+      padding: 0.05rem 0.3rem;
+      border-radius: 0.2rem;
+      font-size: 0.8125rem;
+    }
 
     /* ─────── Metric summary (above charts) ─────── */
     .metric-summary {
@@ -1032,42 +1075,104 @@
   {% block filter_bar %}
   <nav class="filter-bar" aria-label="Filters">
     <div class="container">
-      {# The workflow switcher only renders on the workflow's
-         home page (the dashboard, where `metric_name` is unset).
-         Detail pages use the breadcrumb to navigate. #}
-      {% if not metric_name %}
-      <label>Workflow
-        <select name="workflow"
-                onchange="(function(s){
-                  if (!s.value || s.value === '{{ contract.name }}') return;
-                  /* Preserve sub-route after /workflows/{id} so the
-                     viewer keeps their current metric/page when
-                     switching between workflows. */
-                  location.pathname = location.pathname.replace(
-                    /^\/workflows\/[^\/]+/,
-                    '/workflows/' + encodeURIComponent(s.value)
-                  );
-                })(this)">
-          {% for c in available_contracts %}
-            <option value="{{ c }}"{% if c == contract.name %} selected{% endif %}>{{ c }}</option>
-          {% endfor %}
-        </select>
-      </label>
+      {# Workflow switcher lives on the home page (`/`). Detail
+         pages use the breadcrumb to navigate back; the workflow
+         dashboard's filter bar focuses on date controls only. #}
+      {% if contract.data_is_stale %}
+        <p class="filter-stale-banner">
+          Data anchored to <strong>{{ contract.data_max_date }}</strong> —
+          the most recent completion in the warehouse.
+          Run <code>flow materialise {{ contract.name }}</code> to refresh
+          (or wait for cron).
+        </p>
       {% endif %}
       <form method="get" class="filter-bar-form" aria-label="Window controls">
-        <fieldset class="filter-window">
-          <legend>View window <span class="filter-hint">— chart x-axes (inclusive)</span></legend>
-          <label>From <input type="date" name="view_from" value="{{ contract.view_from }}"></label>
-          <label>To <input type="date" name="view_to" value="{{ contract.view_to }}"></label>
-        </fieldset>
-        <fieldset class="filter-window">
-          <legend>Reference period <span class="filter-hint">— P-lines + MCS sample (inclusive)</span></legend>
-          <label>From <input type="date" name="ref_from" value="{{ contract.ref_from }}"></label>
-          <label>To <input type="date" name="ref_to" value="{{ contract.ref_to }}"></label>
-        </fieldset>
+        {# Common case: preset + anchor + durations. View
+           and reference share an anchor; durations decide
+           how far back each window reaches. #}
+        <label class="filter-compact">Quick range
+          <select name="preset" onchange="flowmetricsApplyPreset(this.form, this.value)">
+            <option value="">Custom…</option>
+            <option value="last-7-days">Last 7 days</option>
+            <option value="last-14-days">Last 14 days</option>
+            <option value="last-30-days">Last 30 days</option>
+            <option value="last-90-days">Last 90 days</option>
+            <option value="last-week">Last week (Sun–Sat)</option>
+            <option value="last-2-weeks">Last 2 weeks</option>
+          </select>
+        </label>
+        <label class="filter-compact">Anchor
+          <input type="date" name="anchor" value="{{ contract.anchor }}">
+        </label>
+        <label class="filter-compact">View
+          <select name="view_days">
+            {% for d in [7, 14, 30, 60, 90, 180] %}
+              <option value="{{ d }}"{% if d == contract.view_days %} selected{% endif %}>{{ d }} days</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="filter-compact">Reference
+          <select name="ref_days">
+            {% for d in [7, 14, 30, 60, 90] %}
+              <option value="{{ d }}"{% if d == contract.ref_days %} selected{% endif %}>{{ d }} days</option>
+            {% endfor %}
+          </select>
+        </label>
         <button type="submit" class="filter-apply">Apply</button>
-        <a class="filter-reset" href="{{ request.url.path }}">Reset to defaults</a>
+        <a class="filter-reset" href="{{ request.url.path }}">Reset</a>
+
+        <details class="filter-advanced"{% if contract.is_advanced_window %} open{% endif %}>
+          <summary>Advanced</summary>
+          <p class="filter-hint">
+            Explicit From / To dates per window. When set, these
+            override the anchor + durations above (and let view
+            and reference end on different dates).
+          </p>
+          <fieldset class="filter-window">
+            <legend>View window</legend>
+            <label>From <input type="date" name="view_from" value="{% if contract.is_advanced_window %}{{ contract.view_from }}{% endif %}"></label>
+            <label>To <input type="date" name="view_to" value="{% if contract.is_advanced_window %}{{ contract.view_to }}{% endif %}"></label>
+          </fieldset>
+          <fieldset class="filter-window">
+            <legend>Reference period</legend>
+            <label>From <input type="date" name="ref_from" value="{% if contract.is_advanced_window %}{{ contract.ref_from }}{% endif %}"></label>
+            <label>To <input type="date" name="ref_to" value="{% if contract.is_advanced_window %}{{ contract.ref_to }}{% endif %}"></label>
+          </fieldset>
+        </details>
       </form>
+      <script>
+        // Preset → set anchor + view_days + ref_days and clear
+        // the advanced from/to inputs, then submit. Submission
+        // strips empty advanced fields so the URL stays clean.
+        function flowmetricsApplyPreset(form, preset) {
+          if (!preset) return; // "Custom…" — just leave the form
+          const today = new Date();
+          let anchor = today;
+          let viewDays = 30;
+          let refDays = 14;
+          if (preset === "last-7-days")  { viewDays = 7;  refDays = 7;  }
+          else if (preset === "last-14-days") { viewDays = 14; refDays = 14; }
+          else if (preset === "last-30-days") { viewDays = 30; refDays = 14; }
+          else if (preset === "last-90-days") { viewDays = 90; refDays = 14; }
+          else if (preset === "last-week" || preset === "last-2-weeks") {
+            // Most recent COMPLETED Sun-to-Sat week. Mirror
+            // `last_completed_week` in flowmetrics.windows.
+            const dow = today.getUTCDay();       // 0=Sun..6=Sat
+            const daysBackToSat = dow === 6 ? 7 : (dow + 1);
+            anchor = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - daysBackToSat));
+            viewDays = preset === "last-2-weeks" ? 14 : 7;
+            refDays = viewDays;
+          }
+          form.elements.anchor.value = anchor.toISOString().slice(0, 10);
+          form.elements.view_days.value = viewDays;
+          form.elements.ref_days.value = refDays;
+          // Clear the advanced inputs so they don't override.
+          for (const name of ["view_from", "view_to", "ref_from", "ref_to"]) {
+            if (form.elements[name]) form.elements[name].value = "";
+          }
+          form.submit();
+        }
+      </script>
     </div>
   </nav>
   {% endblock %}

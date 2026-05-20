@@ -1186,15 +1186,16 @@ class TestWorkflowUrls:
                 f"#{tile} Details → must point at /workflows/...; got {href!r}"
             )
 
-    def test_filter_bar_says_workflow_not_contract(
+    def test_filter_bar_does_not_say_contract(
         self, server_url: str, page: Page
     ):
+        """Internal `contract` naming stays out of the filter
+        bar's user-facing copy. (The workflow switcher itself
+        moved to the home page; the dashboard filter bar is
+        date-controls-only.)"""
         page.goto(server_url + "/workflows/astral-uv-week")
         page.wait_for_selector(".filter-bar", timeout=10000)
         bar = page.locator(".filter-bar").inner_text()
-        assert "Workflow" in bar, (
-            f"filter bar must label the select 'Workflow'; got {bar!r}"
-        )
         assert "Contract" not in bar, (
             f"filter bar must not say 'Contract'; got {bar!r}"
         )

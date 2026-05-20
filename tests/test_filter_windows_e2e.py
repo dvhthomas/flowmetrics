@@ -109,34 +109,30 @@ class TestFilterBarWindows:
     def test_inputs_default_to_30_day_view_and_14_day_reference(
         self, server_url: str, page: Page
     ):
-        """No query params → both windows populate with defaults:
-        30-day view, 14-day reference. Anchored to the latest
-        completion date in the warehouse (so defaults always
-        produce non-empty charts), with fallback to today UTC
-        for empty warehouses."""
-        from datetime import date as _date, timedelta
+        """No query params → common-mode controls populate with
+        defaults: anchor=data-max, view_days=30, ref_days=14.
+        Data-max anchor (rather than today) means defaults
+        produce non-empty charts when the contract's data is
+        from months ago."""
+        from datetime import date as _date
         page.goto(server_url + "/workflows/astral-uv-week")
-        page.wait_for_selector("input[name='view_from']")
+        page.wait_for_selector("input[name='anchor']")
 
         def _val(name: str) -> str:
             return page.evaluate(
-                f"() => document.querySelector(\"input[name='{name}']\").value"
+                f"() => document.querySelector(\"[name='{name}']\").value"
             )
-        view_from = _date.fromisoformat(_val("view_from"))
-        view_to = _date.fromisoformat(_val("view_to"))
-        ref_from = _date.fromisoformat(_val("ref_from"))
-        ref_to = _date.fromisoformat(_val("ref_to"))
+        anchor = _date.fromisoformat(_val("anchor"))
+        view_days = int(_val("view_days"))
+        ref_days = int(_val("ref_days"))
 
-        # View window: 30 days inclusive.
-        assert (view_to - view_from).days == 29
-        # Reference period: 14 days inclusive.
-        assert (ref_to - ref_from).days == 13
-        # Both windows end on the SAME anchor (data-max date).
-        assert view_to == ref_to
+        assert view_days == 30
+        assert ref_days == 14
         # Anchor should be inside the fixture's window (May 4-10, 2026).
-        assert _date(2026, 5, 4) <= view_to <= _date(2026, 5, 10), (
-            f"default anchor should be the data-max completion date "
-            f"(within May 4-10, 2026 for the fixture); got {view_to}"
+        assert _date(2026, 5, 4) <= anchor <= _date(2026, 5, 10), (
+            f"default anchor should be the data-max completion "
+            f"date (within May 4-10, 2026 for the fixture); "
+            f"got {anchor}"
         )
 
     def test_url_params_override_defaults_in_inputs(
@@ -181,17 +177,16 @@ class TestFilterBarWindows:
     def test_apply_button_submits_form_to_same_url(
         self, server_url: str, page: Page
     ):
-        """Setting an input and clicking 'Apply' navigates to the
-        same path with the new query params."""
+        """Setting the common-mode controls (anchor + view_days)
+        and clicking 'Apply' navigates to the same path with
+        the new query params. View days = 7 with an anchor in
+        May 2026 should produce a 7-day CFD."""
         page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd")
-        page.wait_for_selector("input[name='view_from']")
-        page.fill("input[name='view_from']", "2026-05-04")
-        page.fill("input[name='view_to']", "2026-05-10")
-        page.fill("input[name='ref_from']", "2026-05-04")
-        page.fill("input[name='ref_to']", "2026-05-07")
+        page.wait_for_selector("input[name='anchor']")
+        page.fill("input[name='anchor']", "2026-05-10")
+        page.select_option("select[name='view_days']", "7")
         page.locator("button.filter-apply").click()
-        page.wait_for_url("**view_from=2026-05-04**view_to=2026-05-10**")
-        # And the CFD now reflects the window.
+        page.wait_for_url("**anchor=2026-05-10**view_days=7**")
         page.wait_for_selector("#cfd-chart svg", timeout=15000)
         assert "7 days" in page.locator("body").inner_text()
 

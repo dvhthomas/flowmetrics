@@ -126,3 +126,84 @@ class TestParseWindows:
         doesn't go unnoticed."""
         assert DEFAULT_VIEW_DAYS == 30
         assert DEFAULT_REFERENCE_DAYS == 14
+
+    def test_anchor_plus_view_days_derives_view_window(self):
+        """The common-case URL shape: `?anchor=YYYY-MM-DD&view_days=N`
+        derives a view window of N inclusive days ending on the
+        anchor. Same for reference via `ref_days`."""
+        view, ref = parse_windows(
+            {"anchor": "2026-05-20",
+             "view_days": "30",
+             "ref_days": "14"},
+            today=date(2026, 5, 20),
+        )
+        assert view.to == date(2026, 5, 20)
+        assert view.from_ == date(2026, 4, 21)
+        assert view.days_inclusive == 30
+        assert ref.to == date(2026, 5, 20)
+        assert ref.from_ == date(2026, 5, 7)
+        assert ref.days_inclusive == 14
+
+    def test_anchor_only_uses_default_durations(self):
+        """`?anchor=X` without view_days/ref_days should still
+        derive both windows using DEFAULT_VIEW_DAYS and
+        DEFAULT_REFERENCE_DAYS — just shift the anchor."""
+        view, ref = parse_windows(
+            {"anchor": "2025-04-05"},
+            today=date(2026, 5, 20),
+        )
+        assert view.to == date(2025, 4, 5)
+        assert view.days_inclusive == DEFAULT_VIEW_DAYS
+        assert ref.to == date(2025, 4, 5)
+        assert ref.days_inclusive == DEFAULT_REFERENCE_DAYS
+
+    def test_explicit_view_from_to_overrides_anchor(self):
+        """Advanced/custom mode wins: when both `view_from` and
+        `view_to` are set, ignore anchor + view_days for the view
+        window. Reference is unaffected."""
+        view, ref = parse_windows(
+            {
+                "anchor": "2026-05-20",
+                "view_days": "30",
+                "view_from": "2025-01-01",
+                "view_to": "2025-01-15",
+                "ref_days": "7",
+            },
+            today=date(2026, 5, 20),
+        )
+        assert view.from_ == date(2025, 1, 1)
+        assert view.to == date(2025, 1, 15)
+        # Reference still uses anchor + ref_days.
+        assert ref.to == date(2026, 5, 20)
+        assert ref.days_inclusive == 7
+
+    def test_invalid_anchor_or_days_falls_back_to_defaults(self):
+        """Garbage in user params shouldn't 4xx the request —
+        defaults still apply."""
+        view, ref = parse_windows(
+            {"anchor": "nope", "view_days": "abc"},
+            today=date(2026, 5, 20),
+        )
+        assert view.to == date(2026, 5, 20)
+        assert view.days_inclusive == DEFAULT_VIEW_DAYS
+
+    def test_last_completed_week_sun_to_sat(self):
+        """`last_completed_week` returns the most-recent COMPLETED
+        Sunday-to-Saturday week (excludes the current partial
+        week the viewer is in). Used by the 'Last week (Sun-Sat)'
+        preset to anchor the windows."""
+        from flowmetrics.windows import last_completed_week
+        # Thu 2026-05-21 → last completed week = Sun May 10 – Sat May 16
+        w = last_completed_week(today=date(2026, 5, 21))
+        assert w.from_ == date(2026, 5, 10)
+        assert w.to == date(2026, 5, 16)
+        # Sunday 2026-05-24 → last completed week = Sun May 17 – Sat May 23
+        # (today is Sun, so the JUST-FINISHED week is the answer)
+        w = last_completed_week(today=date(2026, 5, 24))
+        assert w.from_ == date(2026, 5, 17)
+        assert w.to == date(2026, 5, 23)
+        # Saturday 2026-05-23 → last completed week ends previous Sat
+        # (today is Sat, current week not yet done)
+        w = last_completed_week(today=date(2026, 5, 23))
+        assert w.from_ == date(2026, 5, 10)
+        assert w.to == date(2026, 5, 16)

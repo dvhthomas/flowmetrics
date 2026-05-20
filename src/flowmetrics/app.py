@@ -168,12 +168,19 @@ class WorkflowView:
         # non-empty charts even when the contract's data window
         # is months old. Falls back to today UTC for fresh
         # installs with no data yet.
-        anchor = (
-            self._latest_completion_date()
-            or datetime.now(UTC).date()
-        )
+        today_utc = datetime.now(UTC).date()
+        self.data_max_date = self._latest_completion_date()
+        anchor = self.data_max_date or today_utc
         self.view_window, self.reference_period = parse_windows(
             dict(query or {}), today=anchor,
+        )
+        # "Data is stale" diagnostic for the template. True when
+        # the warehouse's latest completion is meaningfully
+        # before today (>= 2 days) — typical cron lag is one
+        # day, so two-day staleness is the noise floor.
+        self.data_is_stale = (
+            self.data_max_date is not None
+            and (today_utc - self.data_max_date).days >= 2
         )
 
     def _latest_completion_date(self):
@@ -208,16 +215,42 @@ class WorkflowView:
     def template_context(self) -> dict:
         """Template-side context for "what workflow is this":
         id, decorative slug, plus the current view/reference
-        windows for the filter bar. The source-system label
-        was dropped from the header — viewer doesn't need to be
-        told the source per metric."""
+        windows expressed BOTH as explicit from/to dates AND as
+        anchor+duration. The filter bar's common controls bind
+        to anchor + days; advanced controls bind to from/to.
+
+        `is_advanced_window`: True when view and reference don't
+        share a `to` date (advanced mode); False when they do
+        (common case — both end at the same anchor).
+        """
+        anchor = self.view_window.to
         return {
             "name": self.id,
             "slug": self._slug(),
+            # Advanced/legacy form: explicit dates per window.
             "view_from": self.view_window.from_.isoformat(),
             "view_to": self.view_window.to.isoformat(),
             "ref_from": self.reference_period.from_.isoformat(),
             "ref_to": self.reference_period.to.isoformat(),
+            # Common form: shared anchor + per-window durations.
+            "anchor": anchor.isoformat(),
+            "view_days": self.view_window.days_inclusive,
+            "ref_days": self.reference_period.days_inclusive,
+            # True when view/reference can't be expressed as
+            # shared-anchor + days (i.e. they end on different
+            # dates). The template shows the advanced controls
+            # by default in that case.
+            "is_advanced_window": (
+                self.view_window.to != self.reference_period.to
+            ),
+            # "Showing data anchored to X — N days ago. Cron
+            # will refresh, or run `flow materialise`." banner
+            # data. None when data is fresh.
+            "data_max_date": (
+                self.data_max_date.isoformat()
+                if self.data_max_date else None
+            ),
+            "data_is_stale": self.data_is_stale,
         }
 
     def _slug(self) -> str:
