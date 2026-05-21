@@ -392,6 +392,43 @@ def create_app(
     app = FastAPI(title="flowmetrics", version="1")
     templates = Jinja2Templates(directory=str(_TEMPLATES_DIR))
 
+    # `keep_filters` Jinja filter — appends the operator's
+    # view/reference window params to a path so the filter
+    # survives navigation between pages within a workflow.
+    # `@pass_context` lets the filter read `request` (always
+    # injected by Jinja2Templates) without each call site
+    # passing it explicitly: `{{ some_path | keep_filters }}`.
+    #
+    # Only the window-control params propagate — NOT arbitrary
+    # query keys. Without the whitelist, internal-endpoint
+    # params (`workflow=` on the dashboard-tile route) would
+    # leak into every navigation URL.
+    from jinja2 import pass_context
+    from urllib.parse import parse_qsl, urlencode
+
+    _CARRIED_PARAMS = frozenset({
+        "anchor", "view_days", "ref_days",
+        "view_from", "view_to", "ref_from", "ref_to",
+        "preset", "asof",
+    })
+
+    @pass_context
+    def _keep_filters(ctx, path: str) -> str:
+        request = ctx.get("request")
+        if request is None:
+            return path
+        carried = [
+            (k, v)
+            for k, v in parse_qsl(request.url.query)
+            if k in _CARRIED_PARAMS
+        ]
+        if not carried:
+            return path
+        sep = "&" if "?" in path else "?"
+        return f"{path}{sep}{urlencode(carried)}"
+
+    templates.env.filters["keep_filters"] = _keep_filters
+
     # Auth dependency — pass-through when no password configured.
     # FastAPI's idiomatic `Depends(...)` lives in the parameter default
     # which trips ruff's B008; bound to a module-level helper here so

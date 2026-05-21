@@ -11,13 +11,13 @@
     <div class="metric-header-controls">
       <button class="reset-btn"
               type="button"
-              hx-get="/api/internal/cfd?workflow={{ contract.name }}"
+              hx-get="{{ ('/api/internal/cfd?workflow=' ~ contract.name) | keep_filters }}"
               hx-target="#{{ chart_container_id }}"
               hx-swap="outerHTML"
               title="Re-load this chart">↻ Reset</button>
       {% if mode == 'tile' %}
         <a class="details-link"
-           href="/workflows/{{ contract.name }}/metrics/cfd">Details →</a>
+           href="{{ ("/workflows/" ~ contract.name ~ "/metrics/cfd") | keep_filters }}">Details →</a>
       {% endif %}
     </div>
   </header>

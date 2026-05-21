@@ -1098,7 +1098,7 @@
            is human-friendly prose ("Cassandra"); `name` stays
            the URL-safe ID ("apache-cassandra-week"). #}
         {% if metric_name %}
-          <a class="stamp" href="/workflows/{{ contract.name }}">{{ contract.label }}</a>
+          <a class="stamp" href="{{ ('/workflows/' ~ contract.name) | keep_filters }}">{{ contract.label }}</a>
         {% else %}
           <span class="stamp stamp--current">{{ contract.label }}</span>
         {% endif %}

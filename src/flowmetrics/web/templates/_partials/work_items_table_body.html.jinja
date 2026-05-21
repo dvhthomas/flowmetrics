@@ -40,7 +40,7 @@
          the canonical id form in the warehouse, but `%23` reads
          as junk. The route accepts both forms; the cell shows
          `#19291`. #}
-      <a href="/workflows/{{ contract.name }}/items/{{ r.item_id|replace('#', '')|urlencode }}">{{ r.item_id }}</a>
+      <a href="{{ ('/workflows/' ~ contract.name ~ '/items/' ~ (r.item_id|replace('#', '')|urlencode)) | keep_filters }}">{{ r.item_id }}</a>
     </td>
   {%- elif col.kind == 'title-link' -%}
     <td class="title">

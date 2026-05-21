@@ -162,9 +162,11 @@
       res.view.addEventListener("click", function (_event, item) {
         if (!item || !item.datum || !item.datum.item_id) return;
         const cleanId = String(item.datum.item_id).replace(/^#/, "");
+        // Carry the current view/reference window into the
+        // item page so the filter persists across navigation.
         window.location.href =
           "/workflows/{{ contract.name }}/items/" +
-          encodeURIComponent(cleanId);
+          encodeURIComponent(cleanId) + window.location.search;
       });
     }).catch(function (err) {
       const el = document.getElementById("{{ chart_container_id }}");

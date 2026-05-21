@@ -4,7 +4,7 @@
 <section class="metric">
   <header class="metric-header">
     <a class="details-link"
-       href="/workflows/{{ contract.name }}/metrics/forecast">Details →</a>
+       href="{{ ("/workflows/" ~ contract.name ~ "/metrics/forecast") | keep_filters }}">Details →</a>
   </header>
   <div class="forecast-grid">
     <section class="forecast-panel">

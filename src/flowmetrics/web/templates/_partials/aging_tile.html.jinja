@@ -5,19 +5,21 @@
 #}
 {%- set chart_container_id = "aging-chart" -%}
 {%- set chart_height = 480 if mode == 'detail' else 320 -%}
+{%- set _aging_reset = '/api/internal/aging?workflow=' ~ contract.name -%}
+{%- if data.asof_iso %}{% set _aging_reset = _aging_reset ~ '&asof=' ~ data.asof_iso %}{% endif -%}
 
 <section id="aging-tile" class="metric">
   <header class="metric-header">
     <div class="metric-header-controls">
       <button class="reset-btn"
               type="button"
-              hx-get="/api/internal/aging?workflow={{ contract.name }}{% if data.asof_iso %}&asof={{ data.asof_iso }}{% endif %}"
+              hx-get="{{ _aging_reset | keep_filters }}"
               hx-target="#{{ chart_container_id }}"
               hx-swap="outerHTML"
               title="Re-load this chart">↻ Reset</button>
       {% if mode == 'tile' %}
         <a class="details-link"
-           href="/workflows/{{ contract.name }}/metrics/aging">Details →</a>
+           href="{{ ("/workflows/" ~ contract.name ~ "/metrics/aging") | keep_filters }}">Details →</a>
       {% endif %}
     </div>
   </header>
