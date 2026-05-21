@@ -303,21 +303,22 @@ class TestDetailPageCycleTime:
     def test_detail_page_shows_metric_summary_above_tile(
         self, server_url: str, page: Page
     ):
-        """The detail page introduces itself with the same
-        composable `metric-summary` component the dashboard uses
-        (title + headline above the chart tile). Replaces the
-        old standalone <h1>page-title pattern with the reusable
-        component pattern."""
+        """The detail page introduces itself with a brand-accented
+        `metric-strip` above the chart — uppercase metric label +
+        the one-line headline (percentiles). Mirrors the work-item
+        lifecycle metric strip."""
         page.goto(server_url + "/workflows/astral-uv-week/metrics/cycle-time")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
-        summary = page.locator(".metric-summary")
-        expect(summary).to_be_visible()
-        text = summary.inner_text()
-        assert "Cycle time" in text, (
-            f"detail page metric-summary must name the metric; got {text!r}"
+        strip = page.locator(".metric-strip")
+        expect(strip).to_be_visible()
+        # `inner_text()` reflects the CSS `text-transform:
+        # uppercase` on the label, so compare case-insensitively.
+        text = strip.inner_text()
+        assert "cycle time" in text.lower(), (
+            f"detail metric-strip must name the metric; got {text!r}"
         )
         assert "P50" in text and "P85" in text and "P95" in text, (
-            f"detail page metric-summary must show the percentiles; got {text!r}"
+            f"detail metric-strip must show the percentiles; got {text!r}"
         )
 
 
@@ -994,15 +995,15 @@ class TestAgingOnDashboard:
             f"expected 3 percentile rule lines (P50/P85/P95); "
             f"got {n_rules}"
         )
-        # The percentile values are still named in the metric-summary
-        # headline above the chart.
-        summary = page.locator(
-            ".metric-summary", has_text="Aging WIP"
+        # The percentile values are named in the detail-page
+        # metric strip above the chart.
+        strip = page.locator(
+            ".metric-strip", has_text="Aging WIP"
         ).first
-        text = summary.inner_text()
+        text = strip.inner_text()
         for label in ("P50", "P85", "P95"):
             assert label in text, (
-                f"metric-summary must name {label!r}; got {text!r}"
+                f"metric strip must name {label!r}; got {text!r}"
             )
 
     def test_aging_tile_details_link_uses_contract_scoped_url(

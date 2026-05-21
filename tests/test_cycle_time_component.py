@@ -94,6 +94,52 @@ class TestCycleTimeRenderDataShape:
         assert data.item_count == 43
         assert len(data.points) == 43
 
+    def test_empty_window_with_data_elsewhere_says_widen_not_no_data(
+        self, warehouse
+    ):
+        """A view window outside the warehouse's data range is a
+        FILTER artefact — the data exists, just not here. The
+        headline must say so ("warehouse covers X – Y, widen the
+        view"), NOT "no completed items" (which reads as a
+        materialise gap and sends the operator looking for the
+        wrong fix)."""
+        from datetime import date
+        from flowmetrics.windows import Window
+        # Fixture data is May 2026; this window is years later.
+        data = render(
+            warehouse, "astral-uv-week",
+            view=Window(from_=date(2030, 1, 1), to=date(2030, 1, 31)),
+        )
+        assert data.item_count == 0
+        assert "warehouse covers" in data.headline.lower(), (
+            f"empty-window headline must name the covered range; "
+            f"got {data.headline!r}"
+        )
+        assert "widen" in data.headline.lower()
+        # Must NOT imply the warehouse is empty.
+        assert "no data materialised" not in data.headline.lower()
+
+    def test_truly_empty_warehouse_says_materialise(self):
+        """An empty warehouse (nothing pulled yet) gets the
+        'run flow materialise' message — distinct from the
+        window-too-narrow case above."""
+        import duckdb
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """CREATE TABLE work_items (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                title VARCHAR, url VARCHAR,
+                created_at TIMESTAMP, completed_at TIMESTAMP,
+                cycle_time_days DOUBLE
+            )"""
+        )
+        data = render(con, "empty-contract")
+        assert data.item_count == 0
+        assert "materialise" in data.headline.lower(), (
+            f"empty-warehouse headline must point at materialise; "
+            f"got {data.headline!r}"
+        )
+
     def test_percentiles_are_populated_and_p50_lt_p85(self, warehouse):
         data = render(warehouse, "astral-uv-week")
         assert data.p50 >= 0

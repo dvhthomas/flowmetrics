@@ -1,19 +1,31 @@
 {# Reusable metric summary header.
 
-   Used above the chart tile on the dashboard AND on each metric
-   detail page. Same pattern for every metric: a name + a one-line
-   headline.
+   Two renderings, switched on `metric_name` (set only on metric
+   DETAIL pages, not dashboard tiles):
+
+   - Detail page → a boxed brand-accented strip, mirroring the
+     work-item lifecycle metric strip: uppercase label + the
+     one-line headline. The breadcrumb already carries the
+     metric name, so the strip is the at-a-glance summary.
+   - Dashboard tile → the lighter title + headline (no box;
+     five of these stacked would be visually heavy).
 
    Required context:
      summary.title    — short metric name, e.g. "Cycle time"
      summary.headline — one-line statement, e.g.
                          "43 items completed · P50 0.1d · P85 1.4d · P95 7.8d"
 #}
-<div class="metric-summary">
-  {# H3 (subsection), not H2 (eyebrow). H2 in the Knox design
-     system is UPPERCASE — wrong for a metric name like "Cycle
-     time". H2 is reserved here for in-page section headings like
-     "How to read this" / "Caveats" on detail pages. #}
-  <h3 class="metric-summary-title">{{ summary.title }}</h3>
-  <p class="metric-summary-headline">{{ summary.headline }}</p>
-</div>
+{% if metric_name %}
+  <div class="metric-strip">
+    <span class="metric-strip-label">{{ summary.title }}</span>
+    <span class="metric-strip-headline">{{ summary.headline }}</span>
+  </div>
+{% else %}
+  <div class="metric-summary">
+    {# H3 (subsection), not H2 (eyebrow). H2 in the Knox design
+       system is UPPERCASE — wrong for a metric name like "Cycle
+       time". #}
+    <h3 class="metric-summary-title">{{ summary.title }}</h3>
+    <p class="metric-summary-headline">{{ summary.headline }}</p>
+  </div>
+{% endif %}

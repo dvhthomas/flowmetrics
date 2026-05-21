@@ -428,6 +428,32 @@
       color: var(--muted);
       font-size: 0.875rem;
     }
+    /* Detail-page metric strip — boxed, brand-accented, mirrors
+       the work-item lifecycle metric strip. The breadcrumb
+       already names the metric, so this strip is the
+       at-a-glance summary line. */
+    .metric-strip {
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      margin: 1.1rem 0 1rem 0;
+      padding: 0.6rem 0.9rem;
+      background: var(--p-50);
+      border-left: 0.25rem solid var(--p-500);
+      border-radius: 0.375rem;
+    }
+    .metric-strip-label {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--p-700);
+    }
+    .metric-strip-headline {
+      font-size: 0.9375rem;
+      color: var(--fg);
+    }
 
     /* ─────── Chart tile ─────── */
     .metric {

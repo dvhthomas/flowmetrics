@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Any
 
 import duckdb
@@ -150,13 +150,47 @@ def render(
     )
 
     if not points:
+        # Distinguish "nothing in this window" from "nothing
+        # materialised at all". A view window outside the
+        # warehouse's data range is a filter artefact — the data
+        # exists, just not here. An empty warehouse is a
+        # materialise gap. Conflating them ("no completed items")
+        # sends the operator looking for the wrong fix.
+        cov = con.execute(
+            "SELECT count(*), "
+            "       min(CAST(completed_at AS DATE)), "
+            "       max(CAST(completed_at AS DATE)) "
+            "FROM work_items "
+            "WHERE contract_id = ? AND completed_at IS NOT NULL",
+            [contract_name],
+        ).fetchone()
+        total_completed = int(cov[0]) if cov and cov[0] else 0
+        if total_completed == 0:
+            headline = (
+                "No data materialised yet — run "
+                f"`flow materialise {contract_name}` to pull "
+                "completions from the source system."
+            )
+        else:
+            cov_from = to_utc_display_date(
+                attach_utc(datetime.combine(cov[1], time.min))
+            )
+            cov_to = to_utc_display_date(
+                attach_utc(datetime.combine(cov[2], time.min))
+            )
+            headline = (
+                "No completed items in this window. The warehouse "
+                f"covers {cov_from} – {cov_to} "
+                f"({total_completed} completed items) — widen the "
+                "view window to see them."
+            )
         return CycleTimeData(
             item_count=0,
             p50=0.0,
             p85=0.0,
             p95=0.0,
             points=(),
-            headline="No completed items in window.",
+            headline=headline,
         )
 
     # Empirical percentiles via DuckDB (single statistical pass).
