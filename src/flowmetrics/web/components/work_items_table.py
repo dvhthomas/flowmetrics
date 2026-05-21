@@ -28,6 +28,7 @@ from typing import Literal
 import duckdb
 
 from ...utc_dates import attach_utc, to_utc_display_date, to_utc_iso_date
+from ...windows import Window
 
 SortKey = Literal[
     "item_id",
@@ -183,6 +184,7 @@ def render(
     page_size: int = DEFAULT_PAGE_SIZE,
     columns: tuple[Column, ...] | None = None,
     wip_states: tuple[str, ...] | None = None,
+    view: Window | None = None,
 ) -> WorkItemsTableData:
     """Read a page of rows for the contract.
 
@@ -267,6 +269,20 @@ def render(
         wip_params = [contract_name, in_flight_at]
         wip_clause = f" AND cs.current_state IN ({placeholders}) "
 
+    # View-window filter: clamp completed-item rows to the
+    # chart's date range so the table never shows rows the
+    # chart's view window excludes. Only applies in the
+    # completed-items mode — in-flight rows have no completed_at
+    # to bound, and the aging page bounds them via in_flight_at.
+    view_clause = ""
+    view_params: list = []
+    if view is not None and not in_flight_at:
+        view_clause = (
+            " AND CAST(completed_at AS DATE) BETWEEN "
+            "CAST(? AS DATE) AND CAST(? AS DATE) "
+        )
+        view_params = [view.from_, view.to]
+
     # Build the WHERE clause + params once, used by both the
     # total-count query and the data query.
     where_clause = (
@@ -277,6 +293,7 @@ def render(
         "  AND (? = '' OR CAST(completed_at AS DATE) = CAST(? AS DATE)) "
         f"  {in_flight_filter} "
         f"  {wip_clause}"
+        f"  {view_clause}"
     )
     pattern = f"%{(q or '').lower()}%"
     completed_on_arg = completed_on or ""
@@ -287,6 +304,7 @@ def render(
         where_params.extend([in_flight_at, in_flight_at])
     if in_flight_at and wip_states:
         where_params.extend(list(wip_states))
+    where_params.extend(view_params)
 
     # Total matching rows — feeds the pager.
     total_count = con.execute(

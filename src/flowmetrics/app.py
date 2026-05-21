@@ -684,7 +684,9 @@ def create_app(
         view = _open_view(workflow_id, request)
         with view.warehouse() as con:
             cycle_time = view.render_cycle_time(con)
-            work_items = render_work_items_table(con, workflow_id)
+            work_items = render_work_items_table(
+                con, workflow_id, view=view.view_window,
+            )
         return templates.TemplateResponse(
             request,
             "cycle_time_detail.html.jinja",
@@ -738,7 +740,9 @@ def create_app(
         view = _open_view(workflow_id, request)
         with view.warehouse() as con:
             throughput = view.render_throughput(con)
-            work_items = render_work_items_table(con, workflow_id)
+            work_items = render_work_items_table(
+                con, workflow_id, view=view.view_window,
+            )
         return templates.TemplateResponse(
             request,
             "throughput_detail.html.jinja",
@@ -1149,6 +1153,10 @@ def create_app(
                     view.contract.states.wip
                     if view.contract.states else None
                 ),
+                # View window applies in completed-items mode
+                # (cycle-time / throughput pages); the component
+                # auto-skips it when in_flight_at is set (aging).
+                view=view.view_window,
             )
         return templates.TemplateResponse(
             request,

@@ -390,12 +390,27 @@ def render(
 
     total = sum(d.count for d in daily)
     span_days = len(daily)
-    avg = total / span_days if span_days else 0.0
-    headline = (
-        f"{total} items over {span_days} day"
-        f"{'' if span_days == 1 else 's'} · "
-        f"{avg:.1f}/day"
-    )
+    # Throughput average divides by COVERED days only — days the
+    # warehouse actually has data for. A missing day is "we
+    # didn't observe this", NOT "zero items completed", so
+    # averaging it in would understate the rate. With a 30-day
+    # view over a 7-day materialise window, the divisor is 7.
+    covered_days = sum(1 for d in daily if d.data_coverage == "warehouse")
+    avg = total / covered_days if covered_days else 0.0
+    if covered_days == span_days:
+        # No gaps — straightforward.
+        headline = (
+            f"{total} items over {span_days} day"
+            f"{'' if span_days == 1 else 's'} · {avg:.1f}/day"
+        )
+    else:
+        # Gaps present — name BOTH numbers so the rate isn't
+        # mistaken for a per-window-day average.
+        headline = (
+            f"{total} items · {avg:.1f}/day over {covered_days} day"
+            f"{'' if covered_days == 1 else 's'} with data "
+            f"({span_days}-day window)"
+        )
 
     return ThroughputData(
         daily=tuple(daily),

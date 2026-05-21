@@ -156,6 +156,36 @@ class TestWorkItemsTableShape:
         assert data.rows == ()
         assert data.count == 0
 
+    def test_view_window_filters_table_to_completed_in_range(
+        self, warehouse
+    ):
+        """The detail-page table must respect the same view
+        window the chart does — otherwise the table shows rows
+        the chart's date range excludes (confusing: "no data
+        points but a full table"). `view` clamps completed_at
+        to the inclusive [from_, to] range."""
+        from datetime import date
+        from flowmetrics.windows import Window
+        # Fixture completions span May 4-10, 2026. A window of
+        # just May 4 should match the 19 May-4 completions.
+        data = render(
+            warehouse, "astral-uv-week",
+            view=Window(from_=date(2026, 5, 4), to=date(2026, 5, 4)),
+        )
+        assert data.count == 19, (
+            f"view window May 4-4 should match the 19 May-4 "
+            f"completions; got {data.count}"
+        )
+        # A window entirely outside the data → empty table.
+        empty = render(
+            warehouse, "astral-uv-week",
+            view=Window(from_=date(2099, 1, 1), to=date(2099, 1, 31)),
+        )
+        assert empty.count == 0, (
+            f"view window outside the data range must yield an "
+            f"empty table; got {empty.count}"
+        )
+
     def test_completed_on_filter_combines_with_q_filter(self, warehouse):
         """Filters compose: title contains 'q' AND completion date
         equals X. Used when a viewer drills into a specific day and

@@ -28,7 +28,7 @@
            value="{{ data.q }}"
            placeholder="Filter by title…"
            autocomplete="off"
-           hx-get="/api/internal/work-items?workflow={{ contract.name }}&sort={{ data.sort }}&direction={{ data.direction }}&page=1"
+           hx-get="{{ ('/api/internal/work-items?workflow=' ~ contract.name ~ '&sort=' ~ data.sort ~ '&direction=' ~ data.direction ~ '&page=1') | keep_filters }}"
            hx-target="#work-items-body"
            hx-swap="innerHTML"
            hx-include="#work-items-completed-on, #work-items-in-flight-at"

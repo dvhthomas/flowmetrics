@@ -19,7 +19,7 @@
   {%- set next_dir = 'asc' if (is_active and data.direction == 'desc') else ('desc' if is_active else 'desc') -%}
   {%- set arrow = '↓' if (is_active and data.direction == 'desc') else ('↑' if is_active else '') -%}
   <a href="#"
-     hx-get="/api/internal/work-items?workflow={{ contract.name }}&sort={{ col.sort_key }}&direction={{ next_dir }}&q={{ data.q|urlencode }}&completed_on={{ data.completed_on|urlencode }}&in_flight_at={{ data.in_flight_at|urlencode }}&page=1"
+     hx-get="{{ ('/api/internal/work-items?workflow=' ~ contract.name ~ '&sort=' ~ col.sort_key ~ '&direction=' ~ next_dir ~ '&q=' ~ (data.q|urlencode) ~ '&completed_on=' ~ (data.completed_on|urlencode) ~ '&in_flight_at=' ~ (data.in_flight_at|urlencode) ~ '&page=1') | keep_filters }}"
      hx-target="#work-items-body"
      hx-swap="innerHTML">
     {{ col.label }}{% if arrow %} <span class="sort-indicator">{{ arrow }}</span>{% endif %}
@@ -69,7 +69,7 @@
   <span class="work-items-active-filter-value">{{ data.completed_on_display }}</span>
   <a href="#"
      class="work-items-clear-filter"
-     hx-get="/api/internal/work-items?workflow={{ contract.name }}&sort={{ data.sort }}&direction={{ data.direction }}&q={{ data.q|urlencode }}&in_flight_at={{ data.in_flight_at|urlencode }}&page=1"
+     hx-get="{{ ('/api/internal/work-items?workflow=' ~ contract.name ~ '&sort=' ~ data.sort ~ '&direction=' ~ data.direction ~ '&q=' ~ (data.q|urlencode) ~ '&in_flight_at=' ~ (data.in_flight_at|urlencode) ~ '&page=1') | keep_filters }}"
      hx-target="#work-items-body"
      hx-swap="innerHTML"
      hx-on:click="document.getElementById('work-items-completed-on').value = ''"
@@ -99,9 +99,7 @@
 
 {% if data.total_pages > 1 %}
 <nav class="work-items-pager" aria-label="Pagination">
-  {%- set base_url -%}
-    /api/internal/work-items?workflow={{ contract.name }}&sort={{ data.sort }}&direction={{ data.direction }}&q={{ data.q|urlencode }}&completed_on={{ data.completed_on|urlencode }}&in_flight_at={{ data.in_flight_at|urlencode }}
-  {%- endset -%}
+  {%- set base_url = ('/api/internal/work-items?workflow=' ~ contract.name ~ '&sort=' ~ data.sort ~ '&direction=' ~ data.direction ~ '&q=' ~ (data.q|urlencode) ~ '&completed_on=' ~ (data.completed_on|urlencode) ~ '&in_flight_at=' ~ (data.in_flight_at|urlencode)) | keep_filters -%}
   <span class="work-items-pager-info">
     Page {{ data.page }} of {{ data.total_pages }} · {{ data.page_size }} per page
   </span>

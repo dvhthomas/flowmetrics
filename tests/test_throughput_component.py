@@ -288,6 +288,45 @@ class TestThroughputShape:
             "2026-05-08": "missing",
         }, f"coverage classification wrong; got {by_iso}"
 
+    def test_headline_average_divides_by_covered_days_only(self):
+        """The /day rate must divide by days the warehouse
+        actually covers — NOT the full view span. A missing day
+        is unobserved, not a zero-completion day; averaging it
+        in understates the rate. View May 2-8 (7 days) over a
+        warehouse window of May 4-6 (3 days): 1 completion ÷ 3
+        covered days = 0.3/day, not ÷ 7."""
+        from datetime import datetime, date
+
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """CREATE TABLE work_items (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                title VARCHAR, url VARCHAR,
+                created_at TIMESTAMP, completed_at TIMESTAMP,
+                cycle_time_days DOUBLE
+            )"""
+        )
+        con.execute(
+            "INSERT INTO work_items VALUES "
+            "('c', 'github', '#1', 't', NULL, "
+            "'2026-05-05 09:00', '2026-05-05 12:00', 0.13)"
+        )
+        from flowmetrics.windows import Window
+        data = render(
+            con, "c",
+            view=Window(from_=date(2026, 5, 2), to=date(2026, 5, 8)),
+            warehouse_start=date(2026, 5, 4),
+            warehouse_stop=date(2026, 5, 6),
+        )
+        # 1 item ÷ 3 covered days = 0.3/day. Headline names both
+        # the covered-day count and the window span.
+        assert "0.3/day" in data.headline, (
+            f"average should divide by 3 covered days; got "
+            f"{data.headline!r}"
+        )
+        assert "3 days with data" in data.headline
+        assert "7-day window" in data.headline
+
     def test_each_row_flags_day_type_correctly(self):
         """Saturday + Sunday in UTC are weekend; Mon–Fri are
         weekday. `day_type` is a string-typed classification
