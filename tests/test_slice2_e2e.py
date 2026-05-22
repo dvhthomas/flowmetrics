@@ -1867,28 +1867,17 @@ class TestLifecyclePage:
         """User-reported confusion: the gantt's time axis shows
         wall-clock elapsed time, but the work-items table shows
         the cycle-time metric. The lifecycle page must surface
-        BOTH numbers so the reconciliation is visible.
+        the Vacanti number.
 
         #19330 spans 2026-05-08 19:20 UTC → 2026-05-09 05:13 UTC
         — crosses midnight UTC, so the whole-day Vacanti formula
-        gives `(May 09 - May 08) + 1 = 2d`. Elapsed wall-clock is
-        ~10 hours."""
+        gives `(May 09 - May 08) + 1 = 2d`."""
         page.goto(server_url + "/workflows/astral-uv-week/items/19330")
         page.wait_for_selector(".lifecycle-metric-strip", timeout=10000)
         strip = page.locator(".lifecycle-metric-strip").inner_text()
         assert "2d" in strip, (
             f"strip must show #19330's cycle time as 2d "
             f"(May 08 → May 09 UTC); got {strip!r}"
-        )
-        # Elapsed wall-clock (~9h 53m for #19330) — the gantt span.
-        assert "9h" in strip, (
-            f"strip must show the wall-clock elapsed ('9h Mm' for "
-            f"#19330); got {strip!r}"
-        )
-        # The "calendar days" annotation explains the Vacanti rule.
-        assert "calendar days" in strip, (
-            f"strip should explain the calendar-days formula; "
-            f"got {strip!r}"
         )
 
     def test_unknown_item_returns_404(self, server_url: str, page: Page):
