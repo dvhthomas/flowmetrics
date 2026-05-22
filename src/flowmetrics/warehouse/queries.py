@@ -117,6 +117,102 @@ def in_flight_snapshot(
     ]
 
 
+@dataclass(frozen=True)
+class StageEntry:
+    """An item's first entry into a stage, by calendar date."""
+
+    item_id: str
+    stage: str
+    entered_date: date
+
+
+def first_stage_entries(
+    con: duckdb.DuckDBPyConnection,
+    contract_name: str,
+    *,
+    only_stages: tuple[str, ...] | None = None,
+) -> list[StageEntry]:
+    """First-entry date per (item, stage) for `contract_name`.
+    Collapses ping-pong transitions to the first visit. When
+    `only_stages` is set, transitions for other states are
+    filtered out at the SQL layer — that's how backlog states get
+    excluded from the CFD without round-tripping through Python.
+    """
+    if only_stages is not None:
+        if not only_stages:
+            return []
+        placeholders = ",".join("?" for _ in only_stages)
+        rows = con.execute(
+            f"""
+            SELECT item_id, stage,
+                   CAST(min(entered_at) AS DATE) AS entered_date
+            FROM transitions
+            WHERE contract_id = ?
+              AND stage IN ({placeholders})
+            GROUP BY item_id, stage
+            """,
+            [contract_name, *only_stages],
+        ).fetchall()
+    else:
+        rows = con.execute(
+            """
+            SELECT item_id, stage,
+                   CAST(min(entered_at) AS DATE) AS entered_date
+            FROM transitions
+            WHERE contract_id = ?
+            GROUP BY item_id, stage
+            """,
+            [contract_name],
+        ).fetchall()
+    return [
+        StageEntry(
+            item_id=str(item_id),
+            stage=str(stage),
+            entered_date=entered_date,
+        )
+        for (item_id, stage, entered_date) in rows
+    ]
+
+
+def observed_stages(
+    con: duckdb.DuckDBPyConnection, contract_name: str
+) -> list[str]:
+    """Every distinct stage that has appeared in `transitions` for
+    the contract, sorted alphabetically."""
+    rows = con.execute(
+        "SELECT DISTINCT stage FROM transitions WHERE contract_id = ?",
+        [contract_name],
+    ).fetchall()
+    return sorted(str(s) for (s,) in rows)
+
+
+def pairwise_stage_precedence(
+    con: duckdb.DuckDBPyConnection, contract_name: str
+) -> list[tuple[str, str, int]]:
+    """For every ordered pair `(A, B)` of stages, the count of
+    items whose first entry into A preceded their first entry
+    into B. The CFD's stage-order inference is built on these
+    counts when no contract YAML pins the workflow."""
+    rows = con.execute(
+        """
+        WITH item_stages AS (
+            SELECT item_id, stage,
+                   min(entered_at) AS first_entered
+            FROM transitions
+            WHERE contract_id = ?
+            GROUP BY item_id, stage
+        )
+        SELECT a.stage AS earlier, b.stage AS later, count(*) AS cnt
+        FROM item_stages a
+        JOIN item_stages b ON a.item_id = b.item_id
+        WHERE a.first_entered < b.first_entered
+        GROUP BY 1, 2
+        """,
+        [contract_name],
+    ).fetchall()
+    return [(str(a), str(b), int(c)) for (a, b, c) in rows]
+
+
 def count_open_items(
     con: duckdb.DuckDBPyConnection, contract_name: str
 ) -> int:

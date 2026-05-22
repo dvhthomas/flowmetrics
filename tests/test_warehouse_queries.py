@@ -16,9 +16,13 @@ import duckdb
 from flowmetrics.warehouse.queries import (
     CompletedItem,
     InFlightItem,
+    StageEntry,
     completed_items,
     count_open_items,
+    first_stage_entries,
     in_flight_snapshot,
+    observed_stages,
+    pairwise_stage_precedence,
 )
 
 
@@ -182,3 +186,50 @@ class TestCountOpenItems:
 
     def test_zero_for_an_unknown_contract(self):
         assert count_open_items(_warehouse_with_transitions(), "nope") == 0
+
+
+class TestFirstStageEntries:
+    def test_returns_first_entry_per_item_per_stage(self):
+        entries = first_stage_entries(_warehouse_with_transitions(), "c")
+        # #1: Draft Jan 2, Review Jan 10, Merged Mar 5; #2: Draft Jan 6.
+        keys = {(e.item_id, e.stage, e.entered_date) for e in entries}
+        assert keys == {
+            ("#1", "Draft", date(2026, 1, 2)),
+            ("#1", "Review", date(2026, 1, 10)),
+            ("#1", "Merged", date(2026, 3, 5)),
+            ("#2", "Draft", date(2026, 1, 6)),
+        }
+
+    def test_only_stages_filter_excludes_other_transitions(self):
+        entries = first_stage_entries(
+            _warehouse_with_transitions(), "c",
+            only_stages=("Draft", "Review"),
+        )
+        assert {e.stage for e in entries} == {"Draft", "Review"}
+
+    def test_empty_only_stages_yields_no_entries(self):
+        assert first_stage_entries(
+            _warehouse_with_transitions(), "c", only_stages=(),
+        ) == []
+
+
+class TestObservedStages:
+    def test_returns_distinct_stages_alphabetically(self):
+        assert observed_stages(_warehouse_with_transitions(), "c") == [
+            "Draft", "Merged", "Review",
+        ]
+
+    def test_unknown_contract_is_empty(self):
+        assert observed_stages(_warehouse_with_transitions(), "nope") == []
+
+
+class TestPairwiseStagePrecedence:
+    def test_counts_ordered_pairs(self):
+        pairs = pairwise_stage_precedence(_warehouse_with_transitions(), "c")
+        # #1 visits Draft → Review → Merged; #2 visits Draft only.
+        as_dict = {(a, b): c for a, b, c in pairs}
+        assert as_dict == {
+            ("Draft", "Review"): 1,
+            ("Draft", "Merged"): 1,
+            ("Review", "Merged"): 1,
+        }
