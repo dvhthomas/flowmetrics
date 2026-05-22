@@ -38,7 +38,7 @@ from .backfill import (
     write_status,
 )
 from .contract import ContractError, load_contract
-from .windows import DEFAULT_REFERENCE_DAYS, parse_windows
+from .windows import parse_windows
 from .web.components.aging import render as render_aging
 from .web.components.cfd import render as render_cfd
 from .web.components.data_source import render as render_data_source
@@ -195,6 +195,7 @@ class WorkflowView:
             dict(query or {}),
             today=today_utc,
             data_max=self.data_max_date,
+            data_min=self.data_min_date,
         )
         # "Data is stale" diagnostic for the template. True when
         # the warehouse's latest completion is meaningfully
@@ -269,7 +270,11 @@ class WorkflowView:
             "slug": self._slug(),
             # The one filter model — see flowmetrics.windows.
             "window": self.selection,
-            "default_ref_days": DEFAULT_REFERENCE_DAYS,
+            # The reference sample follows the Period by default,
+            # so the "default" ref length is the current view
+            # length — the filter bar strips ref_days from the URL
+            # when it equals this.
+            "default_ref_days": self.selection.view_days,
             # Completion-data coverage. Bounds the Period Ending
             # date input (min/max) and drives the freshness
             # banner. None when the warehouse is empty.
@@ -295,10 +300,14 @@ class WorkflowView:
     # ---- render orchestration ------------------------------------
 
     def render_cfd(self, con):
+        # The Period is a VISUAL window on the CFD — it clamps the
+        # x-axis. The cumulative math stays full-history, so the
+        # carry-in at the window's left edge is correct; the
+        # y-axis floor slider crops that inert base.
         return render_cfd(
             con, self.id,
-            view=self.view_window,
             states=self.contract.states,
+            view=self.view_window,
         )
 
     def render_aging(self, con):
@@ -338,12 +347,17 @@ class WorkflowView:
         return render_throughput(
             con, self.id,
             view=self.view_window,
-            # Contract's materialise window defines what dates
-            # the warehouse covers. Days inside = real zeros
-            # possible; outside = "no data, backfill needed".
-            # The throughput spec renders these differently.
-            warehouse_start=self.contract.start,
-            warehouse_stop=self.contract.stop,
+            # Coverage = the completion span the warehouse
+            # actually holds, NOT the contract YAML window. A
+            # Data Source backfill fetches an arbitrary range and
+            # never rewrites the YAML, so `contract.start/stop`
+            # routinely understates coverage — keying off it tags
+            # real completion days as "no data" ("102 items over
+            # 0 days"). A day inside [data_min, data_max] with
+            # zero completions is a true zero; outside it is
+            # genuinely NODATA.
+            warehouse_start=self.data_min_date,
+            warehouse_stop=self.data_max_date,
         )
 
     def render_forecast_when_done(self, con, *, items: int, start_date=None):
@@ -972,14 +986,17 @@ def create_app(
         # now() in the route.
         today = view.today
         with view.warehouse() as con:
-            when_done = render_forecast_when_done(
-                con, workflow_id, items=max(1, items), start_date=today
+            # Go through the view's render methods so the reference
+            # window (which follows the Period) reaches the MCS
+            # sample — not the bare component, which would forecast
+            # off the full history regardless of the Period.
+            when_done = view.render_forecast_when_done(
+                con, items=max(1, items), start_date=today
             )
             # Slider semantics: "N days" → N-day inclusive window.
             # end_date = start + (N - 1) gives a window of size N.
-            how_many = render_forecast_how_many(
+            how_many = view.render_forecast_how_many(
                 con,
-                workflow_id,
                 start_date=today,
                 end_date=today + timedelta(days=max(0, days - 1)),
             )
@@ -1018,8 +1035,8 @@ def create_app(
         except (TypeError, ValueError):
             items_int = 20
         with view.warehouse() as con:
-            data = render_forecast_when_done(
-                con, workflow, items=items_int, start_date=start_date
+            data = view.render_forecast_when_done(
+                con, items=items_int, start_date=start_date
             )
         return templates.TemplateResponse(
             request,
@@ -1049,9 +1066,8 @@ def create_app(
         except (TypeError, ValueError):
             days_int = 30
         with view.warehouse() as con:
-            data = render_forecast_how_many(
+            data = view.render_forecast_how_many(
                 con,
-                workflow,
                 start_date=start_date,
                 # Same N → N-day window semantics as the detail page.
                 end_date=start_date + timedelta(days=max(0, days_int - 1)),

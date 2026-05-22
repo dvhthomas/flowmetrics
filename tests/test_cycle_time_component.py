@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import re
 import tempfile
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import duckdb
@@ -505,3 +505,118 @@ class TestCycleTimeChartIntraDayJitter:
             f"(it leaks sub-day randomness into the displayed value). "
             f"Got {completed_field['field']!r}"
         )
+
+
+class TestCycleTimeCapSlider:
+    """The y-axis cap: a range slider that clips the y domain so a
+    few slow outliers don't squash the readable bulk. It runs from
+    ~P95 up to the max cycle time; the percentile VALUES are
+    untouched (computed server-side from the full data)."""
+
+    def test_chart_has_a_y_cap_range_control(self, warehouse):
+        data = render(warehouse, "astral-uv-week")
+        spec = json.loads(data.vega_spec_json())
+        scatter = next(
+            lyr for lyr in spec["layer"]
+            if (lyr["mark"].get("type")
+                if isinstance(lyr["mark"], dict) else lyr["mark"]) == "point"
+        )
+        # The cap is a TOP-LEVEL value param — a layer-scoped param
+        # is out of scope for the shared y scale's domainMax expr.
+        caps = [
+            p for p in spec.get("params", [])
+            if isinstance(p.get("bind"), dict)
+            and p["bind"].get("input") == "range"
+        ]
+        assert caps, "expected a top-level range-input y-cap param"
+        cap = caps[0]
+        # Slider runs from ~P95 (rounded up) to the max observation.
+        assert cap["bind"]["min"] >= data.p95 - 0.5, (
+            f"cap slider should start near P95 ({data.p95}); "
+            f"min={cap['bind']['min']}"
+        )
+        assert cap["bind"]["max"] >= cap["bind"]["min"]
+        # Default = max → opens showing all data; drag down to crop.
+        assert cap["value"] == cap["bind"]["max"]
+        # The scatter layer FILTERS dots by the cap (so the y-axis
+        # auto-scales to what's shown) — it does NOT pin the domain.
+        filters = [t.get("filter") for t in scatter.get("transform", [])]
+        assert any(cap["name"] in str(f) for f in filters), (
+            f"scatter transform must filter dots by {cap['name']!r}; "
+            f"got {filters}"
+        )
+
+    def test_zoom_no_longer_binds_the_y_axis(self, warehouse):
+        """The cap slider owns the y axis, so the wheel/drag zoom
+        is bound to x only — binding y too would fight the cap."""
+        data = render(warehouse, "astral-uv-week")
+        spec = json.loads(data.vega_spec_json())
+        scatter = next(
+            lyr for lyr in spec["layer"]
+            if (lyr["mark"].get("type")
+                if isinstance(lyr["mark"], dict) else lyr["mark"]) == "point"
+        )
+        zoom = next(
+            p for p in scatter["params"]
+            if p.get("bind") == "scales"
+        )
+        assert zoom["select"]["encodings"] == ["x"]
+
+
+class TestCycleTimeGridlineDensity:
+    """The x-axis tick/gridline interval scales with the window
+    span. A multi-month view must not draw a gridline every single
+    day — that hatches the plot into an unreadable grey wash.
+    Short windows keep daily ticks so Vega doesn't auto-pick a
+    sub-day granularity that repeats the same '%b %d' label."""
+
+    def _warehouse_spanning(self, days: int):
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """CREATE TABLE work_items (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                title VARCHAR, url VARCHAR,
+                created_at TIMESTAMP, completed_at TIMESTAMP,
+                cycle_time_days DOUBLE
+            )"""
+        )
+        base = datetime(2025, 1, 1)
+        rows = [
+            ("c", "github", f"#{n}", f"item {n}", None,
+             base + timedelta(days=n - 3), base + timedelta(days=n), 3.0)
+            for n in range(days + 1)
+        ]
+        con.executemany(
+            "INSERT INTO work_items VALUES (?,?,?,?,?,?,?,?)", rows
+        )
+        return con
+
+    def _x_tick_count(self, con):
+        data = render(con, "c")
+        spec = json.loads(data.vega_spec_json())
+        scatter = next(
+            lyr for lyr in spec["layer"]
+            if (lyr["mark"].get("type")
+                if isinstance(lyr["mark"], dict) else lyr["mark"]) == "point"
+        )
+        return scatter["encoding"]["x"]["axis"]["tickCount"]
+
+    def test_short_window_keeps_daily_ticks(self):
+        """A ≤ 1-month window keeps daily ticks — needed so Vega
+        doesn't auto-pick a sub-day granularity that repeats the
+        same '%b %d' label four times."""
+        tc = self._x_tick_count(self._warehouse_spanning(20))
+        assert tc == {"interval": "day", "step": 1}
+
+    def test_quarter_window_steps_up_to_weekly_ticks(self):
+        """A ~90-day span is too wide for daily gridlines (~90
+        lines) — it steps up to a weekly interval."""
+        tc = self._x_tick_count(self._warehouse_spanning(90))
+        assert tc == {"interval": "week", "step": 1}
+
+    def test_multi_month_window_steps_up_to_monthly_ticks(self):
+        """A 14-month span must NOT use daily ticks — that draws
+        ~400 gridlines (the reported bug). It steps up to a
+        monthly interval, ~14 sane gridlines."""
+        tc = self._x_tick_count(self._warehouse_spanning(420))
+        assert tc == {"interval": "month", "step": 1}

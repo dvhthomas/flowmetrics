@@ -471,6 +471,28 @@
     .metric-chart {
       width: 100%;
     }
+    /* Vega input bindings (the cap / floor range sliders) sit
+       ABOVE the chart, not below it. Vega-Embed renders them last
+       and sets `.vega-embed { display: inline-block }` from its
+       own injected stylesheet — so the override needs the higher-
+       specificity `.metric-chart.vega-embed` (both classes land on
+       the same element) to win, then flex + order:-1 hoists the
+       bindings to the top. */
+    .metric-chart.vega-embed {
+      display: flex; flex-direction: column;
+    }
+    .metric-chart.vega-embed .vega-bindings {
+      order: -1;
+      margin: 0 0 0.55rem 0;
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+    .metric-chart.vega-embed .vega-bindings .vega-bind {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .metric-chart.vega-embed .vega-bindings input[type="range"] {
+      flex: 1;
+    }
     .metric--link-only {
       /* Tile that's just a link, no chart. Keeps the border +
          padding so it looks like a tile, but no min-height. */
@@ -1149,6 +1171,7 @@
             <option value="last-90-days"{% if p == "last-90-days" %} selected{% endif %}>Last 90 days</option>
             <option value="last-week"{% if p == "last-week" %} selected{% endif %}>Last week (Sun–Sat)</option>
             <option value="last-2-weeks"{% if p == "last-2-weeks" %} selected{% endif %}>Last 2 weeks</option>
+            <option value="all-time"{% if p == "all-time" %} selected{% endif %}>All time</option>
             <option value="custom"{% if p == "custom" %} selected{% endif %}>Custom…</option>
           </select>
         </label>
@@ -1176,15 +1199,16 @@
           <summary>Advanced</summary>
           <p class="filter-hint">
             The <strong>reference period</strong> is the recent
-            sample the aging thresholds and forecasts draw from —
-            the last N days of completion data, ending on the most
-            recent data (independent of the Period above).
+            sample the aging thresholds and forecasts draw from.
+            It matches the Period above by default; override here
+            to draw the sample from a different number of days.
+            It always ends on the most recent data.
           </p>
           <label class="filter-compact">Reference
             <select name="ref_days"
                     data-default="{{ contract.default_ref_days }}"
                     onchange="flowmetricsSubmitFilters(this.form)">
-              {% for d in [7, 14, 30, 60, 90] %}
+              {% for d in [7, 14, 30, 60, 90, 180] %}
                 <option value="{{ d }}"{% if d == contract.window.ref_days %} selected{% endif %}>{{ d }} days</option>
               {% endfor %}
             </select>

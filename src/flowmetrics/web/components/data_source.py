@@ -170,9 +170,15 @@ class DataSourceData:
                     "type": "ordinal",
                     "scale": {
                         "domain": ["None", "Low", "Medium", "High"],
+                        # None=grey; Low/Medium/High climb the plum
+                        # ramp. Low is p-200 (not the near-white
+                        # p-100) so a 1-2-item day reads as clearly
+                        # coloured, not mistaken for an empty cell —
+                        # otherwise genuine low-activity stretches
+                        # (e.g. weekends) look falsely blank.
                         "range": [
                             "__theme:border__",
-                            "__theme:p-100__",
+                            "__theme:p-200__",
                             "__theme:p-400__",
                             "__theme:p-700__",
                         ],

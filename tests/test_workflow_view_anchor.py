@@ -22,6 +22,7 @@ from __future__ import annotations
 import tempfile
 from datetime import UTC, date, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -29,7 +30,6 @@ from click.testing import CliRunner
 
 from flowmetrics.app import WorkflowView
 from flowmetrics.cli import cli
-from flowmetrics.windows import DEFAULT_REFERENCE_DAYS
 
 from tests._window_helpers import window_query
 
@@ -121,12 +121,13 @@ class TestViewAnchor:
 class TestReferenceAnchor:
     def test_reference_anchors_to_data_max_not_the_view(self, view_factory):
         """The reference period ends on the most recent data,
-        regardless of where the view anchor sits."""
+        regardless of where the view anchor sits. Its length
+        follows the view period."""
         view = view_factory(
             window_query(custom_ending="2027-01-01", view_days=14)
         )
         assert view.selection.reference.to == view.data_max_date
-        assert view.selection.ref_days == DEFAULT_REFERENCE_DAYS
+        assert view.selection.ref_days == view.selection.view_days == 14
 
     def test_reference_duration_is_tweakable_via_ref_days(
         self, view_factory
@@ -175,3 +176,24 @@ class TestAgingPinnedToSnapshot:
         assert aging.asof_iso == snapshot.date().isoformat()
         # The Period anchor (2026-05-06) must NOT drive aging.
         assert aging.asof_iso != "2026-05-06"
+
+
+class TestThroughputCoverage:
+    def test_coverage_uses_data_span_not_the_yaml_window(
+        self, view_factory
+    ):
+        """Throughput's coverage shading keys off the actual
+        completion span (`data_min`/`data_max`), never the
+        contract YAML window. A Data Source backfill fetches an
+        arbitrary range and never rewrites the YAML, so keying off
+        `contract.start/stop` mis-tags real completion days as
+        "no data"."""
+        view = view_factory()
+        with (
+            patch("flowmetrics.app.render_throughput") as mock_rt,
+            view.warehouse() as con,
+        ):
+            view.render_throughput(con)
+        _, kwargs = mock_rt.call_args
+        assert kwargs["warehouse_start"] == view.data_min_date
+        assert kwargs["warehouse_stop"] == view.data_max_date

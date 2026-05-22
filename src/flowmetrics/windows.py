@@ -18,8 +18,9 @@ more than the data needed to express it:
     ?period=custom&anchor=YYYY-MM-DD&view_days=N   (Custom)
     ?ref_days=N                             (Advanced reference)
 
-Missing or invalid params → 30-day view ending today, 30-day
-reference ending on the most recent data.
+Missing or invalid params → 30-day view ending today, with the
+reference sample matching the view length (also 30 days), ending
+on the most recent data.
 """
 
 from __future__ import annotations
@@ -29,7 +30,6 @@ from datetime import date, timedelta
 
 
 DEFAULT_VIEW_DAYS = 30
-DEFAULT_REFERENCE_DAYS = 30
 
 
 @dataclass(frozen=True)
@@ -82,8 +82,9 @@ class WindowSelection:
     @property
     def is_advanced(self) -> bool:
         """The Advanced panel is "in use" when the reference
-        period isn't the default length."""
-        return self.ref_days != DEFAULT_REFERENCE_DAYS
+        window has been decoupled from the view period — i.e. the
+        statistical sample is a different length from the Period."""
+        return self.ref_days != self.view_days
 
 
 def last_completed_week(today: date) -> Window:
@@ -120,8 +121,9 @@ VIEW_PRESET_DAYS: dict[str, int] = {
 }
 WEEK_PRESETS = ("last-week", "last-2-weeks")
 DEFAULT_PERIOD = "last-30-days"
-# Every period the filter bar may emit. Anything else → default.
-KNOWN_PERIODS = (*VIEW_PRESET_DAYS, *WEEK_PRESETS, "custom")
+# `all-time` resolves the view to the full data span (data_min →
+# data_max); useful for the CFD's "show everything" mode.
+KNOWN_PERIODS = (*VIEW_PRESET_DAYS, *WEEK_PRESETS, "all-time", "custom")
 
 
 def _parse_date(raw: object, default: date) -> date:
@@ -150,6 +152,7 @@ def parse_windows(
     query: dict[str, str] | dict,
     today: date,
     data_max: date | None = None,
+    data_min: date | None = None,
 ) -> WindowSelection:
     """The ONE place date math happens. The filter bar emits a
     `period` choice; this turns it into a `WindowSelection` —
@@ -163,11 +166,11 @@ def parse_windows(
       - missing / unknown → the default preset (last 30 days).
 
     **Reference period** — the statistical sample for aging
-    thresholds + forecasts: `ref_days` (default 30) inclusive
-    days ending on `data_max` (the most recent data), or `today`
-    when the warehouse is empty. Anchored to the data, never to
-    the view — so scrolling the view can't strand the percentile
-    sample.
+    thresholds + forecasts. Its length follows the Period by
+    default (`ref_days` overrides it); inclusive days ending on
+    `data_max` (the most recent data), or `today` when the
+    warehouse is empty. Anchored to the data, never to the view —
+    so scrolling the view can't strand the percentile sample.
 
     `period` on the result is always resolved to a value in
     `KNOWN_PERIODS`. Never raises on user input.
@@ -182,6 +185,13 @@ def parse_windows(
     elif period == "last-2-weeks":
         end = last_completed_week(today).to
         view = Window(from_=end - timedelta(days=13), to=end)
+    elif period == "all-time":
+        # The whole data span. Falls back to the default preset
+        # when the warehouse is empty (no data bounds to span).
+        if data_min is not None and data_max is not None:
+            view = Window(from_=data_min, to=data_max)
+        else:
+            view = Window.last_n_days(DEFAULT_VIEW_DAYS, today=today)
     else:  # "custom" — the only remaining KNOWN_PERIODS value
         anchor = _parse_date(query.get("anchor"), today)
         view = Window.last_n_days(
@@ -189,8 +199,11 @@ def parse_windows(
             today=anchor,
         )
 
-    reference = Window.last_n_days(
-        _parse_days(query.get("ref_days"), DEFAULT_REFERENCE_DAYS),
-        today=data_max or today,
-    )
+    # Reference length follows the chosen Period by default: pick
+    # "Last 7 days" and the percentile / forecast sample is 7 days
+    # too. `?ref_days=` (Advanced) overrides it. The reference is
+    # always anchored to `data_max` (most recent data), never the
+    # view anchor — so scrolling the view can't strand the sample.
+    ref_days = _parse_days(query.get("ref_days"), view.days_inclusive)
+    reference = Window.last_n_days(ref_days, today=data_max or today)
     return WindowSelection(view=view, reference=reference, period=period)

@@ -14,9 +14,10 @@ now" metric: the caller pins `asof` to the in-flight snapshot date
 from __future__ import annotations
 
 import json
+import math
 import re
 import tempfile
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import duckdb
@@ -633,54 +634,20 @@ class TestAgingShape:
         for item in data.items:
             assert item.current_state in valid
 
-    def test_y_axis_reserves_headroom_for_per_column_count_badge(
-        self, warehouse
-    ):
-        """User-reported: the per-column 'N WIP' badge above each
-        category renders at y = max(age_days) + small pixel
-        offset. If the y scale's domainMax is exactly the highest
-        dot, the badge sits OUTSIDE the plot area and gets
-        clipped.
-
-        Fix: the y scale must declare an explicit `domainMax`
-        larger than the max age in the data (the spec carries a
-        computed value), OR a `scale.padding` configured so the
-        plot area leaves room. Pin one of the two."""
+    def test_y_axis_floors_at_zero(self, warehouse):
+        """The dot layer's y scale is floored at 0 (age can't go
+        negative); the domainMax auto-fits whatever survives the
+        cap filter, so the visible dots fill the plot."""
         data = render(warehouse, "astral-uv-week", asof=_DEMO_ASOF)
         spec = json.loads(data.vega_spec_json())
-        # The point layer's y channel carries the scale. Walk
-        # layers to find any quantitative y with domainMax >
-        # max(age_days) — or an explicit padding hint.
         if not data.items:
             pytest.skip("no in-flight items in fixture")
-        max_age = max(i.age_days for i in data.items)
-        # Find any layer whose y encoding has a scale with
-        # domainMax > max_age.
-        y_scales: list = []
-
-        def _walk(node):
-            if isinstance(node, dict):
-                y = node.get("encoding", {}).get("y") if "encoding" in node else None
-                if isinstance(y, dict) and isinstance(y.get("scale"), dict):
-                    y_scales.append(y["scale"])
-                for v in node.values():
-                    _walk(v)
-            elif isinstance(node, list):
-                for v in node:
-                    _walk(v)
-
-        _walk(spec)
-        has_headroom = any(
-            isinstance(s.get("domainMax"), (int, float))
-            and s["domainMax"] > max_age
-            for s in y_scales
+        point_layer = next(
+            lyr for lyr in spec["layer"]
+            if isinstance(lyr.get("mark"), dict)
+            and lyr["mark"].get("type") == "point"
         )
-        assert has_headroom, (
-            f"y scale must declare domainMax > max age "
-            f"({max_age:.1f}d) so the per-column 'N WIP' badge "
-            f"isn't clipped at the top. Found y scales: "
-            f"{y_scales!r}"
-        )
+        assert point_layer["encoding"]["y"]["scale"]["domainMin"] == 0
 
     def test_chart_uses_canonical_xoffset_random_pattern(self, warehouse):
         """The aging chart's jitter follows Vega-Lite's canonical
@@ -759,43 +726,51 @@ class TestAgingShape:
         )
 
     def test_chart_includes_per_column_count_badge(self, warehouse):
-        """User-asked: at a glance count of WIP per state. The chart
-        needs a text-mark layer that aggregates count per
-        `current_state` band, positioned above the dot cloud."""
+        """At-a-glance WIP count per state — a 'WIP N' text header
+        pinned to the TOP of the chart (a fixed pixel y, not
+        floating above each column's tallest dot), one label per
+        state column."""
         data = render(warehouse, "astral-uv-week", asof=_DEMO_ASOF)
         spec = json.loads(data.vega_spec_json())
-        # Walk layers; look for a text mark whose `text` encoding
-        # uses `count` aggregation.
-        found = False
-
-        def _walk(node):
-            nonlocal found
-            if isinstance(node, dict):
-                m = node.get("mark")
-                m_type = m if isinstance(m, str) else (
-                    m.get("type") if isinstance(m, dict) else None
-                )
-                if m_type == "text":
-                    enc = node.get("encoding", {})
-                    text_enc = enc.get("text")
-                    if (
-                        isinstance(text_enc, dict)
-                        and text_enc.get("aggregate") == "count"
-                    ):
-                        found = True
-                        return
-                for v in node.values():
-                    _walk(v)
-            elif isinstance(node, list):
-                for v in node:
-                    _walk(v)
-
-        _walk(spec)
-        assert found, (
-            "aging spec must include a text-mark layer with "
-            "`text: {aggregate: 'count'}` per state so the WIP "
-            "count per column is visible at a glance"
+        badge = None
+        for lyr in spec["layer"]:
+            m = lyr.get("mark")
+            m_type = m.get("type") if isinstance(m, dict) else m
+            if m_type != "text":
+                continue
+            vals = lyr.get("data", {}).get("values", [])
+            if any("WIP" in str(v.get("label", "")) for v in vals):
+                badge = lyr
+                break
+        assert badge is not None, (
+            "aging spec must include a 'WIP N' per-state count "
+            "header layer"
         )
+        # Pinned to the top — a fixed pixel position, not a
+        # data-driven y above the dots.
+        assert badge["encoding"]["y"] == {"value": 0}, (
+            f"count header must be top-pinned; got "
+            f"{badge['encoding']['y']!r}"
+        )
+        # One 'WIP N' label per state column.
+        labels = [v["label"] for v in badge["data"]["values"]]
+        assert labels and all(lab.startswith("WIP ") for lab in labels)
+
+    def test_dots_are_coloured_by_state_category(self, warehouse):
+        """Each dot is coloured by its workflow state, so a viewer
+        can tell which state category a point belongs to. The
+        x-axis already labels the columns, so the colour carries
+        no legend — it just reinforces the grouping."""
+        data = render(warehouse, "astral-uv-week", asof=_DEMO_ASOF)
+        spec = json.loads(data.vega_spec_json())
+        point_layer = next(
+            lyr for lyr in spec["layer"]
+            if isinstance(lyr.get("mark"), dict)
+            and lyr["mark"].get("type") == "point"
+        )
+        color = point_layer["encoding"]["color"]
+        assert color["field"] == "current_state"
+        assert color.get("legend") is None
 
     def test_chart_spec_is_zoom_and_pan_able(self, warehouse):
         """Aging WIP needs zoom/pan so an operator can dig into
@@ -1040,3 +1015,101 @@ class TestPinnedToSnapshot:
                 asof=date(2025, 1, 20),
                 view=Window(from_=date(2025, 1, 1), to=date(2025, 1, 20)),
             )
+
+
+class TestAgingCapSlider:
+    """The aging chart's y-axis cap — a range slider that clips the
+    age axis to the readable bulk so a few very-old items don't
+    squash it. Runs from ~P95 of the in-flight ages up to the
+    oldest item; the percentile threshold lines are unaffected."""
+
+    def _warehouse(self):
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """CREATE TABLE work_items (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                title VARCHAR, url VARCHAR,
+                created_at TIMESTAMP, completed_at TIMESTAMP,
+                cycle_time_days DOUBLE, materialised_at TIMESTAMP)"""
+        )
+        con.execute(
+            """CREATE TABLE transitions (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                entered_at TIMESTAMP, stage VARCHAR, signal VARCHAR)"""
+        )
+        snap = datetime(2026, 6, 1)
+        # 20 items aged 1-20 days, plus one ancient at 600 days.
+        rows = [
+            ("c", "github", f"#{age}", f"item {age}", None,
+             snap - timedelta(days=age - 1), None, None, snap)
+            for age in [*range(1, 21), 600]
+        ]
+        con.executemany(
+            "INSERT INTO work_items VALUES (?,?,?,?,?,?,?,?,?)", rows
+        )
+        return con
+
+    def _warehouse_with_completions(self):
+        """Same in-flight items as `_warehouse`, plus completed
+        items whose cycle times drive the P95 reference line."""
+        con = self._warehouse()
+        snap = datetime(2026, 6, 1)
+        completed = [
+            ("c", "github", f"done-{n}", f"done {n}", None,
+             datetime(2026, 1, 1), datetime(2026, 5, 1), 200.0, snap)
+            for n in range(10)
+        ]
+        con.executemany(
+            "INSERT INTO work_items VALUES (?,?,?,?,?,?,?,?,?)", completed
+        )
+        return con
+
+    def test_cap_floor_is_the_p95_commitment_line(self):
+        """The cap slider's floor is the P95 reference line — the
+        dashed commitment threshold drawn from completed cycle
+        times — NOT the P95 of the in-flight ages. Cropping down
+        to it focuses the view on items at or below the
+        high-stakes threshold."""
+        con = self._warehouse_with_completions()
+        data = render(con, "c", asof=date(2026, 6, 1))
+        spec = json.loads(data.vega_spec_json())
+        cap = next(
+            p for p in spec.get("params", [])
+            if isinstance(p.get("bind"), dict)
+            and p["bind"].get("input") == "range"
+        )
+        assert data.percentiles.p95 > 0
+        assert cap["bind"]["min"] == math.ceil(data.percentiles.p95), (
+            f"cap floor must be the P95 reference line "
+            f"({data.percentiles.p95}); got {cap['bind']['min']}"
+        )
+
+    def test_chart_has_a_y_cap_range_control(self):
+        con = self._warehouse()
+        data = render(con, "c", asof=date(2026, 6, 1))
+        spec = json.loads(data.vega_spec_json())
+        # Top-level value param — a layer-scoped one would be out
+        # of scope for the shared y scale's domainMax expr.
+        caps = [
+            p for p in spec.get("params", [])
+            if isinstance(p.get("bind"), dict)
+            and p["bind"].get("input") == "range"
+        ]
+        assert caps, "expected a top-level range-input y-cap param"
+        cap = caps[0]
+        assert cap["bind"]["max"] >= 600  # reaches the oldest item
+        assert cap["bind"]["min"] < cap["bind"]["max"]
+        # Default = max → opens showing every in-flight item.
+        assert cap["value"] == cap["bind"]["max"]
+        # The dot layer FILTERS by the cap; the y-axis auto-scales.
+        point_layer = next(
+            lyr for lyr in spec["layer"]
+            if isinstance(lyr.get("mark"), dict)
+            and lyr["mark"].get("type") == "point"
+        )
+        filters = [
+            t.get("filter") for t in point_layer.get("transform", [])
+        ]
+        assert any(cap["name"] in str(f) for f in filters), (
+            f"dot transform must filter by {cap['name']!r}; got {filters}"
+        )

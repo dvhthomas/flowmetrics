@@ -22,7 +22,6 @@ from __future__ import annotations
 from datetime import date
 
 from flowmetrics.windows import (
-    DEFAULT_REFERENCE_DAYS,
     DEFAULT_VIEW_DAYS,
     Window,
     WindowSelection,
@@ -87,6 +86,26 @@ class TestParseWindowsViewPresets:
         assert sel.view.to == date(2026, 5, 16)
         assert sel.view.days_inclusive == 14
 
+    def test_period_all_time_spans_the_full_data(self):
+        """`all-time` resolves the view to the whole data span —
+        data_min → data_max."""
+        sel = parse_windows(
+            {"period": "all-time"},
+            today=self.TODAY,
+            data_min=date(2025, 1, 1),
+            data_max=date(2025, 4, 5),
+        )
+        assert sel.period == "all-time"
+        assert sel.view.from_ == date(2025, 1, 1)
+        assert sel.view.to == date(2025, 4, 5)
+
+    def test_period_all_time_falls_back_when_warehouse_empty(self):
+        """No data bounds → all-time falls back to the default
+        preset rather than producing a degenerate window."""
+        sel = parse_windows({"period": "all-time"}, today=self.TODAY)
+        assert sel.view.to == self.TODAY
+        assert sel.view.days_inclusive == 30
+
     def test_unknown_period_resolves_to_the_default(self):
         sel = parse_windows({"period": "bogus"}, today=self.TODAY)
         assert sel.period == "last-30-days"
@@ -136,31 +155,53 @@ class TestParseWindowsCustom:
 
 
 class TestParseWindowsReference:
+    """The reference window is the statistical sample — aging
+    percentiles and the Monte Carlo forecast. Its LENGTH follows
+    the chosen Period by default (pick 7 days → a 7-day sample);
+    `?ref_days=` (Advanced) overrides it. It is always anchored to
+    `data_max`, never the view anchor."""
+
     TODAY = date(2026, 5, 20)
 
-    def test_reference_defaults_to_30_days_ending_at_data_max(self):
+    def test_reference_length_follows_the_period(self):
+        """Pick 'Last 7 days' → the reference sample is 7 days too,
+        not a fixed 30."""
+        sel = parse_windows(
+            {"period": "last-7-days"},
+            today=self.TODAY, data_max=date(2025, 4, 5),
+        )
+        assert sel.reference.to == date(2025, 4, 5)
+        assert sel.reference.days_inclusive == 7
+        assert sel.reference.days_inclusive == sel.view.days_inclusive
+
+    def test_default_period_gives_a_30_day_reference(self):
         sel = parse_windows(
             {}, today=self.TODAY, data_max=date(2025, 4, 5),
         )
-        assert sel.reference.to == date(2025, 4, 5)
+        # No period → last-30-days → 30-day view → 30-day reference.
         assert sel.reference.days_inclusive == 30
 
     def test_reference_anchors_to_data_max_not_the_view(self):
         """A 'Last 2 weeks' view far from the data must not strand
-        the percentile sample — reference ends on the data."""
+        the percentile sample — reference ends on the data, and
+        its length follows the period (14 days)."""
         sel = parse_windows(
             {"period": "last-2-weeks"},
             today=self.TODAY,
             data_max=date(2025, 4, 5),
         )
         assert sel.reference.to == date(2025, 4, 5)
+        assert sel.reference.days_inclusive == 14
 
-    def test_ref_days_controls_reference_duration(self):
+    def test_ref_days_overrides_the_period_length(self):
+        """`?ref_days=` is the Advanced escape hatch — it decouples
+        the sample length from the Period."""
         sel = parse_windows(
-            {"ref_days": "60"},
+            {"period": "last-7-days", "ref_days": "60"},
             today=self.TODAY,
             data_max=date(2025, 4, 5),
         )
+        assert sel.view.days_inclusive == 7
         assert sel.reference.to == date(2025, 4, 5)
         assert sel.reference.days_inclusive == 60
 
@@ -169,13 +210,14 @@ class TestParseWindowsReference:
         then ends at today so the math still has a window."""
         sel = parse_windows({}, today=self.TODAY, data_max=None)
         assert sel.reference.to == self.TODAY
-        assert sel.reference.days_inclusive == DEFAULT_REFERENCE_DAYS
+        assert sel.reference.days_inclusive == 30  # follows 30-day view
 
-    def test_invalid_ref_days_falls_back_to_default(self):
+    def test_invalid_ref_days_falls_back_to_the_period_length(self):
         sel = parse_windows(
-            {"ref_days": "lots"}, today=self.TODAY, data_max=None,
+            {"period": "last-7-days", "ref_days": "lots"},
+            today=self.TODAY, data_max=None,
         )
-        assert sel.reference.days_inclusive == DEFAULT_REFERENCE_DAYS
+        assert sel.reference.days_inclusive == 7
 
 
 class TestWindowSelection:
@@ -210,9 +252,15 @@ class TestWindowSelection:
             {"period": "last-7-days"}, today=self.TODAY,
         ).is_custom
 
-    def test_is_advanced_when_reference_is_non_default(self):
-        plain = parse_windows({}, today=self.TODAY)
-        assert plain.is_advanced is False
+    def test_is_advanced_when_reference_decoupled_from_period(self):
+        # Default: reference follows the period → not advanced.
+        assert parse_windows({}, today=self.TODAY).is_advanced is False
+        # Picking a preset is not "advanced" — the reference just
+        # follows along.
+        assert parse_windows(
+            {"period": "last-7-days"}, today=self.TODAY,
+        ).is_advanced is False
+        # An explicit ref_days that differs from the view → advanced.
         tweaked = parse_windows({"ref_days": "60"}, today=self.TODAY)
         assert tweaked.is_advanced is True
 
@@ -222,7 +270,6 @@ class TestConstantsAndHelpers:
         """Pin the documented defaults so a change doesn't go
         unnoticed."""
         assert DEFAULT_VIEW_DAYS == 30
-        assert DEFAULT_REFERENCE_DAYS == 30
 
     def test_last_completed_week_sun_to_sat(self):
         """`last_completed_week` returns the most-recent COMPLETED

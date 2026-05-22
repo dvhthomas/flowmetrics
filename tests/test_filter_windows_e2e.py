@@ -17,11 +17,13 @@ every view reads. Pins:
 from __future__ import annotations
 
 import contextlib
+import re
 import socket
 import threading
 import time
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 import uvicorn
@@ -34,6 +36,78 @@ from flowmetrics.cli import cli
 pytestmark = pytest.mark.e2e
 
 FIXTURE_CACHE = Path(__file__).parent / "fixtures" / "cache"
+
+
+def _materialise_wide(
+    contracts_dir: Path, data_dir: Path, cache_dir: Path
+) -> None:
+    """Materialise a `wide-demo` contract whose completions span
+    ~130 days, plus a few in-flight items.
+
+    The `astral-uv-week` fixture only holds one week of data, so a
+    7-day Period and a 90-day Period capture the *same* sample —
+    useless for testing that the Period actually drives the
+    metrics. `wide-demo` spreads the data wide enough that the
+    windows visibly diverge.
+    """
+    from flowmetrics.compute import WorkItem
+    from flowmetrics.contract import Contract
+    from flowmetrics.materialise import materialise
+
+    name = "wide-demo"
+    (contracts_dir / f"{name}.yaml").write_text(
+        yaml.safe_dump({
+            "contract": {
+                "name": name, "source": "github", "repo": "x/y",
+                "start": "2025-01-01", "stop": "2027-12-31",
+            }
+        })
+    )
+    now = datetime.now(UTC)
+
+    def _item(item_id: str, *, created, completed):
+        return WorkItem(
+            item_id=item_id,
+            title=f"item {item_id}",
+            url=f"https://github.com/x/y/pull/{item_id.lstrip('#')}",
+            created_at=created,
+            completed_at=completed,
+        )
+
+    # One completion every 4 days back ~130 days — 33 items, so a
+    # 7-day window catches ~2 and a 90-day window catches ~23.
+    completed = [
+        _item(
+            f"#{i + 1}",
+            created=(now - timedelta(days=i * 4 + 2)),
+            completed=(now - timedelta(days=i * 4)),
+        )
+        for i in range(33)
+    ]
+    in_flight = [
+        _item("#901", created=now - timedelta(days=20), completed=None),
+        _item("#902", created=now - timedelta(days=8), completed=None),
+        _item("#903", created=now - timedelta(days=2), completed=None),
+        # A deeply-stale open item — its age dwarfs a short
+        # reference window, tripping the aging "smell" warning.
+        _item("#904", created=now - timedelta(days=400), completed=None),
+    ]
+    source = MagicMock()
+    source.fetch_completed_in_window.return_value = completed
+    source.fetch_in_flight.return_value = in_flight
+    with patch(
+        "flowmetrics.materialise.make_github_source",
+        return_value=source,
+    ):
+        materialise(
+            contract=Contract(
+                name=name, source="github", repo="x/y",
+                start=date(2025, 1, 1), stop=date(2027, 12, 31),
+            ),
+            data_dir=data_dir,
+            cache_dir=cache_dir,
+            offline=False,
+        )
 
 
 def _free_port() -> int:
@@ -89,6 +163,10 @@ def server_url(tmp_path_factory):
     )
     assert res.exit_code == 0, res.output
 
+    # A second contract whose data spans ~130 days — the filter-
+    # propagation tests need that spread (see `_materialise_wide`).
+    _materialise_wide(contracts_dir, data_dir, tmp_path / "cache")
+
     app = create_app(data_dir=data_dir, contracts_dir=contracts_dir)
     port = _free_port()
     thread = _ServerThread(app, port)
@@ -128,7 +206,9 @@ class TestPeriodFilterBar:
     ):
         """Picking a preset auto-submits, emitting just
         `?period=<name>` — no anchor/view_days noise."""
-        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd")
+        page.goto(
+            server_url + "/workflows/astral-uv-week/metrics/cycle-time"
+        )
         page.wait_for_selector("select[name='period']")
         page.select_option("select[name='period']", "last-7-days")
         page.wait_for_url("**period=last-7-days**")
@@ -141,29 +221,38 @@ class TestPeriodFilterBar:
     ):
         """Choosing "Custom…" reveals the Period Ending date
         field and the View dropdown without submitting."""
-        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd")
+        page.goto(
+            server_url + "/workflows/astral-uv-week/metrics/cycle-time"
+        )
         page.wait_for_selector("select[name='period']")
         expect(page.locator("input[name='anchor']")).to_be_hidden()
         page.select_option("select[name='period']", "custom")
         expect(page.locator("input[name='anchor']")).to_be_visible()
         expect(page.locator("select[name='view_days']")).to_be_visible()
 
-    def test_custom_period_drives_the_cfd_window(
+    def test_cfd_follows_the_period(
         self, server_url: str, page: Page
     ):
-        """A custom Period Ending + View resolves to that exact
-        window in the CFD headline."""
-        page.goto(
-            server_url + "/workflows/astral-uv-week/metrics/cfd"
-            "?period=custom&anchor=2026-05-10&view_days=7"
+        """The Period is a VISUAL window on the CFD — it clamps the
+        x-axis (the cumulative math stays full-history). So the CFD
+        headline changes with the Period, and the page carries the
+        Period bar."""
+        def _cfd_headline(period: str) -> str:
+            page.goto(
+                server_url + "/workflows/astral-uv-week/metrics/cfd"
+                f"?period={period}"
+            )
+            page.wait_for_selector(".metric-strip-headline")
+            return page.locator(".metric-strip-headline").inner_text()
+
+        h7 = _cfd_headline("last-7-days")
+        h90 = _cfd_headline("last-90-days")
+        assert h7 != h90, (
+            f"CFD headline should change with the Period; "
+            f"7d={h7!r}  90d={h90!r}"
         )
-        page.wait_for_selector("#cfd-chart svg", timeout=15000)
-        body = page.locator("body").inner_text()
-        assert "7 days" in body, (
-            f"CFD headline should report a 7-day window; got "
-            f"{body[:1500]!r}"
-        )
-        assert "May 10, 2026" in body
+        # The CFD page carries the Period bar (it is period-driven).
+        expect(page.locator("select[name='period']")).to_have_count(1)
 
     def test_period_ending_is_bounded_to_the_data_coverage(
         self, server_url: str, page: Page
@@ -211,3 +300,197 @@ class TestPeriodFilterBar:
         url = page.evaluate("() => location.href")
         assert "period=" not in url
         assert "anchor=" not in url
+
+
+class TestFilterPropagationToText:
+    """Audit: changing the Period must update every metric's
+    dynamic TEXT — headlines and provenance — not only the chart
+    SVGs. Uses `wide-demo` (data spans ~130 days) so a 7-day and a
+    90-day Period capture visibly different samples."""
+
+    def _strip_headline(
+        self, page: Page, server_url: str, metric: str, period: str
+    ) -> str:
+        page.goto(
+            f"{server_url}/workflows/wide-demo/metrics/{metric}"
+            f"?period={period}"
+        )
+        page.wait_for_selector(".metric-strip-headline", timeout=15000)
+        return page.locator(".metric-strip-headline").inner_text()
+
+    def test_aging_percentile_provenance_follows_the_period(
+        self, server_url: str, page: Page
+    ):
+        """Aging's percentile sample is the reference window, which
+        follows the Period — a 7-day Period draws on fewer
+        completed items than a 90-day one, and the headline says
+        so. (This is the bug the audit was opened for.)"""
+        h7 = self._strip_headline(page, server_url, "aging", "last-7-days")
+        h90 = self._strip_headline(
+            page, server_url, "aging", "last-90-days"
+        )
+        assert h7 != h90, (
+            f"aging percentile provenance must change with the "
+            f"Period; 7d={h7!r}  90d={h90!r}"
+        )
+
+    def test_cycle_time_headline_follows_the_period(
+        self, server_url: str, page: Page
+    ):
+        h7 = self._strip_headline(
+            page, server_url, "cycle-time", "last-7-days"
+        )
+        h90 = self._strip_headline(
+            page, server_url, "cycle-time", "last-90-days"
+        )
+        assert h7 != h90, (
+            f"cycle-time headline must change with the Period; "
+            f"7d={h7!r}  90d={h90!r}"
+        )
+
+    def test_aging_tile_surfaces_the_smell_warning(
+        self, server_url: str, page: Page
+    ):
+        """When in-flight ages dwarf the reference window the
+        percentile lines are an unreliable benchmark — the
+        'smell' warning must show on the dashboard aging TILE,
+        not only the detail page."""
+        page.goto(
+            f"{server_url}/workflows/wide-demo?period=last-7-days"
+        )
+        page.wait_for_selector("#aging-tile", timeout=15000)
+        # `wide-demo` has a 400-day-old open item vs a 7-day
+        # reference → the smell fires.
+        expect(page.locator(".aging-smell")).to_be_visible()
+
+    def test_throughput_headline_follows_the_period(
+        self, server_url: str, page: Page
+    ):
+        h7 = self._strip_headline(
+            page, server_url, "throughput", "last-7-days"
+        )
+        h90 = self._strip_headline(
+            page, server_url, "throughput", "last-90-days"
+        )
+        assert h7 != h90, (
+            f"throughput headline must change with the Period; "
+            f"7d={h7!r}  90d={h90!r}"
+        )
+
+    def test_forecast_history_window_follows_the_period(
+        self, server_url: str, page: Page
+    ):
+        """The forecast's Monte Carlo sample is the reference
+        window — its 'N days of throughput history' must shrink for
+        a shorter Period."""
+        def _history_days(period: str) -> list[str]:
+            page.goto(
+                f"{server_url}/workflows/wide-demo/metrics/forecast"
+                f"?period={period}"
+            )
+            page.wait_for_selector("body")
+            page.wait_for_timeout(500)
+            body = page.locator("body").inner_text()
+            return re.findall(
+                r"over ([\d,]+) days of throughput history", body
+            )
+
+        d7 = _history_days("last-7-days")
+        d90 = _history_days("last-90-days")
+        assert d7, "forecast must report its throughput-history span"
+        assert d7 != d90, (
+            f"forecast history span must change with the Period; "
+            f"7d={d7}  90d={d90}"
+        )
+
+
+class TestFilterPropagationThroughInteractions:
+    """Audit: an HTMX interaction that re-fetches a fragment
+    (a forecast slider, a chart drill-down) must carry the Period
+    — otherwise the fragment silently reverts to the default
+    window mid-interaction."""
+
+    def test_forecast_slider_keeps_the_period(
+        self, server_url: str, page: Page
+    ):
+        """Dragging a forecast slider re-fetches the panel — that
+        fetch must carry the Period, or the forecast's history
+        window silently snaps back to the default."""
+        page.goto(
+            f"{server_url}/workflows/wide-demo/metrics/forecast"
+            "?period=last-7-days"
+        )
+        page.wait_for_selector("#items-slider", timeout=15000)
+        page.wait_for_timeout(700)
+
+        def _history() -> list[str]:
+            body = page.locator("body").inner_text()
+            return re.findall(
+                r"over ([\d,]+) days of throughput history", body
+            )
+
+        before = _history()
+        # Drag the items slider — set value + fire the events HTMX
+        # listens for (`fill` doesn't drive range inputs reliably).
+        page.evaluate(
+            """() => {
+                const s = document.getElementById('items-slider');
+                s.value = String(Math.min(200, Number(s.value) + 60));
+                s.dispatchEvent(new Event('input', {bubbles: true}));
+                s.dispatchEvent(new Event('change', {bubbles: true}));
+            }"""
+        )
+        page.wait_for_timeout(1200)  # hx delay 100ms + re-render
+        after = _history()
+        assert before and after, (
+            f"forecast must report its history span; "
+            f"before={before} after={after}"
+        )
+        assert before == after, (
+            f"a forecast slider drag must not change the history "
+            f"window; before={before} after={after}"
+        )
+
+    def test_throughput_bar_click_drilldown_keeps_the_period(
+        self, server_url: str, page: Page
+    ):
+        """Clicking a throughput bar drills into the work-items
+        table — that request must carry the Period so the
+        drill-down keeps the selected view window."""
+        page.goto(
+            f"{server_url}/workflows/wide-demo/metrics/throughput"
+            "?period=last-90-days"
+        )
+        page.wait_for_selector("#throughput-chart svg", timeout=15000)
+        page.wait_for_selector("#work-items", timeout=10000)
+        page.wait_for_timeout(800)
+        with page.expect_request(
+            "**/api/internal/work-items**"
+        ) as info:
+            clicked = page.evaluate(
+                """() => {
+                    const groups = document.querySelectorAll(
+                        '#throughput-chart svg g.mark-rect');
+                    if (!groups.length) return false;
+                    const bars = groups[groups.length - 1]
+                        .querySelectorAll('path');
+                    let tallest = null, h = 0;
+                    for (const p of bars) {
+                        const r = p.getBoundingClientRect();
+                        if (r.height > h) { h = r.height; tallest = p; }
+                    }
+                    if (!tallest) return false;
+                    const r = tallest.getBoundingClientRect();
+                    tallest.dispatchEvent(new MouseEvent('click', {
+                        bubbles: true, cancelable: true,
+                        clientX: r.x + r.width / 2,
+                        clientY: r.y + r.height / 2,
+                        view: window}));
+                    return true;
+                }"""
+            )
+            assert clicked, "could not find a throughput bar to click"
+        assert "period=last-90-days" in info.value.url, (
+            f"throughput drill-down must carry the Period; "
+            f"url={info.value.url}"
+        )

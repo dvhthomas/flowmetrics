@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import json
 import tempfile
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import duckdb
@@ -270,32 +270,20 @@ class TestCfdShape:
                 f"{d.date_display!r}"
             )
 
-    def test_default_window_caps_at_90_days(self, warehouse):
-        """When no contract bounds are given, the time axis caps
-        at 90 days back from the data's most recent date. Without
-        this cap, in-flight items dragging multi-year transition
-        histories produce an unreadable 700+ day axis.
-
-        For the fixture the data spans well under 90 days, so the
-        cap is no-op here. The assertion is on the cap behavior
-        when there's enough data to be capped — use a small
-        `default_window_days` to force the cap to bite."""
-        data = render(warehouse, "demo", default_window_days=3)
-        # The cap should produce at most 3 days.
-        assert len(data.daily) <= 3, (
-            f"3-day cap should produce ≤ 3 daily points; got "
-            f"{len(data.daily)}: {[d.date_iso for d in data.daily]}"
-        )
-
-    def test_default_window_caps_at_90_when_no_bounds(self, warehouse):
-        """The default cap is 90 days — pin this so future edits
-        don't silently widen the default and re-introduce the
-        full-history axis bug."""
-        from flowmetrics.web.components.cfd import DEFAULT_WINDOW_DAYS
-        assert DEFAULT_WINDOW_DAYS == 90, (
-            f"DEFAULT_WINDOW_DAYS must be 90 (the documented default); "
-            f"got {DEFAULT_WINDOW_DAYS}"
-        )
+    def test_spans_full_data_history(self, warehouse):
+        """The CFD spans the FULL observed transition history —
+        first stage-entry to last — never a clamped window. A
+        cumulative chart needs the whole build-up to be legible;
+        it is not driven by the filter Period."""
+        data = render(warehouse, "demo")
+        span = warehouse.execute(
+            "SELECT min(d), max(d) FROM ("
+            "  SELECT CAST(min(entered_at) AS DATE) AS d "
+            "  FROM transitions WHERE contract_id = 'demo' "
+            "  GROUP BY item_id, stage)"
+        ).fetchone()
+        assert data.first_date_iso == span[0].isoformat()
+        assert data.last_date_iso == span[1].isoformat()
 
     def test_cfd_bands_are_wip_plus_done_in_declared_order(
         self, warehouse
@@ -330,83 +318,95 @@ class TestCfdShape:
         ).fetchone()[0]
         assert last.counts["Merged"] == completed
 
-    def test_window_clamps_with_only_start_set(self, warehouse):
-        """A contract with `start` but no `stop` should clamp the
-        LEFT edge of the axis to `start` and let the right edge
-        come from the data — not fall back to the full history.
-        Same logic if only `stop` is set.
+    def _data_span(self, warehouse) -> tuple[date, date]:
+        row = warehouse.execute(
+            "SELECT min(d), max(d) FROM ("
+            "  SELECT CAST(min(entered_at) AS DATE) AS d "
+            "  FROM transitions WHERE contract_id = 'demo' "
+            "  GROUP BY item_id, stage)"
+        ).fetchone()
+        return row[0], row[1]
 
-        This guards against the previous bug where both bounds were
-        required together: a contract with one bound silently
-        dropped the clamp and the axis ranged over the entire
-        in-flight-item lifetime."""
-        from datetime import date as _date
-        start = _date(2026, 5, 4)
-        data = render(warehouse, "demo", contract_start=start)
-        first = _date.fromisoformat(data.daily[0].date_iso)
-        assert first == start, (
-            f"first daily point should be contract.start ({start}) "
-            f"even with stop=None; got {first}"
-        )
-
-    def test_window_clamps_with_only_stop_set(self, warehouse):
-        from datetime import date as _date
-        stop = _date(2026, 5, 10)
-        data = render(warehouse, "demo", contract_stop=stop)
-        last = _date.fromisoformat(data.daily[-1].date_iso)
-        assert last == stop, (
-            f"last daily point should be contract.stop ({stop}) "
-            f"even with start=None; got {last}"
-        )
-
-    def test_window_clamps_to_contract_start_and_stop(self, warehouse):
-        """When `contract_start` and `contract_stop` are provided
-        the daily axis must be exactly that window. The CFD is a
-        view of a contract's window; in-flight items can have
-        transitions extending years before `contract.start`
-        (their PR was opened long ago), but the chart should be
-        anchored to the contract's window so the axis stays
-        readable and the metric stays scoped.
-
-        Cumulative counts at each date STILL reflect every
-        transition that happened on or before that date — items
-        that entered earlier than `contract.start` are counted
-        as "already reached" at start. Only the time AXIS is
-        clamped; the math is unchanged.
-        """
-        from datetime import date as _date
-        start = _date(2026, 5, 4)
-        stop = _date(2026, 5, 10)
-        data = render(
-            warehouse, "demo",
-            contract_start=start,
-            contract_stop=stop,
-        )
-        assert data.daily, "should still produce daily points within window"
-        first = _date.fromisoformat(data.daily[0].date_iso)
-        last = _date.fromisoformat(data.daily[-1].date_iso)
-        assert first == start, (
-            f"first daily point should be contract.start ({start}); got {first}"
-        )
-        assert last == stop, (
-            f"last daily point should be contract.stop ({stop}); got {last}"
-        )
-        # And the cumulative at start should NOT be zero — items
-        # that entered before start are already accounted for.
-        # (For the fixture, items predate start by some margin.)
-
-    def test_view_window_past_all_data_is_nodata(self, warehouse):
-        """The phantom-projection bug: CFD must not carry a stale
-        cumulative count forward into a view window that has no
-        data. A view entirely outside the transition data →
-        NODATA, not "612 items in the system"."""
+    def test_chart_has_a_y_axis_floor_control(self, warehouse):
+        """A range slider raises the y-axis floor so the operator
+        can crop the inert carry-in base and zoom into the active
+        bands. It appears only when a Period window starts partway
+        into the data (so there IS a carry-in to crop); default
+        0 = no crop."""
         from flowmetrics.windows import Window
-        data = render(
-            warehouse, "demo",
-            view=Window(from_=date(2030, 1, 1), to=date(2030, 1, 7)),
+        _data_min, data_max = self._data_span(warehouse)
+        # A window over the tail of the data, so its left edge
+        # carries a non-zero, non-final terminal-stage base.
+        view = Window(from_=data_max - timedelta(days=4), to=data_max)
+        data = render(warehouse, "demo", view=view)
+        spec = json.loads(data.vega_spec_json())
+        floors = [
+            p for p in spec.get("params", [])
+            if isinstance(p.get("bind"), dict)
+            and p["bind"].get("input") == "range"
+        ]
+        assert floors, "expected a range-input y-floor param"
+        floor = floors[0]
+        assert floor["value"] == 0  # default: full chart
+        assert floor["bind"]["min"] == 0
+        assert floor["bind"]["max"] > 0
+        # The y-scale's domainMin follows the floor param.
+        assert spec["encoding"]["y"]["scale"]["domainMin"] == {
+            "expr": floor["name"]
+        }
+
+    def test_y_floor_slider_max_is_the_left_edge_carry_in(
+        self, warehouse
+    ):
+        """The 'hide first N items' slider can crop at most the
+        inert carry-in present at the FIRST visible date — cropping
+        past that would eat into the curve that grows inside the
+        window. Its max is the terminal-stage cumulative at the
+        window's LEFT edge, not at the right (the final count)."""
+        from flowmetrics.windows import Window
+        _data_min, data_max = self._data_span(warehouse)
+        # A window over the tail of the data, so its left edge
+        # carries a non-zero, non-final terminal-stage base.
+        view = Window(from_=data_max - timedelta(days=4), to=data_max)
+        data = render(warehouse, "demo", view=view)
+        spec = json.loads(data.vega_spec_json())
+        floor = next(
+            p for p in spec.get("params", [])
+            if isinstance(p.get("bind"), dict)
+            and p["bind"].get("input") == "range"
         )
-        assert not data.daily, "no daily points for a range with no data"
-        assert "No data available" in data.headline
+        terminal = data.stages[-1]
+        left_edge = data.daily[0].counts[terminal]
+        right_edge = data.daily[-1].counts[terminal]
+        assert floor["bind"]["max"] == left_edge
+        assert left_edge < right_edge, (
+            "fixture must have the terminal cumulative GROW across "
+            "the window for this test to be meaningful"
+        )
+
+    def test_visual_window_clamps_to_the_data_range(self, warehouse):
+        """A view window wider than the data must not paint empty
+        columns: the CFD clamps its visible span to the observed
+        [first arrival, last arrival] range — no blank dates
+        before the first arrival or after the last."""
+        from flowmetrics.windows import Window
+        data_min, data_max = self._data_span(warehouse)
+        wide = Window(
+            from_=data_min - timedelta(days=120),
+            to=data_max + timedelta(days=120),
+        )
+        data = render(warehouse, "demo", view=wide)
+        assert data.first_date_iso == data_min.isoformat()
+        assert data.last_date_iso == data_max.isoformat()
+
+    def test_area_marks_are_clipped_to_the_plot(self, warehouse):
+        """The CFD area marks are clipped to the plot rectangle.
+        Without `clip`, raising the y-floor slider leaves the
+        cumulative bands spilling below the axis instead of
+        cropping cleanly."""
+        data = render(warehouse, "demo")
+        spec = json.loads(data.vega_spec_json())
+        assert spec["mark"]["clip"] is True
 
     def test_chart_spec_uses_area_marks_stacked_in_stage_order(
         self, warehouse
@@ -443,3 +443,11 @@ class TestCfdShape:
             assert stage in json_str, (
                 f"stage {stage!r} must appear in spec (color domain)"
             )
+
+    def test_chart_x_scale_has_no_outer_padding(self, warehouse):
+        """The CFD area fills the plot edge-to-edge — no empty
+        strip before the first date or after the last (the
+        default point-scale outer padding)."""
+        data = render(warehouse, "demo")
+        spec = json.loads(data.vega_spec_json())
+        assert spec["encoding"]["x"]["scale"]["paddingOuter"] == 0

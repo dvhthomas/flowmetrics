@@ -134,17 +134,55 @@ class CfdData:
         # Vega's `set3` is a soft 12-color qualitative palette
         # designed for stacked-area charts of this kind.
 
+        # Y-axis floor slider: when a Period window starts partway
+        # into the data, the bottom (departed) band carries an
+        # inert base of items that completed BEFORE the window —
+        # nothing about them moves inside it. This range control
+        # raises the y-domain's floor so the operator can crop
+        # that carry-in and zoom into the active bands.
+        #
+        # The max crop is the carry-in at the FIRST visible date,
+        # not the final departed count: the terminal band grows
+        # across the window, so cropping past its left-edge value
+        # would eat into the curve that actually rises inside the
+        # window. Default 0 = full chart, no crop.
+        base_carry_in = (
+            self.daily[0].counts[self.stages[-1]]
+            if self.daily and self.stages else 0
+        )
+        floor_param: dict | None = None
+        if base_carry_in > 1:
+            floor_param = {
+                "name": "cfdfloor",
+                "value": 0,
+                "bind": {
+                    "input": "range",
+                    "min": 0,
+                    "max": base_carry_in,
+                    "step": max(1, base_carry_in // 100),
+                    "name": "Crop base — hide first N items  ",
+                },
+            }
+
         spec: dict = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "background": "transparent",
             "padding": 12,
             "width": "container",
             "data": {"values": values},
-            "mark": {"type": "area", "opacity": 0.95},
+            # `clip` keeps the bands inside the plot rectangle so
+            # raising the y-floor slider crops them cleanly instead
+            # of spilling the cumulative areas below the axis.
+            "mark": {"type": "area", "opacity": 0.95, "clip": True},
             "encoding": {
                 "x": {
                     "field": "date_iso",
                     "type": "nominal",
+                    # No outer padding — the cumulative area fills
+                    # the plot edge-to-edge. The point-scale
+                    # default (0.5) leaves an empty strip before
+                    # the first date and after the last.
+                    "scale": {"paddingOuter": 0},
                     "axis": {
                         "title": "Date (UTC)",
                         "labelAngle": 0,
@@ -175,6 +213,10 @@ class CfdData:
                     "type": "quantitative",
                     "aggregate": "sum",
                     "stack": "zero",
+                    "scale": (
+                        {"domainMin": {"expr": "cfdfloor"}}
+                        if floor_param else {}
+                    ),
                     "axis": {"title": "Items"},
                 },
                 "color": {
@@ -229,6 +271,8 @@ class CfdData:
                 },
             },
         }
+        if floor_param is not None:
+            spec["params"] = [floor_param]
         return json.dumps(spec)
 
 
@@ -240,9 +284,6 @@ def _empty(headline: str = "No transitions yet.") -> CfdData:
         first_date_iso=None,
         last_date_iso=None,
     )
-
-
-DEFAULT_WINDOW_DAYS = 90
 
 
 def _infer_stage_order(
@@ -351,40 +392,10 @@ def _compute_reached_dates(
     return reached
 
 
-def _resolve_window(
-    first_entries: list[tuple[str, str, date]],
-    *,
-    view: Window | None,
-    contract_start: date | None,
-    contract_stop: date | None,
-    default_window_days: int,
-) -> tuple[date, date]:
-    """Pick the visible (first, last) dates per the resolution
-    table in `render`'s docstring. An explicit `view` window
-    wins outright (user-supplied bounds shouldn't be silently
-    overridden). Otherwise contract bounds, then a default
-    `default_window_days` look-back from the data's max."""
-    if view is not None:
-        return view.from_, view.to
-    all_dates = [d for _, _, d in first_entries]
-    data_min = min(all_dates)
-    data_max = max(all_dates)
-    last_date = contract_stop if contract_stop is not None else data_max
-    if contract_start is not None:
-        first_date = contract_start
-    else:
-        cap = last_date - timedelta(days=default_window_days - 1)
-        first_date = max(cap, data_min)
-    return first_date, last_date
-
-
 def render(
     con: duckdb.DuckDBPyConnection,
     contract_name: str,
     *,
-    contract_start: date | None = None,
-    contract_stop: date | None = None,
-    default_window_days: int = DEFAULT_WINDOW_DAYS,
     states: WorkflowStates | None = None,
     view: Window | None = None,
 ) -> CfdData:
@@ -400,24 +411,17 @@ def render(
       departures). Each raw state is its OWN band. Raw
       transitions for states outside that list are treated as
       backlog and excluded from CFD math entirely (Vacanti —
-      backlog is not WIP). When `states` is None, the CFD
-      falls back to pairwise-precedence inference over all
-      observed raw states.
+      backlog is not WIP). When `states` is None, the CFD falls
+      back to pairwise-precedence inference over all observed raw
+      states.
 
-    Window resolution (from explicit → defaulted):
-
-      1. Both bounds given → use exactly `[contract_start,
-         contract_stop]`.
-      2. One bound given → use it; pick the other from data,
-         capped to `default_window_days`.
-      3. No bounds → anchor at the data's most recent date and
-         look back `default_window_days` (default 90).
-
-    Cumulative counts AT each visible date still reflect every
-    transition that happened on or before that date — items that
-    reached a stage before the visible window are already counted
-    at the left edge. Only the axis is clamped; the math is
-    unchanged.
+    `view` — a VISUAL window. The cumulative math always covers
+    the FULL transition history (the count at any date includes
+    every prior arrival), so the carry-in at the window's left
+    edge is the true running total. `view` only clamps which
+    dates the x-axis shows; pair it with the y-axis floor slider
+    to crop the inert carry-in base. When `view` is None the
+    chart spans the full observed data span.
     """
     # Resolve stages. Explicit YAML wins; otherwise infer.
     if states is not None:
@@ -434,42 +438,22 @@ def render(
     if not first_entries:
         return _empty()
 
-    # Coverage gate: when the picked view window sits entirely
-    # outside the warehouse's data, there is nothing to render —
-    # return NODATA, never a stale cumulative count carried
-    # forward. Coverage is the completion span — the same number
-    # the freshness banner reports, so every metric agrees on
-    # "what data the warehouse has". (Transition timestamps are
-    # not used here: in-flight snapshots get materialise-time
-    # markers that would mask a stale warehouse.)
-    if view is not None:
-        cov = con.execute(
-            "SELECT min(CAST(completed_at AS DATE)), "
-            "       max(CAST(completed_at AS DATE)) "
-            "FROM work_items "
-            "WHERE contract_id = ? AND completed_at IS NOT NULL",
-            [contract_name],
-        ).fetchone()
-        cov_lo = cov[0] if cov else None
-        cov_hi = cov[1] if cov else None
-        if cov_hi is not None and (
-            view.from_ > cov_hi or view.to < cov_lo
-        ):
-            return _empty(
-                "No data available for "
-                f"{to_utc_display_date(datetime(view.from_.year, view.from_.month, view.from_.day, tzinfo=UTC))}"
-                f" – {to_utc_display_date(datetime(view.to.year, view.to.month, view.to.day, tzinfo=UTC))}"
-            )
-
     reached_by_stage = _compute_reached_dates(first_entries, stages)
 
-    first_date, last_date = _resolve_window(
-        first_entries,
-        view=view,
-        contract_start=contract_start,
-        contract_stop=contract_stop,
-        default_window_days=default_window_days,
-    )
+    # X-axis span. `view` is a visual window — it clamps which
+    # dates show, NOT the cumulative math. It is intersected with
+    # the observed data span so the chart never paints empty
+    # columns before the first arrival or after the last. Without
+    # a view, the full observed history (first stage-entry → last).
+    all_dates = [d for _, _, d in first_entries]
+    data_min, data_max = min(all_dates), max(all_dates)
+    if view is not None:
+        first_date = max(view.from_, data_min)
+        last_date = min(view.to, data_max)
+    else:
+        first_date, last_date = data_min, data_max
+    if first_date > last_date:
+        return _empty("No transitions in the selected period.")
 
     # Cumulative count per (date, stage). Sort each stage's
     # reached-date list once, then bisect for each date in the

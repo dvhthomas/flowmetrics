@@ -12,6 +12,7 @@ The template knows how to lay it out at each `mode`.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from typing import Any
@@ -280,8 +281,57 @@ def _build_vega_spec(data: CycleTimeData) -> dict[str, Any]:
         last_date = date.fromisoformat(point_dates[-1])
         domain_start = (first_date - timedelta(days=1)).isoformat()
         domain_end = (last_date + timedelta(days=1)).isoformat()
+        span_days = (last_date - first_date).days
     else:
         domain_start = domain_end = None
+        span_days = 0
+
+    # Tick/gridline interval scales with the window span. A fixed
+    # daily interval keeps short windows clean (and stops Vega
+    # auto-picking a sub-day granularity that repeats the same
+    # "%b %d" label), but across many months it hatches the plot
+    # into an unreadable grey wash — one gridline per day. Step up
+    # to week/month so the gridline count stays ~10-30.
+    if span_days <= 30:
+        x_tick_count: dict = {"interval": "day", "step": 1}
+    elif span_days <= 210:
+        x_tick_count = {"interval": "week", "step": 1}
+    elif span_days <= 1095:
+        x_tick_count = {"interval": "month", "step": 1}
+    else:
+        x_tick_count = {"interval": "month", "step": 3}
+
+    # Y-axis cap slider: a range control that EXCLUDES outliers
+    # above the cap so the bulk stays readable. It runs from ~P95
+    # up to the max observed cycle time. It works by FILTERING the
+    # dots (not by pinning the y domain) — so the y-axis auto-
+    # scales to whatever is shown and the chart always fills the
+    # plot. The percentile VALUES are untouched: they're computed
+    # server-side from the full data, and the rule layer is not
+    # filtered.
+    cycle_vals = sorted(p.cycle_time_days for p in data.points)
+    cap_param: dict | None = None
+    cap_filter: dict | None = None
+    if len(cycle_vals) >= 2:
+        cap_floor = math.ceil(data.p95)
+        cap_ceiling = math.ceil(cycle_vals[-1])
+        if cap_floor < cap_ceiling:
+            cap_param = {
+                "name": "cyclecap",
+                # Default = max → the chart opens showing ALL data;
+                # the operator drags down to exclude outliers.
+                "value": cap_ceiling,
+                "bind": {
+                    "input": "range",
+                    "min": cap_floor,
+                    "max": cap_ceiling,
+                    "step": 1,
+                    "name": "Max cycle time shown (days)  ",
+                },
+            }
+            cap_filter = {
+                "filter": "datum.cycle_time_days <= cyclecap"
+            }
 
     scatter_layer = {
         "mark": {
@@ -313,25 +363,29 @@ def _build_vega_spec(data: CycleTimeData) -> dict[str, Any]:
         # was a separate TZ-formatting bug; the tooltip now
         # pre-formats in Python (UTC) so the date the user sees on
         # hover matches the column the dot is in.
+        # Cap filter (when present) drops dots above the slider
+        # value BEFORE the jitter calculate; the y-axis then
+        # auto-scales to what remains.
         "transform": [
+            *([cap_filter] if cap_filter else []),
             {
                 "calculate": (
                     "time(datum.completed_at) + random() * 86400000"
                 ),
                 "as": "completed_at_jittered",
-            }
+            },
         ],
-        # `params` lives on the scatter layer, NOT top-level. Top-level
-        # params on a layered Vega-Lite spec produce per-layer copies of
-        # the selection signals at compile time, which clash on names
-        # like `cycle_zoom_completed_at`. Same pattern the existing
-        # renderers/vega_specs.py uses for its scatter chart.
+        # Wheel/drag zoom on the date (x) axis only — the y axis is
+        # owned by the cap slider. The interval selection must live
+        # on this layer (a top-level selection on a layered spec
+        # produces duplicate per-layer signals); the cap is a plain
+        # value param and goes top-level.
         "params": [
             {
                 "name": "cycle_zoom",
-                "select": {"type": "interval", "encodings": ["x", "y"]},
+                "select": {"type": "interval", "encodings": ["x"]},
                 "bind": "scales",
-            }
+            },
         ],
         # All x/y encoding lives on the scatter layer (not top-level).
         # Top-level encoding bleeds into the rule/text reference
@@ -367,17 +421,21 @@ def _build_vega_spec(data: CycleTimeData) -> dict[str, Any]:
                     "titleFontWeight": "bold",
                     "format": "%b %d",
                     "labelAngle": 0,
-                    # Pin ticks to daily boundaries. Without this
-                    # Vega-Lite auto-picks a sub-day granularity for
-                    # short windows (every 6h for a 7-day window) and
-                    # renders each "%b %d" label four times.
-                    "tickCount": {"interval": "day", "step": 1},
+                    # Span-adaptive tick interval (see x_tick_count
+                    # above). Pins ticks to whole-day/week/month
+                    # boundaries so Vega never auto-picks a sub-day
+                    # granularity (which renders each "%b %d" label
+                    # several times) and a multi-month window never
+                    # draws a gridline per day.
+                    "tickCount": x_tick_count,
                     "labelOverlap": "parity",
                 },
             },
             "y": {
                 "field": "cycle_time_days",
                 "type": "quantitative",
+                # Auto domain — it re-fits whatever survives the cap
+                # filter, so the visible dots always fill the plot.
                 "scale": {"zero": True},
                 "axis": {
                     "title": "Cycle time (days)",
@@ -465,7 +523,7 @@ def _build_vega_spec(data: CycleTimeData) -> dict[str, Any]:
         },
     }
 
-    return {
+    spec: dict[str, Any] = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "width": "container",
         "height": 360,
@@ -485,6 +543,12 @@ def _build_vega_spec(data: CycleTimeData) -> dict[str, Any]:
             ),
         },
     }
+    # The cap value param is top-level: the y scale is shared
+    # across layers, so a param scoped to one layer would be out
+    # of scope for the scale's `domainMax` expr.
+    if cap_param is not None:
+        spec["params"] = [cap_param]
+    return spec
 
 
 # Re-export for templates that don't want to import from a sub-package

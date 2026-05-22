@@ -16,6 +16,7 @@ faithfully computed at that date.
 from __future__ import annotations
 
 import json
+import math
 import random
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -28,13 +29,13 @@ from ...windows import Window
 
 
 # Chart colors are CSS-theme-driven; see _base.html.jinja's
-# `flowmetricsTheme` for resolved values. Same neutrals + P85
-# accent as the cycle-time chart so the commitment line is the
-# single thing that pops on both charts.
+# `flowmetricsTheme` for resolved values. The percentile rules
+# keep the neutrals + P85 accent shared with the cycle-time
+# chart; the dots themselves are coloured per workflow state
+# (a categorical scheme) so each column is easy to read.
 _PCT_COLOR_P50 = "__theme:border__"
 _PCT_COLOR_P85 = "__theme:p-500__"
 _PCT_COLOR_P95 = "__theme:muted__"
-_POINT_COLOR = "__theme:muted__"
 
 
 @dataclass(frozen=True)
@@ -154,30 +155,81 @@ class AgingData:
         for v in item_values:
             v["_jitter"] = rng.random()
 
-        # Compute y-axis headroom for the per-column 'N WIP'
-        # badge. The badge sits ABOVE the highest dot in each
-        # band (Vega text mark with `baseline: bottom, dy: -8`).
-        # If the y domain is exactly max(age_days), the badge
-        # gets clipped against the top edge of the plot area.
-        # 10% headroom is enough for the text + dy offset at
-        # typical chart heights without making the dots feel
-        # squashed. Percentile threshold lines (P95) may also
-        # extend slightly above the max-aged dot; this also
-        # ensures their right-edge label sits inside the plot.
+        # X-axis state columns in display order (first-appearance
+        # order in the data). Pinned explicitly as `sort` on every
+        # x encoding so the dots and the count headers agree on
+        # the column layout.
+        ordered_states: list[str] = []
+        for v in item_values:
+            if v["current_state"] not in ordered_states:
+                ordered_states.append(v["current_state"])
+
+        # Per-state WIP count, pre-aggregated here (not via a Vega
+        # `aggregate: count`) so each label can read "WIP N" and
+        # sit as a fixed header at the TOP of the chart — above
+        # its column, at a constant height — rather than floating
+        # above the tallest dot at a per-column height.
+        state_counts: dict[str, int] = {}
+        for v in item_values:
+            s = v["current_state"]
+            state_counts[s] = state_counts.get(s, 0) + 1
+        badge_values = [
+            {"current_state": s, "label": f"WIP {state_counts[s]}"}
+            for s in ordered_states
+        ]
+
         max_age = max((i.age_days for i in self.items), default=1.0)
-        y_domain_max = max_age * 1.10
-        # Round up to a nicer tick value when ages are large so
-        # the axis labels stay legible (avoids "5,973" instead
-        # of "6,000" as the top tick).
-        if y_domain_max > 100:
-            step = 10 ** (len(str(int(y_domain_max))) - 2)
-            y_domain_max = (int(y_domain_max / step) + 1) * step
+
+        # Y-axis cap slider: a range control that EXCLUDES in-flight
+        # items older than the cap so a few ancient items don't
+        # squash the readable bulk. Runs from the P95 commitment
+        # line up to the oldest item; default = max (opens showing
+        # all). It FILTERS the dots (not the y domain) so the axis
+        # auto-scales to what's shown and the plot always fills.
+        # The percentile threshold lines are unaffected — separate
+        # layer, separate data.
+        ages = sorted(i.age_days for i in self.items)
+        cap_param: dict | None = None
+        cap_filter: dict | None = None
+        if len(ages) >= 2:
+            # Floor the cap at the P95 reference line — the dashed
+            # commitment threshold. Cropping down to it focuses the
+            # view on items at or below the high-stakes threshold;
+            # the ancient outliers above it are exactly what the
+            # slider hides. Fall back to the ages' own P95 when
+            # there is no percentile line (no completed sample to
+            # draw it from).
+            if self.percentiles.p95 > 0:
+                cap_floor = math.ceil(self.percentiles.p95)
+            else:
+                idx = min(len(ages) - 1, math.ceil(0.95 * len(ages)) - 1)
+                cap_floor = math.ceil(ages[idx])
+            cap_ceiling = math.ceil(max_age)
+            if cap_floor < cap_ceiling:
+                cap_param = {
+                    "name": "agecap",
+                    "value": cap_ceiling,
+                    "bind": {
+                        "input": "range",
+                        "min": cap_floor,
+                        "max": cap_ceiling,
+                        "step": 1,
+                        "name": "Max age shown (days)  ",
+                    },
+                }
+                cap_filter = {"filter": "datum.age_days <= agecap"}
 
         spec: dict = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "background": "transparent",
             "padding": 12,
             "width": "container",
+            # The dot layer colours by `current_state`; the rule
+            # layer colours P50/P85/P95. Vega-Lite shares colour
+            # scales across layers by default — which would merge
+            # these two unrelated scales. Resolve colour
+            # independently so each layer keeps its own.
+            "resolve": {"scale": {"color": "independent"}},
             "layer": [
                 # In-flight item dots — painted FIRST so the
                 # threshold rules above sit on top and stay
@@ -191,22 +243,32 @@ class AgingData:
                     # layered spec produce per-layer copies of
                     # the selection and Vega complains about
                     # duplicate signal names.
+                    # Zoom is bound to the x axis only — the y axis
+                    # is driven by the cap slider, so binding y to
+                    # the zoom too would fight the cap's domainMax.
+                    # The interval selection stays on this layer (a
+                    # top-level selection on a layered spec makes
+                    # duplicate per-layer signals); the cap value
+                    # param goes top-level — see below.
                     "params": [
                         {
                             "name": "aging_zoom",
                             "select": {
                                 "type": "interval",
-                                "encodings": ["x", "y"],
+                                "encodings": ["x"],
                             },
                             "bind": "scales",
-                        }
+                        },
                     ],
                     "data": {"values": item_values},
+                    # Cap filter (when present) drops dots older
+                    # than the slider value; the y-axis then auto-
+                    # scales to what remains.
+                    "transform": [cap_filter] if cap_filter else [],
                     "mark": {
                         "type": "point",
                         "filled": True,
                         "size": 90,
-                        "color": _POINT_COLOR,
                         "opacity": 0.85,
                         # Signal clickability (the fragment script
                         # navigates to the item's lifecycle page on
@@ -229,7 +291,7 @@ class AgingData:
                                 "paddingOuter": 0.1,
                             },
                             "axis": {"title": "Current state", "labelAngle": 0},
-                            "sort": None,
+                            "sort": ordered_states,
                         },
                         "xOffset": {
                             # Canonical `point_offset_random` —
@@ -242,17 +304,29 @@ class AgingData:
                             "field": "_jitter",
                             "type": "quantitative",
                         },
+                        # Colour each dot by its workflow state, so
+                        # a viewer can tell which category a point
+                        # belongs to even mid-zoom. The x-axis
+                        # already labels each column, so the colour
+                        # needs no legend — it just reinforces the
+                        # grouping. P50/P85/P95 rules stay readable:
+                        # they are horizontal dashed lines, a wholly
+                        # different shape from the dot cloud.
+                        "color": {
+                            "field": "current_state",
+                            "type": "nominal",
+                            "scale": {"scheme": "tableau10"},
+                            "legend": None,
+                        },
                         "y": {
                             "field": "age_days",
                             "type": "quantitative",
-                            # Floor at 0 — age can't go negative.
-                            # Ceil with headroom for the per-band
-                            # 'N WIP' badge that paints above the
-                            # tallest dot in each column.
-                            "scale": {
-                                "domainMin": 0,
-                                "domainMax": y_domain_max,
-                            },
+                            # Floored at 0 (age can't go negative);
+                            # domainMax auto-fits whatever survives
+                            # the cap filter, with Vega's `nice`
+                            # rounding giving headroom for the
+                            # top-pinned "WIP N" header.
+                            "scale": {"domainMin": 0},
                             "axis": {"title": "Age (days)"},
                         },
                         "tooltip": [
@@ -271,19 +345,19 @@ class AgingData:
                         ],
                     },
                 },
-                # Per-state count badge — "n WIP" above the column.
-                # Aggregated client-side by Vega-Lite so it stays
-                # in sync with the visible dot cloud (and with
-                # zoom/filter selections, when those land). Y is
-                # the max age per band + a small offset upward so
-                # the badge sits just above the highest dot.
+                # Per-state "WIP N" header — pinned to the TOP of
+                # the chart (`y: {value: 0}` is a fixed pixel
+                # position, not a data value) and sitting in the
+                # clear headroom band above the dots. A stable
+                # header row, one per column, not a label floating
+                # at the height of each column's tallest dot.
                 {
-                    "data": {"values": item_values},
+                    "data": {"values": badge_values},
                     "mark": {
                         "type": "text",
-                        "baseline": "bottom",
-                        "dy": -8,
-                        "fontSize": 12,
+                        "baseline": "top",
+                        "dy": 3,
+                        "fontSize": 11,
                         "fontWeight": 600,
                         "color": "__theme:muted__",
                     },
@@ -291,14 +365,10 @@ class AgingData:
                         "x": {
                             "field": "current_state",
                             "type": "nominal",
-                            "sort": None,
+                            "sort": ordered_states,
                         },
-                        "y": {
-                            "aggregate": "max",
-                            "field": "age_days",
-                            "type": "quantitative",
-                        },
-                        "text": {"aggregate": "count"},
+                        "y": {"value": 0},
+                        "text": {"field": "label", "type": "nominal"},
                     },
                 },
                 # Percentile threshold rules — painted AFTER the
@@ -362,6 +432,12 @@ class AgingData:
                 },
             },
         }
+        # The cap value param is top-level: the y scale is shared
+        # across layers, so a param scoped to one layer would be
+        # out of scope for the scale's `domainMax` expr.
+        if cap_param is not None:
+            spec["params"] = [cap_param]
+
         # No completions in the reference window → percentiles
         # are 0/0/0. Drop the rule layer entirely; three dashed
         # rules stacked on y=0 read as a real threshold.

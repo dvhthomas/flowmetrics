@@ -145,103 +145,37 @@ _HEADLINE_RANGE_RE = re.compile(
 )
 
 
-class TestCfdAxisDomainMatchesSpecWindow:
-    """The data domain for the x axis matches the CFD spec
-    window. If the contract says 7 days, only 7 days are
-    visible — not 700."""
+class TestCfdVisualPeriod:
+    """The Period is a VISUAL window on the CFD — it clamps the
+    x-axis viewport. The cumulative math stays full-history (the
+    carry-in at the window's left edge is the true running total);
+    the Period just chooses which dates are shown."""
 
     def test_detail_page_renders_chart_svg(
         self, server_url: str, page: Page
     ):
-        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd?period=custom&anchor=2026-05-10&view_days=7")
+        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd")
         page.wait_for_selector("#cfd-chart svg", timeout=15000)
         expect(page.locator("#cfd-chart svg")).to_be_visible()
 
-    def test_headline_reports_exactly_the_contract_window(
+    def test_cfd_page_has_the_period_bar(
         self, server_url: str, page: Page
     ):
-        """The headline 'N days (date – date)' must match the
-        contract window. A 7-day window must say 7 days; a 90-day
-        cap (no bounds) must say at most 90."""
-        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd?period=custom&anchor=2026-05-10&view_days=7")
+        """The CFD is period-driven (the Period is its visual
+        window), so its page carries the Period filter bar."""
+        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd")
         page.wait_for_selector("#cfd-chart svg", timeout=15000)
-        # The headline lives in `metric_summary.html.jinja`; pull
-        # ALL text from the page and find the range.
-        page_text = page.locator("body").inner_text()
-        m = _HEADLINE_RANGE_RE.search(page_text)
-        assert m, (
-            f"could not find a 'N days (date – date)' range in page text; "
-            f"got: {page_text[:1000]!r}"
-        )
-        # The dates should parse to May 04, 2026 and May 10, 2026
-        # (matching the contract's start/stop set in `server_url`).
-        assert "May 4, 2026" in m.group("from") or "May 04, 2026" in m.group("from"), (
-            f"range start should be contract.start (2026-05-04); got {m.group('from')!r}"
-        )
-        assert "May 10, 2026" in m.group("to"), (
-            f"range stop should be contract.stop (2026-05-10); got {m.group('to')!r}"
-        )
+        expect(page.locator("select[name='period']")).to_have_count(1)
 
-    def test_x_axis_labels_all_fall_within_window(
+    def test_axis_clamps_to_the_period_window(
         self, server_url: str, page: Page
     ):
-        """Every visible x-axis label is a date in [start, stop].
-        This is the user-facing claim: the axis domain matches the
-        spec window, not the in-flight items' multi-year history.
-
-        Vega-Lite emits axis labels as `<text>` nodes under the
-        SVG; we pull them, filter for ones that look like dates
-        (e.g. 'May 04', 'May 05'), and assert all fall in the
-        7-day window.
-        """
-        page.goto(server_url + "/workflows/astral-uv-week/metrics/cfd?period=custom&anchor=2026-05-10&view_days=7")
-        page.wait_for_selector("#cfd-chart svg", timeout=15000)
-        page.wait_for_timeout(500)  # let Vega finish drawing axes
-
-        svg_texts: list[str] = page.evaluate(
-            """() => Array.from(
-                document.querySelectorAll('#cfd-chart svg text')
-            ).map(t => t.textContent.trim())"""
+        """A 7-day Period clamps the CFD x-axis to that 7-day
+        window — every visible date tick falls inside it."""
+        page.goto(
+            server_url + "/workflows/astral-uv-week/metrics/cfd"
+            "?period=custom&anchor=2026-05-10&view_days=7"
         )
-
-        # Filter for labels that look like a date tick (`Mon DD`)
-        # — ignores axis titles ("Date (UTC)", "Items"), legend
-        # entries (stage names), numeric y-tick labels, and the
-        # data labels of the cross-hair guideline.
-        date_labels = [s for s in svg_texts if _DATE_TEXT_RE.match(s)]
-        assert date_labels, (
-            f"expected at least one date-shaped tick label on the x-axis; "
-            f"SVG <text> nodes were: {svg_texts}"
-        )
-
-        # Parse each label and verify it's in the 7-day window.
-        # The contract window is 2026-05-04 → 2026-05-10. The
-        # axis must NOT contain any date outside this range.
-        from datetime import datetime
-        start = date(2026, 5, 4)
-        stop = date(2026, 5, 10)
-        for label in date_labels:
-            # `May 04` → parse with a fixed year (2026 since labels
-            # don't carry a year). The assertion is on month+day.
-            parsed = datetime.strptime(f"{label} 2026", "%b %d %Y").date()
-            assert start <= parsed <= stop, (
-                f"x-axis shows tick {label!r} (parsed {parsed}) which is "
-                f"OUTSIDE the contract window [{start} – {stop}]. The CFD's "
-                f"data domain leaked past the spec — likely cause: render "
-                f"call dropped the contract.start/stop kwargs, or the "
-                f"warehouse contains in-flight items whose transitions "
-                f"predate the window and the clamp logic is missing/broken."
-            )
-
-    def test_dashboard_tile_axis_also_within_window(
-        self, server_url: str, page: Page
-    ):
-        """Same axis-domain assertion on the dashboard tile —
-        guards against the dashboard route silently dropping the
-        contract window while the detail route keeps it (a real
-        regression mode now that both routes load_contract
-        independently)."""
-        page.goto(server_url + "/workflows/astral-uv-week?period=custom&anchor=2026-05-10&view_days=7")
         page.wait_for_selector("#cfd-chart svg", timeout=15000)
         page.wait_for_timeout(500)
         svg_texts: list[str] = page.evaluate(
@@ -251,15 +185,14 @@ class TestCfdAxisDomainMatchesSpecWindow:
         )
         date_labels = [s for s in svg_texts if _DATE_TEXT_RE.match(s)]
         assert date_labels, (
-            f"expected date labels on dashboard CFD tile x-axis; "
+            f"expected date tick labels on the CFD x-axis; "
             f"SVG <text> nodes were: {svg_texts}"
         )
         from datetime import datetime
-        start = date(2026, 5, 4)
-        stop = date(2026, 5, 10)
+        start, stop = date(2026, 5, 4), date(2026, 5, 10)
         for label in date_labels:
             parsed = datetime.strptime(f"{label} 2026", "%b %d %Y").date()
             assert start <= parsed <= stop, (
-                f"dashboard tile x-axis shows {label!r} ({parsed}) outside "
-                f"the contract window [{start} – {stop}]"
+                f"x-axis tick {label!r} ({parsed}) is outside the "
+                f"7-day Period window [{start} – {stop}]"
             )

@@ -67,11 +67,17 @@
         if (!filterInput || !body || !wrap) return;
         filterInput.value = item.datum.date_iso;
         const contract = wrap.dataset.contract || "{{ contract.name }}";
-        const url = (
+        let url = (
           "/api/internal/work-items?workflow=" +
           encodeURIComponent(contract) +
           "&completed_on=" + encodeURIComponent(item.datum.date_iso)
         );
+        // Carry the page's filter params (period / anchor / …) so
+        // the drill-down table keeps the selected view window — a
+        // bar for a date outside the default window would
+        // otherwise re-render against the wrong window.
+        const qs = window.location.search;
+        if (qs.length > 1) url += "&" + qs.slice(1);
         if (typeof htmx !== "undefined") {
           htmx.ajax("GET", url, {target: "#work-items-body", swap: "innerHTML"});
         }
