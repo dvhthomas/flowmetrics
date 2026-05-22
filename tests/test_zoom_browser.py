@@ -115,7 +115,6 @@ def _drag_changes_axis(html_path: Path, container_id: str) -> tuple[bool, list, 
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).parent.parent
-SAMPLE = REPO_ROOT / "samples" / "astral-sh_uv"
 
 CHARTS = [
     ("scatterplot.html", "scatterplot-chart"),
@@ -131,26 +130,33 @@ CHARTS = [
 
 
 @pytest.fixture(scope="session")
-def regenerate_samples():
-    """Re-render samples once per session against current vega_specs
-    so we test the LIVE spec, not whatever was last committed to disk."""
+def sample_dir(tmp_path_factory) -> Path:
+    """Render the sample gallery once per session into a tmp dir —
+    NOT the tracked `samples/` tree — and return the astral-sh/uv
+    folder. Re-rendering tests the LIVE spec; `FLOWMETRICS_SAMPLES_DIR`
+    redirects the output so a test run never dirties the committed
+    gallery."""
+    import os
     import subprocess
+    out = tmp_path_factory.mktemp("samples")
     subprocess.run(
         ["uv", "run", "python", "scripts/generate_samples.py", "--offline"],
         cwd=REPO_ROOT,
         check=True,
         capture_output=True,
+        env={**os.environ, "FLOWMETRICS_SAMPLES_DIR": str(out)},
     )
+    return out / "astral-sh_uv"
 
 
 @pytest.mark.parametrize("filename,container_id", CHARTS)
 def test_wheel_zoom_works_over_empty_plot_area(
-    regenerate_samples, filename, container_id
+    sample_dir, filename, container_id
 ):
     """The regression: bind:scales on a layered spec was dead over
     empty plot area because view.fill: null meant no event-catcher
     rect. Fix is view.fill: 'transparent'."""
-    html = SAMPLE / filename
+    html = sample_dir / filename
     if not html.exists():
         pytest.skip(f"{filename} not in sample dir")
     changed, before, after = _wheel_changes_axis(html, container_id)
@@ -181,7 +187,7 @@ def test_wheel_zoom_works_over_empty_plot_area(
     ("aging.html", ["aging-chart", "aging-dist-chart"]),
 ])
 def test_every_chart_actually_renders_svg(
-    regenerate_samples, filename, container_ids
+    sample_dir, filename, container_ids
 ):
     """Each chart container should hold a non-trivial Vega SVG once
     loaded. Catches:
@@ -190,7 +196,7 @@ def test_every_chart_actually_renders_svg(
       - spec compile errors that leave the container empty
       - CDN load failures
     """
-    html = SAMPLE / filename
+    html = sample_dir / filename
     if not html.exists():
         pytest.skip(f"{filename} not in sample dir")
     with sync_playwright() as p:

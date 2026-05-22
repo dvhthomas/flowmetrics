@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import base64
 import html
+import os
 import re
 import subprocess
 import sys
@@ -25,7 +26,10 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent
-SAMPLES_DIR = PROJECT_ROOT / "samples"
+# Output root. Defaults to the tracked `samples/` tree, but
+# `FLOWMETRICS_SAMPLES_DIR` redirects it — tests render into a tmp
+# dir so a test run never dirties the committed sample gallery.
+SAMPLES_DIR = Path(os.environ.get("FLOWMETRICS_SAMPLES_DIR", PROJECT_ROOT / "samples"))
 CACHE_DIR = PROJECT_ROOT / ".cache" / "github"
 
 
