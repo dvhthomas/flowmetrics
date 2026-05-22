@@ -1,7 +1,7 @@
 {# Forecast WWIBD-How-Many chart fragment.
 
    Required context:
-     data           — HowManyData
+     data           — HowManyModel (rendered via the vega_spec Jinja global)
      chart_height   — int pixels
      contract.name  — for any back-links
 #}
@@ -52,7 +52,7 @@
         catch (e) { /* finalize is best-effort */ }
         window.__flowmetricsForecastHowManyView = null;
       }
-      const spec = {{ data.vega_spec_json() | safe }};
+      const spec = {{ vega_spec(data) | safe }};
       spec.height = {{ _h }};
       // First-paint fix: same as the When-Done fragment. Even
       // though this chart's x is quantitative (and so doesn't

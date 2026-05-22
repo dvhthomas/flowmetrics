@@ -137,25 +137,17 @@ def _collect_component_specs(warehouse) -> list[tuple[str, dict]]:
         ),
         (
             "forecast_when_done",
-            json.loads(
-                render_forecast_when_done(
-                    warehouse,
-                    "astral-uv-week",
-                    items=20,
-                    start_date=date(2026, 5, 11),
-                ).vega_spec_json()
-            ),
+            to_vega(render_forecast_when_done(
+                warehouse, "astral-uv-week",
+                items=20, start_date=date(2026, 5, 11),
+            )),
         ),
         (
             "forecast_how_many",
-            json.loads(
-                render_forecast_how_many(
-                    warehouse,
-                    "astral-uv-week",
-                    start_date=date(2026, 5, 11),
-                    end_date=date(2026, 6, 10),
-                ).vega_spec_json()
-            ),
+            to_vega(render_forecast_how_many(
+                warehouse, "astral-uv-week",
+                start_date=date(2026, 5, 11), end_date=date(2026, 6, 10),
+            )),
         ),
         (
             "cfd",

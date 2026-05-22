@@ -178,22 +178,8 @@ class TestAgingPinnedToSnapshot:
         assert aging.asof_iso != "2026-05-06"
 
 
-class TestThroughputCoverage:
-    def test_coverage_uses_data_span_not_the_yaml_window(
-        self, view_factory
-    ):
-        """Throughput's coverage shading keys off the actual
-        completion span (`data_min`/`data_max`), never the
-        contract YAML window. A Data Source backfill fetches an
-        arbitrary range and never rewrites the YAML, so keying off
-        `contract.start/stop` mis-tags real completion days as
-        "no data"."""
-        view = view_factory()
-        with (
-            patch("flowmetrics.app.render_throughput") as mock_rt,
-            view.warehouse() as con,
-        ):
-            view.render_throughput(con)
-        _, kwargs = mock_rt.call_args
-        assert kwargs["warehouse_start"] == view.data_min_date
-        assert kwargs["warehouse_stop"] == view.data_max_date
+# NOTE: the throughput-coverage assertion that lived here checked
+# that the view's `render_throughput` wrapper forwarded
+# warehouse_start/warehouse_stop. The model now derives coverage
+# from its own input items (see `test_charts_throughput`), so the
+# wrapper no longer threads those args.

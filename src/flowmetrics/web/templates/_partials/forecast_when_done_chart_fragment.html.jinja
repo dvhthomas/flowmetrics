@@ -1,7 +1,7 @@
 {# Forecast WWIBD-Date chart fragment.
 
    Required context:
-     data           — WhenDoneData (vega_spec_json(), p50/p85/p95_display, headline)
+     data           — WhenDoneModel (rendered via the vega_spec Jinja global)
      chart_height   — int pixels
      contract.name  — for any back-links
 #}
@@ -52,7 +52,7 @@
         catch (e) { /* finalize is best-effort */ }
         window.__flowmetricsForecastWhenDoneView = null;
       }
-      const spec = {{ data.vega_spec_json() | safe }};
+      const spec = {{ vega_spec(data) | safe }};
       spec.height = {{ _h }};
       // First-paint fix: nominal x-axis with `width: "container"`
       // locks in step-based sizing at embed time. If embed runs
