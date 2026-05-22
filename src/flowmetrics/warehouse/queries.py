@@ -213,6 +213,22 @@ def pairwise_stage_precedence(
     return [(str(a), str(b), int(c)) for (a, b, c) in rows]
 
 
+def creations_by_day(
+    con: duckdb.DuckDBPyConnection, contract_name: str
+) -> list[tuple[date, int]]:
+    """Per-day count of work items created. Ascending date order;
+    days with no creations are NOT included (the model fills them
+    in)."""
+    rows = con.execute(
+        "SELECT CAST(created_at AS DATE), count(*) "
+        "FROM work_items "
+        "WHERE contract_id = ? AND created_at IS NOT NULL "
+        "GROUP BY 1 ORDER BY 1",
+        [contract_name],
+    ).fetchall()
+    return [(d, int(c)) for d, c in rows]
+
+
 def count_open_items(
     con: duckdb.DuckDBPyConnection, contract_name: str
 ) -> int:

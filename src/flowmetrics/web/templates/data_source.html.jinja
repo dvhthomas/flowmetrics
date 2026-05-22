@@ -54,7 +54,7 @@
     {% if coverage.days %}
     <script>
       (function () {
-        const spec = {{ coverage.vega_spec_json() | safe }};
+        const spec = {{ vega_spec(coverage) | safe }};
         vegaEmbed("#ds-coverage", window.applyTheme(spec), {
           actions: false, renderer: "svg"
         }).catch(function (err) {
