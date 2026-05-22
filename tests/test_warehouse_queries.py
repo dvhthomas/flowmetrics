@@ -9,11 +9,17 @@ table directly — no warehouse fixture, no CLI.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 
 import duckdb
 
-from flowmetrics.warehouse.queries import CompletedItem, completed_items
+from flowmetrics.warehouse.queries import (
+    CompletedItem,
+    InFlightItem,
+    completed_items,
+    count_open_items,
+    in_flight_snapshot,
+)
 
 
 def _warehouse() -> duckdb.DuckDBPyConnection:
@@ -80,3 +86,99 @@ class TestCompletedItems:
 
     def test_unknown_contract_returns_empty(self):
         assert completed_items(_warehouse(), "nope") == []
+
+
+def _warehouse_with_transitions() -> duckdb.DuckDBPyConnection:
+    con = duckdb.connect(":memory:")
+    con.execute(
+        """CREATE TABLE work_items (
+            contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+            title VARCHAR, url VARCHAR,
+            created_at TIMESTAMP, completed_at TIMESTAMP,
+            cycle_time_days DOUBLE)"""
+    )
+    con.execute(
+        """CREATE TABLE transitions (
+            contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+            entered_at TIMESTAMP, stage VARCHAR, signal VARCHAR)"""
+    )
+    con.executemany(
+        "INSERT INTO work_items VALUES (?,?,?,?,?,?,?,?)",
+        [
+            # open at 2026-02-01: created before, not completed
+            ("c", "github", "#1", "one", None,
+             datetime(2026, 1, 1), None, None),
+            # open: created before, completed AFTER the snapshot
+            ("c", "github", "#2", "two", None,
+             datetime(2026, 1, 5), datetime(2026, 3, 1), None),
+            # closed: completed before the snapshot
+            ("c", "github", "#3", "three", None,
+             datetime(2026, 1, 2), datetime(2026, 1, 20), 18.0),
+            # not yet created at the snapshot
+            ("c", "github", "#4", "four", None,
+             datetime(2026, 2, 15), None, None),
+            # open, never transitioned
+            ("c", "github", "#5", "five", None,
+             datetime(2026, 1, 10), None, None),
+        ],
+    )
+    con.executemany(
+        "INSERT INTO transitions VALUES (?,?,?,?,?,?)",
+        [
+            ("c", "github", "#1", datetime(2026, 1, 2), "Draft", "open"),
+            ("c", "github", "#1", datetime(2026, 1, 10), "Review", "ready"),
+            # a transition AFTER the snapshot — must be ignored
+            ("c", "github", "#1", datetime(2026, 3, 5), "Merged", "merge"),
+            ("c", "github", "#2", datetime(2026, 1, 6), "Draft", "open"),
+        ],
+    )
+    return con
+
+
+def _by_id(items: list[InFlightItem], item_id: str) -> InFlightItem:
+    return next(i for i in items if i.item_id == item_id)
+
+
+class TestInFlightSnapshot:
+    ASOF = date(2026, 2, 1)
+
+    def test_includes_items_open_at_the_snapshot(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert {i.item_id for i in items} == {"#1", "#2", "#5"}
+
+    def test_excludes_items_completed_by_the_snapshot(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert "#3" not in {i.item_id for i in items}
+
+    def test_excludes_items_created_after_the_snapshot(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert "#4" not in {i.item_id for i in items}
+
+    def test_item_completed_after_the_snapshot_is_still_in_flight(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert "#2" in {i.item_id for i in items}
+
+    def test_current_state_is_the_latest_transition_at_or_before_asof(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert _by_id(items, "#1").current_state == "Review"
+
+    def test_transitions_after_asof_do_not_set_the_state(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert _by_id(items, "#1").current_state != "Merged"
+
+    def test_item_with_no_transitions_is_unknown(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert _by_id(items, "#5").current_state == "Unknown"
+
+    def test_rows_are_ordered_by_creation(self):
+        items = in_flight_snapshot(_warehouse_with_transitions(), "c", self.ASOF)
+        assert [i.item_id for i in items] == ["#1", "#2", "#5"]
+
+
+class TestCountOpenItems:
+    def test_counts_items_with_no_completion(self):
+        # #1, #4, #5 have completed_at NULL.
+        assert count_open_items(_warehouse_with_transitions(), "c") == 3
+
+    def test_zero_for_an_unknown_contract(self):
+        assert count_open_items(_warehouse_with_transitions(), "nope") == 0
