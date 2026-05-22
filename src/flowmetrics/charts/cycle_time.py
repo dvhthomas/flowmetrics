@@ -5,20 +5,26 @@ window into a `CycleTimeModel`: every chart decision resolved,
 nothing left for the view to decide. Pure Python — no DuckDB, no
 Vega.
 
-The cap control, the tick policy and the linear-interpolation
-percentile live HERE for now. When the aging chart needs them too
-(refactor Slice 2) they move to `flowmetrics.charts.primitives`.
+The percentile and cap-slider logic is shared with the aging
+chart — see `flowmetrics.charts.primitives`. `TickPolicy` is
+cycle-time-only for now; it moves to `primitives` when a second
+chart needs span-adaptive ticks.
 """
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 
 from ..utc_dates import attach_utc, to_utc_display_date, to_utc_iso_date
 from ..warehouse.queries import CompletedItem
 from ..windows import Window
+from .primitives import (
+    Percentiles,
+    RangeControl,
+    percentiles_from,
+    range_control,
+)
 
 
 @dataclass(frozen=True)
@@ -45,48 +51,21 @@ class TickPolicy:
 
 
 @dataclass(frozen=True)
-class CapControl:
-    """A y-axis cap slider. The view FILTERS out items above the
-    slider value and lets the axis re-scale. Runs `floor`..`ceiling`
-    and opens at `default`."""
-
-    floor: int
-    ceiling: int
-    default: int
-
-
-@dataclass(frozen=True)
 class CycleTimeModel:
     """Fully-resolved cycle-time chart. The template and the Vega
     view read these fields; neither re-derives anything."""
 
     item_count: int
     points: tuple[CyclePoint, ...]
-    p50: float
-    p85: float
-    p95: float
+    percentiles: Percentiles
     headline: str
     ticks: TickPolicy
     x_domain: tuple[str, str] | None
-    cap: CapControl | None
+    cap: RangeControl | None
 
     @property
     def is_empty(self) -> bool:
         return self.item_count == 0
-
-
-def _percentile_cont(values: list[float], p: float) -> float:
-    """Linear-interpolation percentile — matches DuckDB
-    `percentile_cont`. Empty sample → 0.0."""
-    if not values:
-        return 0.0
-    ordered = sorted(values)
-    if len(ordered) == 1:
-        return ordered[0]
-    rank = p * (len(ordered) - 1)
-    lo = math.floor(rank)
-    hi = math.ceil(rank)
-    return ordered[lo] + (rank - lo) * (ordered[hi] - ordered[lo])
 
 
 def _tick_policy(span_days: int) -> TickPolicy:
@@ -146,18 +125,12 @@ def build_cycle_time_model(
     # Percentiles sample the windowed items' cycle times — the
     # lines summarise the dots on screen. Items with no recorded
     # cycle time are still plotted (at 0) but not sampled.
-    cycle_sample = [
-        it.cycle_time_days
-        for it, _ in windowed
-        if it.cycle_time_days is not None
-    ]
-    p50 = _percentile_cont(cycle_sample, 0.50)
-    p85 = _percentile_cont(cycle_sample, 0.85)
-    p95 = _percentile_cont(cycle_sample, 0.95)
-
+    pct = percentiles_from(
+        [it.cycle_time_days for it, _ in windowed if it.cycle_time_days is not None]
+    )
     headline = (
         f"{len(points)} items completed · "
-        f"P50 {p50:.1f}d · P85 {p85:.1f}d · P95 {p95:.1f}d"
+        f"P50 {pct.p50:.1f}d · P85 {pct.p85:.1f}d · P95 {pct.p95:.1f}d"
     )
 
     point_dates = sorted({p.completed_at for p in points})
@@ -173,30 +146,14 @@ def build_cycle_time_model(
     return CycleTimeModel(
         item_count=len(points),
         points=points,
-        p50=p50,
-        p85=p85,
-        p95=p95,
+        percentiles=pct,
         headline=headline,
         ticks=_tick_policy((last - first).days),
         x_domain=x_domain,
-        cap=_cap_control(points, p95),
+        # The cap slider runs from the P95 line up to the slowest
+        # item; absent when there's nothing to crop.
+        cap=range_control(pct.p95, [p.cycle_time_days for p in points]),
     )
-
-
-def _cap_control(
-    points: tuple[CyclePoint, ...], p95: float
-) -> CapControl | None:
-    """The y-cap slider runs from the P95 line up to the slowest
-    item. Absent when there's nothing to crop — fewer than two
-    items, or P95 already at the maximum."""
-    cycle_vals = sorted(p.cycle_time_days for p in points)
-    if len(cycle_vals) < 2:
-        return None
-    floor = math.ceil(p95)
-    ceiling = math.ceil(cycle_vals[-1])
-    if floor >= ceiling:
-        return None
-    return CapControl(floor=floor, ceiling=ceiling, default=ceiling)
 
 
 def _empty_model(all_items: list[CompletedItem]) -> CycleTimeModel:
@@ -222,9 +179,7 @@ def _empty_model(all_items: list[CompletedItem]) -> CycleTimeModel:
     return CycleTimeModel(
         item_count=0,
         points=(),
-        p50=0.0,
-        p85=0.0,
-        p95=0.0,
+        percentiles=Percentiles(p50=0.0, p85=0.0, p95=0.0, source_count=0),
         headline=headline,
         ticks=TickPolicy("day", 1),
         x_domain=None,

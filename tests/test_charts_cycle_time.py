@@ -13,13 +13,7 @@ from __future__ import annotations
 import math
 from datetime import date, datetime, timedelta
 
-import pytest
-
-from flowmetrics.charts.cycle_time import (
-    CapControl,
-    TickPolicy,
-    build_cycle_time_model,
-)
+from flowmetrics.charts.cycle_time import TickPolicy, build_cycle_time_model
 from flowmetrics.warehouse.queries import CompletedItem
 from flowmetrics.windows import Window
 
@@ -63,20 +57,13 @@ class TestShape:
 
 
 class TestPercentiles:
-    def test_ordered_p50_le_p85_le_p95(self):
-        m = _run(40)
-        assert m.p50 <= m.p85 <= m.p95
+    """Exact linear-interpolation values are tested in
+    test_charts_primitives.py; here we pin only the cycle-time
+    behaviour — the sample is the windowed items."""
 
-    def test_linear_interpolation_matches_percentile_cont(self):
-        # cycle times 1..10 — DuckDB percentile_cont reference values.
-        items = [
-            _item(i, date(2026, 1, 1) + timedelta(days=i - 1), float(i))
-            for i in range(1, 11)
-        ]
-        m = build_cycle_time_model(items, view=None)
-        assert m.p50 == 5.5                    # 1 + 0.50*(10-1)
-        assert m.p85 == pytest.approx(8.65)    # 1 + 0.85*9
-        assert m.p95 == pytest.approx(9.55)    # 1 + 0.95*9
+    def test_ordered_p50_le_p85_le_p95(self):
+        p = _run(40).percentiles
+        assert p.p50 <= p.p85 <= p.p95
 
     def test_percentiles_shift_when_the_window_narrows(self):
         """The percentile sample is the windowed items — narrowing
@@ -89,7 +76,7 @@ class TestPercentiles:
         narrow = build_cycle_time_model(
             items, view=Window(from_=date(2026, 1, 1), to=date(2026, 1, 5)),
         )
-        assert narrow.p95 < wide.p95
+        assert narrow.percentiles.p95 < wide.percentiles.p95
 
 
 class TestWindowing:
@@ -144,7 +131,7 @@ class TestCapControl:
         ] + [_item(99, date(2026, 3, 1), 500.0)]
         m = build_cycle_time_model(items, view=None)
         assert m.cap is not None
-        assert m.cap.floor == math.ceil(m.p95)
+        assert m.cap.floor == math.ceil(m.percentiles.p95)
         assert m.cap.ceiling == 500
         assert m.cap.default == m.cap.ceiling  # opens showing all
 

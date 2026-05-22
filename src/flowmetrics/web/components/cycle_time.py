@@ -83,10 +83,11 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
         }
         for p in model.points
     ]
+    pct = model.percentiles
     reference_rows = [
-        {"y": model.p50, "label": f"P50 ({model.p50:.1f}d)", "pct": "P50"},
-        {"y": model.p85, "label": f"P85 ({model.p85:.1f}d)", "pct": "P85"},
-        {"y": model.p95, "label": f"P95 ({model.p95:.1f}d)", "pct": "P95"},
+        {"y": pct.p50, "label": f"P50 ({pct.p50:.1f}d)", "pct": "P50"},
+        {"y": pct.p85, "label": f"P85 ({pct.p85:.1f}d)", "pct": "P85"},
+        {"y": pct.p95, "label": f"P95 ({pct.p95:.1f}d)", "pct": "P95"},
     ]
 
     # X scale + tick interval come straight from the model.

@@ -103,8 +103,9 @@ class TestToVegaStructure:
     def test_percentile_values_reach_the_reference_rows(self):
         model = _model()
         rows = to_vega(model)["layer"][1]["data"]["values"]
+        pct = model.percentiles
         assert {r["pct"]: r["y"] for r in rows} == {
-            "P50": model.p50, "P85": model.p85, "P95": model.p95,
+            "P50": pct.p50, "P85": pct.p85, "P95": pct.p95,
         }
 
     def test_tick_interval_reaches_the_x_axis(self):
