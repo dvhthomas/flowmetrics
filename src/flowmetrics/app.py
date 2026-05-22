@@ -379,10 +379,7 @@ class WorkflowView:
         )
 
     def render_lifecycle(self, con, *, source: str, item_id: str):
-        return render_lifecycle(
-            con, self.id, source, item_id,
-            reference=self.reference_period,
-        )
+        return render_lifecycle(con, self.id, source, item_id)
 
 
 def create_app(

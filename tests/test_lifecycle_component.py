@@ -440,22 +440,6 @@ class TestLifecycleShape:
             f"vs {canonical!r}"
         )
 
-    def test_payload_carries_human_readable_elapsed(self, warehouse):
-        """Two views of duration on the lifecycle page:
-          - `cycle_time_days` — the Vacanti metric (elapsed + 1)
-          - `elapsed_display` — the actual wall-clock span ("9h 53m")
-        Surfacing both lets the viewer reconcile the chart's time
-        axis with the metric used everywhere else."""
-        data = render(warehouse, "astral-uv-week", "github", "#19330")
-        # #19330's wall-clock span is 9h 53m (see fixture).
-        # The display string follows the lifecycle component's
-        # `_duration_display` formatting.
-        assert data.elapsed_display, "elapsed_display must be set"
-        assert "h" in data.elapsed_display or "m" in data.elapsed_display, (
-            f"elapsed_display should be `Xh Ym`-style; got "
-            f"{data.elapsed_display!r}"
-        )
-
     def test_payload_is_jsonable_for_vega_lite(self, warehouse, known_item):
         """The events list serialises to a flat list of dicts that
         Vega-Lite can consume directly as inline data. The component

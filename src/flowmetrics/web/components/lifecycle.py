@@ -20,7 +20,6 @@ from typing import Literal
 import duckdb
 
 from ...utc_dates import attach_utc, to_utc_display_date
-from ...windows import Window
 
 
 class ItemNotFound(Exception):
@@ -95,23 +94,6 @@ class LifecycleData:
     # lifecycle page reports the SAME number the work-items table
     # does (Vacanti's elapsed-plus-one-day).
     cycle_time_days: float
-    # Wall-clock elapsed time between the first and last event,
-    # formatted as a human-readable string ("9h 53m"). Distinct
-    # from cycle_time_days because the chart's time axis shows
-    # this span, not the Vacanti metric.
-    elapsed_display: str
-    # Reference-period percentile thresholds (cycle-time
-    # distribution). Surface them on the lifecycle page so the
-    # viewer can see whether the item is past P50/P85/P95 — the
-    # statistical context the per-item view otherwise lacks.
-    # Same source as the cycle-time and aging charts.
-    p50_days: float
-    p85_days: float
-    p95_days: float
-    # Provenance count — how many completed items informed those
-    # percentiles. Shown as "from N items" so the viewer can
-    # judge whether the thresholds are statistically meaningful.
-    percentile_source_count: int
 
 
 def _display_datetime(d) -> str:
@@ -157,16 +139,9 @@ def render(
     contract_name: str,
     source: str,
     item_id: str,
-    *,
-    reference: Window | None = None,
 ) -> LifecycleData:
     """Read the item's identity + every transition, return a payload
     the timeline partial can render.
-
-    `reference`: when supplied, P50/P85/P95 thresholds drawn from
-    completions inside that inclusive window (matches the cycle-
-    time / aging chart's percentile source). When None, the full
-    completion history feeds the percentiles.
 
     Raises ItemNotFound if the (contract, source, item_id) tuple
     doesn't match any work_items row."""
@@ -302,45 +277,6 @@ def render(
         ]
     )
 
-    # Wall-clock elapsed time between item start and finish.
-    # Derived from the SAME (created_at, completed_at) timestamps
-    # the materialise step uses to compute cycle_time_days — that
-    # way the relationship "cycle_time = elapsed + 1 day" holds
-    # exactly, not approximately. If we derived from the events
-    # list instead, a missing/duplicate event would silently
-    # break the reconciliation.
-    if header_created_at is not None and header_completed_at is not None:
-        created_aware = attach_utc(header_created_at)
-        completed_aware = attach_utc(header_completed_at)
-        elapsed_seconds = max(
-            0.0,
-            (completed_aware - created_aware).total_seconds(),
-        )
-        elapsed_display = _duration_display(elapsed_seconds)
-    else:
-        elapsed_display = "0s"
-
-    # Reference-period percentile thresholds. Same source query
-    # the cycle-time and aging charts use, so per-item view's
-    # P-lines match what those charts show.
-    pct_where = ["contract_id = ?", "cycle_time_days IS NOT NULL"]
-    pct_params: list = [contract_name]
-    if reference is not None:
-        pct_where.append("CAST(completed_at AS DATE) BETWEEN ? AND ?")
-        pct_params.extend([reference.from_, reference.to])
-    pct_row = con.execute(
-        f"SELECT percentile_cont(0.50) WITHIN GROUP (ORDER BY cycle_time_days), "
-        f"       percentile_cont(0.85) WITHIN GROUP (ORDER BY cycle_time_days), "
-        f"       percentile_cont(0.95) WITHIN GROUP (ORDER BY cycle_time_days), "
-        f"       count(*) "
-        f"FROM work_items WHERE {' AND '.join(pct_where)}",
-        pct_params,
-    ).fetchone()
-    p50_days = float(pct_row[0] or 0.0)
-    p85_days = float(pct_row[1] or 0.0)
-    p95_days = float(pct_row[2] or 0.0)
-    percentile_source_count = int(pct_row[3] or 0)
-
     return LifecycleData(
         item_id=item_id,
         source=source,
@@ -359,9 +295,4 @@ def render(
         cycle_time_days=(
             float(cycle_time_days) if cycle_time_days is not None else 0.0
         ),
-        elapsed_display=elapsed_display,
-        p50_days=p50_days,
-        p85_days=p85_days,
-        p95_days=p95_days,
-        percentile_source_count=percentile_source_count,
     )

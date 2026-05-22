@@ -1,5 +1,8 @@
 {% extends "_base.html.jinja" %}
 
+{# A per-item page; the Period filter doesn't apply. #}
+{% block filter_bar %}{% endblock %}
+
 {% block content %}
   {% set _headline -%}
     {{ data.events|length }} stage event{% if data.events|length != 1 %}s{% endif %}
@@ -9,24 +12,10 @@
     {% include "_partials/metric_summary.html.jinja" %}
   {% endwith %}
 
-  {# Cycle time strip: surface both numbers — the per-day metric
-     the rest of the system uses (Vacanti's `FD - SD + 1`, whole
-     calendar days, both endpoints inclusive) AND the wall-clock
-     elapsed time the timeline above shows. Reconciles the two so
-     a viewer doesn't read "1d" on the metric and "10 hours" on
-     the chart and wonder which is right. #}
+  {% if data.cycle_time_days > 0 %}
   <div class="lifecycle-metric-strip">
     <span class="lifecycle-metric-strip-label">Cycle time</span>
     <span class="lifecycle-metric-strip-value">{{ data.cycle_time_days|int }}d</span>
-    <span class="lifecycle-metric-strip-formula">elapsed {{ data.elapsed_display }} · calendar days, ends inclusive (Vacanti)</span>
-  </div>
-  {% if data.percentile_source_count > 0 %}
-  <div class="lifecycle-percentile-strip">
-    <span class="lifecycle-percentile-label">Team thresholds</span>
-    <span class="lifecycle-percentile-cell">P50 {{ data.p50_days|round(1) }}d</span>
-    <span class="lifecycle-percentile-cell">P85 {{ data.p85_days|round(1) }}d</span>
-    <span class="lifecycle-percentile-cell">P95 {{ data.p95_days|round(1) }}d</span>
-    <span class="lifecycle-percentile-source">from {{ data.percentile_source_count }} completed items</span>
   </div>
   {% endif %}
 
