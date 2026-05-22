@@ -3,7 +3,8 @@
    `/api/internal/cfd` as the HTMX swap payload.
 
    Required context:
-     data           — CfdData
+     data           — CfdModel (rendered to a spec via the
+                      `vega_spec` Jinja global)
      chart_height   — int pixels (~320 for tile, ~440 for detail)
      contract.name  — for any back-links
 #}
@@ -26,7 +27,7 @@
       catch (e) { /* finalize is best-effort */ }
       window.__flowmetricsCfdView = null;
     }
-    const spec = {{ data.vega_spec_json() | safe }};
+    const spec = {{ vega_spec(data) | safe }};
     spec.height = {{ _h }};
     vegaEmbed("#{{ chart_container_id }}", window.applyTheme(spec), {
       actions: false,

@@ -1,0 +1,192 @@
+"""Layer 2 — the Cumulative Flow Diagram (CFD) chart model.
+
+`build_cfd_model` turns first-entry rows + a stage order + a view
+window into a `CfdModel`: every chart decision resolved, including
+the visual-window clamping and the y-floor crop bounds. Pure
+Python — no DuckDB, no Vega.
+
+The Vacanti invariants this preserves:
+
+  #1  Top line = cumulative arrivals; bottom = cumulative departures.
+  #2  No line decreases over time.
+  #3  count(earlier) >= count(later) for every date and every
+      adjacent pair (so the bands never cross).
+
+`infer_stage_order` is the pairwise-precedence resolver used when
+no contract YAML pins the workflow.
+
+Reference: Vacanti, *Actionable Agile Metrics for Predictability*,
+10th Anniversary Edition, ch. 3.
+"""
+
+from __future__ import annotations
+
+from bisect import bisect_right
+from dataclasses import dataclass, field
+from datetime import UTC, date, datetime, timedelta
+
+from ..utc_dates import to_utc_display_date
+from ..warehouse.queries import StageEntry
+from ..windows import Window
+from .primitives import RangeControl
+
+
+@dataclass(frozen=True)
+class CfdDailyPoint:
+    """Cumulative arrivals at each stage as of `date_iso`."""
+
+    date_iso: str
+    date_display: str
+    counts: dict[str, int] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class CfdModel:
+    """Fully-resolved CFD chart. The template and the Vega view
+    read these fields; neither re-derives anything."""
+
+    daily: tuple[CfdDailyPoint, ...]
+    stages: tuple[str, ...]
+    headline: str
+    first_date_iso: str | None
+    last_date_iso: str | None
+    # The y-floor "crop base" slider — runs 0..left-edge-carry-in,
+    # opens at 0. Absent when the window's left edge has no inert
+    # carry-in to crop (the cumulative starts at 0 there).
+    crop: RangeControl | None
+
+    @property
+    def is_empty(self) -> bool:
+        return not self.daily
+
+
+def infer_stage_order(
+    pairs: list[tuple[str, str, int]], all_stages: list[str],
+) -> tuple[str, ...]:
+    """Pairwise-precedence ordering. Each stage's net `precedes`
+    count (precedes − preceded-by) drives the sort: higher = earlier
+    in workflow. Alphabetical tiebreak for stages that never
+    co-occur. Robust against items skipping an early stage."""
+    if not all_stages:
+        return ()
+    precedes: dict[str, int] = {s: 0 for s in all_stages}
+    for earlier, later, cnt in pairs:
+        precedes[earlier] = precedes.get(earlier, 0) + cnt
+        precedes[later] = precedes.get(later, 0) - cnt
+    return tuple(sorted(all_stages, key=lambda s: (-precedes[s], s)))
+
+
+def _reached_dates(
+    entries: list[StageEntry], stages: tuple[str, ...],
+) -> dict[str, list[date]]:
+    """For each stage, the dates per item at which the item reached
+    that stage OR any later stage.
+
+    Items that skipped an early stage propagate a later-stage entry
+    backward to set a 'reached' date for every earlier stage too —
+    without this expansion the bands cross (count(later) > count
+    (earlier)) when an item enters mid-workflow.
+    """
+    per_item: dict[str, dict[str, date]] = {}
+    for e in entries:
+        per_item.setdefault(e.item_id, {})[e.stage] = e.entered_date
+    reached: dict[str, list[date]] = {s: [] for s in stages}
+    for item_entries in per_item.values():
+        running: date | None = None
+        for stage in reversed(stages):
+            own = item_entries.get(stage)
+            if own is not None and (running is None or own < running):
+                running = own
+            if running is not None:
+                reached[stage].append(running)
+    return reached
+
+
+def _empty(headline: str = "No transitions yet.") -> CfdModel:
+    return CfdModel(
+        daily=(),
+        stages=(),
+        headline=headline,
+        first_date_iso=None,
+        last_date_iso=None,
+        crop=None,
+    )
+
+
+def _display(d: date) -> str:
+    return to_utc_display_date(datetime(d.year, d.month, d.day, tzinfo=UTC))
+
+
+def build_cfd_model(
+    entries: list[StageEntry],
+    stages: tuple[str, ...],
+    *,
+    view: Window | None = None,
+) -> CfdModel:
+    """Build the CFD model from first-stage-entry rows.
+
+    `view` is a VISUAL window — it clamps the x-axis viewport to
+    its intersection with the observed data span. The cumulative
+    math stays full-history, so the carry-in at the window's left
+    edge is the true running total.
+    """
+    if not stages or not entries:
+        return _empty()
+
+    reached = _reached_dates(entries, stages)
+    for s in reached:
+        reached[s].sort()
+
+    all_dates = [e.entered_date for e in entries]
+    data_min, data_max = min(all_dates), max(all_dates)
+    if view is not None:
+        first_date = max(view.from_, data_min)
+        last_date = min(view.to, data_max)
+    else:
+        first_date, last_date = data_min, data_max
+    if first_date > last_date:
+        return _empty("No transitions in the selected period.")
+
+    daily: list[CfdDailyPoint] = []
+    cur = first_date
+    while cur <= last_date:
+        counts: dict[str, int] = {}
+        for stage in stages:
+            counts[stage] = bisect_right(reached[stage], cur)
+        daily.append(
+            CfdDailyPoint(
+                date_iso=cur.isoformat(),
+                date_display=_display(cur),
+                counts=counts,
+            )
+        )
+        cur += timedelta(days=1)
+
+    terminal = stages[-1]
+    departures = daily[-1].counts[terminal]
+    # Distinct items the workflow has touched. count[stages[0]] would
+    # undercount items that skipped the first stage (e.g. a PR opened
+    # straight into Awaiting Review).
+    total_distinct = len({e.item_id for e in entries})
+    in_flight = total_distinct - departures
+    headline = (
+        f"{total_distinct} item{'' if total_distinct == 1 else 's'} touched · "
+        f"{departures} departed · {in_flight} in the system · "
+        f"{len(daily)} day{'' if len(daily) == 1 else 's'} "
+        f"({_display(first_date)} – {_display(last_date)})"
+    )
+
+    base_carry_in = daily[0].counts[terminal]
+    crop = (
+        RangeControl(floor=0, ceiling=base_carry_in, default=0)
+        if base_carry_in > 1 else None
+    )
+
+    return CfdModel(
+        daily=tuple(daily),
+        stages=stages,
+        headline=headline,
+        first_date_iso=first_date.isoformat(),
+        last_date_iso=last_date.isoformat(),
+        crop=crop,
+    )
