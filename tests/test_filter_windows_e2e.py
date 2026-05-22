@@ -88,8 +88,8 @@ def _materialise_wide(
         _item("#901", created=now - timedelta(days=20), completed=None),
         _item("#902", created=now - timedelta(days=8), completed=None),
         _item("#903", created=now - timedelta(days=2), completed=None),
-        # A deeply-stale open item — its age dwarfs a short
-        # reference window, tripping the aging "smell" warning.
+        # A deeply-stale open item — gives the aging chart an
+        # outlier so the cap-slider range is meaningful.
         _item("#904", created=now - timedelta(days=400), completed=None),
     ]
     source = MagicMock()
@@ -347,21 +347,6 @@ class TestFilterPropagationToText:
             f"cycle-time headline must change with the Period; "
             f"7d={h7!r}  90d={h90!r}"
         )
-
-    def test_aging_tile_surfaces_the_smell_warning(
-        self, server_url: str, page: Page
-    ):
-        """When in-flight ages dwarf the reference window the
-        percentile lines are an unreliable benchmark — the
-        'smell' warning must show on the dashboard aging TILE,
-        not only the detail page."""
-        page.goto(
-            f"{server_url}/workflows/wide-demo?period=last-7-days"
-        )
-        page.wait_for_selector("#aging-tile", timeout=15000)
-        # `wide-demo` has a 400-day-old open item vs a 7-day
-        # reference → the smell fires.
-        expect(page.locator(".aging-smell")).to_be_visible()
 
     def test_throughput_headline_follows_the_period(
         self, server_url: str, page: Page

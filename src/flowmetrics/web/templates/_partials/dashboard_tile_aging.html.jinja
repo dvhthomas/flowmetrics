@@ -1,16 +1,6 @@
 {% with summary = {"title": "Aging WIP", "headline": data.headline} %}
   {% include "_partials/metric_summary.html.jinja" %}
 {% endwith %}
-{# Surface the percentile-provenance smell here too, not only on
-   the detail page — when in-flight ages dwarf the reference
-   window the threshold lines are an unreliable benchmark, and the
-   operator should see that warning right on the dashboard. #}
-{% if data.smell %}
-  <div class="aging-smell" role="note">
-    <span class="aging-smell-icon" aria-hidden="true">⚠</span>
-    <span class="aging-smell-text">{{ data.smell_text }}</span>
-  </div>
-{% endif %}
 {% with mode = 'tile', data = data %}
   {% include "_partials/aging_tile.html.jinja" %}
 {% endwith %}

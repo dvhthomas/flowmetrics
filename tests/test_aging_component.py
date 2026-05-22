@@ -2,8 +2,8 @@
 (`flowmetrics.web.components.aging`).
 
 The chart DECISIONS — age, the WIP filter, percentile thresholds,
-the empty-state classification, the smell flag, the cap bounds,
-column order and WIP-count badges — are tested at Layer 2 in
+the empty-state classification, the cap bounds, column order and
+WIP-count badges — are tested at Layer 2 in
 `test_charts_aging.py`, with no warehouse and no Vega. This file
 covers the view only:
 

@@ -151,30 +151,6 @@ class TestHeadline:
         assert "no percentile thresholds" in m.headline
 
 
-class TestSmell:
-    def test_flags_when_ages_dwarf_the_reference_window(self):
-        # in-flight aged ~100d against a 7-day reference window.
-        m = _build(
-            [_inflight(1, date(2026, 2, 22))],
-            [_completed(1, date(2026, 5, 25), 3.0)],
-            reference=Window(from_=date(2026, 5, 25), to=date(2026, 5, 31)),
-        )
-        assert m.smell is True
-        assert m.smell_text
-
-    def test_no_smell_when_ages_are_within_range(self):
-        m = _build(
-            [_inflight(1, date(2026, 5, 28))],
-            [_completed(1, date(2026, 5, 1), 3.0)],
-            reference=Window(from_=date(2026, 5, 1), to=date(2026, 5, 31)),
-        )
-        assert m.smell is False
-
-    def test_no_smell_without_a_percentile_sample(self):
-        m = _build([_inflight(1, date(2026, 1, 1))], [])
-        assert m.smell is False
-
-
 class TestCap:
     def _ancient_plus_bulk(self):
         items = [_inflight(i, date(2026, 5, 1)) for i in range(1, 20)]

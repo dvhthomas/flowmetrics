@@ -27,11 +27,6 @@ from .primitives import (
     range_control,
 )
 
-# In-flight ages this many times wider than the percentile sample
-# window → the thresholds are statistically shaky; the UI flags it.
-_SMELL_RATIO_THRESHOLD = 3.0
-
-
 @dataclass(frozen=True)
 class AgingPoint:
     """One in-flight item at the asof date."""
@@ -60,8 +55,6 @@ class AgingModel:
     headline: str
     empty_state: str | None
     percentiles: Percentiles
-    smell: bool
-    smell_text: str
     coverage_earliest_display: str | None
     coverage_latest_display: str | None
     ordered_states: tuple[str, ...]
@@ -151,8 +144,6 @@ def build_aging_model(
     for i in items:
         counts[i.current_state] = counts.get(i.current_state, 0) + 1
 
-    smell, smell_text = _smell(items, percentiles, sample_dates, reference)
-
     return AgingModel(
         items=tuple(items),
         count=len(items),
@@ -163,8 +154,6 @@ def build_aging_model(
             items, asof, earliest_data, latest_data, open_item_count
         ),
         percentiles=percentiles,
-        smell=smell,
-        smell_text=smell_text,
         coverage_earliest_display=(
             _display(earliest_data) if earliest_data else None
         ),
@@ -207,38 +196,6 @@ def _headline(
             "reference period"
         )
     return f"{count_part} · {pct_part}"
-
-
-def _smell(
-    items: list[AgingPoint],
-    percentiles: Percentiles,
-    sample_dates: list[date],
-    reference: Window | None,
-) -> tuple[bool, str]:
-    """Flag when in-flight ages dwarf the percentile sample window
-    — the thresholds are then drawn from too narrow a history to
-    be trustworthy. A `NNN× wider` callout against an empty sample
-    would be noise, so no smell without a sample."""
-    if not items or percentiles.source_count == 0:
-        return False, ""
-    if reference is not None:
-        # Prefer the configured window — that's what the filter
-        # bar promises; the observed span would contradict it.
-        window_days = reference.days_inclusive
-    elif sample_dates:
-        window_days = (sample_dates[-1] - sample_dates[0]).days + 1
-    else:
-        window_days = 0
-    max_age = max(i.age_days for i in items)
-    if window_days <= 0 or max_age / window_days < _SMELL_RATIO_THRESHOLD:
-        return False, ""
-    ratio = max_age / window_days
-    return True, (
-        f"In-flight ages reach {max_age}d but percentiles are drawn "
-        f"from a {window_days}d window — that's {ratio:.1f}× wider. "
-        f"Consider broadening the historical sample for more "
-        f"representative thresholds."
-    )
 
 
 def _empty_state(

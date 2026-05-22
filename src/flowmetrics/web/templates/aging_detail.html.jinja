@@ -10,13 +10,6 @@
     {% include "_partials/metric_summary.html.jinja" %}
   {% endwith %}
 
-  {% if aging.smell %}
-    <div class="aging-smell" role="note">
-      <span class="aging-smell-icon" aria-hidden="true">⚠</span>
-      <span class="aging-smell-text">{{ aging.smell_text }}</span>
-    </div>
-  {% endif %}
-
   {% with mode = 'detail', data = aging %}
     {% include "_partials/aging_tile.html.jinja" %}
   {% endwith %}
