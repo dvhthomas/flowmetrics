@@ -564,6 +564,11 @@ def create_app(
             {
                 "title": "flowmetrics",
                 "workflows": workflows,
+                # Surface the directory we actually scanned —
+                # operators routinely run `flow serve` from a place
+                # where the default `./contracts` is empty/missing
+                # and need to see the resolved path to debug.
+                "contracts_dir_display": str(contracts_dir.resolve()),
                 # Empty contract keeps `_base.html.jinja` header
                 # / filter-bar guards happy without implying a
                 # current workflow.
@@ -696,7 +701,7 @@ def create_app(
         cmd = [
             sys.executable, "-m", "flowmetrics", "materialise", workflow,
             "--data-dir", str(data_dir),
-            "--contracts-dir", str(contracts_dir),
+            "--workflows-dir", str(contracts_dir),
             "--cache-dir", str(cache_dir),
             "--since", since, "--until", until,
             "--status-file", str(spath),

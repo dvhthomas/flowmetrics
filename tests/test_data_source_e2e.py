@@ -71,7 +71,7 @@ def server_url(tmp_path_factory):
         [
             "materialise", name,
             "--data-dir", str(data_dir),
-            "--contracts-dir", str(contracts_dir),
+            "--workflows-dir", str(contracts_dir),
             "--cache-dir", str(FIXTURE_CACHE),
             "--offline",
         ],

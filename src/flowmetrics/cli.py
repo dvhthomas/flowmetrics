@@ -1060,11 +1060,11 @@ def forecast_how_many(
     help="Directory where work_items/, transitions/, runs/ Parquet land.",
 )
 @click.option(
-    "--contracts-dir",
+    "--workflows-dir", "contracts_dir",
     type=click.Path(path_type=Path),
     default=Path("./contracts"),
     show_default=True,
-    help="Directory holding contract YAML files (one file per contract).",
+    help="Directory of workflow YAMLs (one per workflow).",
 )
 @click.option(
     "--cache-dir",
@@ -1257,7 +1257,7 @@ def _assert_port_available(host: str, port: int) -> None:
     show_default=True,
 )
 @click.option(
-    "--contracts-dir",
+    "--workflows-dir", "contracts_dir",
     type=click.Path(path_type=Path),
     default=Path("./contracts"),
     show_default=True,
@@ -1304,5 +1304,11 @@ def serve(
         contracts_dir=contracts_dir,
         password=password,
     )
+    # Banner names the resolved paths so a confused operator
+    # ("why is the dashboard empty?") immediately sees what's
+    # being scanned and can re-point with --data-dir /
+    # --workflows-dir.
     click.echo(f"flow serve listening on http://{host}:{port}/")
+    click.echo(f"  data_dir:      {data_dir.resolve()}")
+    click.echo(f"  workflows_dir: {contracts_dir.resolve()}")
     uvicorn.run(app, host=host, port=port, log_level="info")

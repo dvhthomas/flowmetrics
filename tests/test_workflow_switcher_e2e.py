@@ -94,7 +94,7 @@ def server_url(tmp_path_factory):
                 name,
                 "--data-dir",
                 str(data_dir),
-                "--contracts-dir",
+                "--workflows-dir",
                 str(contracts_dir),
                 "--cache-dir",
                 str(FIXTURE_CACHE),

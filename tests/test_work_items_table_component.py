@@ -54,7 +54,7 @@ def warehouse() -> duckdb.DuckDBPyConnection:
             "astral-uv-week",
             "--data-dir",
             str(data_dir),
-            "--contracts-dir",
+            "--workflows-dir",
             str(contracts_dir),
             "--cache-dir",
             str(FIXTURE_CACHE),

@@ -78,7 +78,7 @@ class TestMaterialiseStatusFile:
             [
                 "materialise", "astral-uv-week",
                 "--data-dir", str(tmp / "data"),
-                "--contracts-dir", str(contracts),
+                "--workflows-dir", str(contracts),
                 "--cache-dir", str(FIXTURE_CACHE),
                 "--offline",
                 "--status-file", str(status),
@@ -103,7 +103,7 @@ class TestMaterialiseStatusFile:
             [
                 "materialise", "does-not-exist",
                 "--data-dir", str(tmp / "data"),
-                "--contracts-dir", str(contracts),
+                "--workflows-dir", str(contracts),
                 "--cache-dir", str(FIXTURE_CACHE),
                 "--offline",
                 "--status-file", str(status),
@@ -124,7 +124,7 @@ class TestMaterialiseStatusFile:
             [
                 "materialise", "astral-uv-week",
                 "--data-dir", str(tmp / "data"),
-                "--contracts-dir", str(contracts),
+                "--workflows-dir", str(contracts),
                 "--cache-dir", str(FIXTURE_CACHE),
                 "--offline",
             ],
@@ -196,7 +196,7 @@ class TestMaterialiseSnapshotsAreAdditive:
                 [
                     "materialise", "astral-uv-week",
                     "--data-dir", str(data),
-                    "--contracts-dir", str(contracts),
+                    "--workflows-dir", str(contracts),
                     "--cache-dir", str(FIXTURE_CACHE),
                     "--offline",
                 ],
@@ -230,7 +230,7 @@ class TestMaterialiseSweepsStaleTmp:
             [
                 "materialise", "astral-uv-week",
                 "--data-dir", str(data),
-                "--contracts-dir", str(contracts),
+                "--workflows-dir", str(contracts),
                 "--cache-dir", str(FIXTURE_CACHE),
                 "--offline",
             ],
@@ -255,7 +255,7 @@ class TestCompaction:
             [
                 "materialise", "astral-uv-week",
                 "--data-dir", str(data),
-                "--contracts-dir", str(contracts),
+                "--workflows-dir", str(contracts),
                 "--cache-dir", str(FIXTURE_CACHE),
                 "--offline",
             ],

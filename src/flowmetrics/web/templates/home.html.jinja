@@ -28,7 +28,10 @@
     <p class="aging-empty">
       <strong class="aging-empty-headline">No workflows yet.</strong>
       <span class="aging-empty-sub">
-        Add a contract YAML under <code>contracts/</code>. Once it
+        Add a contract YAML under
+        <code>{{ contracts_dir_display }}</code> — the directory
+        this server is scanning. (Point elsewhere with
+        <code>flow serve --workflows-dir PATH</code>.) Once a YAML
         appears here, open it and use the Data Source page to
         fetch data into the warehouse.
       </span>

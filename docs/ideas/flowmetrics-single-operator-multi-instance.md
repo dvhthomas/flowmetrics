@@ -86,7 +86,7 @@ tool. No slice is "data layer in isolation."
 7. **MCP server.** `flow mcp --data-dir ~/flowmetrics-X` connects via
    stdio. Tools, resources, prompts (list below). Configured in
    Claude Desktop.
-8. **Multi-instance hardening.** `--data-dir`, `--contracts-dir`
+8. **Multi-instance hardening.** `--data-dir`, `--workflows-dir`
    flags so multiple instances coexist. CSRF on state-changing
    routes, basic CSP headers, daily Parquet backup script,
    token-redaction in logs.
@@ -171,6 +171,6 @@ config; agent sees them as separate servers
   APScheduler.
 - **Single-page dashboard** with anchored sections — not per-chart
   pages.
-- **`--port`, `--host`, `--data-dir`, `--contracts-dir`** are
+- **`--port`, `--host`, `--data-dir`, `--workflows-dir`** are
   first-class CLI flags. Multi-instance is a v1 reality.
 - **MCP first-class** alongside the dashboard, not deferred.

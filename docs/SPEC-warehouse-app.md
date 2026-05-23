@@ -67,7 +67,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                    RUNTIME PROCESS (per instance)                │
 │                    flow serve --port N --host …                  │
-│                    --data-dir … --contracts-dir …                │
+│                    --data-dir … --workflows-dir …                │
 │  ─────────────────────────────────────────────────────────────  │
 │  /              single dashboard page                            │
 │  /api/internal  HTMX fragment endpoints (private; not versioned) │
@@ -115,7 +115,7 @@
 
 ╔═══════════════════════════════════════════════════════════════════╗
 ║                MCP SERVER (separate stdio process)                 ║
-║                flow mcp --data-dir … --contracts-dir …             ║
+║                flow mcp --data-dir … --workflows-dir …             ║
 ║  ───────────────────────────────────────────────────────────────  ║
 ║  Configured in Claude Desktop / Cursor / Zed.                     ║
 ║  Reads same Parquet store. Tools, resources, prompts.             ║
@@ -369,7 +369,7 @@ last good contract.
 ```
 flow materialise <contract-name> \
     --data-dir $DATA_DIR \
-    --contracts-dir $CONTRACTS_DIR
+    --workflows-dir $CONTRACTS_DIR
 ```
 
 - One-shot. Exits 0 on success, non-zero on failure.
@@ -460,7 +460,7 @@ every run.
 ```
 flow serve --port 8000 --host 127.0.0.1 \
     --data-dir $DATA_DIR \
-    --contracts-dir $CONTRACTS_DIR \
+    --workflows-dir $CONTRACTS_DIR \
     [--password $PASSWORD | $FLOW_PASSWORD]
 ```
 
@@ -468,7 +468,7 @@ flow serve --port 8000 --host 127.0.0.1 \
   set to anything else (any LAN/0.0.0.0 bind, IPv6 etc.) **unless**
   `--password` or `$FLOW_PASSWORD` is set. No exceptions.
 - `--port` defaults to 8000.
-- `--data-dir` and `--contracts-dir` default to `./data` and
+- `--data-dir` and `--workflows-dir` default to `./data` and
   `./contracts` respectively; intended override per instance.
 
 ### 7.2 Performance budget
@@ -662,7 +662,7 @@ This is what makes the contract debuggable.
 ### 8.1 Invocation
 
 ```
-flow mcp --data-dir $DATA_DIR --contracts-dir $CONTRACTS_DIR
+flow mcp --data-dir $DATA_DIR --workflows-dir $CONTRACTS_DIR
 ```
 
 Stdio-only. Spawned by an MCP client (Claude Desktop, Cursor, Zed,
@@ -811,8 +811,8 @@ Three shapes, all from the same `flow` binary.
 
 ```
 $ flow materialise personal-projects    # run by cron, /Users/me/.crontab
-$ flow serve --port 8000 --data-dir ./data --contracts-dir ./contracts
-$ flow mcp --data-dir ./data --contracts-dir ./contracts   # spawned by Claude Desktop
+$ flow serve --port 8000 --data-dir ./data --workflows-dir ./contracts
+$ flow mcp --data-dir ./data --workflows-dir ./contracts   # spawned by Claude Desktop
 ```
 
 All three commands share `./data` and `./contracts`. No process
@@ -1005,7 +1005,7 @@ returns typed percentiles + histogram data.
 
 ### Slice 8 — Multi-instance + hardening
 
-**Goal.** `--data-dir` and `--contracts-dir` flags so multiple
+**Goal.** `--data-dir` and `--workflows-dir` flags so multiple
 instances coexist. CSRF on state-changing routes. CSP headers.
 Token-redaction middleware. Daily Parquet backup script.
 

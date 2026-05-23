@@ -5,7 +5,7 @@ The slice 2 click-path (from docs/SPEC-warehouse-app.md §15 and the
 spec-driven session leading up to it):
 
   > Run `flow materialise astral-uv-week` (Slice 1, already works).
-  > Run `flow serve --port 8000 --host 127.0.0.1 --data-dir … --contracts-dir …`.
+  > Run `flow serve --port 8000 --host 127.0.0.1 --data-dir … --workflows-dir …`.
   > Open http://127.0.0.1:8000/. See:
   >   - Sticky filter bar (decorative in Slice 2).
   >   - Anchored #cycle-time section with a Vega-Lite scatterplot,
@@ -193,7 +193,7 @@ def server_url(tmp_path_factory):
             name,
             "--data-dir",
             str(data_dir),
-            "--contracts-dir",
+            "--workflows-dir",
             str(contracts_dir),
             "--cache-dir",
             str(FIXTURE_CACHE),
@@ -1932,7 +1932,7 @@ class TestPasswordGate:
         We can't actually start the server in this test (would block),
         but we can verify the validation passes by mocking uvicorn.run.
         """
-        # Stand up a minimal --data-dir / --contracts-dir so the loader
+        # Stand up a minimal --data-dir / --workflows-dir so the loader
         # doesn't fail before the bind check.
         (tmp_path / "contracts").mkdir()
         (tmp_path / "data").mkdir()
@@ -1949,7 +1949,7 @@ class TestPasswordGate:
                     "12346",
                     "--data-dir",
                     str(tmp_path / "data"),
-                    "--contracts-dir",
+                    "--workflows-dir",
                     str(tmp_path / "contracts"),
                 ],
                 catch_exceptions=False,

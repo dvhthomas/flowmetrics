@@ -58,7 +58,7 @@ def warehouse() -> duckdb.DuckDBPyConnection:
         [
             "materialise", "demo",
             "--data-dir", str(data_dir),
-            "--contracts-dir", str(contracts_dir),
+            "--workflows-dir", str(contracts_dir),
             "--cache-dir", str(FIXTURE_CACHE),
             "--offline",
         ],
