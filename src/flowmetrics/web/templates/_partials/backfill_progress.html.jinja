@@ -22,6 +22,10 @@
   {% elif st == "done" %}
     <span>&check; Backfill complete.{% if backfill.message %}
       {{ backfill.message }}{% endif %}</span>
+    <button type="button" class="backfill-dismiss"
+            aria-label="Dismiss"
+            data-dismiss-key="{{ workflow }}:{{ backfill.started_at }}"
+            >&times;</button>
     {%- if poll %}
     {# Delivered by the 2s poll — the backfill just finished.
        Refresh the whole page so the coverage chart and the
@@ -34,6 +38,29 @@
       setTimeout(function () { window.location.reload(); }, 1500);
     </script>
     {%- endif %}
+    <script>
+      // Flash banner: per-run dismissal lives in localStorage so
+      // a "done" notice the user already X'd never shows again,
+      // even across reloads. Key is `workflow:started_at` so a
+      // NEW backfill (new started_at) starts a fresh notice.
+      (function () {
+        var row = document.getElementById('backfill-progress-row');
+        if (!row) return;
+        var btn = row.querySelector('.backfill-dismiss');
+        if (!btn) return;
+        var key = (
+          'flowmetricsBackfillDismissed:' + btn.dataset.dismissKey
+        );
+        if (localStorage.getItem(key) === '1') {
+          row.remove();
+          return;
+        }
+        btn.addEventListener('click', function () {
+          localStorage.setItem(key, '1');
+          row.remove();
+        });
+      })();
+    </script>
   {% else %}
     <span>&cross; Backfill failed.{% if backfill.message %}
       {{ backfill.message }}{% endif %}</span>

@@ -1,34 +1,53 @@
 {% extends "_base.html.jinja" %}
 
-{% block content %}
-  {# Each metric tile lazy-loads via HTMX from
-     `/api/internal/dashboard-tile/{metric}`. The dashboard route
-     returns instantly with these stubs; tiles fill in as their
-     server-side renders complete. Per-tile failures don't block
-     the page.
+{# Dashboard sections by scope, not a single page-top filter bar.
+   The Period + Reference picker lives WITH the windowed-section
+   header it actually controls; the snapshot section (Aging) has
+   its own header. Scope is intrinsic to the grouping — no
+   per-tile explanation needed. #}
+{% block filter_bar %}{% endblock %}
 
-     `request.url.query` carries the filter params (period /
-     anchor / view_days / ref_days) so the selected window
-     propagates to each tile. #}
+{% block content %}
   {%- set q = request.url.query -%}
   {%- set qs = ('&' + q) if q else '' -%}
 
-  <p class="dashboard-datasource">
-    <a href="/workflows/{{ contract.name }}/data-source">Data source &amp; backfill →</a>
-  </p>
-
-  {% for slug, label in [
-    ('aging', 'Aging WIP'),
-    ('throughput', 'Throughput'),
-    ('cfd', 'Cumulative Flow'),
-    ('cycle-time', 'Cycle time'),
-    ('forecast', 'Forecast'),
-  ] %}
+  {# Snapshot section — Aging WIP. Pinned to the latest
+     materialise date; the Period picker doesn't apply here.
+     `hx-preserve` keeps this section's DOM (including the Vega
+     chart) across the windowed-section's hx-boost'd Period swap,
+     so changing Period never re-renders Aging. #}
+  <section class="scope-section scope-section--snapshot"
+           id="snapshot-section"
+           hx-preserve="true">
+    <h2 class="scope-section-h2">Current state</h2>
     <section class="metric metric-loading"
-             hx-get="/api/internal/dashboard-tile/{{ slug }}?workflow={{ contract.name }}{{ qs }}"
+             hx-get="/api/internal/dashboard-tile/aging?workflow={{ contract.name }}{{ qs }}"
              hx-trigger="load"
              hx-swap="outerHTML swap:180ms">
-      <p class="metric-loading-text">Loading {{ label }}…</p>
+      <p class="metric-loading-text">Loading Aging WIP…</p>
     </section>
-  {% endfor %}
+  </section>
+
+  {# Windowed section — Throughput, Cycle Time, Cumulative Flow,
+     Forecast. The Period + Reference picker lives in this
+     section's header and drives only these tiles. #}
+  <section class="scope-section scope-section--window">
+    <h2 class="scope-section-h2">Time slice</h2>
+    <div class="scope-section-header scope-section-header--filter">
+      {% include "_partials/period_filter.html.jinja" %}
+    </div>
+    {% for slug, label in [
+      ('throughput', 'Throughput'),
+      ('cycle-time', 'Cycle time'),
+      ('cfd', 'Cumulative Flow'),
+      ('forecast', 'Forecast'),
+    ] %}
+      <section class="metric metric-loading"
+               hx-get="/api/internal/dashboard-tile/{{ slug }}?workflow={{ contract.name }}{{ qs }}"
+               hx-trigger="load"
+               hx-swap="outerHTML swap:180ms">
+        <p class="metric-loading-text">Loading {{ label }}…</p>
+      </section>
+    {% endfor %}
+  </section>
 {% endblock %}

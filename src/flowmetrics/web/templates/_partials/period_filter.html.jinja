@@ -1,0 +1,111 @@
+{# The Period + Reference filter controls — the picker for
+   window-driven metrics. The default `_base.html.jinja` block
+   wraps this in a page-top `<nav class="filter-bar">`; the
+   dashboard inlines it inside its windowed-section header. Same
+   form everywhere.
+
+   Required context:
+     contract.window           — the WindowSelection model.
+     contract.data_min_date    — ISO date for the date input min.
+     contract.data_max_date    — ISO date for the date input max.
+     contract.data_is_stale    — drives the stale-data banner.
+     contract.default_ref_days — strips ref_days from URL when default.
+     contract.name             — for the stale banner's backfill link.
+#}
+{# `hx-boost` makes the form submit an XHR body-swap instead of
+   a full page reload. Pair with `hx-preserve` on the snapshot
+   section so changing Period doesn't re-render Aging.
+
+   The data-source-strip at the page top owns the
+   "data freshness" affordance; this form no longer carries a
+   redundant stale-data banner. #}
+<form method="get" class="filter-bar-form" aria-label="Period controls"
+      hx-boost="true"
+      hx-target="body" hx-swap="outerHTML"
+      hx-push-url="true">
+  <label class="filter-compact">Period
+    <select name="period"
+            onchange="flowmetricsPeriodChanged(this.form)">
+      {%- set p = contract.window.period -%}
+      <option value="last-7-days"{% if p == "last-7-days" %} selected{% endif %}>Last 7 days</option>
+      <option value="last-14-days"{% if p == "last-14-days" %} selected{% endif %}>Last 14 days</option>
+      <option value="last-30-days"{% if p == "last-30-days" %} selected{% endif %}>Last 30 days</option>
+      <option value="last-90-days"{% if p == "last-90-days" %} selected{% endif %}>Last 90 days</option>
+      <option value="last-week"{% if p == "last-week" %} selected{% endif %}>Last week (Sun–Sat)</option>
+      <option value="last-2-weeks"{% if p == "last-2-weeks" %} selected{% endif %}>Last 2 weeks</option>
+      <option value="all-time"{% if p == "all-time" %} selected{% endif %}>All time</option>
+      <option value="custom"{% if p == "custom" %} selected{% endif %}>Custom…</option>
+    </select>
+  </label>
+  {# Custom fields — revealed only for `period=custom`. The
+     date input is bounded to the data coverage so the user
+     can't pick a Period Ending with no data behind it. #}
+  <div class="filter-custom"{% if not contract.window.is_custom %} hidden{% endif %}>
+    <label class="filter-compact">Period ending
+      <input type="date" name="anchor" value="{{ contract.window.anchor }}"
+             {% if contract.data_min_date %}min="{{ contract.data_min_date }}"{% endif %}
+             {% if contract.data_max_date %}max="{{ contract.data_max_date }}"{% endif %}
+             onchange="flowmetricsSubmitFilters(this.form)">
+    </label>
+    <label class="filter-compact">View
+      <select name="view_days" onchange="flowmetricsSubmitFilters(this.form)">
+        {% for d in [7, 14, 30, 60, 90, 180] %}
+          <option value="{{ d }}"{% if d == contract.window.view_days %} selected{% endif %}>{{ d }} days</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <a class="filter-reset" href="{{ request.url.path }}">Reset</a>
+
+  <details class="filter-advanced"{% if contract.window.is_advanced %} open{% endif %}>
+    <summary>Advanced</summary>
+    <p class="filter-hint">
+      The <strong>reference period</strong> is the recent
+      sample the aging thresholds and forecasts draw from.
+      It matches the Period above by default; override here
+      to draw the sample from a different number of days.
+      It always ends on the most recent data.
+    </p>
+    <label class="filter-compact">Reference
+      <select name="ref_days"
+              data-default="{{ contract.default_ref_days }}"
+              onchange="flowmetricsSubmitFilters(this.form)">
+        {% for d in [7, 14, 30, 60, 90, 180] %}
+          <option value="{{ d }}"{% if d == contract.window.ref_days %} selected{% endif %}>{{ d }} days</option>
+        {% endfor %}
+      </select>
+    </label>
+  </details>
+</form>
+<script>
+  // Submit the filter form, emitting only the params the
+  // chosen Period needs — no empty or redundant `name=` noise.
+  // A disabled control is excluded from a GET submission.
+  // `requestSubmit()` fires the submit event so hx-boost
+  // intercepts; `form.submit()` would skip the event and
+  // bypass HTMX, falling back to a full page reload (and
+  // re-rendering the preserved Aging section).
+  function flowmetricsSubmitFilters(form) {
+    if (form.elements.period.value !== "custom") {
+      // Anchor + View only matter for Custom.
+      form.elements.anchor.disabled = true;
+      form.elements.view_days.disabled = true;
+    }
+    // A default-length reference needn't ride in the URL.
+    const ref = form.elements.ref_days;
+    if (ref.value === ref.dataset.default) ref.disabled = true;
+    form.requestSubmit();
+  }
+  // Period dropdown changed. A preset applies immediately;
+  // "Custom…" just reveals the Period Ending + View fields
+  // and waits for the user to set them.
+  function flowmetricsPeriodChanged(form) {
+    const custom = form.querySelector(".filter-custom");
+    if (form.elements.period.value === "custom") {
+      if (custom) custom.hidden = false;
+      return;
+    }
+    if (custom) custom.hidden = true;
+    flowmetricsSubmitFilters(form);
+  }
+</script>

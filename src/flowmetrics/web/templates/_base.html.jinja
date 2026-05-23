@@ -12,15 +12,19 @@
     /* Knox design system — single-hue derivation.
        See ~/projects/awm/kno/docs/design-system.md */
     :root {
-      --hue: 290; /* plum-violet — locked */
+      --hue: 142; /* WhatsApp-style green — locked */
 
       --p-50:  hsla(var(--hue), 32%, 96%, 1);
       --p-100: hsla(var(--hue), 34%, 88%, 1);
       --p-200: hsla(var(--hue), 38%, 78%, 1);
-      --p-400: hsla(var(--hue), 42%, 58%, 1);
-      --p-500: hsla(var(--hue), 46%, 48%, 1);
-      --p-700: hsla(var(--hue), 52%, 30%, 1);
-      --p-900: hsla(var(--hue), 58%, 14%, 1);
+      --p-400: hsla(var(--hue), 42%, 48%, 1);
+      --p-500: hsla(var(--hue), 60%, 40%, 1);
+      /* Lighter brand-green for TEXT (headings, breadcrumbs,
+         labels). p-700 is too dark — it competes with the CTA
+         (p-500 fill) and the P85 commitment line (p-900). */
+      --p-600: hsla(var(--hue), 64%, 28%, 1);
+      --p-700: hsla(var(--hue), 70%, 20%, 1);
+      --p-900: hsla(var(--hue), 80%, 10%, 1);
 
       --s-100: hsla(calc(var(--hue) + 60), 36%, 90%, 1);
       --s-500: hsla(calc(var(--hue) + 60), 44%, 56%, 1);
@@ -30,20 +34,19 @@
       --t-500: hsla(calc(var(--hue) - 60), 32%, 54%, 1);
       --t-700: hsla(calc(var(--hue) - 60), 38%, 32%, 1);
 
-      /* Neutrals — TRUE grays (saturation: 0). Page chrome and
-         body text should not carry a hue tint; that would compete
-         with the actual accent colours (`--p-*` for the import
-         CTA, the P85 commitment line). Knox's hue-tinted neutrals
-         were the source of the "everything looks plum" feedback;
-         deliberately desaturating them here lets the accent
-         palette do its job. */
-      --bg:      hsl(0, 0%, 97%);
-      --surface: hsl(0, 0%, 94%);
+      /* Neutrals — *very pale cream* tint (warm yellow hue at
+         low saturation). Just enough warmth so the page doesn't
+         read as sterile chip-white against the green accents,
+         not so much that the cream competes with the brand
+         palette. Borders and body text stay neutral grey so type
+         contrast isn't tinted. */
+      --bg:      hsl(45, 30%, 97%);
+      --surface: hsl(45, 24%, 93%);
       --border:  hsl(0, 0%, 84%);
       --fg:      hsl(0, 0%, 13%);
       --muted:   hsl(0, 0%, 46%);
 
-      --white: #ffffff;
+      --white: hsl(45, 30%, 97%);
       --black: #111111;
 
       --head-font: "Rubik", sans-serif;
@@ -59,6 +62,14 @@
        only px-based scale is hairlines under 1rem (0.0625rem). */
 
     * { box-sizing: border-box; }
+
+    /* Brand-tint all native form controls (sliders, checkboxes,
+       progress bars). Per-element accent rules below remain as
+       targeted overrides; this gives a sensible default for any
+       new control. */
+    html {
+      accent-color: var(--p-500);
+    }
 
     body {
       font-family: var(--body-font);
@@ -150,17 +161,21 @@
        (the mono font + surface chip read as a literal/code
        token, which the workflow name isn't). */
     header.site-header .stamp {
+      /* Workflow name in the breadcrumb — matches the section
+         h2 treatment (head font + brand plum) so the page's two
+         brand-coloured anchors agree. */
+      font-family: var(--head-font);
       font-size: 1.375rem;
-      color: var(--t-700);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--p-600);
       text-decoration: none;
     }
     header.site-header a.stamp:hover {
       text-decoration: underline;
     }
-    /* The current page's breadcrumb segment — same tertiary
-       hue, not a link. */
     header.site-header .stamp--current {
-      color: var(--t-700);
+      color: var(--p-600);
     }
     header.site-header .header-sep {
       color: var(--border);
@@ -173,6 +188,81 @@
       font-size: 1.4375rem;
       letter-spacing: -0.005em;
       color: var(--fg);
+    }
+
+    /* ─────── Data source strip ───────
+       A muted one-liner naming the data source + the latest
+       materialise date. Lives inline in the site-header (pushed
+       to the right edge by `margin-left: auto`), so it costs
+       zero extra vertical space. Click to backfill. Replaces
+       the old in-form stale banner. */
+    .data-source-strip {
+      margin: 0 0 0 auto;
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+    .data-source-strip a {
+      color: inherit;
+      text-decoration: underline dotted;
+    }
+    .data-source-strip a:hover {
+      color: var(--fg);
+    }
+
+    /* ─────── Dashboard scope sections ───────
+       The dashboard groups tiles by what scope drives them. Each
+       section's header IS the scope label — no per-tile icon, no
+       explanatory text. See `dashboard.html.jinja`. */
+    .scope-section {
+      margin: 1.4rem 0 1.6rem 0;
+    }
+    .scope-section-h2 {
+      font-family: var(--head-font);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--p-600);
+      margin: 0;
+      padding: 0.4rem 0 0.2rem 0;
+    }
+    /* On the overview, the h3 metric titles ("Aging WIP",
+       "Throughput", …) read AS subheadings under each scope h2 —
+       smaller than the h2 above them. Detail pages keep the
+       larger treatment defined on `.metric-summary-title`. */
+    .scope-section .metric-summary-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+    .scope-section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      margin-bottom: 0.3rem;
+    }
+    .scope-section-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.6875rem;
+      font-weight: 600;
+    }
+    .scope-section-value {
+      color: var(--fg);
+      font-size: 0.875rem;
+    }
+    .scope-section-aside {
+      color: var(--muted);
+      font-size: 0.78125rem;
+      margin-left: 0.3rem;
+    }
+    /* The windowed section's header IS the period-filter row —
+       no extra label, the controls are self-describing. */
+    .scope-section-header--filter {
+      padding: 0.4rem 0;
+      flex-wrap: wrap;
     }
 
     /* ─────── Dashboard tile loading state ─────── */
@@ -382,22 +472,6 @@
       text-decoration: none;
     }
     .filter-reset:hover { color: var(--fg); text-decoration: underline; }
-    .filter-stale-banner {
-      flex-basis: 100%;
-      margin: 0 0 0.3rem 0;
-      padding: 0.4rem 0.7rem;
-      font-size: 0.8125rem;
-      color: var(--fg);
-      background: var(--surface);
-      border-left: 0.25rem solid var(--p-500);
-      border-radius: 0.25rem;
-    }
-    .filter-stale-banner code {
-      background: var(--white);
-      padding: 0.05rem 0.3rem;
-      border-radius: 0.2rem;
-      font-size: 0.8125rem;
-    }
 
     /* ─────── Metric summary (above charts) ─────── */
     .metric-summary {
@@ -441,7 +515,7 @@
       letter-spacing: 0.06em;
       font-size: 0.6875rem;
       font-weight: 600;
-      color: var(--p-700);
+      color: var(--p-600);
     }
     .metric-strip-headline {
       font-size: 0.9375rem;
@@ -492,6 +566,7 @@
     }
     .metric-chart.vega-embed .vega-bindings input[type="range"] {
       flex: 1;
+      accent-color: var(--p-500);
     }
     .metric--link-only {
       /* Tile that's just a link, no chart. Keeps the border +
@@ -1084,111 +1159,20 @@
         <span class="header-sep" aria-hidden="true">›</span>
         <span class="header-metric-name">{{ metric_name }}</span>
       {% endif %}
+      {# Data-source freshness lives inline in the header — same
+         row as the breadcrumb, pushed to the right edge by the
+         flex layout. Eliminates the dead vertical band a separate
+         strip-row was eating. #}
+      {% block data_source_strip %}
+        {% include "_partials/data_source_strip.html.jinja" %}
+      {% endblock %}
     </div>
   </header>
 
   {% block filter_bar %}
   <nav class="filter-bar" aria-label="Filters">
     <div class="container">
-      {# Workflow switcher lives on the home page (`/`). Detail
-         pages use the breadcrumb to navigate back; the workflow
-         dashboard's filter bar focuses on date controls only. #}
-      {% if contract.data_is_stale %}
-        <p class="filter-stale-banner">
-          Warehouse data ends <strong>{{ contract.data_max_date }}</strong>.
-          Pick a Period that overlaps it, or
-          <a href="/workflows/{{ contract.name }}/data-source">backfill newer data</a>.
-        </p>
-      {% endif %}
-      {# The filter bar is a thin input layer: it emits a `period`
-         choice (plus anchor + view_days for Custom, ref_days for
-         Advanced) and nothing else. All date math lives in
-         `parse_windows` server-side. #}
-      <form method="get" class="filter-bar-form" aria-label="Period controls">
-        <label class="filter-compact">Period
-          <select name="period"
-                  onchange="flowmetricsPeriodChanged(this.form)">
-            {%- set p = contract.window.period -%}
-            <option value="last-7-days"{% if p == "last-7-days" %} selected{% endif %}>Last 7 days</option>
-            <option value="last-14-days"{% if p == "last-14-days" %} selected{% endif %}>Last 14 days</option>
-            <option value="last-30-days"{% if p == "last-30-days" %} selected{% endif %}>Last 30 days</option>
-            <option value="last-90-days"{% if p == "last-90-days" %} selected{% endif %}>Last 90 days</option>
-            <option value="last-week"{% if p == "last-week" %} selected{% endif %}>Last week (Sun–Sat)</option>
-            <option value="last-2-weeks"{% if p == "last-2-weeks" %} selected{% endif %}>Last 2 weeks</option>
-            <option value="all-time"{% if p == "all-time" %} selected{% endif %}>All time</option>
-            <option value="custom"{% if p == "custom" %} selected{% endif %}>Custom…</option>
-          </select>
-        </label>
-        {# Custom fields — revealed only for `period=custom`. The
-           date input is bounded to the data coverage so the user
-           can't pick a Period Ending with no data behind it. #}
-        <div class="filter-custom"{% if not contract.window.is_custom %} hidden{% endif %}>
-          <label class="filter-compact">Period ending
-            <input type="date" name="anchor" value="{{ contract.window.anchor }}"
-                   {% if contract.data_min_date %}min="{{ contract.data_min_date }}"{% endif %}
-                   {% if contract.data_max_date %}max="{{ contract.data_max_date }}"{% endif %}
-                   onchange="flowmetricsSubmitFilters(this.form)">
-          </label>
-          <label class="filter-compact">View
-            <select name="view_days" onchange="flowmetricsSubmitFilters(this.form)">
-              {% for d in [7, 14, 30, 60, 90, 180] %}
-                <option value="{{ d }}"{% if d == contract.window.view_days %} selected{% endif %}>{{ d }} days</option>
-              {% endfor %}
-            </select>
-          </label>
-        </div>
-        <a class="filter-reset" href="{{ request.url.path }}">Reset</a>
-
-        <details class="filter-advanced"{% if contract.window.is_advanced %} open{% endif %}>
-          <summary>Advanced</summary>
-          <p class="filter-hint">
-            The <strong>reference period</strong> is the recent
-            sample the aging thresholds and forecasts draw from.
-            It matches the Period above by default; override here
-            to draw the sample from a different number of days.
-            It always ends on the most recent data.
-          </p>
-          <label class="filter-compact">Reference
-            <select name="ref_days"
-                    data-default="{{ contract.default_ref_days }}"
-                    onchange="flowmetricsSubmitFilters(this.form)">
-              {% for d in [7, 14, 30, 60, 90, 180] %}
-                <option value="{{ d }}"{% if d == contract.window.ref_days %} selected{% endif %}>{{ d }} days</option>
-              {% endfor %}
-            </select>
-          </label>
-        </details>
-      </form>
-      <script>
-        // Submit the filter form, emitting only the params the
-        // chosen Period needs — no empty or redundant `name=`
-        // noise. A disabled control is excluded from a GET
-        // submission. (`form.submit()` skips the submit event, so
-        // this can't be a submit-event handler.)
-        function flowmetricsSubmitFilters(form) {
-          if (form.elements.period.value !== "custom") {
-            // Anchor + View only matter for Custom.
-            form.elements.anchor.disabled = true;
-            form.elements.view_days.disabled = true;
-          }
-          // A default-length reference needn't ride in the URL.
-          const ref = form.elements.ref_days;
-          if (ref.value === ref.dataset.default) ref.disabled = true;
-          form.submit();
-        }
-        // Period dropdown changed. A preset applies immediately;
-        // "Custom…" just reveals the Period Ending + View fields
-        // and waits for the user to set them.
-        function flowmetricsPeriodChanged(form) {
-          const custom = form.querySelector(".filter-custom");
-          if (form.elements.period.value === "custom") {
-            if (custom) custom.hidden = false;
-            return;
-          }
-          if (custom) custom.hidden = true;
-          flowmetricsSubmitFilters(form);
-        }
-      </script>
+      {% include "_partials/period_filter.html.jinja" %}
     </div>
   </nav>
   {% endblock %}

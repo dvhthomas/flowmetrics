@@ -18,9 +18,11 @@ from flowmetrics.warehouse.queries import (
     InFlightItem,
     StageEntry,
     completed_items,
+    completion_date_range,
     count_open_items,
     first_stage_entries,
     in_flight_snapshot,
+    latest_materialised_at,
     observed_stages,
     pairwise_stage_precedence,
 )
@@ -233,3 +235,66 @@ class TestPairwiseStagePrecedence:
             ("Draft", "Merged"): 1,
             ("Review", "Merged"): 1,
         }
+
+
+def _warehouse_with_materialised() -> duckdb.DuckDBPyConnection:
+    con = duckdb.connect(":memory:")
+    con.execute(
+        """CREATE TABLE work_items (
+            contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+            title VARCHAR, url VARCHAR,
+            created_at TIMESTAMP, completed_at TIMESTAMP,
+            cycle_time_days DOUBLE, materialised_at TIMESTAMP)"""
+    )
+    con.executemany(
+        "INSERT INTO work_items VALUES (?,?,?,?,?,?,?,?,?)",
+        [
+            ("c", "github", "#1", "a", None,
+             datetime(2026, 1, 1), datetime(2026, 1, 4), 3.0,
+             datetime(2026, 5, 1, 8, 0)),
+            ("c", "github", "#2", "b", None,
+             datetime(2026, 1, 2), datetime(2026, 1, 9), 7.0,
+             datetime(2026, 5, 3, 9, 0)),
+            ("other", "github", "#9", "x", None,
+             datetime(2026, 1, 1), datetime(2026, 1, 2), 1.0,
+             datetime(2099, 1, 1)),  # other contract — must be excluded
+        ],
+    )
+    return con
+
+
+class TestCompletionDateRange:
+    def test_returns_min_and_max_completion_dates_for_contract(self):
+        from datetime import date as _d
+        lo, hi = completion_date_range(_warehouse_with_materialised(), "c")
+        assert lo == _d(2026, 1, 4)
+        assert hi == _d(2026, 1, 9)
+
+    def test_unknown_contract_yields_none_none(self):
+        assert completion_date_range(_warehouse_with_materialised(), "nope") == (None, None)
+
+    def test_no_completions_yields_none_none(self):
+        # only in-flight items for the contract.
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """CREATE TABLE work_items (
+                contract_id VARCHAR, source VARCHAR, item_id VARCHAR,
+                title VARCHAR, url VARCHAR,
+                created_at TIMESTAMP, completed_at TIMESTAMP,
+                cycle_time_days DOUBLE, materialised_at TIMESTAMP)"""
+        )
+        con.execute(
+            "INSERT INTO work_items VALUES "
+            "('c','github','#1','a',NULL,?,NULL,NULL,?)",
+            [datetime(2026, 1, 1), datetime(2026, 5, 1)],
+        )
+        assert completion_date_range(con, "c") == (None, None)
+
+
+class TestLatestMaterialisedAt:
+    def test_returns_the_max_materialised_at_date(self):
+        from datetime import date as _d
+        assert latest_materialised_at(_warehouse_with_materialised(), "c") == _d(2026, 5, 3)
+
+    def test_unknown_contract_is_none(self):
+        assert latest_materialised_at(_warehouse_with_materialised(), "nope") is None

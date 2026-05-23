@@ -243,3 +243,37 @@ def count_open_items(
             [contract_name],
         ).fetchone()[0]
     )
+
+
+def completion_date_range(
+    con: duckdb.DuckDBPyConnection, contract_name: str
+) -> tuple[date | None, date | None]:
+    """`(earliest, latest)` completed_at dates the warehouse holds
+    for `contract_name`. `(None, None)` when no completions yet —
+    drives both the filter-bar date-input bounds and the empty-
+    state UIs that name where data actually exists."""
+    row = con.execute(
+        "SELECT min(CAST(completed_at AS DATE)), "
+        "       max(CAST(completed_at AS DATE)) "
+        "FROM work_items "
+        "WHERE contract_id = ? AND completed_at IS NOT NULL",
+        [contract_name],
+    ).fetchone()
+    if row and row[1] is not None:
+        return row[0], row[1]
+    return None, None
+
+
+def latest_materialised_at(
+    con: duckdb.DuckDBPyConnection, contract_name: str
+) -> date | None:
+    """The latest materialise date for `contract_name` — i.e. the
+    asof of the warehouse's most recent in-flight snapshot. None
+    when the warehouse holds no rows yet."""
+    row = con.execute(
+        "SELECT max(materialised_at) FROM work_items "
+        "WHERE contract_id = ?",
+        [contract_name],
+    ).fetchone()
+    mat = row[0] if row else None
+    return mat.date() if mat is not None else None

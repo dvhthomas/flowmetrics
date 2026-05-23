@@ -101,6 +101,75 @@ class TestCoverage:
         assert by_iso["2026-01-20"] == "missing"
 
 
+class TestReferenceBand:
+    """Empirical P50/P85 of daily throughput — the "throughput
+    reference band" Vacanti uses to read a day as typical/below.
+    Computed in TWO variants on the model so the view can offer an
+    include-/exclude-weekends toggle without re-querying."""
+
+    def test_default_reference_uses_every_warehouse_day(self):
+        # Mon–Sun: counts 1,2,3,4,5,6,7. P50=4, P85≈6.1.
+        items = []
+        for i, day in enumerate(range(5, 12), start=1):  # Jan 5 Mon … Jan 11 Sun
+            items.extend(_completed(i * 10 + k, date(2026, 1, day)) for k in range(i))
+        m = build_throughput_model(items)
+        assert m.reference is not None
+        ref = m.reference.include_weekends
+        assert ref.p50 == 4
+        assert abs(ref.p85 - 6.1) < 0.01
+        assert ref.source_count == 7
+
+    def test_weekdays_reference_drops_saturday_and_sunday(self):
+        # Mon–Sun: counts 1,2,3,4,5,6,7. Weekdays-only: 1,2,3,4,5 →
+        # P50=3, P85=4.4. Different from the include-weekends band
+        # — that's the whole point of the toggle.
+        items = []
+        for i, day in enumerate(range(5, 12), start=1):
+            items.extend(_completed(i * 10 + k, date(2026, 1, day)) for k in range(i))
+        m = build_throughput_model(items)
+        wk = m.reference.weekdays_only
+        assert wk.p50 == 3
+        assert abs(wk.p85 - 4.4) < 0.01
+        assert wk.source_count == 5
+
+    def test_missing_days_never_dilute_the_percentiles(self):
+        """A 'missing' day is NO DATA, not zero throughput. Both
+        variants must clamp the sample to warehouse-covered days."""
+        items = [_completed(1, date(2026, 1, 10))]
+        m = build_throughput_model(
+            items,
+            view=Window(from_=date(2026, 1, 1), to=date(2026, 1, 20)),
+        )
+        # Only Jan 10 is covered → sample is [1]. P50/P85 = 1, not
+        # the deflated value you'd get by averaging missing days as
+        # zeros.
+        assert m.reference.include_weekends.p50 == 1
+        assert m.reference.include_weekends.p85 == 1
+        assert m.reference.include_weekends.source_count == 1
+
+    def test_no_covered_days_yields_no_reference(self):
+        items = [_completed(1, date(2026, 1, 10))]
+        m = build_throughput_model(
+            items,
+            view=Window(from_=date(2027, 1, 1), to=date(2027, 1, 31)),
+        )
+        # Empty model already short-circuits; this is the edge of a
+        # populated model with zero covered days inside the view.
+        assert m.is_empty
+
+    def test_no_weekdays_in_window_yields_none_weekdays_reference(self):
+        # Sat + Sun only (Jan 3-4, 2026). Both warehouse-covered
+        # (data on Jan 3 AND Jan 4 — so neither is `missing`).
+        items = [_completed(1, date(2026, 1, 3)), _completed(2, date(2026, 1, 4))]
+        m = build_throughput_model(
+            items,
+            view=Window(from_=date(2026, 1, 3), to=date(2026, 1, 4)),
+        )
+        # Include-weekends band exists; weekdays-only does not.
+        assert m.reference.include_weekends.source_count == 2
+        assert m.reference.weekdays_only is None
+
+
 class TestHeadline:
     def test_full_coverage_headline_states_total_and_rate(self):
         items = [

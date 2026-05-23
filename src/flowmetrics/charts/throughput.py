@@ -20,6 +20,7 @@ from ..throughput import daily_counts
 from ..utc_dates import attach_utc, to_utc_display_date, to_utc_iso_date
 from ..warehouse.queries import CompletedItem
 from ..windows import Window
+from .primitives import Percentiles, percentiles_from
 
 
 @dataclass(frozen=True)
@@ -40,12 +41,28 @@ class DailyThroughput:
 
 
 @dataclass(frozen=True)
+class ThroughputReference:
+    """Empirical P50/P85 of the daily throughput counts — the
+    "throughput reference band" the chart draws as horizontal
+    rule marks. Both variants are pre-computed so the view can
+    toggle include-/exclude-weekends without re-querying.
+
+    `weekdays_only` is None when the window has no warehouse-covered
+    weekday (a Sat-only span, for example).
+    """
+
+    include_weekends: Percentiles
+    weekdays_only: Percentiles | None
+
+
+@dataclass(frozen=True)
 class ThroughputModel:
     """Fully-resolved throughput chart. The template and the Vega
     view read these fields; neither re-derives anything."""
 
     daily: tuple[DailyThroughput, ...]
     headline: str
+    reference: ThroughputReference | None = None
 
     @property
     def is_empty(self) -> bool:
@@ -142,4 +159,23 @@ def build_throughput_model(
             f"({span_days}-day window)"
         )
 
-    return ThroughputModel(daily=tuple(daily), headline=headline)
+    # Reference band: empirical P50/P85 of the daily counts, drawn
+    # from COVERED days only — a `missing` day is no-data, not zero
+    # throughput, so including it would deflate the percentiles.
+    # Both variants are precomputed so the view can toggle
+    # include-/exclude-weekends without round-tripping to the model.
+    covered_counts = [d.count for d in daily if d.data_coverage == "warehouse"]
+    weekday_counts = [
+        d.count for d in daily
+        if d.data_coverage == "warehouse" and d.day_type == "weekday"
+    ]
+    reference = ThroughputReference(
+        include_weekends=percentiles_from(covered_counts),
+        weekdays_only=(
+            percentiles_from(weekday_counts) if weekday_counts else None
+        ),
+    ) if covered_counts else None
+
+    return ThroughputModel(
+        daily=tuple(daily), headline=headline, reference=reference,
+    )

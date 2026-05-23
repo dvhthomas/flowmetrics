@@ -38,6 +38,8 @@ from .backfill import (
     write_status,
 )
 from .contract import ContractError, load_contract
+from .utc_dates import to_utc_display_date
+from .warehouse.queries import completion_date_range, latest_materialised_at
 from .web.components.aging import render as render_aging
 from .web.components.cfd import render as render_cfd
 from .web.components.cycle_time import render as render_cycle_time
@@ -66,81 +68,13 @@ from .windows import parse_windows
 
 _TEMPLATES_DIR = Path(__file__).parent / "web" / "templates"
 
+# Source `kind` → human label for the snapshot-section aside on
+# the dashboard ("most recent GitHub import"). New backends added
+# here; `.title()` is a safe fallback.
+_SOURCE_DISPLAY = {"github": "GitHub", "jira": "Jira"}
 
-def open_warehouse(data_dir: Path) -> duckdb.DuckDBPyConnection:
-    """Open an in-memory DuckDB connection with `work_items` and
-    `transitions` views registered against the Parquet warehouse
-    under `data_dir`.
 
-    Each ETL run writes its OWN snapshot file —
-    `year={Y}/month={M}/day={D}/items-{run_id}.parquet` — so every
-    run (daily cron OR a browser-triggered backfill) is purely
-    additive and never overwrites another. Runs accumulate, so the
-    same item appears in N snapshots. The views deduplicate at read
-    time so every consumer sees one canonical row per
-    `(contract_id, source, item_id)` — the LATEST snapshot —
-    without losing the on-disk history (useful for future
-    "what did aging look like at snapshot X" features).
-
-    `transitions` is similarly deduplicated. Transitions are
-    append-only events — same `entered_at` for the same item
-    should never collide — but a re-run that re-fetches the same
-    item writes identical rows again, so DISTINCT collapses them.
-
-    Both views fall back to empty stubs when the corresponding
-    parquet files don't exist yet (fresh install before
-    materialise has ever run).
-    """
-    con = duckdb.connect(":memory:")
-
-    work_items_glob = (data_dir / "work_items" / "**" / "*.parquet").as_posix()
-    try:
-        # Latest snapshot per (contract_id, source, item_id) by
-        # materialised_at. Stable tie-break by run_id keeps the
-        # answer deterministic when two snapshots share the exact
-        # same materialised_at (rare; same-second re-runs).
-        con.execute(
-            f"CREATE VIEW work_items AS "
-            f"SELECT * EXCLUDE (_dedup_rn) FROM ( "
-            f"  SELECT *, ROW_NUMBER() OVER ("
-            f"    PARTITION BY contract_id, source, item_id "
-            f"    ORDER BY materialised_at DESC, run_id DESC"
-            f"  ) AS _dedup_rn "
-            f"  FROM read_parquet('{work_items_glob}', hive_partitioning = true)"
-            f") WHERE _dedup_rn = 1"
-        )
-    except duckdb.IOException:
-        # No parquet yet — caller is on a fresh install. work_items
-        # is required by every component; let this raise.
-        raise
-
-    transitions_glob = (
-        data_dir / "transitions" / "**" / "*.parquet"
-    ).as_posix()
-    try:
-        # Transitions are append-only stage-entry events; identical
-        # rows across snapshots collapse via DISTINCT. No
-        # materialised_at column to order by (transitions don't
-        # carry one), but exact-row dedup is enough.
-        con.execute(
-            f"CREATE VIEW transitions AS "
-            f"SELECT DISTINCT * FROM read_parquet("
-            f"'{transitions_glob}', hive_partitioning = true)"
-        )
-    except duckdb.IOException:
-        con.execute(
-            "CREATE VIEW transitions AS "
-            "SELECT NULL::VARCHAR AS source, "
-            "NULL::VARCHAR AS item_id, "
-            "NULL::TIMESTAMP AS entered_at, "
-            "NULL::VARCHAR AS stage, "
-            "NULL::VARCHAR AS signal, "
-            "NULL::VARCHAR AS contract_id "
-            "WHERE FALSE"
-        )
-
-    return con
-
+from .warehouse.connection import open_warehouse
 
 # Exported for tests so they can exercise the production read path
 # without standing up a full FastAPI app.
@@ -222,16 +156,21 @@ class WorkflowView:
         except duckdb.IOException:
             return None, None
         try:
-            row = con.execute(
-                "SELECT min(CAST(completed_at AS DATE)), "
-                "       max(CAST(completed_at AS DATE)) "
-                "FROM work_items "
-                "WHERE contract_id = ? AND completed_at IS NOT NULL",
-                [self.id],
-            ).fetchone()
-            if row and row[1]:
-                return row[0], row[1]
-            return None, None
+            return completion_date_range(con, self.id)
+        finally:
+            con.close()
+
+    def _aging_snapshot_date(self) -> date | None:
+        """The aging snapshot's asof — the date of the latest
+        materialise for this workflow. `None` when the warehouse
+        has no rows yet. The Aging tile pins itself to this
+        moment; the dashboard's snapshot-section header names it."""
+        try:
+            con = open_warehouse(self._data_dir)
+        except duckdb.IOException:
+            return None
+        try:
+            return latest_materialised_at(con, self.id)
         finally:
             con.close()
 
@@ -293,7 +232,24 @@ class WorkflowView:
                 if self.data_max_date else None
             ),
             "data_is_stale": self.data_is_stale,
+            # The aging snapshot's asof — the date the dashboard's
+            # Snapshot-section header names. Aging WIP is pinned to
+            # this moment regardless of the Period picker.
+            "aging_asof_display": self._aging_asof_display(),
+            # Source display name for the snapshot-section aside
+            # ("most recent GitHub import" / "Jira import").
+            "source_display": _SOURCE_DISPLAY.get(
+                self.contract.source, self.contract.source.title()
+            ),
         }
+
+    def _aging_asof_display(self) -> str | None:
+        asof = self._aging_snapshot_date()
+        if asof is None:
+            return None
+        return to_utc_display_date(
+            datetime.combine(asof, datetime.min.time(), tzinfo=UTC)
+        )
 
     def _slug(self) -> str:
         c = self.contract
@@ -322,15 +278,7 @@ class WorkflowView:
         # the Period anchor. The warehouse holds one in-flight
         # snapshot, so aging can only be faithfully computed at
         # that date.
-        snap = con.execute(
-            "SELECT max(materialised_at) FROM work_items "
-            "WHERE contract_id = ?",
-            [self.id],
-        ).fetchone()
-        snapshot_dt = snap[0] if snap else None
-        asof = (
-            snapshot_dt.date() if snapshot_dt is not None else self.today
-        )
+        asof = latest_materialised_at(con, self.id) or self.today
         return render_aging(
             con, self.id,
             asof=asof,

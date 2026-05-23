@@ -100,9 +100,9 @@ class TestCalendarLayout:
 
 
 class TestHeadline:
-    def test_headline_names_count_and_span(self):
+    def test_headline_names_count_earliest_and_most_recent_items(self):
         per_day = [(date(2026, 1, 1), 2), (date(2026, 1, 5), 3)]
         m = build_data_source_model(per_day)
         assert "5 work items" in m.headline
-        assert "Jan 01, 2026" in m.headline
-        assert "Jan 05, 2026" in m.headline
+        assert "earliest work item Jan 01, 2026" in m.headline
+        assert "most recent work item Jan 05, 2026" in m.headline

@@ -557,7 +557,7 @@ Aligned to `docs/ideas/flowmetrics-single-operator-multi-instance.md`.
    button invokes `flow materialise` subprocess.
 7. **MCP server.** `flow mcp --data-dir …` exposes tools, resources,
    prompts. Configured in Claude Desktop.
-8. **Multi-instance + hardening.** `--data-dir`, `--contracts-dir`,
+8. **Multi-instance + hardening.** `--data-dir`, `--workflows-dir`,
    CSRF, CSP, token-redaction, daily backup script.
 
 Detailed acceptance criteria per slice live in

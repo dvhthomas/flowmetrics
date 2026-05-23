@@ -1,0 +1,16 @@
+{# One-line data-freshness affordance: "GitHub data through
+   May 21, 2026". Clickable — opens the workflow's Data Source
+   page for backfill. Replaces the old "Data source & backfill →"
+   tile-top link AND the stale-data banner inside the filter
+   form: one compact line, one place. #}
+{% if contract %}
+  <p class="data-source-strip">
+    <a href="/workflows/{{ contract.name }}/data-source">
+      {%- if contract.aging_asof_display -%}
+        {{ contract.source_display }} data through {{ contract.aging_asof_display }}
+      {%- else -%}
+        No {{ contract.source_display }} data yet — backfill →
+      {%- endif -%}
+    </a>
+  </p>
+{% endif %}

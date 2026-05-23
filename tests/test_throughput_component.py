@@ -82,15 +82,23 @@ class TestRenderWiresQueryToModel:
 
 
 class TestToVegaStructure:
-    def test_spec_has_four_layers(self):
-        # weekend rect, missing rect, bars, em-dash marker.
-        assert _mark_types(to_vega(_model())) == ["rect", "rect", "bar", "text"]
+    def test_spec_has_the_expected_layer_marks(self):
+        # weekend rect, missing rect, bars, em-dash marker, then the
+        # reference band's rule + label text marks.
+        assert _mark_types(to_vega(_model())) == [
+            "rect", "rect", "bar", "text", "rule", "text",
+        ]
 
     def test_x_axis_is_pinned_to_the_date_order(self):
         model = _model()
         expected = [d.date_iso for d in model.daily]
+        # Date-encoded layers (rects, bars, gap markers) all share
+        # the same sort. Reference-band layers (rule + label) pin
+        # to the chart edge with a literal x — no `field`.
         for layer in to_vega(model)["layer"]:
-            assert layer["encoding"]["x"]["sort"] == expected
+            x = layer.get("encoding", {}).get("x")
+            if x is not None and "field" in x:
+                assert x["sort"] == expected
 
     def test_axis_labels_are_thinned_for_long_windows(self):
         # 31-day window → ≤ 11 labels.
@@ -125,3 +133,81 @@ class TestToVegaStructure:
         # shift the UTC date to browser-local.
         assert completed["field"] == "date_display"
         assert completed["type"] == "nominal"
+
+
+class TestReferenceBand:
+    """The throughput reference band — empirical P50/P85 of the
+    daily count series rendered as horizontal rule marks. A Vega
+    `param` toggles between the include-weekends sample (default)
+    and the weekdays-only sample."""
+
+    def _rule_layer(self, spec):
+        return next(
+            lyr for lyr in spec["layer"]
+            if isinstance(lyr["mark"], dict) and lyr["mark"]["type"] == "rule"
+        )
+
+    def test_rule_layer_carries_both_modes_pre_computed(self):
+        # Mon–Sun: counts 1..7. P50_all=4, P85_all≈6.1.
+        # Weekdays-only P50=3, P85=4.4.
+        items = []
+        for i, day in enumerate(range(5, 12), start=1):
+            items.extend(_completed(i * 10 + k, date(2026, 1, day)) for k in range(i))
+        spec = to_vega(build_throughput_model(items))
+        rule = self._rule_layer(spec)
+        values = rule["data"]["values"]
+        by_key = {(v["mode"], v["label"]): v["value"] for v in values}
+        assert by_key[("include_weekends", "P50")] == 4
+        assert abs(by_key[("include_weekends", "P85")] - 6.1) < 0.01
+        assert by_key[("weekdays_only", "P50")] == 3
+        assert abs(by_key[("weekdays_only", "P85")] - 4.4) < 0.01
+
+    def test_rule_layer_is_gated_by_the_weekends_param(self):
+        rule = self._rule_layer(to_vega(_model()))
+        filters = [t.get("filter") for t in rule.get("transform", [])]
+        # The filter selects rows whose `mode` matches the param.
+        assert any("weekendsMode" in str(f) for f in filters)
+
+    def test_label_text_carries_the_value(self):
+        # Mon–Sun counts 1..7. Include-weekends P50=4, P85≈6.1.
+        items = []
+        for i, day in enumerate(range(5, 12), start=1):
+            items.extend(_completed(i * 10 + k, date(2026, 1, day)) for k in range(i))
+        spec = to_vega(build_throughput_model(items))
+        label_layer = next(
+            lyr for lyr in spec["layer"]
+            if isinstance(lyr["mark"], dict)
+            and lyr["mark"]["type"] == "text"
+            and lyr["encoding"].get("text", {}).get("field") == "text"
+        )
+        rows = {(v["mode"], v["label"]): v["text"]
+                for v in label_layer["data"]["values"]}
+        # Numbers go inline with the percentile — no hover needed.
+        assert rows[("include_weekends", "P50")] == "P50: 4.0"
+        assert rows[("include_weekends", "P85")] == "P85: 6.1"
+        assert rows[("weekdays_only", "P50")] == "P50: 3.0"
+        assert rows[("weekdays_only", "P85")] == "P85: 4.4"
+
+    def test_weekends_param_defaults_to_include(self):
+        spec = to_vega(_model())
+        param = next(p for p in spec["params"] if p["name"] == "weekendsMode")
+        assert param["value"] == "include_weekends"
+        # The bound options expose both modes to the user.
+        opts = param["bind"]["options"]
+        assert "include_weekends" in opts and "weekdays_only" in opts
+
+    def test_band_is_absent_when_no_covered_days(self):
+        # No reference → no rule/label layers in the spec.
+        items = [_completed(1, date(2026, 1, 1))]
+        model = build_throughput_model(
+            items,
+            view=Window(from_=date(2027, 1, 1), to=date(2027, 1, 31)),
+        )
+        assert model.is_empty
+        # An empty model still produces a valid spec — but no rules.
+        spec = to_vega(model)
+        marks = [
+            lyr["mark"]["type"] if isinstance(lyr["mark"], dict) else lyr["mark"]
+            for lyr in spec["layer"]
+        ]
+        assert "rule" not in marks

@@ -11,9 +11,69 @@ come from `gh auth token` (run `gh auth login` once) or the
 uv sync
 ```
 
-## Commands
+## Interactive dashboard
 
-The CLI is `flow`, grouped into five subcommands.
+The primary workflow. Define a *workflow YAML*, materialise it into a
+local Parquet warehouse, and browse the dashboard in your browser.
+
+### 1. Write a workflow YAML
+
+One YAML per workflow, in a directory you control. Minimal GitHub
+example (`contracts/astral-uv-week.yaml`):
+
+```yaml
+contract:
+  name: astral-uv-week
+  source: github
+  repo: astral-sh/uv
+  start: 2026-05-04
+  stop: 2026-05-10
+```
+
+Jira works the same with `source: jira`, `jira_url:`, and
+`jira_project:`. Label-driven GitHub PR stitching uses a `wip_labels:`
+list — see [docs/SPEC-github-labels.md](SPEC-github-labels.md) for the
+resolution rules.
+
+### 2. Materialise the warehouse
+
+```
+uv run flow materialise astral-uv-week \
+    --workflows-dir contracts/ \
+    --data-dir data/
+```
+
+Fetches from the source API (cached on disk), canonicalises, and writes
+Parquet under `data/`. Cron-friendly — exits 0 on success and writes a
+JSON status file when `--status-file` is set.
+
+### 3. Serve the dashboard
+
+```
+uv run flow serve --workflows-dir contracts/ --data-dir data/
+# → http://127.0.0.1:8000
+```
+
+`--port` picks an alternate port if 8000 is busy. `--host 0.0.0.0`
+binds publicly and requires `--password` (or `$FLOW_PASSWORD`).
+
+The dashboard splits into two sections:
+
+- **Current state** — Aging WIP, pinned to the most recent materialise
+  date. The Period picker doesn't apply.
+- **Time slice** — Throughput, Cycle Time, Cumulative Flow, and Forecast,
+  all driven by the Period picker (last 7/14/30/90 days, last
+  week/2-weeks, all time, or custom). Throughput shows an empirical
+  P50/P85 reference band with an "Include weekends / Weekdays only"
+  toggle.
+
+The **Data source** page (top-right link) shows coverage and lets you
+backfill date ranges from the browser.
+
+## Ad-hoc CLI reports
+
+The same metrics as one-shot commands — useful for terminals,
+pipelines, static HTML exports, and agent consumption.
 
 ### Flow efficiency
 
@@ -32,8 +92,6 @@ We say `--items`, not `--backlog`: Vacanti flags "backlog" as
 contaminated by Scrum. See [Glossary](GLOSSARY.md).
 
 ```
-# 50 items to complete, 30 days of training data (defaults).
-# Training window defaults: history ends yesterday-UTC, starts 29 days earlier.
 uv run flow forecast when-done --repo astral-sh/uv --items 50
 
 # Explicit training window + deterministic seed
@@ -68,15 +126,10 @@ uv run flow cfd --jira-url https://issues.apache.org/jira --jira-project BIGTOP 
 
 ```
 # GitHub — review-cycle mode (default).
-# Columns come from isDraft + reviewDecision.
 uv run flow aging --repo astral-sh/uv \
     --workflow "Draft,Awaiting Review,Changes Requested,Approved"
 
 # GitHub — label-driven mode.
-# You name the labels that count as WIP, in order with most progress
-# on the right. PR state is materialized from LabeledEvent /
-# UnlabeledEvent timestamps; PRs not currently in a WIP column are
-# excluded. See docs/SPEC-github-labels.md for the resolution rules.
 uv run flow aging --repo dvhthomas/kno \
     --wip-labels "shaping,in-progress,in-review"
 
@@ -87,13 +140,13 @@ uv run flow aging --jira-url https://issues.apache.org/jira --jira-project BIGTO
 
 ## Output formats
 
-Every command takes `--format text|json|html`. Default is `text`.
+Every CLI command takes `--format text|json|html`. Default is `text`.
 
 | Format | Audience | Output |
 |--------|----------|--------|
-| `text` (default) | Humans, terminal | One-line headline by default; `--verbose` adds `rich`-styled tables and the full interpretation. No chart art — charts live in HTML. |
-| `json` | Agents, scripts | Schema-versioned envelope. Includes raw data, chart data (so an agent can reason about charts it can't see), and a `cli_invocation` field for provenance. **Stderr + warnings are captured into the `logs` field** so an agent reading only stdout doesn't miss diagnostics. Errors emit a `flowmetrics.error.v1` envelope with `type`, `message`, `hint`, and an optional `command_to_fix`. |
-| `html` | Archival | Single-file HTML report (datetime-stamped filename, embedded base64 PNG charts with 50/70/85/95 percentile lines, collapsible per-PR table, reproducible-command block at the top). |
+| `text` (default) | Humans, terminal | One-line headline; `--verbose` adds tables and interpretation. |
+| `json` | Agents, scripts | Schema-versioned envelope: raw data, chart data, captured stderr, reproducer command. Errors emit a `flowmetrics.error.v1` envelope with `hint` and `command_to_fix`. |
+| `html` | Archival | Single-file HTML report — embedded charts with 50/70/85/95 percentile lines, collapsible per-item table, reproducer at the top. |
 
 ### Agent example
 
@@ -105,30 +158,27 @@ uv run flow forecast when-done --repo astral-sh/uv --items 50 \
 The JSON envelope includes:
 
 - `schema` — versioned identifier (e.g. `flowmetrics.forecast.when_done.v1`).
-- `input` — echo of all parameters.
-- `result` / `training` / `simulation` / `percentiles` — the raw data.
-- `chart_data` — everything needed to reconstruct charts without seeing the image.
+- `input` / `result` / `training` / `simulation` / `percentiles` — raw data.
+- `chart_data` — everything needed to reconstruct charts.
 - `interpretation` — `headline`, `key_insight`, `next_actions`, `caveats`.
 - `logs` — stderr + warnings captured during the run.
-- `docs` — paths to the explainer docs in this repo.
 
 ## Testing
 
 Unit tests run by default and never hit the network — a `conftest.py`
-fixture asserts on any attempt. Run them as many times as you like:
+fixture asserts on any attempt.
 
 ```
 uv run pytest
 ```
 
-Integration tests are opt-in (require `gh auth login` or
-`$GITHUB_TOKEN`) and make real GraphQL calls:
+Integration tests are opt-in (require `gh auth login` or `$GITHUB_TOKEN`):
 
 ```
 uv run pytest -m integration
 ```
 
-Lint and type check (Astral stack):
+Lint and type check:
 
 ```
 uv run ruff check
@@ -141,22 +191,19 @@ uv run ty check src
 uv run python scripts/generate_samples.py
 ```
 
-This script is the source of truth for the `samples/` directory.
-Every run makes live GitHub and Jira calls (cached on disk, so reruns
-are free), regenerates the per-repo sample files in `samples/`, and
-rewrites `samples/index.html`. The pure helpers (repo config, index
-template) are unit-tested by `tests/test_samples_helpers.py`.
+Source of truth for the `samples/` directory. Every run makes live
+GitHub and Jira calls (cached on disk), regenerates the per-repo sample
+files, and rewrites `samples/index.html`.
 
 ## Local Pages preview
 
-The published site uses Jekyll via GitHub Pages
-(`_config.yml` at repo root). To preview locally requires Ruby and
-Bundler:
+The published site uses Jekyll via GitHub Pages (`_config.yml` at repo
+root). To preview locally:
 
 ```
 bundle install
 bundle exec jekyll serve
 ```
 
-In practice, the Pages build is fast enough that pushing to `main` and
-waiting for the workflow is the simpler iteration loop.
+In practice, pushing to `main` and waiting for the Pages workflow is the
+simpler iteration loop.

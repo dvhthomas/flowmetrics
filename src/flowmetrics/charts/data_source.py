@@ -141,7 +141,8 @@ def build_data_source_model(
     latest_display = _display(latest)
     headline = (
         f"{total} work item{'' if total == 1 else 's'} in the "
-        f"warehouse · created {earliest_display} – {latest_display}"
+        f"warehouse · earliest work item {earliest_display}, "
+        f"most recent work item {latest_display}"
     )
     return DataSourceModel(
         days=tuple(days),

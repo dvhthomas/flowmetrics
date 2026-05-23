@@ -87,7 +87,102 @@ def _throughput_to_vega(model: ThroughputModel) -> dict[str, Any]:
         "sort": date_order,
     }
 
-    return {
+    # Reference-band layers — only drawn when the model has them
+    # (i.e. at least one warehouse-covered day). Both modes (include
+    # weekends / weekdays only) are emitted as separate rows in a
+    # tiny inline dataset; a Vega `param` toggle picks which mode is
+    # visible via a transform filter — no re-render or refetch.
+    band_layers: list[dict[str, Any]] = []
+    band_params: list[dict[str, Any]] = []
+    if model.reference is not None:
+        def _band_row(mode: str, label: str, value: float) -> dict[str, Any]:
+            # Inline label carries the value — "P50: 3.0" — so the
+            # reader doesn't have to mentally project from a
+            # gridline to the y-axis.
+            return {
+                "mode": mode, "label": label, "value": value,
+                "text": f"{label}: {value:.1f}",
+            }
+
+        band_values: list[dict[str, Any]] = [
+            _band_row("include_weekends", "P50",
+                      model.reference.include_weekends.p50),
+            _band_row("include_weekends", "P85",
+                      model.reference.include_weekends.p85),
+        ]
+        if model.reference.weekdays_only is not None:
+            band_values.extend([
+                _band_row("weekdays_only", "P50",
+                          model.reference.weekdays_only.p50),
+                _band_row("weekdays_only", "P85",
+                          model.reference.weekdays_only.p85),
+            ])
+
+        band_params.append({
+            "name": "weekendsMode",
+            "value": "include_weekends",
+            "bind": {
+                "input": "select",
+                "options": ["include_weekends", "weekdays_only"],
+                "labels": ["Include weekends", "Weekdays only"],
+                "name": "Reference band: ",
+            },
+        })
+        band_layers.extend([
+            # P50/P85 horizontal rule marks. The filter keeps just
+            # the two rows matching the current toggle.
+            {
+                "data": {"values": band_values},
+                "transform": [{"filter": "datum.mode === weekendsMode"}],
+                "mark": {"type": "rule", "strokeDash": [4, 3]},
+                "encoding": {
+                    "y": {"field": "value", "type": "quantitative"},
+                    "color": {
+                        "field": "label", "type": "nominal",
+                        "scale": {
+                            "domain": ["P50", "P85"],
+                            "range": ["__theme:border__", "__theme:p-500__"],
+                        },
+                        "legend": None,
+                    },
+                    "tooltip": [
+                        {"field": "label", "type": "nominal",
+                         "title": "Percentile"},
+                        {"field": "value", "type": "quantitative",
+                         "title": "Items/day", "format": ".1f"},
+                    ],
+                },
+            },
+            # Per-rule label ("P50", "P85") pinned at the right
+            # edge of the chart. Same filter as the rule layer.
+            {
+                "data": {"values": band_values},
+                "transform": [{"filter": "datum.mode === weekendsMode"}],
+                "mark": {
+                    "type": "text",
+                    "align": "right",
+                    "baseline": "bottom",
+                    "dx": -4, "dy": -2,
+                    "fontSize": 10,
+                    "fontWeight": 600,
+                },
+                "encoding": {
+                    "x": {"value": {"expr": "width"}},
+                    "y": {"field": "value", "type": "quantitative"},
+                    "text": {"field": "text", "type": "nominal"},
+                    "color": {
+                        "field": "label", "type": "nominal",
+                        "scale": {
+                            "domain": ["P50", "P85"],
+                            "range": ["__theme:muted__", "__theme:p-500__"],
+                        },
+                        "legend": None,
+                    },
+                },
+            },
+        ])
+
+    spec: dict[str, Any] = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "background": "transparent",
         "padding": 12,
@@ -188,6 +283,7 @@ def _throughput_to_vega(model: ThroughputModel) -> dict[str, Any]:
                 },
                 "encoding": {"x": x_encoding, "y": {"value": 0}},
             },
+            *band_layers,
         ],
         "config": {
             "view": {"stroke": None},
@@ -203,3 +299,6 @@ def _throughput_to_vega(model: ThroughputModel) -> dict[str, Any]:
             },
         },
     }
+    if band_params:
+        spec["params"] = band_params
+    return spec
