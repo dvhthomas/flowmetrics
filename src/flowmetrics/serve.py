@@ -52,11 +52,18 @@ def main(argv: list[str] | None = None) -> int:
         httpd = _ReuseTCPServer(("127.0.0.1", args.port), handler)
     except OSError as exc:
         if exc.errno == errno.EADDRINUSE:
+            import os as _os
+            if _os.name == "nt":
+                find_cmd = f"netstat -ano | findstr :{args.port}"
+                kill_cmd = "taskkill /F /PID <PID>"
+            else:
+                find_cmd = f"lsof -ti:{args.port}"
+                kill_cmd = f"kill $(lsof -ti:{args.port})"
             sys.stderr.write(
                 f"error: port {args.port} is already in use.\n"
                 "  Another instance may already be running. Options:\n"
-                f"    - find it:  lsof -ti:{args.port}\n"
-                f"    - kill it:  kill $(lsof -ti:{args.port})\n"
+                f"    - find it:  {find_cmd}\n"
+                f"    - kill it:  {kill_cmd}\n"
                 f"    - try a different port:  uv run samples --port {args.port + 1}\n"
             )
             return 1

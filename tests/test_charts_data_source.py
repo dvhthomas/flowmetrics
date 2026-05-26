@@ -12,7 +12,6 @@ from datetime import date, timedelta
 
 from flowmetrics.charts.data_source import (
     MAX_DAYS,
-    DataSourceModel,
     build_data_source_model,
 )
 

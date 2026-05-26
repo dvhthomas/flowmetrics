@@ -1226,14 +1226,33 @@ def _assert_port_available(host: str, port: int) -> None:
         if exc.errno in (errno.EADDRINUSE, errno.EACCES):
             raise click.ClickException(
                 f"port {port} on {host} is already in use.\n"
-                f"  - find what is holding it:  lsof -ti:{port}\n"
-                f"  - free it:                  kill $(lsof -ti:{port})\n"
-                f"  - or pick another port:     "
-                f"flow serve --port {port + 1}"
+                f"{_port_busy_hints(port)}"
             ) from exc
         raise
     finally:
         probe.close()
+
+
+def _port_busy_hints(port: int, os_name: str | None = None) -> str:
+    """OS-appropriate 'find/kill the holder' suggestion block for
+    the port-busy error message. POSIX → `lsof` / `kill`; Windows →
+    `netstat` / `taskkill`. The `--port N+1` escape hatch is the
+    same on both."""
+    import os as _os
+
+    name = _os.name if os_name is None else os_name
+    alt_port = port + 1
+    if name == "nt":
+        return (
+            f"  - find what is holding it:  netstat -ano | findstr :{port}\n"
+            f"  - free it:                  taskkill /F /PID <PID>\n"
+            f"  - or pick another port:     flow serve --port {alt_port}"
+        )
+    return (
+        f"  - find what is holding it:  lsof -ti:{port}\n"
+        f"  - free it:                  kill $(lsof -ti:{port})\n"
+        f"  - or pick another port:     flow serve --port {alt_port}"
+    )
 
 
 @cli.command(short_help="Serve the warehouse-backed web UI")

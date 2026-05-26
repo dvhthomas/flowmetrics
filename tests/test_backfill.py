@@ -9,6 +9,7 @@ import os
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import ClassVar
 
 import yaml
 from click.testing import CliRunner
@@ -324,8 +325,9 @@ class TestBackfillProgressFragment:
 
     @staticmethod
     def _render(ctx: dict) -> str:
-        import flowmetrics
         from jinja2 import Environment, FileSystemLoader
+
+        import flowmetrics
 
         templates_dir = (
             Path(flowmetrics.__file__).parent / "web" / "templates"
@@ -335,8 +337,10 @@ class TestBackfillProgressFragment:
             "_partials/backfill_progress.html.jinja"
         ).render(**ctx)
 
-    _DONE = {"status": "done", "message": "", "since": None, "until": None}
-    _RUNNING = {
+    _DONE: ClassVar = {
+        "status": "done", "message": "", "since": None, "until": None,
+    }
+    _RUNNING: ClassVar = {
         "status": "running", "message": "",
         "since": "2026-05-04", "until": "2026-05-10",
     }

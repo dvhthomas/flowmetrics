@@ -14,10 +14,8 @@ section it controls.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from pathlib import Path
 
-import duckdb
 import pytest
 import yaml
 from click.testing import CliRunner

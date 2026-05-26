@@ -17,6 +17,7 @@ stand up multiple isolated instances per the multi-instance design.
 
 from __future__ import annotations
 
+import os
 import secrets
 import subprocess
 import sys
@@ -39,6 +40,7 @@ from .backfill import (
 )
 from .contract import ContractError, load_contract
 from .utc_dates import to_utc_display_date
+from .warehouse.connection import open_warehouse
 from .warehouse.queries import completion_date_range, latest_materialised_at
 from .web.components.aging import render as render_aging
 from .web.components.cfd import render as render_cfd
@@ -68,13 +70,33 @@ from .windows import parse_windows
 
 _TEMPLATES_DIR = Path(__file__).parent / "web" / "templates"
 
+
+# `subprocess.CREATE_NEW_PROCESS_GROUP` is the Win32 flag value
+# 0x00000200 — only attached to the `subprocess` module on Windows.
+# We hard-code the constant so the helper is testable on POSIX too;
+# the call site only passes it through `creationflags=` when running
+# on Windows.
+_WIN_CREATE_NEW_PROCESS_GROUP = 0x00000200
+
+
+def _detached_popen_kwargs(os_name: str | None = None) -> dict[str, object]:
+    """OS-appropriate kwargs for spawning a detached child that
+    outlives the request worker. POSIX uses `start_new_session`;
+    Windows wants `CREATE_NEW_PROCESS_GROUP` — passing the POSIX
+    flag on Windows raises. Unknown OS → no extras (caller still
+    gets a working but non-detached child)."""
+    name = os.name if os_name is None else os_name
+    if name == "posix":
+        return {"start_new_session": True}
+    if name == "nt":
+        return {"creationflags": _WIN_CREATE_NEW_PROCESS_GROUP}
+    return {}
+
 # Source `kind` → human label for the snapshot-section aside on
 # the dashboard ("most recent GitHub import"). New backends added
 # here; `.title()` is a safe fallback.
 _SOURCE_DISPLAY = {"github": "GitHub", "jira": "Jira"}
 
-
-from .warehouse.connection import open_warehouse
 
 # Exported for tests so they can exercise the production read path
 # without standing up a full FastAPI app.
@@ -656,12 +678,15 @@ def create_app(
         ]
         if offline:
             cmd.append("--offline")
-        # Detached: survives this request worker.
+        # Detached: survives this request worker. The detach flag
+        # itself is OS-conditional (POSIX `start_new_session` vs.
+        # Windows `creationflags=CREATE_NEW_PROCESS_GROUP`); see
+        # `_detached_popen_kwargs`.
         subprocess.Popen(
             cmd,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            start_new_session=True,
+            **_detached_popen_kwargs(),
         )
         return _fragment(read_status(spath))
 

@@ -23,13 +23,11 @@ caller (e.g. "what did aging look like at X-snapshot?") needs it.
 
 from __future__ import annotations
 
-import tempfile
 from datetime import datetime
 from pathlib import Path
 
 import duckdb
 import pytest
-
 
 
 @pytest.fixture
@@ -91,14 +89,8 @@ def _open_warehouse_via_app(data_dir: Path) -> duckdb.DuckDBPyConnection:
 
     contracts_dir = data_dir.parent / "contracts"
     contracts_dir.mkdir(exist_ok=True)
-    app = create_app(data_dir=data_dir, contracts_dir=contracts_dir)
-    # The dedup logic lives inside the `_open_warehouse` closure
-    # of `create_app`. We can't reach it directly, but we can hit
-    # it via a route that opens the warehouse. Cleaner: have the
-    # test ask the warehouse glob via DuckDB the same way the
-    # app's helper does, and assert the dedup contract.
-    # For now, just reach inside the routes by exporting a tiny
-    # helper from the app module (added by the implementation).
+    # Ensure the app's import side-effects fire (templates, helpers).
+    _ = create_app(data_dir=data_dir, contracts_dir=contracts_dir)
     from flowmetrics.app import open_warehouse_for_test
 
     return open_warehouse_for_test(data_dir)
@@ -120,7 +112,7 @@ class TestWorkItemsDedup:
             assert len(rows) == 1, (
                 f"expected 1 deduplicated row; got {len(rows)}: {rows}"
             )
-            item_id, completed_at, cycle = rows[0]
+            _item_id, completed_at, cycle = rows[0]
             assert completed_at is not None, (
                 "latest snapshot must have completed_at filled in"
             )
