@@ -38,7 +38,12 @@ from .backfill import (
     status_path,
     write_status,
 )
-from .contract import ContractError, load_contract
+from .contract import (
+    ContractError,
+    load_contract,
+    parse_contract_text,
+    validate_yaml_text_structured,
+)
 from .utc_dates import to_utc_display_date
 from .warehouse.connection import open_warehouse
 from .warehouse.queries import completion_date_range, latest_materialised_at
@@ -601,6 +606,23 @@ def create_app(
     # UI (B3..B5) layers on top.
     # ------------------------------------------------------------------
 
+    def _require_csrf(request: Request) -> None:
+        """Drive-by cross-origin POST/PUT/DELETE can't set custom
+        request headers without triggering a CORS preflight (which
+        this app doesn't accept). Requiring X-Requested-With: fetch
+        on writes is enough proof the request came from our own UI."""
+        if request.headers.get("X-Requested-With") != "fetch":
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    "writes require the X-Requested-With: fetch header. "
+                    "This blocks drive-by cross-origin POSTs from "
+                    "other tabs."
+                ),
+            )
+
+    write_dep = [Depends(_require_csrf), *auth_dep]
+
     @app.get("/api/internal/contracts", dependencies=auth_dep)
     def list_contracts() -> list[dict]:
         """List every workflow YAML under contracts_dir.
@@ -648,6 +670,100 @@ def create_app(
             "yaml": raw or "",
             "materialise": _materialise_status(contract_id),
         }
+
+    @app.post(
+        "/api/internal/contracts/_validate", dependencies=write_dep,
+    )
+    def validate_contract(payload: dict) -> dict:
+        """Validate a YAML body without touching disk. Always returns
+        200; the response carries `{valid, errors}` so the UI can
+        render line-level feedback inline."""
+        text = payload.get("yaml") or ""
+        errors = validate_yaml_text_structured(text)
+        return {"valid": not errors, "errors": errors}
+
+    @app.put(
+        "/api/internal/contracts/{contract_id}", dependencies=write_dep,
+    )
+    def put_contract(contract_id: str, payload: dict) -> dict:
+        """Create or overwrite a contract YAML atomically. Body must
+        carry a `yaml` STRING that parses against `parse_contract_text`
+        with `name == contract_id`."""
+        text = payload.get("yaml") or ""
+        try:
+            parse_contract_text(text, contract_id)
+        except ContractError as exc:
+            errors = validate_yaml_text_structured(text, contract_id)
+            raise HTTPException(
+                status_code=422,
+                detail={"message": str(exc), "errors": errors},
+            ) from exc
+
+        # Atomic write: tmp → rename. tmp lives in the same dir so
+        # the rename stays on one filesystem.
+        target = contracts_dir / f"{contract_id}.yaml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        tmp = target.with_suffix(".yaml.tmp")
+        tmp.write_text(text)
+        os.replace(tmp, target)
+        return get_contract(contract_id)
+
+    @app.delete(
+        "/api/internal/contracts/{contract_id}", dependencies=write_dep,
+    )
+    async def delete_contract(
+        contract_id: str, request: Request,
+    ) -> dict:
+        """Remove a contract YAML. Refuses if Parquet exists for that
+        contract unless `?purge_data=true` (or a JSON body
+        `{"purge_data": true}`) is passed — the flag also wipes
+        `<data-dir>/work_items/contract_id=<id>` and the matching
+        `transitions/` + `runs/` directories."""
+        _ensure_contract_exists(contract_id)
+
+        # Accept the flag from EITHER the query string (the standard
+        # DELETE-with-no-body shape) OR a JSON body (what fetch()
+        # callers naturally send). Whichever the UI chooses works.
+        purge = (request.query_params.get("purge_data") or "").lower() in (
+            "true", "1", "yes",
+        )
+        if not purge:
+            try:
+                raw = await request.body()
+                if raw:
+                    import json as _json
+                    purge = bool(_json.loads(raw).get("purge_data"))
+            except (ValueError, TypeError):
+                purge = False
+
+        partition_dirs = [
+            data_dir / "work_items" / f"contract_id={contract_id}",
+            data_dir / "transitions" / f"contract_id={contract_id}",
+            data_dir / "runs" / contract_id,
+        ]
+        has_data = any(p.exists() and any(p.rglob("*")) for p in partition_dirs)
+        if has_data and not purge:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"contract {contract_id!r} has warehouse data on "
+                    "disk. Pass `{\"purge_data\": true}` to delete "
+                    "the YAML AND the partitioned Parquet, or run "
+                    "`flow restore` first if you wanted to keep it."
+                ),
+            )
+
+        for ext in (".yaml", ".yml"):
+            p = contracts_dir / f"{contract_id}{ext}"
+            if p.exists():
+                p.unlink()
+        if purge:
+            import shutil
+
+            for d in partition_dirs:
+                if d.exists():
+                    shutil.rmtree(d)
+        return {"id": contract_id, "deleted": True, "purged": purge}
 
     @app.get(
         "/workflows/{workflow_id}/metrics/cfd",

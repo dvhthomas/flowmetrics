@@ -97,8 +97,16 @@ def load_contract(name: str, contracts_dir: Path) -> Contract:
                 f"(looked for {name}.yaml and {name}.yml)"
             )
 
+    return parse_contract_text(path.read_text(), name)
+
+
+def parse_contract_text(text: str, name: str) -> Contract:
+    """Same validation as `load_contract`, but takes raw YAML text
+    instead of a file path. The write API (PUT
+    /api/internal/contracts/{id}) routes the body through this so
+    validation logic is never duplicated."""
     try:
-        raw = yaml.safe_load(path.read_text())
+        raw = yaml.safe_load(text)
     except yaml.YAMLError as exc:
         raise ContractError(
             f"contract {name!r} is not valid YAML: {exc}"
@@ -106,14 +114,13 @@ def load_contract(name: str, contracts_dir: Path) -> Contract:
 
     if not isinstance(raw, dict) or "contract" not in raw:
         raise ContractError(
-            f"contract file {path} must have a top-level `contract:` key"
+            "must have a top-level `contract:` key"
         )
 
     body = raw["contract"]
     if not isinstance(body, dict):
         raise ContractError(
-            f"`contract:` in {path} must be a mapping; "
-            f"got {type(body).__name__}"
+            f"`contract:` must be a mapping; got {type(body).__name__}"
         )
 
     declared_name = body.get("name")
@@ -216,3 +223,56 @@ def load_contract(name: str, contracts_dir: Path) -> Contract:
         states=states_obj,
         label=label,
     )
+
+
+def validate_yaml_text_structured(
+    text: str, name: str | None = None,
+) -> list[dict]:
+    """Structured-error variant for the validate-on-keystroke API.
+    Returns `[]` when the text is a valid contract; otherwise a list
+    of `{message, line, column}` dicts (line/column null for semantic
+    errors that don't pin a single row).
+
+    `name` lets the caller assert the parsed contract.name matches a
+    URL slug; pass None to skip that check."""
+    try:
+        if name is None:
+            # Parse without the slug check by extracting it from the
+            # body and feeding it back in. If the body doesn't even
+            # have a `name`, parse_contract_text will surface that.
+            try:
+                doc = yaml.safe_load(text)
+            except yaml.YAMLError as exc:
+                return [_yaml_err_to_struct(exc)]
+            if not isinstance(doc, dict) or not isinstance(doc.get("contract"), dict):
+                return [{
+                    "message": "must have a top-level `contract:` key",
+                    "line": None, "column": None,
+                }]
+            inferred = doc["contract"].get("name") or ""
+            parse_contract_text(text, inferred)
+        else:
+            parse_contract_text(text, name)
+    except ContractError as exc:
+        # ContractError messages may wrap a YAMLError; preserve
+        # location info when present.
+        cause = exc.__cause__
+        if isinstance(cause, yaml.YAMLError):
+            return [_yaml_err_to_struct(cause)]
+        return [{"message": str(exc), "line": None, "column": None}]
+    except yaml.YAMLError as exc:
+        return [_yaml_err_to_struct(exc)]
+    return []
+
+
+def _yaml_err_to_struct(exc: yaml.YAMLError) -> dict:
+    """PyYAML's YAMLError carries a `problem_mark` with line/column
+    on syntax errors. Pull that out so the UI can underline the
+    bad line."""
+    line = column = None
+    mark = getattr(exc, "problem_mark", None)
+    if mark is not None:
+        line = int(getattr(mark, "line", -1)) + 1   # 0-indexed → 1-indexed
+        column = int(getattr(mark, "column", -1)) + 1
+    msg = getattr(exc, "problem", None) or str(exc)
+    return {"message": msg, "line": line, "column": column}

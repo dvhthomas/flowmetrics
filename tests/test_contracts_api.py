@@ -134,6 +134,220 @@ class TestGetContractDetail:
         assert "source" in r.text.lower() or "contract" in r.text.lower()
 
 
+class TestValidateEndpoint:
+    """`POST /api/internal/contracts/_validate` is the structured
+    parser the UI calls live to surface errors without touching disk.
+    Returns the same outcome `load_contract` would, but as JSON the
+    UI can render inline."""
+
+    def _post(self, client, **kwargs):
+        # Writes require the "this came from our UI" header so a
+        # drive-by cross-origin POST can't forge them.
+        kwargs.setdefault("headers", {})["X-Requested-With"] = "fetch"
+        return client.post("/api/internal/contracts/_validate", **kwargs)
+
+    def test_valid_yaml_returns_valid_true(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._post(client, json={"yaml":
+                "contract:\n  name: alpha\n  source: github\n  repo: a/b\n"
+            })
+        assert r.status_code == 200
+        body = r.json()
+        assert body == {"valid": True, "errors": []}
+
+    def test_invalid_yaml_returns_structured_errors(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        # Missing source: → ContractError.
+        with TestClient(app) as client:
+            r = self._post(client, json={"yaml":
+                "contract:\n  name: alpha\n"
+            })
+        assert r.status_code == 200  # validate ALWAYS returns 200
+        body = r.json()
+        assert body["valid"] is False
+        assert body["errors"]
+        # Each error names a message; line/column may be null when
+        # semantic (the parser can't pin a row).
+        for e in body["errors"]:
+            assert "message" in e
+
+    def test_yaml_syntax_error_pins_line_and_column(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        # Bad indentation → PyYAML raises with a problem_mark.
+        with TestClient(app) as client:
+            r = self._post(client, json={"yaml":
+                "contract:\n  name: alpha\n source: github\n"
+            })
+        body = r.json()
+        assert body["valid"] is False
+        assert any(
+            e.get("line") is not None and e.get("line") > 0
+            for e in body["errors"]
+        )
+
+
+class TestWriteContract:
+    def _put(self, client, contract_id, yaml_text):
+        return client.put(
+            f"/api/internal/contracts/{contract_id}",
+            json={"yaml": yaml_text},
+            headers={"X-Requested-With": "fetch"},
+        )
+
+    def test_creates_a_new_contract(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._put(client, "alpha",
+                "contract:\n  name: alpha\n  source: github\n  repo: a/b\n")
+            assert r.status_code == 200, r.text
+            body = r.json()
+            assert body["id"] == "alpha"
+            # The detail endpoint sees it immediately.
+            assert client.get("/api/internal/contracts/alpha").status_code == 200
+        # File landed on disk.
+        assert (contracts / "alpha.yaml").exists()
+
+    def test_overwrites_an_existing_contract_atomically(self, workspace):
+        contracts, data = workspace
+        _write(contracts, "alpha", label="old")
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._put(client, "alpha",
+                "contract:\n  name: alpha\n  label: new\n  source: github\n  repo: a/b\n")
+            assert r.status_code == 200, r.text
+        # New label visible.
+        text = (contracts / "alpha.yaml").read_text()
+        assert "label: new" in text
+
+    def test_invalid_yaml_rejects_with_422_and_does_not_write(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._put(client, "broken", "contract: {name: broken}\n")
+            assert r.status_code == 422
+            body = r.json()
+            assert "errors" in body or "detail" in body
+        assert not (contracts / "broken.yaml").exists()
+
+    def test_id_must_match_contract_name(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            # URL says "alpha" but YAML says "beta" → reject.
+            r = self._put(client, "alpha",
+                "contract:\n  name: beta\n  source: github\n  repo: a/b\n")
+            assert r.status_code == 422
+        # Nothing written.
+        assert not (contracts / "alpha.yaml").exists()
+        assert not (contracts / "beta.yaml").exists()
+
+
+class TestDeleteContract:
+    def _delete(self, client, contract_id, **kwargs):
+        kwargs.setdefault("headers", {})["X-Requested-With"] = "fetch"
+        return client.delete(
+            f"/api/internal/contracts/{contract_id}", **kwargs
+        )
+
+    def test_removes_yaml_when_no_warehouse_data(self, workspace):
+        contracts, data = workspace
+        _write(contracts, "alpha")
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._delete(client, "alpha")
+            assert r.status_code == 200, r.text
+        assert not (contracts / "alpha.yaml").exists()
+
+    def test_refuses_when_warehouse_data_exists(self, workspace):
+        contracts, data = workspace
+        _write(contracts, "alpha")
+        # Synthesise a Parquet leaf for this contract.
+        work = (
+            data / "work_items" / "contract_id=alpha"
+            / "year=2026" / "month=05" / "day=10"
+        )
+        work.mkdir(parents=True)
+        (work / "items-r1.parquet").write_bytes(b"fake")
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = self._delete(client, "alpha")
+            assert r.status_code == 409
+            body = r.json()
+            assert "purge" in str(body).lower()
+        # YAML still there, warehouse still there.
+        assert (contracts / "alpha.yaml").exists()
+        assert work.exists()
+
+    def test_purge_data_true_clears_warehouse_alongside_yaml(self, workspace):
+        contracts, data = workspace
+        _write(contracts, "alpha")
+        work = (
+            data / "work_items" / "contract_id=alpha"
+            / "year=2026" / "month=05" / "day=10"
+        )
+        work.mkdir(parents=True)
+        (work / "items-r1.parquet").write_bytes(b"fake")
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = client.request(
+                "DELETE",
+                "/api/internal/contracts/alpha",
+                json={"purge_data": True},
+                headers={"X-Requested-With": "fetch"},
+            )
+            assert r.status_code == 200, r.text
+        assert not (contracts / "alpha.yaml").exists()
+        # The contract's partition is gone; other partitions would
+        # be untouched (there are none in this test).
+        assert not (data / "work_items" / "contract_id=alpha").exists()
+
+
+class TestCSRFOnWrites:
+    """Writes require X-Requested-With: fetch. A drive-by POST from a
+    malicious page can't set that header cross-origin without
+    triggering a preflight (which we don't accept), so the header's
+    presence is enough proof the request came from our own UI."""
+
+    def test_put_without_header_is_blocked(self, workspace):
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = client.put(
+                "/api/internal/contracts/alpha",
+                json={"yaml":
+                    "contract:\n  name: alpha\n  source: github\n  repo: a/b\n"
+                },
+            )
+            assert r.status_code == 403
+        assert not (contracts / "alpha.yaml").exists()
+
+    def test_delete_without_header_is_blocked(self, workspace):
+        contracts, data = workspace
+        _write(contracts, "alpha")
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = client.delete("/api/internal/contracts/alpha")
+            assert r.status_code == 403
+        assert (contracts / "alpha.yaml").exists()
+
+    def test_validate_without_header_is_also_blocked(self, workspace):
+        # _validate is a POST that takes user input — same CSRF
+        # surface as PUT/DELETE.
+        contracts, data = workspace
+        app = create_app(data_dir=data, contracts_dir=contracts)
+        with TestClient(app) as client:
+            r = client.post(
+                "/api/internal/contracts/_validate",
+                json={"yaml": "x: y"},
+            )
+            assert r.status_code == 403
+
+
 class TestAuthPosture:
     def test_no_auth_required_on_localhost(self, workspace):
         # The factory's `password` arg is the off-host gate; when None,
