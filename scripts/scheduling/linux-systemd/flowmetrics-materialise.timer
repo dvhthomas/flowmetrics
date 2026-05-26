@@ -1,0 +1,16 @@
+[Unit]
+Description=Daily flowmetrics ingest
+
+[Timer]
+# 02:30 local time, every day. RandomizedDelaySec spreads the load if
+# you run this on a shared host or against the same API as someone
+# else's cron.
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=15min
+# If the host was off when the timer should have fired, run on next
+# boot instead of skipping the day.
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

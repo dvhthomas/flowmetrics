@@ -14,6 +14,7 @@ Errors in JSON mode are a `flowmetrics.error.v1` envelope on stdout.
 
 from __future__ import annotations
 
+import json
 import sys
 from collections.abc import Callable
 from datetime import UTC, date, datetime, timedelta
@@ -1204,6 +1205,131 @@ def materialise(
     )
     _status("done", msg)
     click.echo(msg)
+
+
+# ---------------------------------------------------------------------------
+# `flow materialise-all` — daily-ingest wrapper for cron / launchd / Task
+# Scheduler. Iterates every YAML in --workflows-dir; one bad contract
+# doesn't block the others. Writes a JSON manifest the user's monitoring
+# tool can grep for failures.
+# ---------------------------------------------------------------------------
+
+
+def _materialise_all_now() -> datetime:
+    """Indirection so tests can pin the timestamp without touching
+    the global `datetime.now`. Plain function, not a constant — the
+    monkeypatch needs a name to rebind."""
+    return datetime.now(UTC)
+
+
+@cli.command(
+    name="materialise-all",
+    short_help="Run materialise for every workflow YAML in --workflows-dir",
+)
+@click.option(
+    "--data-dir",
+    type=click.Path(path_type=Path),
+    default=Path("./data"),
+    show_default=True,
+)
+@click.option(
+    "--workflows-dir", "contracts_dir",
+    type=click.Path(path_type=Path),
+    default=Path("./contracts"),
+    show_default=True,
+)
+@click.option(
+    "--cache-dir",
+    type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR,
+    show_default=True,
+)
+@click.option("--offline/--online", default=False)
+@click.option(
+    "--manifest",
+    "manifest_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help=(
+        "Where to write the daily JSON manifest. Defaults to "
+        "<data-dir>/_status/daily-<UTC-date>.json."
+    ),
+)
+def materialise_all(
+    data_dir: Path,
+    contracts_dir: Path,
+    cache_dir: Path,
+    offline: bool,
+    manifest_path: Path | None,
+) -> None:
+    """Iterate every workflow YAML and materialise each one.
+
+    Scheduler-friendly: a single failing contract doesn't block the
+    rest. Exit code is 0 when at least one workflow succeeded (so
+    monitoring only pages when EVERYTHING is broken); the manifest
+    holds per-workflow detail for finer-grained alerting.
+    """
+
+    from .contract import ContractError, load_contract
+    from .materialise import materialise as run_materialise
+
+    started = _materialise_all_now()
+    yaml_paths = []
+    if contracts_dir.is_dir():
+        yaml_paths = sorted(
+            p for p in contracts_dir.iterdir()
+            if p.suffix in (".yaml", ".yml") and p.is_file()
+        )
+
+    results: list[dict] = []
+    for path in yaml_paths:
+        name = path.stem
+        entry: dict = {"workflow": name, "status": "failed", "error": ""}
+        try:
+            contract = load_contract(name, contracts_dir)
+            manifest = run_materialise(
+                contract=contract,
+                data_dir=data_dir,
+                cache_dir=cache_dir,
+                offline=offline,
+            )
+            entry["status"] = "ok"
+            entry["items"] = manifest.items_fetched
+            entry["run_id"] = manifest.run_id
+        except ContractError as exc:
+            entry["error"] = f"ContractError: {exc}"
+        except Exception as exc:
+            entry["error"] = f"{type(exc).__name__}: {exc}"
+        results.append(entry)
+
+    finished = _materialise_all_now()
+    payload = {
+        "schema": "flowmetrics.materialise_all.v1",
+        "started_at": started.isoformat(),
+        "finished_at": finished.isoformat(),
+        "results": results,
+    }
+
+    if manifest_path is None:
+        manifest_path = (
+            data_dir / "_status" / f"daily-{started.date().isoformat()}.json"
+        )
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(payload, indent=2))
+
+    # Echo a one-line summary so cron mail / journal reads cleanly.
+    ok = sum(1 for r in results if r["status"] == "ok")
+    failed = sum(1 for r in results if r["status"] == "failed")
+    click.echo(
+        f"materialise-all: {ok} ok, {failed} failed, manifest at {manifest_path}"
+    )
+
+    # Exit non-zero only when everything failed (or the dir was empty
+    # AND someone explicitly expects something there — we treat the
+    # empty case as success: "no workflows configured today" is the
+    # cron-job's first day, not an error).
+    if results and ok == 0:
+        sys.exit(1)
 
 
 # ---------------------------------------------------------------------------

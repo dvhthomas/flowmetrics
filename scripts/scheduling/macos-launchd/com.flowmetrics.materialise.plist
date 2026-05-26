@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  flowmetrics daily ingest under launchd (macOS).
+
+  Adjust the three placeholders before installing:
+    REPLACE_HOME  → your install root (holds contracts/ and data/)
+    REPLACE_VENV  → path to the venv ($HOME/projects/flowmetrics/.venv)
+
+  Install:
+    cp com.flowmetrics.materialise.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.flowmetrics.materialise.plist
+
+  Test-fire it once:
+    launchctl kickstart -k gui/$UID/com.flowmetrics.materialise
+
+  Uninstall:
+    launchctl bootout gui/$UID/com.flowmetrics.materialise
+    rm ~/Library/LaunchAgents/com.flowmetrics.materialise.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.flowmetrics.materialise</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>REPLACE_VENV/bin/flow</string>
+    <string>materialise-all</string>
+    <string>--workflows-dir</string>
+    <string>REPLACE_HOME/contracts</string>
+    <string>--data-dir</string>
+    <string>REPLACE_HOME/data</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>REPLACE_HOME</string>
+
+  <!-- Daily at 02:30 local time. Change Hour/Minute to taste; add a
+       second <dict> in StartCalendarInterval to fire multiple times. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>2</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+
+  <!-- If the Mac was asleep when the job should have fired, run it
+       the next time the Mac wakes up instead of skipping the day. -->
+  <key>StartCalendarIntervalDoesNotFireWhenSleeping</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>REPLACE_HOME/data/_status/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>REPLACE_HOME/data/_status/launchd.err.log</string>
+
+  <!-- Inherit user's PATH so /opt/homebrew/bin etc. are visible. -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>

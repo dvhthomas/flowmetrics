@@ -1,0 +1,22 @@
+# flowmetrics daily ingest under cron.
+#
+# Append to your user crontab:   crontab -e
+# Or drop in /etc/cron.d/flowmetrics (system-wide; needs USER column).
+#
+# Adjust the three env vars at the top to match your install. The
+# leading PATH= and SHELL= matter: cron's default PATH is minimal and
+# usually doesn't include the venv binary directory.
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+FLOWMETRICS_HOME=/srv/flowmetrics
+FLOWMETRICS_VENV=/srv/flowmetrics/.venv
+
+# Daily at 02:30 local. Output goes to syslog (`logger -t flowmetrics`).
+# Replace with `>> $FLOWMETRICS_HOME/data/_status/cron.log 2>&1`
+# if you prefer file-based logs.
+30 2 * * *  cd $FLOWMETRICS_HOME && $FLOWMETRICS_VENV/bin/flow materialise-all \
+            --workflows-dir $FLOWMETRICS_HOME/contracts \
+            --data-dir $FLOWMETRICS_HOME/data \
+            2>&1 | logger -t flowmetrics

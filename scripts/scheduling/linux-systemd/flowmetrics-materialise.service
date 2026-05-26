@@ -1,0 +1,23 @@
+[Unit]
+Description=flowmetrics daily ingest (materialise every workflow)
+# Don't run until the network is up. Source APIs are the whole point.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=%i
+# Adjust these three to match your install. Make sure the user named
+# above has read+write on $FLOWMETRICS_HOME.
+Environment="FLOWMETRICS_HOME=/srv/flowmetrics"
+Environment="FLOWMETRICS_VENV=/srv/flowmetrics/.venv"
+WorkingDirectory=${FLOWMETRICS_HOME}
+ExecStart=${FLOWMETRICS_VENV}/bin/flow materialise-all \
+    --workflows-dir ${FLOWMETRICS_HOME}/contracts \
+    --data-dir ${FLOWMETRICS_HOME}/data
+# Idle priority — the dashboard reads from local Parquet, never the
+# source API, so a slow ingest doesn't degrade interactive use.
+IOSchedulingClass=idle
+Nice=10
+# Cap runtime so a hung GitHub call doesn't pile up.
+TimeoutStartSec=900

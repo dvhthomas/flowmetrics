@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!--
+  flowmetrics daily ingest under Windows Task Scheduler.
+
+  Adjust these BEFORE importing:
+    - <UserId>          set to the account that owns the install
+    - <WorkingDirectory> path to your FLOWMETRICS_HOME
+    - <Command>         path to flow.exe inside your venv
+    - <Arguments>       --workflows-dir and --data-dir paths
+
+  Import + run:
+    schtasks /Create /XML flowmetrics-materialise.xml /TN flowmetrics-materialise
+    schtasks /Run /TN flowmetrics-materialise
+
+  Inspect / delete:
+    schtasks /Query /TN flowmetrics-materialise /V /FO LIST
+    schtasks /Delete /TN flowmetrics-materialise /F
+-->
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>flowmetrics daily ingest (materialise every workflow)</Description>
+    <Author>flowmetrics</Author>
+  </RegistrationInfo>
+
+  <Triggers>
+    <CalendarTrigger>
+      <!-- Daily at 02:30 local. Adjust StartBoundary to taste. The
+           DATE part is ignored; the TIME part is what matters. -->
+      <StartBoundary>2026-01-01T02:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+
+  <Principals>
+    <Principal id="Author">
+      <!-- Replace DOMAIN\username with the account you want to run as,
+           or just username for a local account. -->
+      <UserId>DOMAIN\username</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable> <!-- run missed runs on next boot -->
+    <RunOnlyIfNetworkAvailable>true</RunOnlyIfNetworkAvailable>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT15M</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+
+  <Actions Context="Author">
+    <Exec>
+      <!-- Replace with the actual paths on your machine. -->
+      <Command>C:\flowmetrics\.venv\Scripts\flow.exe</Command>
+      <Arguments>materialise-all --workflows-dir C:\flowmetrics\contracts --data-dir C:\flowmetrics\data</Arguments>
+      <WorkingDirectory>C:\flowmetrics</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
