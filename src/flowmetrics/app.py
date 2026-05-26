@@ -778,6 +778,32 @@ def create_app(
                 "title": "New workflow · flowmetrics",
                 "contract": None,
                 "contracts_dir_display": str(contracts_dir.resolve()),
+                "wizard_mode": "new",
+                "edit_id": None,
+            },
+        )
+
+    @app.get(
+        "/admin/contracts/{contract_id}/edit",
+        response_class=HTMLResponse,
+        dependencies=auth_dep,
+    )
+    def edit_contract_page(
+        request: Request, contract_id: str,
+    ) -> HTMLResponse:
+        """Edit-existing-contract page. Reuses the wizard template;
+        the JS detects `mode=edit` and hydrates fields from
+        GET /api/internal/contracts/{id} on load."""
+        _ensure_contract_exists(contract_id)
+        return templates.TemplateResponse(
+            request,
+            "contracts_new.html.jinja",
+            {
+                "title": f"Edit {contract_id} · flowmetrics",
+                "contract": None,
+                "contracts_dir_display": str(contracts_dir.resolve()),
+                "wizard_mode": "edit",
+                "edit_id": contract_id,
             },
         )
 

@@ -84,11 +84,19 @@
   }
 </style>
 
+{% if wizard_mode == "edit" %}
+<h1>Edit workflow: {{ edit_id }}</h1>
+<p class="muted">
+  Save overwrites the existing YAML. Delete removes it (warehouse
+  data on disk requires explicit purge — the button asks).
+</p>
+{% else %}
 <h1>New workflow</h1>
 <p class="muted">
   A workflow is a YAML file under <code>contracts/</code>. Fill in the
   fields below; we'll write it for you and open the dashboard.
 </p>
+{% endif %}
 
 <form class="wizard" id="wizard">
   <fieldset>
@@ -175,8 +183,13 @@
   </fieldset>
 
   <div class="wizard-actions">
-    <button type="submit">Save &amp; open</button>
+    <button type="submit">{% if wizard_mode == "edit" %}Save{% else %}Save &amp; open{% endif %}</button>
     <a href="/" class="filter-reset">Cancel</a>
+    {% if wizard_mode == "edit" %}
+    <button type="button" id="delete-btn"
+            style="margin-left: auto; background: transparent; border: 0.0625rem solid var(--t-700); color: var(--t-700); padding: 0.4rem 1rem; border-radius: 0.3rem; cursor: pointer;"
+            onclick="confirmDelete()">Delete</button>
+    {% endif %}
   </div>
   <p class="wizard-errors" id="wizard-errors"></p>
 </form>
@@ -327,6 +340,82 @@
       status.textContent = "probe failed: " + err;
       status.className = "probe-status probe-status--fail";
     });
+  }
+
+  var WIZARD_MODE = {{ wizard_mode | tojson }};
+  var EDIT_ID = {{ edit_id | tojson }};
+
+  function hydrateFromExisting(id) {
+    fetch("/api/internal/contracts/" + encodeURIComponent(id))
+      .then(function (r) { return r.json(); })
+      .then(function (body) {
+        var form = document.getElementById("wizard");
+        var p = body.parsed || {};
+        function setField(name, value) {
+          var el = form.elements[name];
+          if (!el) return;
+          if (value !== null && value !== undefined) el.value = value;
+        }
+        setField("name", p.name);
+        setField("label", p.label);
+        setField("source", p.source);
+        setField("repo", p.repo);
+        setField("jira_url", p.jira_url);
+        setField("jira_project", p.jira_project);
+        setField("start", p.start);
+        setField("stop", p.stop);
+        // Toggle conditional fields based on the loaded source.
+        document.getElementById("source-fieldset").dataset.source = p.source || "github";
+        // Hydrate stages into the right buckets.
+        if (p.states) {
+          ['backlog', 'wip', 'done'].forEach(function (bucket) {
+            var list = document.querySelector('#stage-bucket-' + bucket + ' .stage-list');
+            (p.states[bucket] || []).forEach(function (name) {
+              list.appendChild(renderStageChip(name, bucket));
+            });
+          });
+        }
+        // The id is fixed in edit mode; lock the field.
+        if (WIZARD_MODE === "edit") {
+          form.elements.name.readOnly = true;
+        }
+      });
+  }
+
+  function confirmDelete() {
+    var typed = window.prompt(
+      "Type the workflow id (" + EDIT_ID + ") to confirm delete. " +
+      "If the warehouse has data, you'll be prompted again to purge."
+    );
+    if (typed !== EDIT_ID) return;
+    fetch("/api/internal/contracts/" + encodeURIComponent(EDIT_ID), {
+      method: "DELETE",
+      headers: { "X-Requested-With": "fetch" },
+    }).then(function (r) {
+      if (r.ok) { window.location.href = "/"; return; }
+      if (r.status === 409) {
+        if (window.confirm(
+          "Warehouse data exists for this workflow. Purge it too?"
+        )) {
+          return fetch(
+            "/api/internal/contracts/" + encodeURIComponent(EDIT_ID) +
+            "?purge_data=true",
+            { method: "DELETE", headers: { "X-Requested-With": "fetch" } }
+          ).then(function (r2) {
+            if (r2.ok) window.location.href = "/";
+          });
+        }
+        return;
+      }
+      r.json().then(function (body) {
+        document.getElementById("wizard-errors").textContent =
+          (body.detail && body.detail.message) || body.detail || "delete failed";
+      });
+    });
+  }
+
+  if (WIZARD_MODE === "edit" && EDIT_ID) {
+    hydrateFromExisting(EDIT_ID);
   }
 
   document.getElementById("wizard").addEventListener("submit", function (ev) {

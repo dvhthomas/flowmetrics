@@ -12,5 +12,9 @@
         No {{ contract.source_display }} data yet — backfill →
       {%- endif -%}
     </a>
+    <a class="data-source-edit"
+       href="/admin/contracts/{{ contract.name }}/edit"
+       title="Edit this workflow"
+       style="margin-left: 0.6rem; font-size: 0.75rem; color: var(--muted);">edit</a>
   </p>
 {% endif %}
