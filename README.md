@@ -83,6 +83,8 @@ learning artifact, not a product.
 
 - **[How to install and run](docs/HOWTO.md)** — install, the dashboard
   workflow, ad-hoc CLI commands, output formats, testing.
+- **[Operations](docs/OPERATIONS.md)** — scheduled ingest on every
+  major OS, backup + restore, Docker + GH Actions, troubleshooting.
 - **[Metrics](docs/METRICS.md)** — how cycle / active / wait time and
   flow efficiency are computed; the clustering algorithm; assumptions.
 - **[Forecasting](docs/FORECAST.md)** — Monte Carlo when-done and
