@@ -1,0 +1,23 @@
+# GitHub PR review cycle WITH an explicit states: block.
+#
+# Useful when:
+#   - The data is sparse and the inferred order would be unstable.
+#   - You want chart band order to be reproducible across runs.
+#   - You want to exclude some stages from CFD/Aging (put them under
+#     `backlog:` instead of `wip:`).
+
+contract:
+  name: pytest-week
+  label: pytest-dev/pytest
+  source: github
+  repo: pytest-dev/pytest
+  start: 2026-04-01
+  stop: 2026-05-31
+  states:
+    wip:
+      - Draft
+      - Awaiting Review
+      - Changes Requested
+      - Approved
+    done:
+      - Merged

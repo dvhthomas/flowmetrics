@@ -1,2 +1,0 @@
-Forecast too uncertain -- 85% of simulations produced zero completions in the next 15 days (by May 
-31, 2026). Median is 2 items; consider a wider training window.

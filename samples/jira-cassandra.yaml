@@ -1,0 +1,23 @@
+# Apache CASSANDRA — Jira workflow with richer state vocabulary.
+# Public project, anonymous reads.
+
+contract:
+  name: apache-cassandra-week
+  label: Apache CASSANDRA
+  source: jira
+  jira_url: https://issues.apache.org/jira
+  jira_project: CASSANDRA
+  start: 2026-04-01
+  stop: 2026-05-31
+  states:
+    backlog:
+      - Open
+      - Triage Needed
+    wip:
+      - In Progress
+      - Patch Available
+      - Review In Progress
+      - Ready to Commit
+    done:
+      - Resolved
+      - Closed

@@ -1,0 +1,16 @@
+# GitHub PR review cycle — the default for a typical repo.
+# Stages are inferred from PR timeline events:
+#   Draft → Awaiting Review → Changes Requested → Approved → Merged
+#
+# Edit `repo:` and the date window, save as
+# `contracts/<your-name>.yaml`, then:
+#   flow materialise <your-name> --workflows-dir contracts --data-dir data
+#   flow serve --workflows-dir contracts --data-dir data
+
+contract:
+  name: astral-uv-week
+  label: Astral uv (PRs)
+  source: github
+  repo: astral-sh/uv
+  start: 2026-04-01
+  stop: 2026-05-31

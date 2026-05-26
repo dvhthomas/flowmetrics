@@ -1,0 +1,23 @@
+# Apache Jira — public project, anonymous reads.
+# Small/medium project; the default workflow shows up nicely on the
+# dashboard.
+
+contract:
+  name: apache-bigtop-week
+  label: Apache BIGTOP
+  source: jira
+  jira_url: https://issues.apache.org/jira
+  jira_project: BIGTOP
+  start: 2026-04-01
+  stop: 2026-05-31
+  # Optional: pin the band order. Without this, stages are inferred
+  # from changelog precedence.
+  states:
+    backlog:
+      - Open
+    wip:
+      - In Progress
+      - Patch Available
+    done:
+      - Resolved
+      - Closed

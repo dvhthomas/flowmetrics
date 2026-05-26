@@ -1,0 +1,28 @@
+# GitHub PR workflow driven by labels.
+#
+# Use this when the team's PR workflow is encoded in labels
+# (`status:in-review`, `team:backend/qa-pending`, etc.) rather than the
+# native Draft → Approved → Merged cycle. The `wip_labels:` list names
+# the labels that count as WIP, in workflow order (left to right on the
+# board). State is materialised from LabeledEvent / UnlabeledEvent
+# timestamps in the PR's timeline.
+#
+# See docs/SPEC-github-labels.md for the full resolution rules.
+
+contract:
+  name: backend-team-week
+  label: Backend team (PRs)
+  source: github
+  repo: example-org/your-repo
+  start: 2026-05-01
+  stop: 2026-05-31
+  # `wip_labels` is GitHub-specific. Order matters — most progress on
+  # the right. PRs not currently in a WIP label are treated as
+  # pre-WIP (arrivals) or post-WIP (departures).
+  states:
+    wip:
+      - status:in-review
+      - status:qa-pending
+      - status:approved
+    done:
+      - status:merged

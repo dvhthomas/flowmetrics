@@ -1,2 +1,0 @@
-WIP Aging for rust-lang/rust as of May 17, 2026: 868 in-flight items, 732 already past P85 (17.8d), 
-508 past P95 (74.5d).

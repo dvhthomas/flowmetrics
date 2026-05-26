@@ -1,1 +1,0 @@
-5 items completed in 30 days; median 0.0d, P85 1.1d (wide spread -- long tail skews P85).

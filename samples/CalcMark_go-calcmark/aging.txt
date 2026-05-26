@@ -1,2 +1,0 @@
-WIP Aging for CalcMark/go-calcmark as of May 17, 2026: 5 in-flight items, 5 already past P85 
-(14.8d), 5 past P95 (34.8d).
