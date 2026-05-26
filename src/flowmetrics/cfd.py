@@ -1,4 +1,4 @@
-"""Cumulative Flow Diagram (CFD) construction per Vacanti.
+"""Cumulative Flow Diagram (CFD) construction.
 
 This module is the CLI surface for the CFD math. The actual
 cumulative-by-stage algorithm lives in `flowmetrics.charts.cfd`
@@ -9,7 +9,7 @@ into the `CfdPoint` shape the CLI renderers expect.
 
 For each sample date T and each workflow state S, plot the
 cumulative count of items that have entered S or any later
-workflow state by T. Stacking those counts yields Vacanti's six
+workflow state by T. Stacking those counts yields the six standard
 CFD properties:
 
   #1  Top line = cumulative arrivals; bottom = cumulative departures.

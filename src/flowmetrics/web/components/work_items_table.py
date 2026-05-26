@@ -335,7 +335,7 @@ def render(
     asof_date = _date.fromisoformat(in_flight_at) if in_flight_at else None
 
     def _age(created_at) -> int | None:
-        """Vacanti's Age = CD - SD + 1 (same +1 inclusive rule as
+        """Age = CD - SD + 1 (same +1 inclusive rule as
         cycle time; same-day items are 1d, never 0d). Computed
         here at query/view time because `asof` is a runtime
         parameter — materialise can't precompute it."""

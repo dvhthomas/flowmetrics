@@ -7,7 +7,7 @@
 
 ## 1. Objective
 
-flowmetrics computes Vacanti-style flow metrics — cycle time, flow
+flowmetrics computes kanban-flow metrics — cycle time, flow
 efficiency, CFD, aging, Monte Carlo forecasts — from GitHub PRs and
 Jira issues. It exists to give engineering teams *honest* flow signals:
 the canonical data model is faithful to the source, the math is
@@ -145,7 +145,7 @@ docs/
   METRICS.md              — flow-efficiency calculation contract
   TUNING.md               — per-repo tuning guidance
   DECISIONS.md            — architectural trade-offs
-  GLOSSARY.md             — Vacanti vocabulary
+  GLOSSARY.md             — kanban-flow vocabulary
   FORECAST.md             — MCS methodology
   HOWTO.md                — user-facing usage
   SPEC-warehouse-app.md   — feature-level design for the warehouse + web app

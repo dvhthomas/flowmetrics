@@ -197,7 +197,7 @@ transient failures more than once or twice per week, add an
 
 ## 9. WIP-tracking source is per-system, not generalized
 
-**The question.** Vacanti's CFD and Aging charts assume named workflow
+**The question.** The CFD and Aging charts assume named workflow
 states. Where do those come from? In Jira, status transitions live in
 each issue's changelog. In GitHub, there is no native multi-state
 workflow on PRs — tools like [gh-velocity] reconstruct WIP from issue
@@ -208,7 +208,7 @@ interchangeable; either covers some teams' reality and not others'.
 
 - **Jira issues**: native workflow. Each issue's `changelog.histories`
   provides status transitions; CFD and Aging consume `status_intervals`
-  directly. This is the canonical Vacanti use case and our reference
+  directly. This is the canonical kanban use case and our reference
   surface for those charts.
 
 - **GitHub PRs (Aging)**: a deliberately simple four-state review

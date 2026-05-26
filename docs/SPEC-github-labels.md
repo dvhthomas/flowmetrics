@@ -21,7 +21,7 @@ already consumes from Jira changelogs.
 ### What this unlocks
 
 - **CFD** for GitHub PRs goes from two-state degenerate (arrivals /
-  departures) to a real Vacanti-style stack: one band per WIP label,
+  departures) to a real multi-band stack: one band per WIP label,
   in the order the caller named them, plus implicit arrivals
   (pre-WIP) and departures (no WIP label applied).
 - **Aging** for GitHub PRs gains a label-driven mode that surfaces

@@ -1,9 +1,9 @@
 # Tuning flow-metric parameters per repo
 
-flowmetrics ships sensible Vacanti defaults: 4-hour activity-clustering
-gap, no stale-item filtering, no Issue+PR stitching. They're right for
-the corporate-synchronous teams Vacanti's book was written for. They
-read low for OSS, where the rhythm of work is different.
+flowmetrics ships defaults tuned for corporate-synchronous teams:
+4-hour activity-clustering gap, no stale-item filtering, no Issue+PR
+stitching. These read low for OSS, where the rhythm of work is
+different.
 
 This doc explains the three knobs and how to choose values that match
 your team's actual rhythm — without changing the canonical data model

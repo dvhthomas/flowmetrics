@@ -5,7 +5,7 @@ window into a `CfdModel`: every chart decision resolved, including
 the visual-window clamping and the y-floor crop bounds. Pure
 Python — no DuckDB, no Vega.
 
-The Vacanti invariants this preserves:
+The CFD invariants this preserves:
 
   #1  Top line = cumulative arrivals; bottom = cumulative departures.
   #2  No line decreases over time.
@@ -14,9 +14,6 @@ The Vacanti invariants this preserves:
 
 `infer_stage_order` is the pairwise-precedence resolver used when
 no contract YAML pins the workflow.
-
-Reference: Vacanti, *Actionable Agile Metrics for Predictability*,
-10th Anniversary Edition, ch. 3.
 """
 
 from __future__ import annotations
@@ -86,7 +83,7 @@ def cumulative_arrivals_by_stage(
     items that have entered each stage OR any later stage by that
     date. Returns one dict per sample date, keyed by stage.
 
-    The Vacanti CFD core — both `build_cfd_model` (the web layer)
+    The CFD core — both `build_cfd_model` (the web layer)
     and `flowmetrics.cfd.build_cfd` (the CLI surface) call into
     this. Items that skipped an early stage are propagated backward
     so the bands never cross (#3 in the CFD invariants).

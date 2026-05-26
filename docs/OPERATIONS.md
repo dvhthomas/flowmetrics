@@ -201,6 +201,6 @@ flow materialise your-workflow --workflows-dir contracts --data-dir data
 - [HOWTO.md](HOWTO.md) — getting started: install, the dashboard, the
   ad-hoc CLI subcommands.
 - [METRICS.md](METRICS.md) — what each chart computes, with
-  Vacanti citations.
+  references to the underlying framework.
 - [DECISIONS.md](DECISIONS.md) — why we built it the way we did.
 - `scripts/scheduling/` — copy-paste scheduler templates per OS.

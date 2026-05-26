@@ -4,8 +4,8 @@ older than a threshold.
 OSS pipelines accumulate hundreds of in-flight items with zero
 recent activity: external PRs no maintainer touched, abandoned
 issues, drive-by suggestions. They aren't part of the team's
-real flow but they dominate every chart. Vacanti's framing: this
-isn't a "deep tail" to investigate, it's noise to filter out.
+real flow but they dominate every chart — this isn't a "deep tail"
+to investigate, it's noise to filter out.
 
 `filter_stale(items, asof, days)` keeps only items whose last
 observed event is within `days` of `asof`. "Last observed event"

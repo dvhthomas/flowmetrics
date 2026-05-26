@@ -130,7 +130,7 @@ def interpret_efficiency(input: EfficiencyInput, result: WindowResult) -> Interp
 
     # Diagnostic: zero active time AND configured --active-statuses don't
     # appear in this workflow → name the mismatch and suggest a remap.
-    # (Vacanti-flavored Jira projects often use non-standard status names.)
+    # (Jira projects with non-standard status names need explicit overrides.)
     from datetime import timedelta as _td
 
     if (
@@ -194,8 +194,8 @@ def interpret_when_done(
             f"({training.total_merges} merges in {input.history_days}d). Forecast is "
             "extrapolating past the training horizon — treat the tail with skepticism."
         )
-    # Vacanti: shorter-term forecasts are better. If the 85% date lands
-    # well past the training window, suggest a shorter forecast.
+    # Shorter-term forecasts are better. If the 85% date lands well past
+    # the training window, suggest a shorter forecast.
     horizon_days = (p85 - input.start_date).days if hasattr(p85, "year") else 0
     if horizon_days > input.history_days * 1.5:
         next_actions.append(
@@ -325,7 +325,7 @@ def interpret_cfd(input: CfdInput, points: list[CfdPoint]) -> Interpretation:
         f"{departures} completed, {wip} still in flight at end."
     )
 
-    # Vacanti property #3: the widest vertical band identifies where WIP
+    # CFD property #3: the widest vertical band identifies where WIP
     # concentrates — that's where the bottleneck is. Compute per-band
     # WIP at the latest sample and surface the largest.
     bands: list[tuple[str, int]] = []
@@ -405,7 +405,7 @@ def interpret_aging(
     completed_count: int,
     excluded_above_max_age: int = 0,
 ) -> Interpretation:
-    """Narrate a WIP-Aging snapshot per Vacanti.
+    """Narrate a WIP-Aging snapshot.
 
     Calls out items already past P85 (likely to miss forecast) and the
     state column with the most accumulated WIP.

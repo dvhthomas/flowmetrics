@@ -37,7 +37,7 @@ class WorkflowStates:
     within each tuple is the kanban order (left to right).
 
     - `backlog`: items not yet started; excluded from CFD and
-      Aging WIP entirely (Vacanti — backlog is not WIP).
+      Aging WIP entirely (backlog is not WIP).
     - `wip`: actively-being-worked states; each becomes a band
       on the CFD and a column on Aging WIP.
     - `done`: terminal/departure states; CFD shows them as the

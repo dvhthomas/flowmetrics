@@ -1,24 +1,23 @@
 # Glossary
 
-flowmetrics follows Daniel Vacanti's terminology from *Actionable Agile
-Metrics for Predictability* and *When Will It Be Done?*. We're explicit
-about what each term means here so there's no drift between the code,
-the docs, and the user.
+flowmetrics uses the kanban-flow vocabulary popularised by *Actionable
+Agile Metrics for Predictability* and *When Will It Be Done?* (Daniel
+Vacanti). We're explicit about what each term means here so there's no
+drift between the code, the docs, and the user.
 
-## Vacanti-approved terms
+## Terms we use
 
 ### Items
 
 The unit of work the simulator counts. In this tool an item is one
 merged pull request (GitHub) or one resolved issue (Jira, future).
 
-We use **items**, not **backlog**. Vacanti is explicit that "backlog"
-is contaminated — Scrum overloads it for "the prioritized list of
-work-yet-to-be-done". We mean "the count of things still to do" and
-nothing more. The CLI flag is `--items N`; the dataclass field is
-`WhenDoneInput.items`. The string "backlog" appears nowhere in
-user-facing narrative copy (`tests/test_interpretation.py` asserts
-this).
+We use **items**, not **backlog**. "Backlog" is Scrum-loaded — it
+overloads the word for "the prioritized list of work-yet-to-be-done".
+We mean "the count of things still to do" and nothing more. The CLI
+flag is `--items N`; the dataclass field is `WhenDoneInput.items`.
+The string "backlog" appears nowhere in user-facing narrative copy
+(`tests/test_interpretation.py` asserts this).
 
 ### Cycle time
 
@@ -43,8 +42,7 @@ queue, which is where flow efficiency points you.
 `active_time / cycle_time`. Always reported in two flavours:
 
 - **Portfolio flow efficiency** = `Σ active / Σ cycle` across all
-  items in the window. Vacanti's recipe. The right number for system-
-  level conversations.
+  items in the window. The right number for system-level conversations.
 - **Per-item flow efficiency** = the ratio for one item. Directional;
   not a precise measurement.
 
@@ -67,10 +65,9 @@ input to Monte Carlo Simulation.
 ### Training window
 
 The historical window from which throughput samples are drawn. Default
-30 calendar days ending yesterday-UTC. Vacanti's recommendation in *When
-Will It Be Done?* — long enough to capture variance, short enough not
-to drag in stale regimes. CLI flags: `--history-start` and
-`--history-end`.
+30 calendar days ending yesterday-UTC — long enough to capture variance,
+short enough not to drag in stale regimes. CLI flags: `--history-start`
+and `--history-end`.
 
 ### Forecast window
 
@@ -88,7 +85,7 @@ of outcomes is the forecast. CLI: `--runs N`, default 10,000.
 
 The empirical distribution produced by Monte Carlo. X-axis = outcome
 (date for when-done, item count for how-many); Y-axis = simulation-run
-frequency. Vacanti calls this the **Results Histogram**.
+frequency.
 
 ### Forward percentile
 
@@ -100,7 +97,7 @@ X) >= p%". Higher confidence ⇒ later date.
 For `how-many` (items-axis): "largest item count N such that P(deliver
 >= N) >= p%". Higher confidence ⇒ FEWER items.
 
-This is the trickiest part of Vacanti's framework — *more confidence
+This is the trickiest part of the framework — *more confidence
 means commit to fewer items, not more*. The HTML and text renderers
 spell this out next to every how-many forecast.
 
@@ -112,9 +109,8 @@ Overloaded by Scrum. We say "items" or "items to complete".
 
 ### Velocity
 
-Vacanti rejects velocity as a flow metric: it's a Scrum-specific
-story-point summing convention, gameable, and confused with
-throughput. We don't compute it.
+Not a flow metric. It's a Scrum-specific story-point summing convention,
+gameable, and frequently confused with throughput. We don't compute it.
 
 ### Burndown / burnup
 

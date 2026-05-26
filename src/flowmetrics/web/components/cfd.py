@@ -62,7 +62,7 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
     # the band height for that stage (its cumulative minus the next
     # stage's cumulative; the terminal band's height is its full
     # cumulative). Stacking these adds back up to the cumulative
-    # arrivals — Vacanti's CFD math made explicit.
+    # arrivals — standard CFD math made explicit.
     values: list[dict] = []
     for d in model.daily:
         for i, stage in enumerate(model.stages):

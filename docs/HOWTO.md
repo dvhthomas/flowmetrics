@@ -88,8 +88,8 @@ uv run flow efficiency --repo astral-sh/uv \
 
 ### Forecast — "when will it be done?"
 
-We say `--items`, not `--backlog`: Vacanti flags "backlog" as
-contaminated by Scrum. See [Glossary](GLOSSARY.md).
+We say `--items`, not `--backlog` — the word is Scrum-loaded. See
+[Glossary](GLOSSARY.md).
 
 ```
 uv run flow forecast when-done --repo astral-sh/uv --items 50

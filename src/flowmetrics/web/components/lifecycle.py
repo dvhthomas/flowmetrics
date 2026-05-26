@@ -92,7 +92,7 @@ class LifecycleData:
     is_chartable: bool
     # Canonical cycle time, copied from the work_items row so the
     # lifecycle page reports the SAME number the work-items table
-    # does (Vacanti's elapsed-plus-one-day).
+    # does (elapsed-plus-one-day rule).
     cycle_time_days: float
 
 

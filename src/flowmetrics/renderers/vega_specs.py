@@ -205,7 +205,7 @@ def how_many_spec(report: HowManyReport) -> dict[str, Any]:
 
 
 def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
-    """Vacanti's Cycle-Time Scatterplot.
+    """Cycle-Time Scatterplot.
 
     x = completion date (temporal)
     y = cycle time in days (quantitative)
@@ -232,15 +232,15 @@ def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
         for pt in report.points
     ]
 
-    # Vacanti's deep-tail handling. A single 1500-day outlier crushes
-    # every other point into a thin strip; capping the visible y-axis
-    # at P95 * 1.5 keeps the bulk legible. Items above the cap are
-    # still in the dataset (tooltips, JSON, slowest-finishers table)
-    # — just clipped from the chart. An overflow text layer names the
-    # count so they aren't silently disappeared.
+    # Deep-tail handling. A single 1500-day outlier crushes every other
+    # point into a thin strip; capping the visible y-axis at P95 * 1.5
+    # keeps the bulk legible. Items above the cap are still in the
+    # dataset (tooltips, JSON, slowest-finishers table) — just clipped
+    # from the chart. An overflow text layer names the count so they
+    # aren't silently disappeared.
     #
-    # The cap factor (1.5x P95) is empirically the Vacanti threshold
-    # between "deep tail to investigate" and "outlier to filter."
+    # The cap factor (1.5x P95) is empirically the threshold between
+    # "deep tail to investigate" and "outlier to filter."
     # When P95 is itself 0 (degenerate small datasets), fall back to
     # 1.1x max so the data still fits.
     p95 = report.cycle_time_percentiles.get(95, 0.0)
@@ -356,8 +356,8 @@ def scatterplot_spec(report: ScatterplotReport) -> dict[str, Any]:
 
     # Overflow callout: when items are clipped by the y-cap, name the
     # count in the top-right corner so they aren't silently absent.
-    # Vacanti's framing: outliers belong in retrospective conversations,
-    # not in the headline statistics — but they shouldn't vanish either.
+    # Outliers belong in retrospective conversations, not in the
+    # headline statistics — but they shouldn't vanish either.
     layers: list[dict[str, Any]] = [circle_layer, rule_layer, text_layer]
     if overflow_count > 0:
         # Anchor the callout at the actual latest completion date in
@@ -476,14 +476,14 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
     """Stacked-area Cumulative Flow Diagram.
 
     Each band's vertical thickness at a sample date is the number of
-    items currently in that workflow step (Vacanti's property #3 —
+    items currently in that workflow step (CFD property #3 —
     `wip_in_state` = line[step_i] - line[step_{i+1}], or just
     line[terminal] for the bottom band). Stacked together, the bands
     sum to the top line — the cumulative-arrivals count
     (property #1).
 
     Stacks the terminal workflow step at the visual bottom, the first
-    step at the top, matching Vacanti's reference figure. Renders the
+    step at the top, matching the standard CFD reference figure. Renders the
     GitHub-PR degenerate two-state case (Open / Merged) without
     complaint.
     """
@@ -520,7 +520,7 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
 
     area_layer = {
         # Linear interpolation: each sample is a single inflection on
-        # the line (no flat-column steps). Matches Vacanti's reference
+        # the line (no flat-column steps). Matches the standard CFD
         # shape and removes any ambiguity about which day a hover rule
         # belongs to — the tick at T lines up with the vertex at T.
         "mark": {"type": "area", "interpolate": "linear", "opacity": 0.85},
@@ -664,8 +664,8 @@ def cfd_spec(report: CfdReport) -> dict[str, Any]:
 def efficiency_spec(report: EfficiencyReport) -> dict[str, Any]:
     """Per-PR FE chart, brought to Aging parity.
 
-    Vacanti's framing: long-running PRs dominate the portfolio FE.
-    Sorting by cycle time descending puts the system-bottleneck PRs at
+    Long-running PRs dominate the portfolio FE. Sorting by cycle time
+    descending puts the system-bottleneck PRs at
     the top. Color encodes FE band. The portfolio FE is a vertical
     rule — the system-level reference number the bars are compared
     against.
@@ -756,7 +756,7 @@ def efficiency_spec(report: EfficiencyReport) -> dict[str, Any]:
         },
     }
 
-    # Portfolio FE — Vacanti's system-level reference. Drawn as a
+    # Portfolio FE — the system-level reference. Drawn as a
     # vertical rule across the whole chart so any PR can be compared
     # against the system number.
     portfolio_pct = round(report.result.portfolio_efficiency * 100, 1)
@@ -1022,7 +1022,7 @@ def aging_spec(report: AgingReport) -> dict[str, Any]:
     if percentile_rows:
         rule_layers.append(
             {
-                # P85 is the forecast threshold in Vacanti's framing —
+                # P85 is the standard forecast threshold —
                 # solid + heavier so it stands out. Other percentiles
                 # stay dashed and lighter. Conditional encodings on
                 # `strokeDash` and `size` keep them in one layer (one

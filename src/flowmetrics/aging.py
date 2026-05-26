@@ -1,4 +1,4 @@
-"""Vacanti's Aging Work In Progress chart.
+"""Aging Work In Progress chart.
 
 Plots in-flight items (entered but not exited the workflow) by their
 current workflow state (x-axis) and elapsed age in days (y-axis).
@@ -43,7 +43,7 @@ def compute_aging(
     they have a Cycle Time, not an Age. Current state is read from the
     last status_interval; if there are none, falls back to ``"Unknown"``.
 
-    Age uses Vacanti's `CD - SD + 1` rule (whole calendar days, both
+    Age uses the `CD - SD + 1` rule (whole calendar days, both
     endpoints inclusive) — the same rule cycle time uses, so the two
     metrics speak the same units. A same-day item ages as 1d.
 
@@ -53,7 +53,7 @@ def compute_aging(
 
     `max_age_days` is opt-in: when set, items with `age_days >
     max_age_days` are dropped from the result. Default (None) keeps
-    every in-flight item per Vacanti.
+    every in-flight item.
     """
     out: list[AgingItem] = []
     for item in items:
@@ -84,7 +84,7 @@ def compute_aging_from_stream(
     """Canonical-stream version of compute_aging.
 
     Same return shape as `compute_aging` so renderers don't change.
-    Same Vacanti `CD - SD + 1` age rule, too. Inputs differ: this
+    Same `CD - SD + 1` age rule, too. Inputs differ: this
     reads the two-table Stream so the same code path handles a
     pure-PR flow, a pure-Issue flow, and an Issue+PR stitched flow
     without per-source branching.
@@ -189,7 +189,7 @@ def per_state_diagnostic(
         if ages:
             ages_sorted = sorted(ages)
             median = ages_sorted[len(ages_sorted) // 2]
-            # "At risk" cohort = items between P50 and P85: by Vacanti's
+            # "At risk" cohort = items between P50 and P85: by the
             # conditional-probability math, their risk of missing the
             # 85th-percentile forecast has at least doubled from 15% to
             # 30%. Naming the count surfaces who needs a conversation
@@ -282,7 +282,7 @@ def cycle_time_percentiles(
 ) -> dict[int, float]:
     """50/70/85/95 percentiles of cycle time across completed items, in days.
 
-    Same distribution as Vacanti's Scatterplot — the Aging chart's
+    Same distribution as the Scatterplot — the Aging chart's
     percentile lines are reference checkpoints drawn from this.
     """
     if not completed:

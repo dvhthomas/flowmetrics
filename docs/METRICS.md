@@ -6,7 +6,7 @@ before you act on any of the numbers.
 
 ## 1. The concept
 
-Flow efficiency, in Daniel Vacanti's framing, is one ratio:
+Flow efficiency is one ratio:
 
 ```
 Flow Efficiency = Active Time / Total Cycle Time
@@ -18,19 +18,19 @@ Flow Efficiency = Active Time / Total Cycle Time
   actually working on the item. Everything else — waiting on review, blocked,
   sitting in a QA queue, waiting on a dependency — is **wait time**.
 
-Vacanti's recurring point: real numbers are usually 5–15% in knowledge work,
-and the value of the metric is **locating the biggest queue**, not hitting a
-target.
+A recurring point in the literature: real numbers are usually 5–15% in
+knowledge work, and the value of the metric is **locating the biggest
+queue**, not hitting a target.
 
 This tool measures flow efficiency at the **pull request level**. It does not
 measure feature-level or issue-level flow. See the limitations section for
 what that means in practice.
 
-## 1.5 Measurement vs inference: the Vacanti contract
+## 1.5 Measurement vs inference: the design contract
 
-Vacanti's framing assumes the team has *designed the workflow to expose
-wait time*. His original Kanban formulation pairs each WIP column with a
-Done sub-column:
+This framing assumes the team has *designed the workflow to expose wait
+time*. The original Kanban formulation pairs each WIP column with a Done
+sub-column:
 
 ```
 Backlog │ Design ─ Doing │ Done │ Build ─ Doing │ Done │ Test ─ Doing │ Done │ Released
@@ -39,12 +39,14 @@ Backlog │ Design ─ Doing │ Done │ Build ─ Doing │ Done │ Test ─ 
 A card moves into `Design - Done` the moment design work finishes. It sits
 there — observably — until Build pulls it. The time spent in `Design - Done`
 *is* the wait time. No inference required. The bottleneck is whichever Done
-column is consistently widest. (Reinertsen calls this "making queues visible";
-Vacanti operationalises it as a chart you can read at standup.)
+column is consistently widest. (Reinertsen calls this "making queues
+visible"; the kanban-flow literature operationalises it as a chart you can
+read at standup.)
 
-This design contract is hard-coded into Vacanti's own product. ActionableAgile
-requires the user to designate Jira statuses as either active or **Queueing
-Stages**, and refuses to compute flow efficiency without that designation —
+This design contract is hard-coded into the canonical implementation.
+ActionableAgile requires the user to designate Jira statuses as either active
+or **Queueing Stages**, and refuses to compute flow efficiency without that
+designation —
 its docs are explicit: *"You must have either Blocked Days or Queueing Stages
 checked in order to calculate flow efficiency — without this, there is no
 idle/waiting time designated so the chart cannot calculate a flow efficiency."*
@@ -76,8 +78,9 @@ data:
   fallback, not the recommended path.
 
 **The recommended path** when the team's GitHub workflow has labels
-(`team-X/in-review`, `s-waiting-on-review`, or Vacanti-style `phase:doing`
-/ `phase:done` pairs) is to pass them via `--wip-labels`. The efficiency
+(`team-X/in-review`, `s-waiting-on-review`, or doing/done pairs like
+`phase:doing` / `phase:done`) is to pass them via `--wip-labels`. The
+efficiency
 command then routes through the same status-duration path Jira uses, and
 FE becomes a measurement rather than an inference. When the team has
 neither labels nor a Jira workflow, treat per-PR FE numbers as a screening
@@ -108,10 +111,10 @@ median_efficiency     = median( efficiency(pr_i) )
 ```
 
 `portfolio_efficiency` is the right number. The mean and median are reported
-because people ask for them, but `portfolio_efficiency` is what Vacanti means
-by "the system's flow efficiency": one PR sitting in review for two weeks
-matters more than ten one-hour PRs, and only the portfolio ratio reflects
-that. See section 7 for a worked example showing them diverge.
+because people ask for them, but the portfolio ratio is the one that
+captures "the system's flow efficiency": one PR sitting in review for two
+weeks matters more than ten one-hour PRs, and only the portfolio number
+reflects that. See section 7 for a worked example showing them diverge.
 
 ## 3. How GitHub data proxies the concepts
 
@@ -328,9 +331,9 @@ none is the only possible choice.
 
 ### 6.1 We only measure merged PRs
 
-Closed-without-merge PRs are excluded. Vacanti would argue these still
-represent flow (work was committed to, then abandoned) and ideally should be
-counted with `closed_at` as the end. We exclude them because most teams
+Closed-without-merge PRs are excluded. A purist would argue these still
+represent flow (work was committed to, then abandoned) and ideally should
+be counted with `closed_at` as the end. We exclude them because most teams
 treat them as not-real work, and including them noisily inflates cycle time.
 
 ### 6.2 Draft PRs are treated as part of cycle time
@@ -361,12 +364,11 @@ observable wait), but it's also uninformative: the PR was too small to
 have a queue.
 
 This is not a bug; it's the fundamental cost of inferring active time
-from event timing. Vacanti's status-duration model would also score
-these PRs as 100% active if every status transition happened within
-seconds. The difference is that under Vacanti's contract the user
-*chose* to track that workflow at this granularity. Under event
-clustering we get the same answer for repos that never opted into the
-contract.
+from event timing. A status-duration model would also score these PRs
+as 100% active if every status transition happened within seconds. The
+difference is that under the status-duration contract the user *chose*
+to track that workflow at this granularity. Under event clustering we
+get the same answer for repos that never opted into the contract.
 
 The portfolio-FE weighting (section 5.1) is what makes this tractable in
 aggregate: a 30-minute typo PR contributes 30 minutes of cycle time at
@@ -450,9 +452,9 @@ conclusion.
 - Per-engineer flow efficiency. Individual numbers reflect the system they
   are working in, not their effort. Measuring them rewards gaming the
   metric and punishes the engineers stuck with the messiest queues.
-- Setting a target ("we will hit 25% FE next quarter"). Vacanti is explicit
-  about this: targets cause people to inflate active time by reclassifying
-  wait states. The metric only works as a diagnostic.
+- Setting a target ("we will hit 25% FE next quarter"). Targets cause
+  people to inflate active time by reclassifying wait states. The metric
+  only works as a diagnostic.
 - Comparing across teams or repos. Different conventions, different review
   cultures, different draft-PR patterns make raw comparisons meaningless.
   Compare a team to its own past.

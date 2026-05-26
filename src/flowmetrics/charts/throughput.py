@@ -2,12 +2,9 @@
 
 `build_throughput_model` turns completed-item rows + a view window
 into a `ThroughputModel`: the daily series (zero-completion days
-included, per Vacanti), weekday/weekend classification,
-warehouse-vs-missing coverage tagging, and the headline. Pure
-Python — no DuckDB, no Vega.
-
-Reference: Vacanti, *Actionable Agile Metrics for Predictability*,
-10th Anniversary Edition, pp. 61–63.
+included — they're part of the empirical distribution),
+weekday/weekend classification, warehouse-vs-missing coverage
+tagging, and the headline. Pure Python — no DuckDB, no Vega.
 """
 
 from __future__ import annotations
@@ -107,9 +104,9 @@ def build_throughput_model(
             headline="No completed items in this window.",
         )
 
-    # Window span: chosen Period when a view is set (Vacanti — the
-    # rate divides over the PERIOD, not the observed-completion
-    # span); data-derived otherwise.
+    # Window span: chosen Period when a view is set — the rate divides
+    # over the PERIOD, not the observed-completion span. Data-derived
+    # otherwise.
     if view is not None:
         first_d, last_d = view.from_, view.to
     else:

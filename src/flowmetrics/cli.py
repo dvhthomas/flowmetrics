@@ -369,7 +369,7 @@ def efficiency(
     _dispatch(fmt, output, build, verbose=verbose)
 
 
-@cli.command(short_help="Cumulative Flow Diagram per Vacanti")
+@cli.command(short_help="Cumulative Flow Diagram")
 @_apply_source_options
 @click.option("--start", type=str, required=True, help="Window start (YYYY-MM-DD).")
 @click.option("--stop", type=str, required=True, help="Window stop (YYYY-MM-DD).")
@@ -407,8 +407,8 @@ def efficiency(
     help=(
         "Drop items whose most recent event (commit / comment / "
         "review / label change) is more than N days before the "
-        "window stop. Vacanti's noise filter: OSS pipelines have "
-        "hundreds of zombie items that aren't really 'in flight'. "
+        "window stop. Noise filter for OSS pipelines, which often "
+        "have hundreds of zombie items that aren't really 'in flight'. "
         "Default: no filter."
     ),
 )
@@ -431,7 +431,7 @@ def cfd(
     output: Path | None,
     verbose: bool,
 ) -> None:
-    """Cumulative Flow Diagram per Vacanti — stacked workflow states over time.
+    """Cumulative Flow Diagram — stacked workflow states over time.
 
     The CFD uses items completed inside the window and the timestamped
     status_intervals each item carries. Sources that don't expose
@@ -489,7 +489,7 @@ def cfd(
     _dispatch(fmt, output, build, verbose=verbose)
 
 
-@cli.command(short_help="Cycle Time Scatterplot per Vacanti")
+@cli.command(short_help="Cycle Time Scatterplot")
 @_apply_source_options
 @click.option(
     "--start",
@@ -609,7 +609,7 @@ def scatterplot(
 
 
 
-@cli.command(short_help="Aging Work In Progress (Vacanti WWIBD)")
+@cli.command(short_help="Aging Work In Progress")
 @_apply_source_options
 @click.option(
     "--asof",
@@ -647,7 +647,7 @@ def scatterplot(
     help=(
         "Opt-in: exclude in-flight items older than this many days from "
         "the chart and from past-P85/P95 counts. Default (unset) shows "
-        "every in-flight item per Vacanti — the right choice when you "
+        "every in-flight item — the right choice when you "
         "want full visibility on stalled work. Use this when long-tail "
         "stalled items dwarf actionable WIP. Example: --max-age-days=180."
     ),
@@ -710,7 +710,7 @@ def aging(
     output: Path | None,
     verbose: bool,
 ) -> None:
-    """Aging Work In Progress chart per Vacanti.
+    """Aging Work In Progress chart.
 
     Each in-flight item is plotted in the column of its current workflow
     state at a height equal to its age in days. Percentile lines come
@@ -763,7 +763,7 @@ def aging(
         in_flight = src.fetch_in_flight(asof_d)
         in_flight = filter_stale(in_flight, asof=asof_d, days=exclude_stale_days)
 
-        # Percentile window: completed items, defaulting to Vacanti's 30 days.
+        # Percentile window: completed items, defaulting to the 30-day rolling sample.
         hist_end = _parse_date(history_end) if history_end else (asof_d - timedelta(days=1))
         hist_start = (
             _parse_date(history_start) if history_start
@@ -820,7 +820,7 @@ def aging(
 
 @cli.group(short_help="Monte Carlo forecasting (when-done / how-many)")
 def forecast() -> None:
-    """Monte Carlo forecasting (Vacanti's "When Will It Be Done?")."""
+    """Monte Carlo forecasting — when-done / how-many."""
 
 
 _HISTORY_OPTIONS = [
@@ -831,7 +831,7 @@ _HISTORY_OPTIONS = [
         help=(
             "First day of the training window (YYYY-MM-DD, UTC). "
             f"Defaults to {DEFAULT_TRAINING_DAYS - 1} days before --history-end, "
-            f"giving Vacanti's recommended {DEFAULT_TRAINING_DAYS}-day window."
+            f"giving the standard {DEFAULT_TRAINING_DAYS}-day rolling window."
         ),
     ),
     click.option(
@@ -853,7 +853,7 @@ _HISTORY_OPTIONS = [
         type=int,
         default=10_000,
         show_default=True,
-        help="Monte Carlo iterations. Vacanti: ~1k gives the shape, ~10k stabilises.",
+        help="Monte Carlo iterations. ~1k gives the shape, ~10k stabilises.",
     ),
     click.option("--seed", type=int, default=None, help="RNG seed for reproducible output."),
 ]
@@ -886,8 +886,7 @@ def _resolve_history(
     required=True,
     help=(
         "Number of items to complete. We use 'items' rather than 'backlog' "
-        "because Vacanti flags 'backlog' as overloaded (Scrum uses it for "
-        "the prioritized list)."
+        "because the latter is Scrum-loaded (used for the prioritized list)."
     ),
 )
 @click.option("--start-date", type=str, default=None)

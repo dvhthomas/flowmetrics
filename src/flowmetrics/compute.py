@@ -37,7 +37,7 @@ class WorkItem:
     activity: list[datetime] = field(default_factory=list)
     is_bot: bool = False
     author_login: str | None = None
-    # Vacanti's canonical Jira input. If non-empty AND active_statuses are
+    # Canonical Jira input. If non-empty AND active_statuses are
     # configured, compute_pr_flow uses status-duration math instead of
     # event clustering. See docs/METRICS.md.
     status_intervals: list[StatusInterval] = field(default_factory=list)
@@ -73,7 +73,7 @@ class FlowEfficiency:
 @dataclass(frozen=True)
 class WindowResult:
     pr_count: int
-    portfolio_efficiency: float  # sum(active) / sum(cycle) — Vacanti's recipe
+    portfolio_efficiency: float  # sum(active) / sum(cycle) — the headline number
     mean_efficiency: float  # average of per-PR ratios (less useful)
     median_efficiency: float
     total_cycle: timedelta
@@ -104,7 +104,7 @@ def compute_pr_flow(
 
     # Status-duration path: used when the source provides explicit
     # named-status intervals (Jira) AND the caller has mapped some statuses
-    # as active. This is Vacanti's canonical Jira computation — measured,
+    # as active. This is the canonical Jira computation — measured,
     # not inferred.
     #
     # Discriminator between "Jira-style status_intervals" and "GitHub-PR-

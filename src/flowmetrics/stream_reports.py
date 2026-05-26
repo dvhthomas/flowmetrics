@@ -1,4 +1,4 @@
-"""Stream-native consumers for the remaining Vacanti reports.
+"""Stream-native consumers for the remaining flow-metric reports.
 
 All four reports (CFD, Scatterplot, Throughput, Flow Efficiency)
 implemented as pure functions over `Stream`. Same numeric outputs
@@ -81,7 +81,7 @@ def scatterplot_points(stream: Stream) -> list[StreamScatterPoint]:
 
 def throughput_per_day(stream: Stream, *, start: date, stop: date) -> list[dict]:
     """Daily count of items whose completed_at falls on each date in
-    [start, stop]. The bedrock of Vacanti's how-many forecasts.
+    [start, stop]. The bedrock of the how-many forecast.
     """
     counts: dict[date, int] = {}
     cur = start
@@ -114,8 +114,8 @@ class StreamFlowEfficiency:
 
 def flow_efficiency_per_item(stream: Stream) -> list[StreamFlowEfficiency]:
     """For each completed item, sum the time spent in stages that
-    belong to `workflow.wip_set` (the "active" time per Vacanti)
-    and divide by total cycle time.
+    belong to `workflow.wip_set` ("active" time) and divide by total
+    cycle time.
 
     Exit-of-stage is the next transition's `entered_at` for the
     same item; the terminal transition has no exit (the item

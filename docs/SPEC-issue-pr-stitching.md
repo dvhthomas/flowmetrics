@@ -2,7 +2,7 @@
 
 Status: **Draft, awaiting approval.** Reframed around the
 schema-first thought experiment: what's the minimum table shape
-that lets every Vacanti metric flow from it? Implementation work
+that lets every flow metric drop out of it? Implementation work
 (Issue+PR stitching included) becomes translation rules layered
 on top.
 
@@ -27,7 +27,7 @@ Two problems:
 This spec proposes the canonical model as **two tables**: work
 items, and stage transitions. Sources translate their native
 events into stage-transition rows. The metric layer reads only
-those rows + a team-supplied workflow definition. Every Vacanti
+those rows + a team-supplied workflow definition. Every flow
 metric — Cycle Time, Throughput, WIP, CFD, Aging, Scatterplot,
 Forecast — falls out of this minimum.
 
@@ -108,7 +108,7 @@ The workflow def doesn't live in the DB because it's a *team
 configuration*, not data. Today it's `--workflow` or
 `--wip-labels`; the spec keeps that surface.
 
-## Vacanti metrics, expressed as queries over the schema
+## Flow metrics, expressed as queries over the schema
 
 | Metric                       | Query shape                                                                                                                                            |
 |------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -179,15 +179,15 @@ the basics.
 
 ## Future dimension: slicing by work type (NOT in this spec)
 
-Vacanti calls these *classes of service* or *work-item types* —
-the same metric (cycle time, throughput, CFD, …) computed
-separately per category. Common splits:
+Often called *classes of service* or *work-item types* — the same
+metric (cycle time, throughput, CFD, …) computed separately per
+category. Common splits:
 
 - **Team-typed work**: bug / feature / keep-the-lights-on /
   refactor. Different cycle-time distributions per type — a bug
   fix typically ships faster than a feature.
-- **Vacanti's classes of service**: Standard / Expedite /
-  Fixed-Date / Intangible. Used to drive WIP policy.
+- **Classes of service**: Standard / Expedite / Fixed-Date /
+  Intangible. Used to drive WIP policy.
 
 **Not building this in any of phases 0–4.** But the schema must
 not block it. The clean addition is one new column on the
@@ -319,7 +319,7 @@ deleted when the last one migrates.
 
 ## Vocabulary discipline
 
-Vacanti's framing throughout. Source-specific words (PR, Issue,
+Kanban-flow framing throughout. Source-specific words (PR, Issue,
 merge, label, changelog, status, resolution) live inside the
 source adapters and never leak into the shared types
 (`WorkItem`, `StageTransition`, `WorkflowDef`).
@@ -351,8 +351,8 @@ Translation table:
 
 What we are NOT doing: porting gh-velocity, depending on it,
 rewriting flowmetrics in Go. The patterns are the inspiration;
-the implementation stays Python and stays focused on Vacanti
-metrics + Jira-equal-citizen support.
+the implementation stays Python and stays focused on the
+kanban-flow metric set + Jira-equal-citizen support.
 
 ## Boundaries
 
@@ -360,8 +360,8 @@ metrics + Jira-equal-citizen support.
 
 - Test first, every behavioural change.
 - Run the full suite + ruff before any commit.
-- Use Vacanti's vocabulary in the canonical types — never invent
-  stage names, never prescribe what counts as WIP, never let
+- Use the kanban-flow vocabulary in the canonical types — never
+  invent stage names, never prescribe what counts as WIP, never let
   source-specific words leak into the shared layer.
 - Preserve existing CLI surface. New flags are additive.
 

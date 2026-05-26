@@ -1,8 +1,8 @@
 # flowmetrics
 
-A demo-quality tool for **Vacanti-style flow metrics and Monte Carlo
-forecasting**, against GitHub PR data or Apache Jira issue data. Every
-chart ties back to a specific concept from Daniel Vacanti's
+A demo-quality tool for **flow metrics and Monte Carlo forecasting**,
+against GitHub PR data or Apache Jira issue data. Built on the kanban
+flow-metrics framework as laid out in Daniel Vacanti's
 [*Actionable Agile Metrics*](https://leanpub.com/actionableagilemetrics)
 and [*When Will It Be Done?*](https://leanpub.com/whenwillitbedone) —
 assumptions are surfaced on the page itself, not buried in docs.
@@ -13,7 +13,7 @@ assumptions are surfaced on the page itself, not buried in docs.
 ## What it looks like
 
 A Cumulative Flow Diagram against Apache CASSANDRA's Jira changelog —
-113 issues, seven workflow states stacked by Vacanti's CFD properties:
+113 issues, seven workflow states stacked by the standard CFD properties:
 
 [![Cumulative Flow Diagram for Apache CASSANDRA](samples/preview.png)](https://dvhthomas.github.io/flowmetrics/samples/ASF_CASSANDRA/cfd.html)
 
@@ -57,11 +57,11 @@ See **[How to install and run](docs/HOWTO.md)** for the full walkthrough.
 - **Cycle Time** — scatterplot of completed items with empirical P50/P85/P95.
 - **Throughput** — daily completion counts with an empirical P50/P85
   reference band (toggle: include weekends / weekdays only).
-- **Cumulative Flow Diagram** — Vacanti's six CFD properties laid out
+- **Cumulative Flow Diagram** — the six standard CFD properties laid out
   honestly: arrivals on top, departures on bottom, vertical distance =
   WIP, slope = arrival rate.
 - **Aging WIP** — every in-flight item plotted by current workflow state
-  × age (Vacanti CD–SD+1), with completed-item percentile lines as risk
+  × age (CD − SD + 1), with completed-item percentile lines as risk
   thresholds.
 - **Forecasts** — Monte Carlo *when-done* (date for N items) and
   *how-many* (items by target date) at 50/70/85/95% confidence.
@@ -70,14 +70,14 @@ See **[How to install and run](docs/HOWTO.md)** for the full walkthrough.
 
 ## Why this exists
 
-Most flow-metrics products implement Vacanti's toolkit partially or with
-subtle distortions — a "flow efficiency" that's actually mean per-PR, a
-CFD that smooths over the vertical-distance-equals-WIP property, an
-Aging chart with percentile lines drawn from arbitrary windows. This
-project implements the math straight from the source, surfaces the
-assumptions on the rendered page itself rather than hiding them in docs,
-and points back to the book wherever a number could be misread. It's a
-learning artifact, not a product.
+Most flow-metrics products implement the kanban-flow toolkit partially
+or with subtle distortions — a "flow efficiency" that's actually mean
+per-PR, a CFD that smooths over the vertical-distance-equals-WIP
+property, an Aging chart with percentile lines drawn from arbitrary
+windows. This project implements the math honestly, surfaces the
+assumptions on the rendered page itself rather than hiding them in
+docs, and links out to the canonical references where a number could
+be misread. It's a learning artifact, not a product.
 
 ## Documentation
 
@@ -92,6 +92,6 @@ learning artifact, not a product.
 - **[Decisions](docs/DECISIONS.md)** — architectural trade-offs and
   known constraints (GitHub API caps, cache strategy, WIP-tracking
   source scope).
-- **[Glossary](docs/GLOSSARY.md)** — Vacanti terms, the terms we
-  deliberately avoid (Scrum-contaminated "backlog" and "velocity"),
-  and a concrete Portfolio-FE-vs-mean-FE worked example.
+- **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms
+  we deliberately avoid (Scrum-contaminated "backlog" and "velocity");
+  a concrete Portfolio-FE-vs-mean-FE worked example.

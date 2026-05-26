@@ -33,8 +33,8 @@ from ..utc_dates import attach_utc, to_utc_display_date
 from ..warehouse.queries import CompletedItem
 from ..windows import Window
 
-# Number of simulations. 10K is the standard Vacanti recommendation —
-# enough for stable P95s, fast enough for interactive sliders.
+# Number of simulations. 10K is the standard recommendation — enough
+# for stable P95s, fast enough for interactive sliders.
 DEFAULT_RUNS = 10_000
 
 # Colour tokens — same neutrals + P85 accent the cycle-time chart

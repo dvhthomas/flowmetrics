@@ -2,8 +2,8 @@
 
 This document explains both forecast scenarios this tool implements, exactly
 how each one is computed from GitHub data, the assumptions baked in, and
-how to read the output. It follows Vacanti's *When Will It Be Done?*
-framing for both scenarios.
+how to read the output. The framing follows *When Will It Be Done?*
+(Vacanti) for both scenarios.
 
 ## 1. The two questions
 
@@ -46,8 +46,8 @@ For each of `runs` simulations:
 After `runs` simulations you have `runs` completion dates. Tally them into
 a Results Histogram with **dates on the x-axis and frequency on the y-axis**.
 
-Vacanti's convergence rule of thumb: 1,000 runs gives the shape, 10,000
-runs stabilises it. The default is 10,000.
+Convergence rule of thumb: 1,000 runs gives the shape, 10,000 runs
+stabilises it. The default is 10,000.
 
 ### 2.2 How-many
 
@@ -106,7 +106,7 @@ delivered N or more items. As confidence rises, N moves **lower**.
 Why this direction: promising fewer items is more conservative because
 more simulation runs cleared the lower bar.
 
-This is the trickiest part of Vacanti's framework and the single most
+This is the trickiest part of the framework and the single most
 common mistake when reading the output. The CLI prints both directions
 clearly so there is no ambiguity:
 
@@ -118,7 +118,7 @@ clearly so there is no ambiguity:
 The training samples are real PR-merge counts from GitHub. Specifically:
 
 1. Pick a training window. By default this is the **30 calendar days
-   ending today** — Vacanti's recommended ~30 days of recent data.
+   ending today** — the standard rolling-window recommendation.
 2. Search GitHub for PRs in that repo merged in the window
    (`repo:X is:pr is:merged merged:START..END`).
 3. Group by merge date in UTC.
@@ -198,8 +198,7 @@ contain.
 
 ### 6.4 30 days is "enough but not too much"
 
-Default training window: 30 calendar days. Vacanti's reasoning is
-twofold:
+Default training window: 30 calendar days. The reasoning is twofold:
 
 - **Long enough**: roughly four weeks captures within-week variance and a
   few rare events.

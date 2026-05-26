@@ -69,9 +69,9 @@ def monte_carlo_when_done(
     stop as soon as cumulative throughput meets or exceeds `items`. The
     day on which it crosses is the completion date for that run.
 
-    We use `items` rather than `backlog` because Vacanti's framework
-    flags "backlog" as overloaded — Scrum uses it for "the prioritized
-    list of work"; here we just mean a count of work remaining.
+    We use `items` rather than `backlog` because the latter is
+    Scrum-loaded — it's used for "the prioritized list of work";
+    here we just mean a count of work remaining.
     """
     _validate_samples(daily_samples)
     if items <= 0:

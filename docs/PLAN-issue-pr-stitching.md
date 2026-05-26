@@ -243,7 +243,7 @@ Plus the phase-specific check:
   remain out-of-scope.
 - **No work-type slicing.** Documented as a future dimension
   in the spec; not built in any phase here.
-- **Vacanti vocabulary only** in canonical types. Source-
+- **Flow-metrics vocabulary only** in canonical types. Source-
   specific words (PR, Issue, merge, label, changelog,
   resolution, etc.) live inside source adapters and never leak
   out.

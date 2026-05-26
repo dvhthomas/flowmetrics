@@ -82,8 +82,8 @@ class SimulationSummary:
 @dataclass(frozen=True)
 class WhenDoneInput:
     repo: str
-    items: int  # Number of items to complete. "Items" follows Vacanti's
-    # phrasing; we avoid "backlog" because Scrum overloads it.
+    items: int  # Number of items to complete. We avoid "backlog"
+    # because Scrum overloads it.
     start_date: date
     history_start: date
     history_end: date
@@ -183,7 +183,7 @@ class AgingInput:
     from_wip_labels: bool = False
     # Opt-in: when set, in-flight items older than this are excluded
     # from the chart and from past-P85/P95 counts. None means "show
-    # everything" per Vacanti.
+    # everything".
     max_age_days: int | None = None
     # When the report came from a Jira source, the base URL is needed
     # to reconstruct a runnable reproducer command. The `repo` field
@@ -266,9 +266,9 @@ Report = (
 class ForecastHorizon:
     """How far the forecast extends, vs. how much past data it's based on.
 
-    Vacanti's recurring point: shorter-term forecasts are more reliable.
-    The further `days_ahead` exceeds `training_window_days`, the more
-    susceptible the forecast is to a regime change invalidating it.
+    Shorter-term forecasts are more reliable: the further `days_ahead`
+    exceeds `training_window_days`, the more susceptible the forecast
+    is to a regime change invalidating it.
     """
 
     days_ahead: int

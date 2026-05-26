@@ -26,7 +26,7 @@ from ._vega import to_vega
 #
 # Per-percentile assignment — neutrals + ONE accent.
 #   P50 — light gray  (soft reference, "typical")  → --border
-#   P85 — primary plum (Vacanti's commitment line — the headline
+#   P85 — primary plum (the commitment line — the headline
 #         threshold this chart exists to evaluate against)
 #   P95 — dark gray   (deep reference)             → --muted
 # Plum is reserved for the page CTA (the import button) and the

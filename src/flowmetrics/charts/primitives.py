@@ -12,7 +12,7 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-# Vacanti's canonical chart-annotation percentiles — the ceil-index
+# Canonical chart-annotation percentiles — the ceil-index
 # `chart_percentiles` variant returns this set.
 CANONICAL_PERCENTILES = (50, 70, 85, 95)
 
@@ -72,7 +72,7 @@ def _index_at(percentile: int, n: int) -> int:
 
 
 def chart_percentiles[T: (int, float)](values: Sequence[T]) -> dict[int, T]:
-    """Vacanti's canonical chart-annotation percentiles —
+    """Canonical chart-annotation percentiles —
     `{50: v50, 70: v70, 85: v85, 95: v95}` from `values`.
 
     Uses the *ceil-index* rule: the p-th percentile is the

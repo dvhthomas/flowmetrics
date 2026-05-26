@@ -86,8 +86,8 @@ def build_aging_model(
 ) -> AgingModel:
     """Resolve the aging-WIP chart model.
 
-    `asof` is the in-flight snapshot date. Age is Vacanti's
-    CD - SD + 1 (a same-day item ages as 1d). `wip_states`, when
+    `asof` is the in-flight snapshot date. Age is the
+    CD - SD + 1 rule (a same-day item ages as 1d). `wip_states`, when
     given, keeps only items whose current state is a WIP state —
     backlog and done fall out. Percentile thresholds come from
     completed cycle times inside `reference` (full history when

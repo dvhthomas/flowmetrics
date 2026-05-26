@@ -20,7 +20,7 @@ from .throughput import daily_throughput
 DEFAULT_GAP = timedelta(hours=4)
 DEFAULT_MIN_CLUSTER = timedelta(minutes=30)
 DEFAULT_CACHE_DIR = Path(".cache/github")
-DEFAULT_TRAINING_DAYS = 30  # Vacanti's recommendation in "When Will It Be Done?"
+DEFAULT_TRAINING_DAYS = 30  # the standard rolling-window default
 # Default mapping of named workflow statuses to "active". Used by the
 # status-duration computation when a source provides explicit statuses
 # (Jira). GitHub sources, which infer activity from events, ignore this.
@@ -43,8 +43,8 @@ def default_history_end() -> date:
 def default_history_start(end: date | None = None) -> date:
     """29 days before `end` (default: 29 days before yesterday-UTC).
 
-    Yields a 30-day inclusive window — Vacanti's recommended training
-    horizon in *When Will It Be Done?*.
+    Yields a 30-day inclusive window — the standard rolling training
+    horizon.
     """
     end = end or default_history_end()
     return end - timedelta(days=DEFAULT_TRAINING_DAYS - 1)

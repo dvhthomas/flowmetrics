@@ -349,15 +349,14 @@ CREATE TEMPORARY TABLE transitions (
 def cycle_time_days(
     created_at: datetime, completed_at: datetime | None
 ) -> float | None:
-    """Cycle time in calendar days, per Vacanti's strict formula:
+    """Cycle time in calendar days, using the strict formula:
 
         CT = FD - SD + 1
 
     where SD and FD are the UTC calendar dates of `created_at` and
     `completed_at`. Same-day work = 1 day; next-day = 2 days; etc.
-    Inclusive of both endpoints — "we'd never say it took zero
-    days to complete" (Vacanti, Actionable Agile Metrics for
-    Predictability, 10th Anniversary Edition, p. 59).
+    Both endpoints are inclusive — "we'd never say it took zero
+    days to complete".
 
     The result is always integer-valued (stored as float for
     column-type consistency). Sub-day precision is deliberately
