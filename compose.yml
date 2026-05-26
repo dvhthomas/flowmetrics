@@ -1,0 +1,43 @@
+# Two services share one image — `materialise` for the cron-style
+# ingest (run on demand or via host-side scheduler), `serve` for the
+# long-running dashboard. Both bind-mount your local contracts/ and
+# data/ so deletes + edits round-trip.
+
+services:
+  serve:
+    # `docker compose up serve` keeps the dashboard alive at
+    # http://localhost:8000. Set FLOW_PASSWORD in your shell or a
+    # `.env` next to this file before binding off-localhost.
+    image: flowmetrics:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./contracts:/app/contracts:ro
+      - ./data:/app/data
+    environment:
+      - FLOW_PASSWORD=${FLOW_PASSWORD:-}
+    command: >
+      flow serve
+      --host 0.0.0.0
+      --port 8000
+      --workflows-dir /app/contracts
+      --data-dir /app/data
+    restart: unless-stopped
+
+  materialise:
+    # One-shot. Invoke via `docker compose run --rm materialise`.
+    image: flowmetrics:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    profiles: ["ingest"]  # don't auto-start with `compose up`
+    volumes:
+      - ./contracts:/app/contracts:ro
+      - ./data:/app/data
+    command: >
+      flow materialise-all
+      --workflows-dir /app/contracts
+      --data-dir /app/data

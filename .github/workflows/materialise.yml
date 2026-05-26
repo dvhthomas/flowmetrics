@@ -1,0 +1,85 @@
+# Scheduled materialise via GitHub Actions — alternative to native
+# cron / systemd when you'd rather your warehouse live in CI.
+#
+# Pattern: the workflow YAMLs are committed in `contracts/` (the
+# repo is the source of truth). The job runs `flow materialise-all`
+# against them and uploads the resulting `data/` as a build artifact
+# (retained 14 days). Use `actions/download-artifact` (or copy to
+# a release / external bucket) if you want the warehouse off CI.
+#
+# To enable:
+#   1. Add a GH secret `FLOW_GITHUB_TOKEN` with `repo` scope (or
+#      adapt to use the default GITHUB_TOKEN if you only read
+#      public repos — see the env block below).
+#   2. Edit the cron schedule to taste.
+#   3. Push.
+
+name: materialise
+
+on:
+  schedule:
+    # Daily at 02:30 UTC. Adjust to your data freshness needs;
+    # GitHub Actions cron uses UTC and has 5-15 min jitter.
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    # Manual trigger from the Actions tab.
+
+permissions:
+  contents: read
+  # If you want to commit the warehouse back to the repo, add
+  # `contents: write` and use actions/checkout with a token.
+
+jobs:
+  materialise:
+    name: materialise-all
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python 3.13
+        run: uv python install 3.13
+
+      - name: Sync deps
+        run: uv sync --frozen
+
+      - name: Restore source-API cache
+        # Hits cache instead of GitHub when possible — kinder to
+        # rate limits when the same workflow fires daily.
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: flowmetrics-source-cache-${{ github.run_id }}
+          restore-keys: flowmetrics-source-cache-
+
+      - name: Materialise every workflow
+        env:
+          # Override with your own secret if private repos are in
+          # scope. The default GITHUB_TOKEN reads public repos
+          # in this org without setup.
+          GITHUB_TOKEN: ${{ secrets.FLOW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          uv run flow materialise-all \
+            --workflows-dir contracts \
+            --data-dir data
+
+      - name: Save warehouse as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: warehouse-${{ github.run_id }}
+          path: data/
+          retention-days: 14
+
+      - name: Save daily manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: materialise-manifest-${{ github.run_id }}
+          path: data/_status/daily-*.json
+          retention-days: 30

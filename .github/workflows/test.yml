@@ -35,3 +35,23 @@ jobs:
         run: uv run ruff check
       - name: Unit tests
         run: uv run pytest -q
+
+  docker:
+    name: docker build + smoke
+    runs-on: ubuntu-latest
+    # The Dockerfile is platform-neutral but `docker build` itself
+    # only needs to run once — Linux is the canonical runtime.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: flowmetrics:ci
+      - name: Smoke-test the CLI
+        # If a runtime dep is missing from the slim base, `flow --help`
+        # crashes — this catches dep-pruning regressions.
+        run: docker run --rm flowmetrics:ci flow --help

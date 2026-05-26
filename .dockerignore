@@ -1,0 +1,34 @@
+# Build context excludes — keeps the image small and the build
+# deterministic. Anything not needed to install + run the package
+# stays out.
+.git/
+.github/
+.venv/
+.cache/
+.pytest_cache/
+.ruff_cache/
+.ty_cache/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local workspaces — never in a container build.
+data/
+contracts/
+reports/
+samples/
+.antigravitycli/
+tasks/
+
+# Docs / tests don't ship in the runtime image. Tests run in CI
+# against the source tree, not the container.
+docs/
+tests/
+
+# Editor / OS junk
+.DS_Store
+.idea/
+.vscode/
+*.swp
