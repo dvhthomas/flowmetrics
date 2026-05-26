@@ -509,7 +509,57 @@ def create_app(
         return candidates[0].stem
 
     def _available_contracts() -> list[str]:
-        return sorted(p.stem for p in contracts_dir.glob("*.yaml"))
+        # Both extensions — `load_contract` accepts either, so the
+        # listing should too. A duplicate `foo.yaml` + `foo.yml`
+        # collapses to a single id (load_contract picks .yaml first).
+        seen: set[str] = set()
+        for ext in ("*.yaml", "*.yml"):
+            for p in contracts_dir.glob(ext):
+                seen.add(p.stem)
+        return sorted(seen)
+
+    def _raw_yaml_text(name: str) -> str | None:
+        """Best-effort read of the YAML file as-is. Used by the
+        contract-detail API so the UI can show + edit the original
+        text alongside the parsed view. Returns None when the file
+        is unreadable (caller decides what to do)."""
+        for ext in (".yaml", ".yml"):
+            p = contracts_dir / f"{name}{ext}"
+            if p.exists():
+                try:
+                    return p.read_text()
+                except OSError:
+                    return None
+        return None
+
+    def _materialise_status(name: str) -> dict | None:
+        """Latest known per-workflow materialise outcome. Reads the
+        status file the browser-backfill flow writes; returns None
+        if no run has happened yet."""
+        spath = status_path(data_dir, name)
+        rec = read_status(spath)
+        if rec is None:
+            return None
+        return {
+            "last_run_at": rec.get("finished_at") or rec.get("started_at"),
+            "status": rec.get("status"),
+            "items": rec.get("items"),
+            "message": rec.get("message"),
+        }
+
+    def _contract_summary(name: str) -> dict:
+        """List-row payload. Falls back to bare id+source when the
+        YAML fails to parse so the listing still tells the user
+        what's on disk — the detail endpoint surfaces the error."""
+        try:
+            c = load_contract(name, contracts_dir)
+            return {
+                "id": c.name,
+                "label": c.label or c.name,
+                "source": c.source,
+            }
+        except ContractError:
+            return {"id": name, "label": name, "source": None}
 
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)
     def home(request: Request) -> HTMLResponse:
@@ -545,6 +595,59 @@ def create_app(
                 "contract": None,
             },
         )
+
+    # ------------------------------------------------------------------
+    # Contract management API (B1+). Read endpoints first; the wizard
+    # UI (B3..B5) layers on top.
+    # ------------------------------------------------------------------
+
+    @app.get("/api/internal/contracts", dependencies=auth_dep)
+    def list_contracts() -> list[dict]:
+        """List every workflow YAML under contracts_dir.
+
+        Tolerates malformed YAML — broken entries still appear in the
+        list (with source=null) so the user can find and fix them
+        through the UI; the detail endpoint surfaces the parser error.
+        """
+        return [_contract_summary(name) for name in _available_contracts()]
+
+    @app.get("/api/internal/contracts/{contract_id}", dependencies=auth_dep)
+    def get_contract(contract_id: str) -> dict:
+        """Full detail for one contract: parsed dataclass fields,
+        the original YAML text, and the most recent materialise
+        status. 404 if the file is missing; 422 if it's malformed."""
+        _ensure_contract_exists(contract_id)
+        raw = _raw_yaml_text(contract_id)
+        try:
+            c = load_contract(contract_id, contracts_dir)
+        except ContractError as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=f"contract {contract_id!r} failed to parse: {exc}",
+            ) from exc
+        parsed: dict = {
+            "name": c.name,
+            "source": c.source,
+            "repo": c.repo,
+            "jira_url": c.jira_url,
+            "jira_project": c.jira_project,
+            "start": c.start.isoformat() if c.start else None,
+            "stop": c.stop.isoformat() if c.stop else None,
+            "label": c.label,
+        }
+        if c.states is not None:
+            parsed["states"] = {
+                "backlog": list(c.states.backlog),
+                "wip": list(c.states.wip),
+                "done": list(c.states.done),
+            }
+        return {
+            "id": c.name,
+            "label": c.label or c.name,
+            "parsed": parsed,
+            "yaml": raw or "",
+            "materialise": _materialise_status(contract_id),
+        }
 
     @app.get(
         "/workflows/{workflow_id}/metrics/cfd",
