@@ -1,7 +1,7 @@
 # flowmetrics
 
 A demo-quality tool for **flow metrics and Monte Carlo forecasting**,
-against GitHub PR data or Atlassian Jira issue data. Built on the kanban
+against GitHub (PRs and Issues) or Atlassian Jira issue data. Built on the kanban
 flow-metrics framework as laid out in Daniel Vacanti's
 [*Actionable Agile Metrics*](https://leanpub.com/actionableagilemetrics)
 and [*When Will It Be Done?*](https://leanpub.com/whenwillitbedone) —

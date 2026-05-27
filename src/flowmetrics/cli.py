@@ -249,7 +249,8 @@ def _hint_for(exc: Exception) -> str | None:
 
 @click.group()
 def cli() -> None:
-    """Flow metrics and Monte Carlo forecasting from GitHub PR data.
+    """Flow metrics and Monte Carlo forecasting from GitHub (PRs and
+    Issues) and Atlassian Jira issue data.
 
     For agent use, pass `--format json` to any command. JSON output
     includes schema URI, raw data, chart data, interpretation, and
