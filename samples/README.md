@@ -8,8 +8,8 @@ the fields, then `flow materialise <name>` followed by `flow serve`.
 | [github-pr-review-cycle.yaml](github-pr-review-cycle.yaml) | GitHub | PR review cycle (`Draft → Awaiting Review → Changes Requested → Approved → Merged`). The default for a typical OSS or corporate repo. |
 | [github-pr-labels.yaml](github-pr-labels.yaml) | GitHub | Label-driven workflow — useful when the team uses PR labels (`in-review`, `qa-pending`, etc.) as stage markers. |
 | [github-with-explicit-states.yaml](github-with-explicit-states.yaml) | GitHub | Same as PR review cycle but with an explicit `states:` block pinning the order — gives reproducible chart bands when the data is sparse. |
-| [jira-bigtop.yaml](jira-bigtop.yaml) | Jira | Apache Jira project (anonymous reads). Small project, all six standard workflow states. |
-| [jira-cassandra.yaml](jira-cassandra.yaml) | Jira | Apache Jira project. Larger project with richer workflow (`Patch Available`, `Resolved`, `Closed`). |
+| [jira-bigtop.yaml](jira-bigtop.yaml) | Jira | Apache's public Jira instance, BIGTOP project (anonymous reads). Small project, all six standard workflow states. |
+| [jira-cassandra.yaml](jira-cassandra.yaml) | Jira | Apache's public Jira instance, CASSANDRA project. Larger project with richer workflow (`Patch Available`, `Resolved`, `Closed`). |
 
 ## What the fields mean
 

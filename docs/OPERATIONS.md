@@ -50,7 +50,9 @@ Credentials for live source fetches:
 
 - **GitHub** — `gh auth login` (uses `gh auth token`) or set
   `$GITHUB_TOKEN` directly.
-- **Jira** — Apache public Jira reads work anonymously. Other Jira
+- **Jira** — Atlassian Jira: any instance you have read access to.
+  Apache's public Jira (`https://issues.apache.org/jira`) serves
+  anonymous reads. Other Jira
   instances: configure in the workflow YAML (see [HOWTO](HOWTO.md)).
 
 ## Daily ingest

@@ -11,9 +11,9 @@
 
 title: flowmetrics
 description: >-
-  Vacanti-style flow metrics (cycle/active/wait time, flow efficiency)
-  and Monte Carlo forecasting from GitHub PR data and Apache Jira
-  issue data. Demo-quality learning tool.
+  Kanban-flow metrics (cycle/active/wait time, flow efficiency) and
+  Monte Carlo forecasting from GitHub PR data and Atlassian Jira issue
+  data. Demo-quality learning tool.
 
 # Project sites at user.github.io/<repo>/ need baseurl set so internal
 # absolute paths and theme assets resolve correctly.

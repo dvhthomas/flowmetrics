@@ -1,7 +1,7 @@
 # flowmetrics
 
 A demo-quality tool for **flow metrics and Monte Carlo forecasting**,
-against GitHub PR data or Apache Jira issue data. Built on the kanban
+against GitHub PR data or Atlassian Jira issue data. Built on the kanban
 flow-metrics framework as laid out in Daniel Vacanti's
 [*Actionable Agile Metrics*](https://leanpub.com/actionableagilemetrics)
 and [*When Will It Be Done?*](https://leanpub.com/whenwillitbedone) —
@@ -28,7 +28,7 @@ for every workflow:
 pages, the contract builder, and the data-source page.
 
 [**Example workflow YAMLs →**](samples/) — copy-paste starters for
-GitHub PR cycles, label-driven workflows, and Apache Jira projects.
+GitHub PR cycles, label-driven workflows, and Atlassian Jira projects.
 
 ## Two ways to use it
 
@@ -92,7 +92,7 @@ be misread. It's a learning artifact, not a product.
 - **[Operations](docs/OPERATIONS.md)** — scheduled ingest on every
   major OS, backup + restore, Docker + GH Actions, troubleshooting.
 - **[Screenshots](docs/SCREENSHOTS.md)** — every page, both source
-  types (GitHub PRs + Apache Jira), captured against live data.
+  types (GitHub PRs + Atlassian Jira), captured against live data.
 - **[Metrics](docs/METRICS.md)** — how cycle / active / wait time and
   flow efficiency are computed; the clustering algorithm; assumptions.
 - **[Forecasting](docs/FORECAST.md)** — Monte Carlo when-done and

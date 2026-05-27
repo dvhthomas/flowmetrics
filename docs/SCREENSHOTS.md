@@ -1,7 +1,8 @@
 # Screenshots
 
 Live captures of the dashboard against two public data sources — a
-GitHub repo (`astral-sh/uv`) and an Apache Jira project (`CASSANDRA`).
+GitHub repo (`astral-sh/uv`) and an Atlassian Jira project on Apache's
+public instance (`CASSANDRA`).
 Every chart and control on every page; nothing is mocked.
 
 ## Home — workflow picker

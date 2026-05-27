@@ -4,8 +4,9 @@
 
 Requires Python 3.13 and [`uv`](https://docs.astral.sh/uv/). Credentials
 come from `gh auth token` (run `gh auth login` once) or the
-`GITHUB_TOKEN` env var. Anonymous Jira reads work against
-`https://issues.apache.org/jira` without credentials.
+`GITHUB_TOKEN` env var. Atlassian Jira reads use the instance's own
+auth; Apache's public instance at `https://issues.apache.org/jira`
+serves anonymous reads without credentials.
 
 ```
 uv sync
