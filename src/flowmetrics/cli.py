@@ -1136,7 +1136,6 @@ def materialise(
     record so the web Data Source page can poll a browser-triggered
     backfill. Without it, behaviour is unchanged (cron path).
     """
-    import dataclasses
 
     from .backfill import write_status
     from .contract import ContractError, load_contract
@@ -1181,7 +1180,9 @@ def materialise(
     if until is not None:
         overrides["stop"] = until.date()
     if overrides:
-        contract = dataclasses.replace(contract, **overrides)
+        # Pydantic's `model_copy` is the equivalent of
+        # `dataclasses.replace` for the new Contract model.
+        contract = contract.model_copy(update=overrides)
 
     try:
         manifest = run_materialise(

@@ -536,6 +536,520 @@ updates, tests.
 
 ---
 
+## Plan C: Server-managed contract builder (v2)
+
+### Status
+
+Plans A + B above are shipped. This plan supersedes the v1 wizard
+(`/admin/contracts/new`) with a server-managed schema, richer UI
+affordances (live source-vocab probing), and a proper archive
+lifecycle.
+
+### Goal
+
+A user with the dashboard open can:
+
+1. Build a workflow contract through a structured, schema-validated
+   form — no YAML textarea, no guessing field names.
+2. Define an **ordered list of steps**, each with `name` + `wip: bool`,
+   reorder them, and toggle their WIP flag inline.
+3. Get **live suggestions from the source** as they build: the actual
+   labels in the GitHub repo, the actual statuses in the Jira project,
+   and a curated list of source-native lifecycle events ("PR opened",
+   "Ready for review", "PR closed", "Issue resolved", …) so they
+   don't have to invent step names.
+4. Save → server stores the contract; export YAML as a downloadable
+   file or copy it to the clipboard when needed (sharing, version
+   control, ad-hoc CLI runs).
+5. **Archive** (soft-delete) a contract instead of erasing it, and
+   **restore** from the archive view.
+
+### Working assumptions (revised after feedback)
+
+- **Storage is server-managed; the DB row carries the YAML as text.**
+  A SQLite database at `<workflows-dir>/contracts.db` is the source
+  of truth. Each row is `(id, yaml, archived_at, archived_reason,
+  created_at, updated_at)` — the contract body is one `yaml TEXT`
+  column. The "convenience" is that the server owns the lifecycle
+  (CRUD, archive, audit timestamps) without scattering files; the
+  shape stays YAML-shaped so import/export is a no-op and the
+  Pydantic schema is still the validator. `flow serve` and
+  `flow materialise(-all)` both read from the DB. The DB sits
+  *alongside* the materialise warehouse (the existing `--data-dir`),
+  not inside it.
+- **First-start migration.** On first server boot (or via
+  `flow contracts migrate`), any `*.yaml` / `*.yml` files in the
+  workflows dir are imported as rows and moved to
+  `<workflows-dir>/migrated/` so the user has a rollback. This
+  preserves the demo contracts in samples/ as a one-shot seed.
+- **Schema change**: the per-step canonical shape changes from
+  `states: {backlog: [...], wip: [...], done: [...]}` to
+  `steps: [{name, wip}]` — an ordered list with a per-step boolean.
+  The first non-WIP block before the first WIP step renders as
+  **"Ready"** in the UI (not "Backlog" — see vocabulary note); the
+  trailing non-WIP block renders as "Done".
+- **Vocabulary: "Ready", not "Backlog"** in user-facing copy. "Backlog"
+  implies an unbounded pile of old, un-triaged work; "Ready" means
+  *items committed to be worked next*. The change cascades through
+  the builder UI, the chart explanations, and the glossary.
+- **Pydantic** replaces the hand-rolled validator. The parser is
+  tolerant of the OLD shape during YAML import (read both shapes,
+  always store / write the new one).
+- **Single backend per contract.** Source stays contract-wide
+  (`github` xor `jira`). Steps are source-agnostic strings; the
+  contract's source field decides which probe endpoint runs.
+
+### Dependency graph
+
+```
+C1 (DB + schema) ──→ C2 (archive) ────────────────────────→ C7 (archive page)
+                ├──→ C3 (steps editor) ──┐
+                ├──→ C4 (source vocab) ──┤
+                │                        ├──→ C6 (export YAML)
+                └──→ C5 (dry-run preview)┘
+```
+
+`C1` is foundational. `C2` enables archive lifecycle via the API.
+`C3` is the first user-facing slice (new builder page). `C4` adds
+smart UI affordances on top of the builder. `C5` is the dry-run
+preview — fetches a capped sample and renders items per step so
+the user can see whether their definition actually matches real
+data. `C6` is the export-to-YAML capability. `C7` is the
+archived-contracts page.
+
+### Slices
+
+#### C1 — SQLite store + Pydantic schema + YAML import
+
+**Foundation. No UI change in this slice.**
+
+- New `src/flowmetrics/contracts_db.py` with a thin SQLite store at
+  `<workflows-dir>/contracts.db`. **Storage is yaml-in-a-column**
+  — the DB owns lifecycle metadata, the YAML owns shape:
+  ```sql
+  CREATE TABLE contracts (
+    id TEXT PRIMARY KEY,
+    yaml TEXT NOT NULL,             -- canonical contract body
+    archived_at TEXT,               -- NULL = live; ISO when archived
+    archived_reason TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX contracts_archived_at_idx ON contracts(archived_at);
+  ```
+  No per-field columns. Listing parses the YAML to surface `source`
+  / `label` (and caches the parsed view in memory keyed on
+  `updated_at`); writes go through Pydantic validation and
+  `emit_canonical_yaml`. Adding a future field to the Contract
+  Pydantic model means zero DB migration.
+- New Pydantic models in `src/flowmetrics/contract.py`:
+  ```python
+  class Step(BaseModel):
+      name: str
+      wip: bool = False
+  class Contract(BaseModel):
+      id: str
+      source: Literal["github", "jira"]
+      repo: str | None = None
+      jira_url: str | None = None
+      jira_project: str | None = None
+      start: date | None = None
+      stop: date | None = None
+      label: str | None = None
+      steps: list[Step] = []
+  ```
+  Replaces today's dataclass `Contract` + `WorkflowStates`. The
+  existing `name` field gets renamed `id` in the canonical model
+  (still serialises as `name:` in YAML for back-compat); call sites
+  read `.id`.
+- **Compatibility shim**: `Contract.states` `@property` synthesises
+  the old `WorkflowStates(backlog, wip, done)` object so every CFD /
+  Aging / charts/* call site stays green. `backlog` here is the
+  non-WIP prefix; the property's name preserves the existing API
+  even as the UI vocab moves to "Ready".
+- **YAML I/O** stays as a util — `parse_contract_text(text)` reads
+  both old and new shapes; `emit_canonical_yaml(contract)` writes
+  the new shape. Both live in `contract.py`, both used by the
+  import/export endpoints later.
+- **Migration on first server start**: `flow serve` calls
+  `contracts_db.ensure_initialized(workflows_dir)`:
+  1. Create the DB if missing.
+  2. Scan `<workflows-dir>/*.yaml,yml` (top-level only).
+  3. For each YAML, parse → upsert into the DB.
+  4. Move the processed YAML to `<workflows-dir>/migrated/`
+     (preserves rollback path; never deletes).
+  5. Echo a one-line summary to stderr.
+- Same migration runs from `flow contracts migrate` as a manual
+  trigger for cron-style installs.
+- `flow materialise(-all)` reads from the DB. Removed: directory
+  iteration. Added: an optional `--from-yaml PATH` flag for one-off
+  contracts not yet in the DB (used by the test suite + ad-hoc).
+
+**Files touched**: new `src/flowmetrics/contracts_db.py`,
+`src/flowmetrics/contract.py` (rewrite), `src/flowmetrics/cli.py`
+(materialise paths), `src/flowmetrics/app.py` (CRUD endpoints now
+hit the DB).
+
+**Acceptance**
+
+- A fresh `<workflows-dir>/` with three YAMLs (the demo set) →
+  start `flow serve` → DB now holds three rows; YAMLs are under
+  `migrated/`; `GET /api/internal/contracts` returns the three.
+- The full existing test suite passes — the test helpers (which
+  inject YAMLs into a temp workflows-dir) now exercise the import
+  path implicitly. Tests that need a contract pre-seeded use the
+  PUT API as today.
+- `flow materialise apache-cassandra-week` succeeds against a DB
+  freshly seeded from the existing demo YAML.
+
+**Verification**
+
+- `uv run pytest -q` — every test green.
+- Manual: archive the existing `/tmp/slice2-view/contracts/`,
+  re-start `flow serve`, watch the YAMLs migrate to the DB. Open
+  the dashboard, click each workflow, charts render identically.
+
+#### C2 — Archive / restore lifecycle (server endpoints)
+
+**One PR. No UI surface; API + materialise behaviour only.**
+
+- `POST /api/internal/contracts/{id}/archive` — sets
+  `archived_at = NOW()`. Idempotent. Refuses if Parquet exists for
+  this contract unless body has `{"force": true}` (the warehouse is
+  fine to keep; the archive doesn't touch data).
+- `POST /api/internal/contracts/{id}/restore` — sets
+  `archived_at = NULL`. Refuses if a live contract with the same id
+  exists (would shadow).
+- `GET /api/internal/contracts` keeps `WHERE archived_at IS NULL`;
+  `?include_archived=true` opens it up. Detail endpoint surfaces
+  `archived: true|false` on every response.
+- `DELETE /api/internal/contracts/{id}` becomes **hard delete** —
+  requires `archived_at IS NOT NULL`. Returns 409 with the hint
+  "archive this contract first" when called on a live row.
+- `flow materialise(-all)` adds `WHERE archived_at IS NULL` to its
+  fetch. Archived contracts are invisible to the cron path.
+- Audit: archive sets `archived_at` from server clock. Optional
+  reason in the request body lands in a new `archived_reason TEXT`
+  column (NULL when omitted).
+
+**Files touched**: `src/flowmetrics/contracts_db.py` (add the
+queries), `src/flowmetrics/app.py` (endpoints), tests
+(`test_contracts_archive.py`).
+
+**Acceptance**
+
+- curl-driven: create → archive → list excludes it → list with
+  `?include_archived=true` includes it with `archived: true` →
+  restore → list includes it → archive again → hard-delete →
+  list excludes it permanently.
+- `flow materialise-all` skips archived contracts (verified by
+  archiving one of the demo contracts, running the daily
+  wrapper, asserting the manifest has only the others).
+
+**Verification**
+
+- `tests/test_contracts_archive.py` covers every path above.
+- Manual: archive `apache-cassandra-week` via curl, confirm the
+  dashboard's home page drops it; restore, confirm it returns.
+
+#### C3 — Steps editor (replaces v1 wizard)
+
+**First user-facing slice. Vocabulary refresh + editor rewrite.**
+
+- New `/admin/contracts/new` (overwrites the v1 wizard). Same
+  template hosts `/admin/contracts/{id}/edit` via the
+  `wizard_mode` flag.
+- Identity + Source fieldsets stay (B3 carried them forward).
+- The **Stages** fieldset (three buckets, B4) is REPLACED with a
+  **Steps** editor:
+  - Ordered list rendered as rows. Each row carries a
+    text input (step name), a WIP checkbox, ↑ / ↓ reorder buttons,
+    and a delete (×) button.
+  - "+ Add step" at the bottom appends an empty row.
+  - Each row also shows an **auto-derived category badge** —
+    "READY" for non-WIP rows before the first WIP, "WIP" for
+    `wip: true` rows, "DONE" for non-WIP rows after the last WIP.
+    The badge updates as the user toggles WIP / reorders. The badge
+    is read-only — categories are *consequences* of the WIP flags
+    + step order, not a separate input.
+- Vocabulary cascade: every "Backlog" in user-facing strings
+  becomes "Ready". CHART explanations under aging /
+  cycle-time / cfd detail pages get the same update. Glossary
+  doc gains a Ready ↔ Backlog disambiguation note.
+- Save flow: client serialises the rows into a `steps:` list,
+  PUTs to `/api/internal/contracts/{id}` (DB write, not YAML).
+  Same redirect contract.
+- Delete-confirmation prompt on the edit page now calls
+  `/archive` first (NOT hard-delete); confirmation copy is
+  softer ("archive" instead of "delete").
+
+**Files touched**: rewrite `contracts_new.html.jinja`,
+update `cycle_time_detail.html.jinja` +
+`aging_detail.html.jinja` + `cfd_detail.html.jinja` (vocabulary
+update), `docs/GLOSSARY.md` (Ready ↔ Backlog note),
+`tests/test_contract_wizard.py` + `test_stage_builder.py`
+(update assertions).
+
+**Acceptance**
+
+- Wizard renders with the Steps editor (not the three buckets).
+- Reorder: ↑ / ↓ buttons swap adjacent rows; category badges
+  recompute.
+- Save writes a contract whose `steps:` list matches the row
+  order. Reload pre-fills with the same order.
+- No "Backlog" anywhere in the user-facing surface; "Ready"
+  appears as the auto-derived badge.
+- Delete button shows "Archive" copy; confirmation routes through
+  `/archive`.
+
+**Verification**
+
+- Updated `tests/test_contract_wizard.py`.
+- Playwright E2E: build a 5-step workflow, mark 2 rows WIP in the
+  middle, save, assert the dashboard renders with the new shape.
+- Manual: confirm "Ready" appears (not "Backlog") on the
+  builder + on the cycle-time / aging / CFD detail pages.
+
+#### C4 — Source vocab probe (live labels / statuses / lifecycle events)
+
+**Single concentrated UX slice. Makes the builder feel built-for-the-source.**
+
+- Replaces the existing `_probe-stages` endpoint with a richer
+  `POST /api/internal/contracts/_probe-source-vocab`. Body:
+  ```json
+  { "source": "github", "repo": "astral-sh/uv" }
+  // or
+  { "source": "jira", "jira_url": "...", "jira_project": "BIGTOP" }
+  ```
+  Response:
+  ```json
+  {
+    "labels": [...]           // GitHub: repo labels; Jira: project statuses
+    "lifecycle_events": [...] // hard-coded curated list per source
+    "warehouse_stages": [...] // names already observed in this workflow
+  }
+  ```
+  - **GitHub `labels`** — `GET /repos/{owner}/{repo}/labels` (~50
+    rate-limit cost; cached 15 min per repo).
+  - **GitHub `lifecycle_events`** — curated constant:
+    `["PR opened", "Marked ready for review", "Changes requested",
+     "Review approved", "PR merged", "PR closed without merge",
+     "Issue opened", "Issue closed"]`.
+  - **Jira `labels`** — `GET /rest/api/3/project/{key}/statuses` →
+    distinct status names (often 5–15 per project).
+  - **Jira `lifecycle_events`** — curated constant:
+    `["Issue created", "Assigned", "Resolved", "Reopened",
+     "Closed"]`.
+  - **`warehouse_stages`** — existing `_probe-stages` behaviour
+    (distinct stage names already in the materialised transitions).
+- UI affordance in the builder:
+  - "Suggestions" panel under the Steps editor.
+  - Three small subsections: **Used in your warehouse**, **Labels
+    in the source**, **Standard lifecycle events**.
+  - Each item is a clickable chip → appends a new step with the
+    chip's name + a sensible WIP default (warehouse stages =
+    `wip: true`; lifecycle "opened"/"created" = `wip: false`;
+    lifecycle "closed"/"merged"/"resolved" = `wip: false`;
+    intermediate review chips = `wip: true`).
+- Cache: same 15-min TTL pattern as the existing
+  `_probe-stages_cache`, keyed on `(source, repo / jira_url+project)`.
+- Fallback: if the source probe fails (no network, 404 repo,
+  rate-limited), the panel surfaces the failure inline and still
+  shows the warehouse + lifecycle subsections so the user keeps
+  flowing.
+
+**Files touched**: `src/flowmetrics/app.py` (replace
+`_probe-stages` with `_probe-source-vocab`),
+`contracts_new.html.jinja` (Suggestions panel + chip handlers),
+`tests/test_stage_builder.py` → renamed/extended.
+
+**Acceptance**
+
+- Probe against `astral-sh/uv` returns 50+ real repo labels in
+  `labels` and the 8 curated lifecycle events.
+- Probe against the Apache CASSANDRA project returns the 7
+  project statuses.
+- A click on any chip appends the corresponding step row with the
+  right name + a defensible WIP default.
+- Probe failure surfaces a single-line inline error in the panel
+  while keeping the warehouse + lifecycle sections functional.
+
+**Verification**
+
+- Unit tests with mocked source-API responses.
+- Manual: open the builder, probe the demo workflows, click a
+  GitHub label chip, see it appear as a step row; save.
+
+#### C5 — Dry-run preview (capped sample, per-step table)
+
+**One PR. The "does my definition actually return data?" affordance.**
+
+- New endpoint `POST /api/internal/contracts/_dry-run`. Body:
+  the in-progress contract payload (same shape as `_validate`) + a
+  `{since: "YYYY-MM-DD"}` cap-start date and an optional
+  `items_cap: int` (default 200). Source target comes from the
+  contract body — same as `_probe-source-vocab`.
+- Server fetches **up to the smaller of** 200 items OR a 30-day
+  window from `since`. Streams items in time order; stops at the
+  first cap to bite.
+- The fetch is **non-persisting**: items go through the existing
+  Source adapter but bypass the materialise → Parquet path. They
+  live in a process-local cache only.
+- Response shape:
+  ```json
+  {
+    "fetched_at": "2026-05-27T18:00:00Z",
+    "expires_at": "2026-05-27T18:05:00Z",
+    "stopped_by": "items_cap" | "time_window",
+    "items_fetched": 187,
+    "window": {"from": "2026-04-27", "to": "2026-05-27"},
+    "per_step": [
+      {"step_name": "Draft", "wip": true, "count": 23, "items": [...]},
+      {"step_name": "Awaiting Review", "wip": true, "count": 41, ...},
+      ...,
+      {"step_name": "_unmatched", "count": 4, "items": [...]}
+    ]
+  }
+  ```
+  Each `items` array is the same row shape `work_items_table.py`
+  consumes today — that component renders the result.
+- Cache: in-process dict keyed on
+  `(source_target_hash, since, items_cap, steps_signature)`,
+  5-minute TTL. The `expires_at` in the response surfaces when the
+  cache rolls. `?force=true` busts.
+- Builder UI: under the Steps editor, a "Preview against live
+  source" disclosure section.
+  - "From" date input (default: 30 days ago).
+  - "Dry run" button → spinner → table per step using the existing
+    `work_items_table.html.jinja` partial.
+  - Empty steps render as
+    "no items matched this step in the sample window — name might
+    not match the source's actual state."
+  - `_unmatched` bucket surfaces items whose current state didn't
+    map to any of the user's steps — a powerful "your workflow is
+    missing a step" signal.
+- The preview is intentionally per-step ONLY; no other charts
+  (CFD, cycle-time) render here. The point is "does my definition
+  match real data?", not "what does the dashboard look like?".
+
+**Files touched**: new
+`src/flowmetrics/contract_preview.py` (the bounded fetch +
+in-process cache), `src/flowmetrics/app.py` (endpoint),
+`contracts_new.html.jinja` (Preview panel + table rendering),
+`tests/test_contract_preview.py`.
+
+**Acceptance**
+
+- Dry-run against `astral-sh/uv` with `since = today - 30d` and
+  a 5-step definition returns counts > 0 in at least one WIP
+  step.
+- The `_unmatched` bucket lists items whose current state isn't
+  named in the contract — proves the "warn me about gaps"
+  behaviour.
+- Repeating the same call within 5 min returns the same payload
+  with no network hit (cache).
+- `?force=true` busts the cache and re-fetches.
+
+**Verification**
+
+- Unit tests with mocked source-API responses; assert cap
+  semantics (stop at 200 even when 30d window has more; stop at
+  30d when 200 items would need more).
+- Playwright E2E: build a 3-step workflow against the demo
+  GitHub source, click Dry run, see counts per step.
+- Manual: rename one step to a typo (`"Awating Review"`),
+  re-run, watch its bucket go empty AND its items appear under
+  `_unmatched`.
+
+#### C6 — Export YAML
+
+**One PR. Sharing affordance on the edit page.**
+
+- `GET /api/internal/contracts/{id}/yaml` returns the row's `yaml`
+  column with `Content-Type: application/x-yaml` and
+  `Content-Disposition: attachment; filename="<id>.yaml"`.
+- Edit page gets a "Download YAML" link + a "Copy YAML" button
+  (the latter fetches the body and writes to
+  `navigator.clipboard`).
+- Both work on archived contracts via `?include_archived=true`
+  so an ops team can re-seed a deleted contract from their
+  ad-hoc export.
+
+**Files touched**: `src/flowmetrics/app.py` (endpoint),
+`contracts_new.html.jinja` (two buttons + handler),
+`tests/test_contracts_api.py`.
+
+**Acceptance**
+
+- Downloaded YAML is byte-identical to the row's `yaml` column.
+- Downloaded YAML, fed to `flow materialise --from-yaml
+  /path/to/file.yaml`, succeeds.
+- Copy button populates the clipboard with the same text.
+
+#### C7 — Archived contracts page
+
+**Final slice. Closes the lifecycle.**
+
+- `/admin/contracts/archive` lists archived rows (id, label,
+  archived_at, archive reason, source).
+- Per-row actions:
+  - **Restore** → POST `/restore`, refresh list.
+  - **Export YAML** (link to C6 endpoint with
+    `?include_archived=true`).
+  - **Hard delete** → DELETE `/{id}`; confirmation prompt
+    explicit about permanence + spelling out the data implications.
+- Subtle link from the home page when n > 0: "View archived
+  (n)" — doesn't render at all when there are no archived rows.
+
+**Files touched**: new `contracts_archive.html.jinja`,
+route in `app.py`, link on `home.html.jinja`, tests.
+
+**Acceptance**
+
+- Archive a contract → home grows the "View archived (1)" link.
+- Archive page shows it; restore brings it back.
+- Hard-delete removes the row permanently; cannot be recovered.
+
+**Verification**
+
+- Playwright E2E: full lifecycle — create → archive → restore →
+  archive → hard-delete → assert gone everywhere (home, archive
+  page, materialise-all manifest).
+
+### Phase checkpoints (Plan C)
+
+- **After C1**: schema + storage migration solid; existing tests
+  green. Pause for review BEFORE any UI work — the data model is
+  the foundation everything else builds on.
+- **After C2**: archive lifecycle works through curl. Pause for
+  review of the API surface before the UI lands.
+- **After C3**: new builder shipped with the "Ready" vocab; old
+  wizard gone. Pause for a UX review.
+- **After C4**: source vocab makes the builder feel native. Pause
+  to validate the chip catalogue against a real Jira instance
+  (not just GitHub).
+- **After C5**: dry-run answers "did I get my workflow right?"
+  before the user commits. Pause to confirm the per-step table
+  reads honestly against both source kinds.
+- **After C6 + C7**: lifecycle complete. Final review.
+
+### Non-goals (explicit)
+
+- **No multi-source contracts.** Source stays contract-wide.
+- **No per-revision audit history.** Single `updated_at` + a
+  single archive timestamp is enough; full revision tracking is a
+  future ask.
+- **No drag-and-drop reorder.** ↑/↓ buttons are equivalently
+  testable, accessible by default, and don't pull in a DnD lib.
+- **No DB migrations framework.** The schema is small enough that
+  a single `CREATE TABLE IF NOT EXISTS` + future column adds via
+  ALTER TABLE (gated on PRAGMA `user_version`) is sufficient.
+- **No "import multiple YAMLs at once" UI.** Import-from-YAML
+  stays as the first-boot migration + the per-contract
+  `flow materialise --from-yaml` path.
+
+---
+
 ## How to use this plan
 
 1. Pick one plan to start with (A is lower-risk, ships docs +

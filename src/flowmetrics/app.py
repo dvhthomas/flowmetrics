@@ -224,15 +224,24 @@ class WorkflowView:
         contracts_dir: Path,
         data_dir: Path,
         query: dict | None = None,
+        contracts_db=None,
     ) -> None:
         self.id = workflow_id
         self._data_dir = data_dir
-        # One contract load per request. Propagates ContractError
-        # so a malformed YAML surfaces as an HTTP 500 with the
-        # parser's message — better than the silent degradation
-        # the old _workflow_slug/_workflow_system_label helpers
-        # had.
-        self.contract = load_contract(workflow_id, contracts_dir)
+        # Load the contract via the DB when one is supplied (the
+        # runtime path); fall back to the legacy filesystem path
+        # for any code path that hasn't been wired through yet.
+        if contracts_db is not None:
+            meta = contracts_db.get_meta(workflow_id)
+            if meta is None or meta.archived_at is not None:
+                from .contract import ContractError
+                raise ContractError(
+                    f"contract {workflow_id!r} not in the live "
+                    f"store at {contracts_dir / 'contracts.db'}"
+                )
+            self.contract = meta.contract
+        else:
+            self.contract = load_contract(workflow_id, contracts_dir)
         today_utc = datetime.now(UTC).date()
         # The completion-data coverage. `data_max_date` anchors
         # the reference period; both bound the filter-bar date
@@ -466,6 +475,13 @@ def create_app(
     auth (user='operator', password matches). Used for off-localhost
     binds where Tailscale or Caddy fronts the app.
     """
+    # First-boot migration: import any legacy YAMLs in the workflows
+    # dir into the SQLite store, then move them to `migrated/`.
+    # Idempotent — subsequent calls with no YAMLs are no-ops.
+    from .contracts_db import ContractsDB, ensure_initialized
+    ensure_initialized(contracts_dir)
+    contracts_db = ContractsDB(contracts_dir / "contracts.db")
+
     if cache_dir is None:
         from .cli import DEFAULT_CACHE_DIR
 
@@ -561,6 +577,7 @@ def create_app(
             contracts_dir=contracts_dir,
             data_dir=data_dir,
             query=query,
+            contracts_db=contracts_db,
         )
 
     def _parse_iso_date(value: str | None):
@@ -577,57 +594,49 @@ def create_app(
             return None
 
     def _ensure_contract_exists(name: str) -> None:
-        """Confirm a contract YAML exists; otherwise 404 with a clear
-        message naming the missing artifact."""
-        for ext in (".yaml", ".yml"):
-            if (contracts_dir / f"{name}{ext}").exists():
-                return
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                f"contract {name!r} not found under {contracts_dir}/ "
-                "(looked for .yaml and .yml). Create a YAML file there "
-                "first."
-            ),
-        )
-
-    def _first_contract_or_404() -> str:
-        """Pick the first contract under contracts_dir, or 404 with a
-        clear message if there are none."""
-        candidates = sorted(contracts_dir.glob("*.yaml"))
-        if not candidates:
+        """Confirm a contract exists in the live store; otherwise
+        404 with a clear message."""
+        if contracts_db.get_meta(name) is None or _is_archived(name):
             raise HTTPException(
                 status_code=404,
                 detail=(
-                    f"no contracts found under {contracts_dir}/ — "
-                    "create a YAML file there and run `flow materialise`."
+                    f"contract {name!r} not found in the workflows "
+                    f"store at {contracts_dir / 'contracts.db'}. "
+                    "Create one through /admin/contracts/new, or "
+                    "drop a YAML in this directory and restart."
                 ),
             )
-        return candidates[0].stem
+
+    def _is_archived(name: str) -> bool:
+        meta = contracts_db.get_meta(name)
+        return meta is not None and meta.archived_at is not None
+
+    def _first_contract_or_404() -> str:
+        """Pick the first live contract, or 404 with a clear
+        message if there are none."""
+        rows = contracts_db.list()
+        if not rows:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"no live contracts in the store at "
+                    f"{contracts_dir / 'contracts.db'}. Create one "
+                    "through /admin/contracts/new, or drop a YAML "
+                    "in this directory and restart."
+                ),
+            )
+        return rows[0].name
 
     def _available_contracts() -> list[str]:
-        # Both extensions — `load_contract` accepts either, so the
-        # listing should too. A duplicate `foo.yaml` + `foo.yml`
-        # collapses to a single id (load_contract picks .yaml first).
-        seen: set[str] = set()
-        for ext in ("*.yaml", "*.yml"):
-            for p in contracts_dir.glob(ext):
-                seen.add(p.stem)
-        return sorted(seen)
+        """Live contract ids, alphabetical."""
+        return [m.name for m in contracts_db.list()]
 
     def _raw_yaml_text(name: str) -> str | None:
-        """Best-effort read of the YAML file as-is. Used by the
-        contract-detail API so the UI can show + edit the original
-        text alongside the parsed view. Returns None when the file
-        is unreadable (caller decides what to do)."""
-        for ext in (".yaml", ".yml"):
-            p = contracts_dir / f"{name}{ext}"
-            if p.exists():
-                try:
-                    return p.read_text()
-                except OSError:
-                    return None
-        return None
+        """The contract's canonical YAML body — returned to the UI
+        for the textarea-fallback / diff view. None when the row
+        is missing."""
+        meta = contracts_db.get_meta(name)
+        return meta.yaml if meta else None
 
     def _materialise_status(name: str) -> dict | None:
         """Latest known per-workflow materialise outcome. Reads the
@@ -645,18 +654,31 @@ def create_app(
         }
 
     def _contract_summary(name: str) -> dict:
-        """List-row payload. Falls back to bare id+source when the
-        YAML fails to parse so the listing still tells the user
-        what's on disk — the detail endpoint surfaces the error."""
-        try:
-            c = load_contract(name, contracts_dir)
-            return {
-                "id": c.name,
-                "label": c.label or c.name,
-                "source": c.source,
-            }
-        except ContractError:
+        """List-row payload. Reads from the DB."""
+        c = contracts_db.get(name)
+        if c is None:
             return {"id": name, "label": name, "source": None}
+        return {
+            "id": c.name,
+            "label": c.label or c.name,
+            "source": c.source,
+        }
+
+    def _load_contract_for_request(name: str):
+        """Load a Contract from the DB by id. Raises HTTPException on
+        404 (missing) or 500 (parser failure, which shouldn't happen
+        since the DB only stores YAMLs that passed validation on
+        write, but be defensive)."""
+        meta = contracts_db.get_meta(name)
+        if meta is None or meta.archived_at is not None:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"contract {name!r} not found in "
+                    f"{contracts_dir / 'contracts.db'}."
+                ),
+            )
+        return meta.contract
 
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)
     def home(request: Request) -> HTMLResponse:
@@ -669,11 +691,8 @@ def create_app(
         # subtitle. Fall back to name when label is missing.
         workflows: list[dict] = []
         for name in _available_contracts():
-            try:
-                c = load_contract(name, contracts_dir)
-                label = c.label or name
-            except ContractError:
-                label = name
+            c = contracts_db.get(name)
+            label = c.label if c and c.label else name
             workflows.append({"name": name, "label": label})
         return templates.TemplateResponse(
             request,
@@ -732,13 +751,7 @@ def create_app(
         status. 404 if the file is missing; 422 if it's malformed."""
         _ensure_contract_exists(contract_id)
         raw = _raw_yaml_text(contract_id)
-        try:
-            c = load_contract(contract_id, contracts_dir)
-        except ContractError as exc:
-            raise HTTPException(
-                status_code=422,
-                detail=f"contract {contract_id!r} failed to parse: {exc}",
-            ) from exc
+        c = _load_contract_for_request(contract_id)
         parsed: dict = {
             "name": c.name,
             "source": c.source,
@@ -898,26 +911,28 @@ def create_app(
         "/api/internal/contracts/{contract_id}", dependencies=write_dep,
     )
     def put_contract(contract_id: str, payload: dict) -> dict:
-        """Create or overwrite a contract YAML atomically. Body must
-        carry a `yaml` STRING that parses against `parse_contract_text`
-        with `name == contract_id`."""
+        """Create or overwrite a contract. Body must carry a `yaml`
+        STRING that parses against `parse_contract_text` with
+        `name == contract_id`. The DB owns the storage — no
+        filesystem write."""
+        from .contracts_db import ContractsDBError
+
         text = payload.get("yaml") or ""
         try:
-            parse_contract_text(text, contract_id)
+            contract = parse_contract_text(text, contract_id)
         except ContractError as exc:
             errors = validate_yaml_text_structured(text, contract_id)
             raise HTTPException(
                 status_code=422,
                 detail={"message": str(exc), "errors": errors},
             ) from exc
-
-        # Atomic write: tmp → rename. tmp lives in the same dir so
-        # the rename stays on one filesystem.
-        target = contracts_dir / f"{contract_id}.yaml"
-        target.parent.mkdir(parents=True, exist_ok=True)
-        tmp = target.with_suffix(".yaml.tmp")
-        tmp.write_text(text)
-        os.replace(tmp, target)
+        try:
+            contracts_db.put(contract)
+        except ContractsDBError as exc:
+            # e.g. id collides with an archived row.
+            raise HTTPException(
+                status_code=409, detail=str(exc),
+            ) from exc
         return get_contract(contract_id)
 
     @app.delete(
@@ -948,6 +963,8 @@ def create_app(
             except (ValueError, TypeError):
                 purge = False
 
+        from .contracts_db import ContractsDBError
+
         partition_dirs = [
             data_dir / "work_items" / f"contract_id={contract_id}",
             data_dir / "transitions" / f"contract_id={contract_id}",
@@ -960,15 +977,19 @@ def create_app(
                 detail=(
                     f"contract {contract_id!r} has warehouse data on "
                     "disk. Pass `{\"purge_data\": true}` to delete "
-                    "the YAML AND the partitioned Parquet, or run "
-                    "`flow restore` first if you wanted to keep it."
+                    "the contract AND the partitioned Parquet."
                 ),
             )
 
-        for ext in (".yaml", ".yml"):
-            p = contracts_dir / f"{contract_id}{ext}"
-            if p.exists():
-                p.unlink()
+        # DB delete: archive first (idempotent), then hard-delete to
+        # satisfy the two-step delete invariant.
+        try:
+            if not _is_archived(contract_id):
+                contracts_db.archive(contract_id, reason="api DELETE")
+            contracts_db.hard_delete(contract_id)
+        except ContractsDBError:
+            # Already gone — fine, the user got what they asked for.
+            pass
         if purge:
             import shutil
 

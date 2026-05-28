@@ -121,17 +121,19 @@ class TestGetContractDetail:
             r = client.get("/api/internal/contracts/does-not-exist")
         assert r.status_code == 404
 
-    def test_malformed_yaml_returns_422_with_parser_message(self, workspace):
+    def test_malformed_yaml_is_skipped_by_migration_and_returns_404(self, workspace):
         contracts, data = workspace
-        # Missing `source:` → ContractError at load time.
+        # Missing `source:` → ContractError on parse. The migration
+        # leaves the bad YAML in place (so the user can see + fix
+        # it) and does NOT create a DB row. The detail endpoint
+        # therefore returns 404 rather than 422.
         (contracts / "broken.yaml").write_text("contract: {name: broken}\n")
         app = create_app(data_dir=data, contracts_dir=contracts)
         with TestClient(app) as client:
             r = client.get("/api/internal/contracts/broken")
-        # Validation failures get 422; the listing still returns the
-        # entry, but detail surfaces the parser error.
-        assert r.status_code == 422
-        assert "source" in r.text.lower() or "contract" in r.text.lower()
+        assert r.status_code == 404
+        # The original file is still on disk for the user to fix.
+        assert (contracts / "broken.yaml").exists()
 
 
 class TestValidateEndpoint:
@@ -209,8 +211,6 @@ class TestWriteContract:
             assert body["id"] == "alpha"
             # The detail endpoint sees it immediately.
             assert client.get("/api/internal/contracts/alpha").status_code == 200
-        # File landed on disk.
-        assert (contracts / "alpha.yaml").exists()
 
     def test_overwrites_an_existing_contract_atomically(self, workspace):
         contracts, data = workspace
@@ -220,9 +220,9 @@ class TestWriteContract:
             r = self._put(client, "alpha",
                 "contract:\n  name: alpha\n  label: new\n  source: github\n  repo: a/b\n")
             assert r.status_code == 200, r.text
-        # New label visible.
-        text = (contracts / "alpha.yaml").read_text()
-        assert "label: new" in text
+            # New label visible through the API (DB-backed).
+            body = client.get("/api/internal/contracts/alpha").json()
+        assert body["parsed"]["label"] == "new"
 
     def test_invalid_yaml_rejects_with_422_and_does_not_write(self, workspace):
         contracts, data = workspace
@@ -232,7 +232,8 @@ class TestWriteContract:
             assert r.status_code == 422
             body = r.json()
             assert "errors" in body or "detail" in body
-        assert not (contracts / "broken.yaml").exists()
+            # Nothing stored.
+            assert client.get("/api/internal/contracts/broken").status_code == 404
 
     def test_id_must_match_contract_name(self, workspace):
         contracts, data = workspace
@@ -242,9 +243,8 @@ class TestWriteContract:
             r = self._put(client, "alpha",
                 "contract:\n  name: beta\n  source: github\n  repo: a/b\n")
             assert r.status_code == 422
-        # Nothing written.
-        assert not (contracts / "alpha.yaml").exists()
-        assert not (contracts / "beta.yaml").exists()
+            assert client.get("/api/internal/contracts/alpha").status_code == 404
+            assert client.get("/api/internal/contracts/beta").status_code == 404
 
 
 class TestDeleteContract:
@@ -261,7 +261,7 @@ class TestDeleteContract:
         with TestClient(app) as client:
             r = self._delete(client, "alpha")
             assert r.status_code == 200, r.text
-        assert not (contracts / "alpha.yaml").exists()
+            assert client.get("/api/internal/contracts/alpha").status_code == 404
 
     def test_refuses_when_warehouse_data_exists(self, workspace):
         contracts, data = workspace
@@ -279,8 +279,8 @@ class TestDeleteContract:
             assert r.status_code == 409
             body = r.json()
             assert "purge" in str(body).lower()
-        # YAML still there, warehouse still there.
-        assert (contracts / "alpha.yaml").exists()
+            # Contract still in the DB; warehouse still on disk.
+            assert client.get("/api/internal/contracts/alpha").status_code == 200
         assert work.exists()
 
     def test_purge_data_true_clears_warehouse_alongside_yaml(self, workspace):
@@ -301,7 +301,7 @@ class TestDeleteContract:
                 headers={"X-Requested-With": "fetch"},
             )
             assert r.status_code == 200, r.text
-        assert not (contracts / "alpha.yaml").exists()
+            assert client.get("/api/internal/contracts/alpha").status_code == 404
         # The contract's partition is gone; other partitions would
         # be untouched (there are none in this test).
         assert not (data / "work_items" / "contract_id=alpha").exists()
@@ -324,7 +324,7 @@ class TestCSRFOnWrites:
                 },
             )
             assert r.status_code == 403
-        assert not (contracts / "alpha.yaml").exists()
+            assert client.get("/api/internal/contracts/alpha").status_code == 404
 
     def test_delete_without_header_is_blocked(self, workspace):
         contracts, data = workspace
@@ -333,7 +333,8 @@ class TestCSRFOnWrites:
         with TestClient(app) as client:
             r = client.delete("/api/internal/contracts/alpha")
             assert r.status_code == 403
-        assert (contracts / "alpha.yaml").exists()
+            # Still in the DB after the blocked DELETE.
+            assert client.get("/api/internal/contracts/alpha").status_code == 200
 
     def test_validate_without_header_is_also_blocked(self, workspace):
         # _validate is a POST that takes user input — same CSRF

@@ -1,20 +1,21 @@
-"""Workflow contract — durable config defining what to materialise.
+"""Contract: canonical workflow definition.
 
-A contract YAML declares which source to fetch from and which scope.
-Slice 1 supports the minimum viable shape:
+A `Contract` describes one workflow's identity (id, label), source
+(GitHub or Jira target), window, and the **ordered list of steps**
+items move through. Each `Step` carries a name and a `wip: bool` flag.
 
-    contract:
-      name: my-contract-name
-      source: github          # or 'jira'
-      repo: owner/name        # GitHub only
-      jira_url: https://…     # Jira only
-      jira_project: PROJ      # Jira only
-      start: 2026-05-04       # window start (ISO date)
-      stop: 2026-05-10        # window stop (ISO date)
+The on-disk / over-the-wire shape is YAML. The canonical model is a
+Pydantic `BaseModel` — writes go through Pydantic validation,
+exports go through `emit_canonical_yaml`. The store (SQLite in C1+)
+keeps each contract as a YAML text body so adding fields to the
+Pydantic model never requires a DB migration.
 
-Richer fields (stages, metadata extractors, exclusions) arrive in
-later slices as the contract format grows toward the shape declared
-in docs/SPEC-warehouse-app.md §5.
+Legacy `states: {backlog, wip, done}` YAMLs are still accepted on
+import; `parse_contract_text` normalises them into the new
+`steps: [{name, wip}]` shape. A `Contract.states` compatibility
+property synthesises the legacy `WorkflowStates(backlog, wip, done)`
+object so every existing CFD / Aging / charts caller keeps working
+without modification.
 """
 
 from __future__ import annotations
@@ -25,10 +26,19 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
+from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
 
 
 class ContractError(ValueError):
     """Raised when a contract YAML is missing, malformed, or invalid."""
+
+
+# ---------------------------------------------------------------------------
+# Legacy compatibility — `WorkflowStates` stays importable + constructable
+# because a lot of existing tests + chart components consume it directly.
+# It now also doubles as the synthesised return shape of
+# `Contract.states`.
+# ---------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
@@ -55,8 +65,38 @@ class WorkflowStates:
         return self.wip + self.done
 
 
-@dataclass(frozen=True)
-class Contract:
+# ---------------------------------------------------------------------------
+# Canonical Pydantic model.
+# ---------------------------------------------------------------------------
+
+
+class Step(BaseModel):
+    """One workflow step: a named state items pass through, plus
+    whether it counts as Work-In-Progress.
+
+    `wip=True` rows become bands on the CFD and columns on Aging
+    WIP. Leading `wip=False` rows are "Ready" (committed to be
+    worked next, not the unbounded backlog); trailing `wip=False`
+    rows are "Done"."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+    wip: bool = False
+
+    @field_validator("name")
+    @classmethod
+    def _non_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("step name must be a non-empty string")
+        return v
+
+
+class Contract(BaseModel):
+    """One workflow's canonical definition."""
+
+    model_config = ConfigDict(frozen=True)
+
     name: str
     source: Literal["github", "jira"]
     # GitHub fields
@@ -67,44 +107,54 @@ class Contract:
     # Window
     start: date | None = None
     stop: date | None = None
-    # Optional 3-category state classification. When set,
-    # stage-aware views (CFD, Aging) consult this to filter and
-    # order. When unset, views fall back to data-derived ordering.
-    states: WorkflowStates | None = None
-    # Optional human-friendly display name. The UI shows this in
-    # breadcrumbs / the home-page workflow list. Falls back to
-    # `name` when omitted. `name` stays the routing ID
-    # (unique, URL-safe) — `label` is just prose.
+    # Optional human-friendly display name. Falls back to `name`.
     label: str | None = None
+    # Ordered list of workflow steps. Empty list = no states block;
+    # CFD / Aging fall back to data-derived ordering.
+    steps: list[Step] = []
+
+    @property
+    def states(self) -> WorkflowStates | None:
+        """Compatibility shim. Synthesises the legacy 3-category
+        WorkflowStates from `steps`:
+          - leading non-WIP rows → backlog
+          - contiguous WIP rows → wip
+          - trailing non-WIP rows → done
+        Returns None when the contract has no steps at all
+        (matches the legacy "no states: block" behaviour)."""
+        if not self.steps:
+            return None
+        backlog: list[str] = []
+        wip: list[str] = []
+        done: list[str] = []
+        # Walk forward; the first WIP row ends backlog. Once any
+        # WIP has been seen, every subsequent non-WIP belongs to
+        # done. Intermixed WIP / non-WIP is collapsed by this rule
+        # (the UI's category badges enforce contiguity at edit time).
+        seen_wip = False
+        for s in self.steps:
+            if s.wip:
+                wip.append(s.name)
+                seen_wip = True
+            else:
+                if seen_wip:
+                    done.append(s.name)
+                else:
+                    backlog.append(s.name)
+        return WorkflowStates(
+            backlog=tuple(backlog), wip=tuple(wip), done=tuple(done),
+        )
 
 
-def load_contract(name: str, contracts_dir: Path) -> Contract:
-    """Load and validate a contract YAML by name.
-
-    Looks for `<name>.yaml` then `<name>.yml` under contracts_dir.
-    Raises ContractError with a human-readable message on any
-    failure — the caller (CLI) surfaces this to stderr and exits
-    non-zero. Cron operators read the error in their mail.
-    """
-    path = contracts_dir / f"{name}.yaml"
-    if not path.exists():
-        alt = contracts_dir / f"{name}.yml"
-        if alt.exists():
-            path = alt
-        else:
-            raise ContractError(
-                f"contract {name!r} not found under {contracts_dir}/ "
-                f"(looked for {name}.yaml and {name}.yml)"
-            )
-
-    return parse_contract_text(path.read_text(), name)
+# ---------------------------------------------------------------------------
+# YAML import / export.
+# ---------------------------------------------------------------------------
 
 
 def parse_contract_text(text: str, name: str) -> Contract:
-    """Same validation as `load_contract`, but takes raw YAML text
-    instead of a file path. The write API (PUT
-    /api/internal/contracts/{id}) routes the body through this so
-    validation logic is never duplicated."""
+    """Parse a YAML string into a Contract. Accepts both the new
+    `steps:` shape and the legacy `states: {backlog, wip, done}`
+    shape; both produce the same canonical Contract object."""
     try:
         raw = yaml.safe_load(text)
     except yaml.YAMLError as exc:
@@ -113,9 +163,7 @@ def parse_contract_text(text: str, name: str) -> Contract:
         ) from exc
 
     if not isinstance(raw, dict) or "contract" not in raw:
-        raise ContractError(
-            "must have a top-level `contract:` key"
-        )
+        raise ContractError("must have a top-level `contract:` key")
 
     body = raw["contract"]
     if not isinstance(body, dict):
@@ -130,13 +178,11 @@ def parse_contract_text(text: str, name: str) -> Contract:
             f"but loaded as {name!r}"
         )
 
-    raw_label = body.get("label")
-    if raw_label is not None and not isinstance(raw_label, str):
+    label = body.get("label")
+    if label is not None and not isinstance(label, str):
         raise ContractError(
-            f"contract.label must be a string; got "
-            f"{type(raw_label).__name__}"
+            f"contract.label must be a string; got {type(label).__name__}"
         )
-    label = raw_label
 
     source = body.get("source")
     if source not in ("github", "jira"):
@@ -167,61 +213,164 @@ def parse_contract_text(text: str, name: str) -> Contract:
                 f"contract.{field_name} must be YYYY-MM-DD; got {v!r}"
             ) from exc
 
-    # Optional `states:` block — 3-category classification of
-    # workflow states (backlog/wip/done). Within each category the
-    # list order is the kanban order (no inference). Each state
-    # name can appear in at most one category. Reclassify by
-    # moving a state name between lists.
-    raw_states = body.get("states")
-    states_obj: WorkflowStates | None
-    if raw_states is None:
-        states_obj = None
-    else:
-        if not isinstance(raw_states, dict):
-            raise ContractError(
-                f"contract.states must be a mapping of "
-                f"category → [state_name, …]; got "
-                f"{type(raw_states).__name__}"
-            )
-        valid_categories = {"backlog", "wip", "done"}
-        seen: dict[str, str] = {}  # state_name → category
-        parsed: dict[str, tuple[str, ...]] = {
-            "backlog": (), "wip": (), "done": (),
-        }
-        for category, names in raw_states.items():
-            if category not in valid_categories:
-                raise ContractError(
-                    f"unknown category {category!r} in contract.states; "
-                    f"valid categories are: backlog, wip, done"
-                )
-            if not isinstance(names, list):
-                raise ContractError(
-                    f"contract.states.{category} must be a list of "
-                    f"state names; got {type(names).__name__}"
-                )
-            names_tuple = tuple(str(n) for n in names)
-            for n in names_tuple:
-                if n in seen:
-                    raise ContractError(
-                        f"state {n!r} appears in more than one "
-                        f"category: {seen[n]!r} and {category!r}. "
-                        f"Each state name can be in at most one "
-                        f"category."
-                    )
-                seen[n] = category
-            parsed[category] = names_tuple
-        states_obj = WorkflowStates(**parsed)
+    steps = _read_steps(body)
 
-    return Contract(
-        name=name,
-        source=source,
-        repo=repo,
-        jira_url=jira_url,
-        jira_project=jira_project,
-        start=_parse_date("start"),
-        stop=_parse_date("stop"),
-        states=states_obj,
-        label=label,
+    try:
+        return Contract(
+            name=name,
+            source=source,
+            repo=repo,
+            jira_url=jira_url,
+            jira_project=jira_project,
+            start=_parse_date("start"),
+            stop=_parse_date("stop"),
+            label=label,
+            steps=steps,
+        )
+    except ValidationError as exc:
+        raise ContractError(_summarise_pydantic_errors(exc)) from exc
+
+
+def _read_steps(body: dict) -> list[Step]:
+    """Read either the new `steps:` shape OR the legacy
+    `states: {backlog, wip, done}` shape into a canonical Step list."""
+    new_shape = body.get("steps")
+    legacy_shape = body.get("states")
+    if new_shape is not None and legacy_shape is not None:
+        raise ContractError(
+            "contract may carry `steps:` or `states:` but not both"
+        )
+    if new_shape is not None:
+        return _read_new_steps(new_shape)
+    if legacy_shape is not None:
+        return _read_legacy_states(legacy_shape)
+    return []
+
+
+def _read_new_steps(raw: object) -> list[Step]:
+    if not isinstance(raw, list):
+        raise ContractError(
+            f"contract.steps must be a list; got {type(raw).__name__}"
+        )
+    out: list[Step] = []
+    for i, row in enumerate(raw):
+        if not isinstance(row, dict):
+            raise ContractError(
+                f"contract.steps[{i}] must be a mapping; "
+                f"got {type(row).__name__}"
+            )
+        try:
+            out.append(Step(**row))
+        except ValidationError as exc:
+            raise ContractError(
+                f"contract.steps[{i}]: {_summarise_pydantic_errors(exc)}"
+            ) from exc
+    return out
+
+
+def _read_legacy_states(raw: object) -> list[Step]:
+    """Convert the legacy 3-category mapping into an ordered Step
+    list. Order: backlog rows (wip=False), then wip rows (wip=True),
+    then done rows (wip=False)."""
+    if not isinstance(raw, dict):
+        raise ContractError(
+            f"contract.states must be a mapping of "
+            f"category → [state_name, …]; got {type(raw).__name__}"
+        )
+    valid = {"backlog", "wip", "done"}
+    seen: dict[str, str] = {}
+    buckets: dict[str, list[str]] = {"backlog": [], "wip": [], "done": []}
+    for category, names in raw.items():
+        if category not in valid:
+            raise ContractError(
+                f"unknown category {category!r} in contract.states; "
+                f"valid categories are: backlog, wip, done"
+            )
+        if not isinstance(names, list):
+            raise ContractError(
+                f"contract.states.{category} must be a list of "
+                f"state names; got {type(names).__name__}"
+            )
+        for n in names:
+            name = str(n)
+            if name in seen:
+                raise ContractError(
+                    f"state {name!r} appears in more than one "
+                    f"category: {seen[name]!r} and {category!r}. "
+                    f"Each state name can be in at most one "
+                    f"category."
+                )
+            seen[name] = category
+            buckets[category].append(name)
+    out: list[Step] = []
+    for name in buckets["backlog"]:
+        out.append(Step(name=name, wip=False))
+    for name in buckets["wip"]:
+        out.append(Step(name=name, wip=True))
+    for name in buckets["done"]:
+        out.append(Step(name=name, wip=False))
+    return out
+
+
+def _summarise_pydantic_errors(exc: ValidationError) -> str:
+    parts: list[str] = []
+    for err in exc.errors():
+        loc = ".".join(str(p) for p in err.get("loc", ()) if p != "__root__")
+        msg = err.get("msg", "invalid value")
+        parts.append(f"{loc}: {msg}" if loc else msg)
+    return "; ".join(parts) or str(exc)
+
+
+def load_contract(name: str, contracts_dir: Path) -> Contract:
+    """Load and validate a contract YAML by name from
+    `contracts_dir`.
+
+    Looks for `<name>.yaml` then `<name>.yml`. Raises `ContractError`
+    on any failure. Kept as a thin helper for tests + the CLI's
+    --from-yaml path; the runtime server reads from the SQLite
+    store via `flowmetrics.contracts_db.ContractsDB.get` instead.
+    """
+    path = contracts_dir / f"{name}.yaml"
+    if not path.exists():
+        alt = contracts_dir / f"{name}.yml"
+        if alt.exists():
+            path = alt
+        else:
+            raise ContractError(
+                f"contract {name!r} not found under {contracts_dir}/ "
+                f"(looked for {name}.yaml and {name}.yml)"
+            )
+    return parse_contract_text(path.read_text(), name)
+
+
+def emit_canonical_yaml(contract: Contract) -> str:
+    """Render a Contract in the canonical `steps:` YAML shape.
+
+    The output is what `parse_contract_text` would round-trip
+    against; what the export-YAML endpoint serves; what the SQLite
+    store keeps in its `yaml` column."""
+    body: dict = {"name": contract.name, "source": contract.source}
+    if contract.label is not None:
+        body["label"] = contract.label
+    if contract.repo is not None:
+        body["repo"] = contract.repo
+    if contract.jira_url is not None:
+        body["jira_url"] = contract.jira_url
+    if contract.jira_project is not None:
+        body["jira_project"] = contract.jira_project
+    if contract.start is not None:
+        body["start"] = contract.start.isoformat()
+    if contract.stop is not None:
+        body["stop"] = contract.stop.isoformat()
+    if contract.steps:
+        body["steps"] = [
+            {"name": s.name, "wip": s.wip} for s in contract.steps
+        ]
+    return yaml.safe_dump(
+        {"contract": body},
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=True,
     )
 
 
@@ -237,14 +386,13 @@ def validate_yaml_text_structured(
     URL slug; pass None to skip that check."""
     try:
         if name is None:
-            # Parse without the slug check by extracting it from the
-            # body and feeding it back in. If the body doesn't even
-            # have a `name`, parse_contract_text will surface that.
             try:
                 doc = yaml.safe_load(text)
             except yaml.YAMLError as exc:
                 return [_yaml_err_to_struct(exc)]
-            if not isinstance(doc, dict) or not isinstance(doc.get("contract"), dict):
+            if not isinstance(doc, dict) or not isinstance(
+                doc.get("contract"), dict
+            ):
                 return [{
                     "message": "must have a top-level `contract:` key",
                     "line": None, "column": None,
@@ -254,8 +402,6 @@ def validate_yaml_text_structured(
         else:
             parse_contract_text(text, name)
     except ContractError as exc:
-        # ContractError messages may wrap a YAMLError; preserve
-        # location info when present.
         cause = exc.__cause__
         if isinstance(cause, yaml.YAMLError):
             return [_yaml_err_to_struct(cause)]

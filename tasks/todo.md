@@ -100,3 +100,131 @@ each PR lands. Both plans now shipped end-to-end.
       purge confirmation.
 - [x] "edit" link in the data-source strip on every dashboard.
 - [x] +5 unit tests.
+
+## Plan C — Server-managed contract builder (v2)
+
+### Slice C1: SQLite store + Pydantic schema + YAML import
+
+- [ ] New `src/flowmetrics/contracts_db.py` (single `contracts`
+      table at `<workflows-dir>/contracts.db`; **yaml-in-a-column**
+      schema — `id, yaml, archived_at, archived_reason,
+      created_at, updated_at`).
+- [ ] Rewrite `src/flowmetrics/contract.py` with Pydantic models;
+      `name` → `id` in the canonical type (YAML key stays `name:`).
+- [ ] `Contract.states` `@property` compatibility shim so every CFD
+      / Aging / charts call site stays green.
+- [ ] `parse_contract_text` reads BOTH old `states:` and new
+      `steps:` YAML shapes. `emit_canonical_yaml(contract)` writes
+      the new shape.
+- [ ] `flow serve` first-boot migration: scan workflows dir → import
+      YAMLs → move to `migrated/` → echo summary. Same path
+      available via `flow contracts migrate`.
+- [ ] `flow materialise(-all)` read from the DB. New
+      `--from-yaml PATH` flag for one-off ad-hoc contracts.
+- [ ] CRUD endpoints in `app.py` switched to the DB.
+- [ ] Existing test suite green (after the few helpers that inject
+      YAMLs are switched to use the PUT API or a small DB seeder).
+- **Checkpoint:** schema + storage review before any UI work.
+
+### Slice C2: Archive / restore lifecycle (server endpoints)
+
+- [ ] `archived_at` + `archived_reason` columns on `contracts`.
+- [ ] `POST /api/internal/contracts/{id}/archive` — sets
+      `archived_at`. Optional reason in body.
+- [ ] `POST /api/internal/contracts/{id}/restore` — clears
+      `archived_at`; 409 if a live id collides.
+- [ ] List endpoint excludes archived by default;
+      `?include_archived=true` includes with an `archived: true` flag.
+- [ ] `DELETE` becomes hard delete; refuses unless already archived.
+- [ ] `flow materialise(-all)` skips archived rows.
+- [ ] `tests/test_contracts_archive.py` covers the full lifecycle.
+- **Checkpoint:** API curl flow works before any UI.
+
+### Slice C3: Steps editor + "Ready" vocab cascade
+
+- [ ] Rewrite `/admin/contracts/new` (and the `mode=edit` reuse) to
+      replace the three-bucket stage builder with an ordered Steps
+      editor.
+- [ ] Per-step row: name input + WIP checkbox + ↑ / ↓ reorder + ×
+      delete + auto-derived READY / WIP / DONE badge.
+      "+ Add step" appends an empty row.
+- [ ] Vocabulary cascade: every "Backlog" → "Ready" in user-facing
+      copy (builder UI + cycle-time / aging / cfd detail pages +
+      GLOSSARY.md Ready ↔ Backlog note).
+- [ ] Edit-page Delete button now archives (not hard-deletes);
+      copy reads "Archive". Confirmation routes through `/archive`.
+- [ ] Update / replace `tests/test_contract_wizard.py` +
+      `test_stage_builder.py` for the new editor.
+- [ ] Playwright E2E: build a 5-step / 2-WIP workflow end-to-end;
+      assert the READY / WIP / DONE badges recompute on toggle +
+      reorder.
+- **Checkpoint:** UX review.
+
+### Slice C4: Source vocab probe (labels / statuses / lifecycle)
+
+- [ ] Replace `_probe-stages` with
+      `POST /api/internal/contracts/_probe-source-vocab` returning
+      `{labels, lifecycle_events, warehouse_stages}`.
+- [ ] GitHub probe: repo labels via
+      `/repos/{owner}/{repo}/labels` + curated lifecycle events
+      (`PR opened`, `Marked ready for review`, …).
+- [ ] Jira probe: project statuses via
+      `/rest/api/3/project/{key}/statuses` + curated lifecycle
+      events (`Issue created`, `Resolved`, …).
+- [ ] 15-minute per-target cache; `?force=true` busts.
+- [ ] Builder UI: "Suggestions" panel under the Steps editor with
+      three subsections (Warehouse / Labels / Standard events).
+      Click any chip → append a new step with a sensible WIP
+      default.
+- [ ] Fallback when the probe fails: inline error in the panel;
+      the warehouse + lifecycle sections still work.
+- [ ] Tests with mocked source-API responses.
+- **Checkpoint:** validate against a real Jira instance.
+
+### Slice C5: Dry-run preview (capped sample, per-step table)
+
+- [ ] New `src/flowmetrics/contract_preview.py` with a
+      bounded-fetch helper: stream items from the source in time
+      order, stop at the smaller of `items_cap` (default 200) or
+      a 30-day window from `since`.
+- [ ] `POST /api/internal/contracts/_dry-run` — takes the
+      in-progress contract payload + `{since, items_cap}`,
+      returns `{fetched_at, expires_at, stopped_by, items_fetched,
+      window, per_step: [{step_name, wip, count, items}, …,
+      {step_name: "_unmatched", …}]}`.
+- [ ] In-process cache keyed on
+      `(source_target, since, items_cap, steps_signature)`;
+      5-min TTL; `?force=true` busts.
+- [ ] Builder UI "Preview against live source" disclosure: From
+      date input + Dry-run button → per-step table using the
+      existing `work_items_table.html.jinja` partial. Empty
+      steps surface a "name might not match" hint;
+      `_unmatched` bucket surfaces gap-in-workflow items.
+- [ ] No persistence — items never enter the warehouse.
+- [ ] Unit tests for cap semantics (200 cap, 30d cap, both at once).
+- [ ] Playwright E2E: build a 3-step workflow, click Dry run,
+      see per-step counts; rename a step to a typo, see items
+      shift into `_unmatched`.
+- **Checkpoint:** validate against a real Jira instance.
+
+### Slice C6: Export YAML
+
+- [ ] `GET /api/internal/contracts/{id}/yaml` returns the row's
+      `yaml` column with `application/x-yaml` + download
+      `Content-Disposition`. Works on archived rows via
+      `?include_archived=true`.
+- [ ] "Download YAML" link + "Copy YAML" button on the edit page.
+- [ ] Downloaded YAML → `flow materialise --from-yaml PATH`
+      succeeds (round-trip test).
+
+### Slice C7: Archived contracts page
+
+- [ ] `/admin/contracts/archive` lists archived rows with date,
+      reason, source + per-row actions (Restore, Export YAML,
+      Hard delete).
+- [ ] Drawer-style link on `/` ("View archived (n)") that only
+      renders when n > 0.
+- [ ] Playwright E2E: full lifecycle — create → archive →
+      restore → archive → hard-delete → assert gone in home,
+      archive page, AND `materialise-all` manifest.
+- **Checkpoint:** Plan C complete.
