@@ -42,6 +42,37 @@ class TestStepModel:
         with pytest.raises(ValidationError):
             Step(name="", wip=True)
 
+    def test_step_carries_match_identifiers(self):
+        """A step is a logical bucket; `matches` lists the
+        source-native identifiers (labels, statuses, lifecycle
+        events) whose materialized data lands in this step."""
+        from flowmetrics.contract import Step
+        s = Step(
+            name="Ready",
+            wip=False,
+            matches=["status:ready", "label:ready"],
+        )
+        assert s.matches == ["status:ready", "label:ready"]
+
+    def test_step_matches_default_to_empty_list(self):
+        """Empty `matches` triggers the legacy lookup: the step's
+        `name` itself is treated as the identifier. Existing demo
+        YAMLs whose `states:` block names are the source-native
+        stage names keep working unchanged."""
+        from flowmetrics.contract import Step
+        s = Step(name="Draft")
+        assert s.matches == []
+
+    def test_effective_matches_falls_back_to_name(self):
+        """`Step.effective_matches` is the lookup helper: empty
+        list → `[name]`. Use this everywhere the query layer
+        needs "what source identifiers does this step capture"."""
+        from flowmetrics.contract import Step
+        bare = Step(name="Draft")
+        with_matches = Step(name="Ready", matches=["status:ready"])
+        assert bare.effective_matches == ("Draft",)
+        assert with_matches.effective_matches == ("status:ready",)
+
 
 class TestContractModel:
     def test_minimal_github_contract(self):
@@ -160,6 +191,35 @@ class TestParseNewShape:
         )
         assert [s.name for s in c.steps] == ["Draft", "In Progress", "Merged"]
         assert [s.wip for s in c.steps] == [False, True, False]
+
+    def test_steps_with_matches_round_trip(self):
+        """The `matches:` per-step list survives parse + emit."""
+        from flowmetrics.contract import (
+            emit_canonical_yaml,
+            parse_contract_text,
+        )
+        c = parse_contract_text(
+            "contract:\n"
+            "  name: x\n"
+            "  source: github\n"
+            "  repo: a/b\n"
+            "  steps:\n"
+            "    - name: Ready\n"
+            "      wip: false\n"
+            "      matches:\n"
+            "        - status:ready\n"
+            "        - label:ready\n"
+            "    - name: Review\n"
+            "      wip: true\n"
+            "      matches:\n"
+            "        - Marked ready for review\n",
+            "x",
+        )
+        assert c.steps[0].matches == ["status:ready", "label:ready"]
+        assert c.steps[1].matches == ["Marked ready for review"]
+        # And re-emitting + re-parsing is identity.
+        again = parse_contract_text(emit_canonical_yaml(c), "x")
+        assert again == c
 
     def test_steps_wip_defaults_to_false(self):
         from flowmetrics.contract import parse_contract_text

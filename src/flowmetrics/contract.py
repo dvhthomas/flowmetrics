@@ -71,18 +71,24 @@ class WorkflowStates:
 
 
 class Step(BaseModel):
-    """One workflow step: a named state items pass through, plus
-    whether it counts as Work-In-Progress.
+    """One workflow step: a user-defined logical bucket that
+    materialised source data lands in.
 
-    `wip=True` rows become bands on the CFD and columns on Aging
-    WIP. Leading `wip=False` rows are "Ready" (committed to be
-    worked next, not the unbounded backlog); trailing `wip=False`
-    rows are "Done"."""
+    Fields:
+      - `name`: the user's display name ("Ready", "In Review", …).
+      - `wip`: does this step count as Work-In-Progress? Drives the
+        CFD bands and the Aging WIP columns.
+      - `matches`: the source-native identifiers (labels, statuses,
+        lifecycle events) whose data fills this step. Empty list →
+        legacy lookup: the step's `name` itself is treated as the
+        identifier (backward-compat with the demo YAMLs).
+    """
 
     model_config = ConfigDict(frozen=True)
 
     name: str
     wip: bool = False
+    matches: list[str] = []
 
     @field_validator("name")
     @classmethod
@@ -90,6 +96,15 @@ class Step(BaseModel):
         if not v or not v.strip():
             raise ValueError("step name must be a non-empty string")
         return v
+
+    @property
+    def effective_matches(self) -> tuple[str, ...]:
+        """What source identifiers does this step capture?
+        `matches` if non-empty, else `(name,)` — the legacy
+        "name IS the identifier" rule."""
+        if self.matches:
+            return tuple(self.matches)
+        return (self.name,)
 
 
 class Contract(BaseModel):
@@ -363,9 +378,12 @@ def emit_canonical_yaml(contract: Contract) -> str:
     if contract.stop is not None:
         body["stop"] = contract.stop.isoformat()
     if contract.steps:
-        body["steps"] = [
-            {"name": s.name, "wip": s.wip} for s in contract.steps
-        ]
+        body["steps"] = []
+        for s in contract.steps:
+            row: dict = {"name": s.name, "wip": s.wip}
+            if s.matches:
+                row["matches"] = list(s.matches)
+            body["steps"].append(row)
     return yaml.safe_dump(
         {"contract": body},
         sort_keys=False,

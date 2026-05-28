@@ -86,16 +86,8 @@
 
 {% if wizard_mode == "edit" %}
 <h1>Edit workflow: {{ edit_id }}</h1>
-<p class="muted">
-  Save overwrites the existing YAML. Delete removes it (warehouse
-  data on disk requires explicit purge — the button asks).
-</p>
 {% else %}
 <h1>New workflow</h1>
-<p class="muted">
-  A workflow is a YAML file under <code>contracts/</code>. Fill in the
-  fields below; we'll write it for you and open the dashboard.
-</p>
 {% endif %}
 
 <form class="wizard" id="wizard">
@@ -113,7 +105,7 @@
   <fieldset class="source-fields" data-source="github" id="source-fieldset">
     <legend>Source</legend>
     <label>Source kind
-      <select name="source" onchange="document.getElementById('source-fieldset').dataset.source=this.value">
+      <select name="source" onchange="document.getElementById('source-fieldset').dataset.source=this.value; refreshSourceKindLabel(); probeVocab();">
         <option value="github" selected>GitHub</option>
         <option value="jira">Jira</option>
       </select>
@@ -142,24 +134,10 @@
   </fieldset>
 
   <fieldset id="steps-fieldset">
-    <legend>Steps (optional)</legend>
-    <p class="muted" style="font-size: 0.8125rem; margin: 0 0 0.6rem 0;">
-      Define the workflow as an ordered list of steps. Toggle WIP
-      per step — leading non-WIP rows render as
-      <strong style="color: var(--muted);">READY</strong>, the
-      contiguous WIP block as
-      <strong style="color: var(--p-600);">WIP</strong>, and
-      trailing non-WIP rows as
-      <strong style="color: var(--muted);">DONE</strong>. Use ↑/↓
-      to reorder.
-    </p>
-    <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-      <button type="button" class="filter-apply" onclick="probeStages()">Discover from data source</button>
-      <span class="probe-status" id="stages-status"></span>
-    </div>
+    <legend>Steps</legend>
     <ol id="steps-list"
         style="list-style: none; padding: 0; margin: 0; border: 0.0625rem solid var(--border); border-radius: 0.25rem;"></ol>
-    <div style="margin-top: 0.6rem; display: flex; gap: 0.4rem;">
+    <div style="margin-top: 0.6rem; display: flex; gap: 0.4rem; align-items: center;">
       <input type="text" id="new-step-name" placeholder="Step name (e.g. In Progress)"
              style="flex: 1; padding: 0.3rem 0.5rem; border: 0.0625rem solid var(--border); border-radius: 0.25rem;">
       <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.875rem;">
@@ -167,6 +145,22 @@
         WIP
       </label>
       <button type="button" id="add-step" onclick="addStep()">+ Add step</button>
+      <span class="probe-status" id="stages-status"></span>
+    </div>
+
+    <div id="suggestions-panel" style="margin-top: 1rem;">
+      <div class="sugg-group" style="margin-bottom: 0.4rem;">
+        <strong style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">In your warehouse</strong>
+        <div id="sugg-warehouse" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+      </div>
+      <div class="sugg-group" style="margin-bottom: 0.4rem;">
+        <strong id="sugg-labels-label" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Labels in the source</strong>
+        <div id="sugg-labels" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+      </div>
+      <div class="sugg-group">
+        <strong style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Lifecycle events</strong>
+        <div id="sugg-lifecycle" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+      </div>
     </div>
   </fieldset>
 
@@ -204,9 +198,15 @@
     rows.forEach(function (li) {
       var name = li.querySelector('input.step-name').value.trim();
       if (!name) return;
+      // The row's matches list is stored as a JSON array on a
+      // data attribute; the chip subrow displays it.
+      var raw = li.dataset.matches || '[]';
+      var matches = [];
+      try { matches = JSON.parse(raw); } catch (e) { matches = []; }
       out.push({
         name: name,
         wip: li.querySelector('input.step-wip').checked,
+        matches: matches,
       });
     });
     return out;
@@ -237,26 +237,75 @@
     });
   }
 
-  function renderStepRow(name, wip) {
+  function renderMatchPills(li, matches) {
+    // Re-render the per-row match chips from the row's data-matches.
+    var holder = li.querySelector('.step-matches');
+    if (!holder) return;
+    holder.innerHTML = '';
+    if (!matches || matches.length === 0) {
+      var hint = document.createElement('em');
+      hint.className = 'step-no-match';
+      hint.textContent = '⚠ no source match — items won\'t map here';
+      hint.style.cssText = 'font-size: 0.7rem; color: var(--t-700);';
+      holder.appendChild(hint);
+      return;
+    }
+    matches.forEach(function (m, idx) {
+      var pill = document.createElement('span');
+      pill.className = 'step-match';
+      pill.style.cssText = 'display: inline-flex; align-items: center; ' +
+        'gap: 0.25rem; padding: 0.1rem 0.4rem; border-radius: 0.5rem; ' +
+        'background: var(--p-50); color: var(--p-700); font-size: 0.7rem; ' +
+        'border: 0.0625rem solid var(--p-200);';
+      pill.appendChild(document.createTextNode(m));
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.textContent = '×';
+      x.style.cssText = 'background: transparent; border: 0; cursor: pointer; ' +
+        'padding: 0; font-size: 0.7rem; color: var(--p-700);';
+      x.onclick = function () {
+        var ms = JSON.parse(li.dataset.matches || '[]');
+        ms.splice(idx, 1);
+        li.dataset.matches = JSON.stringify(ms);
+        renderMatchPills(li, ms);
+      };
+      pill.appendChild(x);
+      holder.appendChild(pill);
+    });
+  }
+
+  function renderStepRow(name, wip, matches) {
     var li = document.createElement('li');
     li.dataset.step = '1';
-    li.style.cssText = 'display: flex; align-items: center; gap: 0.4rem; ' +
-      'padding: 0.4rem 0.5rem; border-bottom: 0.0625rem solid var(--border); ' +
+    li.dataset.matches = JSON.stringify(matches || []);
+    li.style.cssText = 'display: grid; ' +
+      'grid-template-columns: 3rem 1fr auto auto auto auto; ' +
+      'gap: 0.4rem; align-items: center; ' +
+      'padding: 0.4rem 0.5rem; ' +
+      'border-bottom: 0.0625rem solid var(--border); ' +
       'background: var(--white);';
 
     var badge = document.createElement('span');
     badge.className = 'step-badge';
-    badge.style.cssText = 'min-width: 3rem; font-size: 0.65rem; ' +
-      'font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;';
+    badge.style.cssText = 'font-size: 0.65rem; font-weight: 600; ' +
+      'letter-spacing: 0.08em; text-transform: uppercase;';
     li.appendChild(badge);
 
+    var center = document.createElement('div');
+    center.style.cssText = 'display: flex; flex-direction: column; gap: 0.25rem;';
     var nameInput = document.createElement('input');
     nameInput.type = 'text';
     nameInput.className = 'step-name';
     nameInput.value = name;
-    nameInput.style.cssText = 'flex: 1; padding: 0.2rem 0.4rem; ' +
+    nameInput.style.cssText = 'padding: 0.2rem 0.4rem; ' +
       'border: 0.0625rem solid var(--border); border-radius: 0.2rem;';
-    li.appendChild(nameInput);
+    center.appendChild(nameInput);
+    var matchHolder = document.createElement('div');
+    matchHolder.className = 'step-matches';
+    matchHolder.style.cssText = 'display: flex; flex-wrap: wrap; gap: 0.25rem; ' +
+      'align-items: center; min-height: 1.1rem;';
+    center.appendChild(matchHolder);
+    li.appendChild(center);
 
     var wipLabel = document.createElement('label');
     wipLabel.style.cssText = 'display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem;';
@@ -269,59 +318,114 @@
     wipLabel.appendChild(document.createTextNode('WIP'));
     li.appendChild(wipLabel);
 
-    var up = document.createElement('button');
-    up.type = 'button';
-    up.textContent = '↑';
-    up.style.cssText = 'font-size: 0.8rem; padding: 0.15rem 0.4rem;';
-    up.onclick = function () {
+    function mkBtn(text, click) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = text;
+      b.style.cssText = 'font-size: 0.8rem; padding: 0.15rem 0.4rem;';
+      b.onclick = click;
+      return b;
+    }
+    li.appendChild(mkBtn('↑', function () {
       var prev = li.previousElementSibling;
       if (prev) li.parentElement.insertBefore(li, prev);
       refreshBadges();
-    };
-    li.appendChild(up);
-
-    var down = document.createElement('button');
-    down.type = 'button';
-    down.textContent = '↓';
-    down.style.cssText = 'font-size: 0.8rem; padding: 0.15rem 0.4rem;';
-    down.onclick = function () {
+    }));
+    li.appendChild(mkBtn('↓', function () {
       var next = li.nextElementSibling;
       if (next) li.parentElement.insertBefore(next, li);
       refreshBadges();
-    };
-    li.appendChild(down);
-
-    var del = document.createElement('button');
-    del.type = 'button';
-    del.textContent = '×';
-    del.style.cssText = 'font-size: 0.8rem; padding: 0.15rem 0.4rem; color: var(--muted);';
-    del.onclick = function () {
+    }));
+    li.appendChild(mkBtn('×', function () {
       li.parentElement.removeChild(li);
       refreshBadges();
-    };
-    li.appendChild(del);
+    }));
 
+    renderMatchPills(li, matches || []);
     return li;
   }
 
-  function addStep(name, wip) {
+  // Track the most recently focused step row — chip clicks append
+  // to it if present, otherwise create a new step.
+  var FOCUSED_STEP = null;
+  document.addEventListener('focusin', function (ev) {
+    var li = ev.target.closest && ev.target.closest('#steps-list li[data-step]');
+    if (li) FOCUSED_STEP = li;
+  });
+
+  function addStep(name, wip, matches) {
     if (name === undefined) {
       var input = document.getElementById('new-step-name');
       name = (input.value || '').trim();
       if (!name) return;
       wip = document.getElementById('new-step-wip').checked;
       input.value = '';
+      matches = [];  // custom typed → no source mapping yet
     }
-    document.getElementById('steps-list').appendChild(renderStepRow(name, !!wip));
+    var li = renderStepRow(name, !!wip, matches || []);
+    document.getElementById('steps-list').appendChild(li);
     refreshBadges();
+    FOCUSED_STEP = li;
   }
 
-  function probeStages() {
+  function addMatchToFocusedStep(match) {
+    // Append `match` to the most-recently-focused step row's
+    // matches. If no row is focused, create a new step whose name
+    // == match and matches == [match].
+    if (FOCUSED_STEP && FOCUSED_STEP.parentElement) {
+      var existing = JSON.parse(FOCUSED_STEP.dataset.matches || '[]');
+      if (existing.indexOf(match) === -1) existing.push(match);
+      FOCUSED_STEP.dataset.matches = JSON.stringify(existing);
+      renderMatchPills(FOCUSED_STEP, existing);
+      return;
+    }
+    addStep(match, true, [match]);
+  }
+
+  function renderChip(container, item) {
+    // `item` = {name, wip}. Two click targets:
+    //   - chip body → add as a MATCH to the focused step row
+    //     (or create a new step if none is focused).
+    //   - "as new step" right-side affordance → always create a
+    //     fresh step row with name == match, matches == [match].
+    var wrap = document.createElement('span');
+    wrap.className = 'sugg-chip';
+    wrap.style.cssText = 'display: inline-flex; align-items: center; ' +
+      'border: 0.0625rem solid var(--border); border-radius: 0.6rem; ' +
+      'background: var(--surface); overflow: hidden;';
+
+    var addMatch = document.createElement('button');
+    addMatch.type = 'button';
+    addMatch.textContent = '+ ' + item.name;
+    addMatch.title = 'Add as a match to the focused step';
+    addMatch.style.cssText = 'font-size: 0.75rem; padding: 0.15rem 0.5rem; ' +
+      'border: 0; background: transparent; cursor: pointer;';
+    addMatch.onclick = function () {
+      addMatchToFocusedStep(item.name);
+    };
+    wrap.appendChild(addMatch);
+
+    var asStep = document.createElement('button');
+    asStep.type = 'button';
+    asStep.textContent = '⇢ step';
+    asStep.title = 'Create a new step whose name = this match';
+    asStep.style.cssText = 'font-size: 0.7rem; padding: 0.15rem 0.4rem; ' +
+      'border: 0; border-left: 0.0625rem solid var(--border); ' +
+      'background: transparent; color: var(--muted); cursor: pointer;';
+    asStep.onclick = function () {
+      addStep(item.name, !!item.wip, [item.name]);
+    };
+    wrap.appendChild(asStep);
+
+    container.appendChild(wrap);
+  }
+
+  function probeVocab() {
     var data = readForm();
     var status = document.getElementById('stages-status');
     status.textContent = 'Discovering…';
     status.className = 'probe-status';
-    fetch('/api/internal/contracts/_probe-stages', {
+    fetch('/api/internal/contracts/_probe-source-vocab', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -329,18 +433,37 @@
       },
       body: JSON.stringify(data),
     }).then(function (r) { return r.json(); }).then(function (body) {
-      var stages = body.stages || [];
-      stages.forEach(function (name) {
-        // Discovered stages default to WIP; user toggles as needed.
-        addStep(name, true);
-      });
-      if (body.hint) {
-        status.textContent = body.hint;
-        status.className = 'probe-status';
-      } else {
-        status.textContent = '✓ ' + stages.length + ' stages discovered';
-        status.className = 'probe-status probe-status--ok';
+      var warehouseDiv = document.getElementById('sugg-warehouse');
+      var labelsDiv = document.getElementById('sugg-labels');
+      var lifecycleDiv = document.getElementById('sugg-lifecycle');
+      warehouseDiv.innerHTML = '';
+      labelsDiv.innerHTML = '';
+      lifecycleDiv.innerHTML = '';
+
+      var warehouse = body.warehouse_stages || [];
+      var labels = body.labels || [];
+      var lifecycle = body.lifecycle_events || [];
+
+      warehouse.forEach(function (item) { renderChip(warehouseDiv, item); });
+      labels.forEach(function (item) { renderChip(labelsDiv, item); });
+      lifecycle.forEach(function (item) { renderChip(lifecycleDiv, item); });
+
+      if (warehouse.length === 0) {
+        warehouseDiv.innerHTML = '<em class="muted" style="font-size: 0.75rem;">' +
+          'no stages observed yet — materialise the workflow to populate this list' +
+          '</em>';
       }
+      if (labels.length === 0) {
+        labelsDiv.innerHTML = '<em class="muted" style="font-size: 0.75rem;">' +
+          (body.hint || 'no labels found') + '</em>';
+      }
+
+      var total = warehouse.length + labels.length + lifecycle.length;
+      status.textContent = '✓ ' + total + ' suggestion' + (total === 1 ? '' : 's');
+      status.className = 'probe-status probe-status--ok';
+    }).catch(function (err) {
+      status.textContent = 'probe failed: ' + err;
+      status.className = 'probe-status probe-status--fail';
     });
   }
 
@@ -367,6 +490,12 @@
       steps.forEach(function (s) {
         lines.push("    - name: " + JSON.stringify(s.name));
         lines.push("      wip: " + (s.wip ? "true" : "false"));
+        if (s.matches && s.matches.length) {
+          lines.push("      matches:");
+          s.matches.forEach(function (m) {
+            lines.push("        - " + JSON.stringify(m));
+          });
+        }
       });
     }
     return lines.join("\n") + "\n";
@@ -396,6 +525,10 @@
       if (body.ok) {
         status.textContent = "✓ " + (body.label || "target reachable");
         status.className = "probe-status probe-status--ok";
+        // Once the source target validates, auto-load the suggestions
+        // for the Steps editor (labels + lifecycle + warehouse). No
+        // separate button to click.
+        probeVocab();
       } else {
         status.textContent = "✗ " + (body.error || "target not reachable");
         status.className = "probe-status probe-status--fail";
@@ -404,6 +537,17 @@
       status.textContent = "probe failed: " + err;
       status.className = "probe-status probe-status--fail";
     });
+  }
+
+  function refreshSourceKindLabel() {
+    // Source dropdown changed → relabel the "Labels in the source"
+    // section to match (Jira's vocab is "statuses", not "labels").
+    var data = readForm();
+    var labelEl = document.getElementById("sugg-labels-label");
+    if (!labelEl) return;
+    labelEl.textContent = data.source === "jira"
+      ? "Statuses in the project"
+      : "Labels in the repo";
   }
 
   var WIZARD_MODE = {{ wizard_mode | tojson }};
@@ -430,14 +574,17 @@
         setField("stop", p.stop);
         // Toggle conditional fields based on the loaded source.
         document.getElementById("source-fieldset").dataset.source = p.source || "github";
-        // Hydrate steps into the ordered list. The C1 detail
-        // endpoint synthesises `states: {backlog, wip, done}` from
-        // the canonical `steps:` for back-compat; rebuild the
-        // ordered list here in the same READY → WIP → DONE order.
-        if (p.states) {
-          (p.states.backlog || []).forEach(function (n) { addStep(n, false); });
-          (p.states.wip || []).forEach(function (n) { addStep(n, true); });
-          (p.states.done || []).forEach(function (n) { addStep(n, false); });
+        // Hydrate steps from the canonical `steps:` list (each
+        // row carries name + wip + matches). Falls back to the
+        // legacy `states:` shim for older payloads.
+        if (Array.isArray(p.steps) && p.steps.length) {
+          p.steps.forEach(function (s) {
+            addStep(s.name, !!s.wip, s.matches || []);
+          });
+        } else if (p.states) {
+          (p.states.backlog || []).forEach(function (n) { addStep(n, false, [n]); });
+          (p.states.wip || []).forEach(function (n) { addStep(n, true, [n]); });
+          (p.states.done || []).forEach(function (n) { addStep(n, false, [n]); });
         }
         // The id is fixed in edit mode; lock the field.
         if (WIZARD_MODE === "edit") {
@@ -477,6 +624,12 @@
   if (WIZARD_MODE === "edit" && EDIT_ID) {
     hydrateFromExisting(EDIT_ID);
   }
+
+  // Always pre-fill the lifecycle chips (they're source-kind
+  // constants — no API call). Warehouse + labels come from the
+  // first probe after the user enters the repo / project.
+  refreshSourceKindLabel();
+  probeVocab();
 
   document.getElementById("wizard").addEventListener("submit", function (ev) {
     ev.preventDefault();

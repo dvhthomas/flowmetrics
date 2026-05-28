@@ -47,8 +47,9 @@ class TestEditPage:
         assert "alpha" in html
         # The page hosts the same fieldsets as the new wizard.
         assert 'name="source"' in html
-        # Delete affordance is on the edit page (only).
-        assert "Delete" in html
+        # Destructive affordance is on the edit page (only). After C3
+        # it archives — the button reads "Archive".
+        assert "Archive" in html
 
     def test_unknown_id_returns_404(self, workspace):
         contracts, data = workspace

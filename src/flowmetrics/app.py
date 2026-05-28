@@ -76,6 +76,85 @@ from .windows import parse_windows
 _TEMPLATES_DIR = Path(__file__).parent / "web" / "templates"
 
 
+# Curated lifecycle-event chips per source. The names are
+# user-facing; the wip default per chip is the typical answer
+# (clickable, overridable in the editor). These don't depend on
+# the source API — they're constants that ship with the build.
+_GITHUB_LIFECYCLE_EVENTS = (
+    {"name": "PR opened", "wip": False},
+    {"name": "Marked ready for review", "wip": True},
+    {"name": "Changes requested", "wip": True},
+    {"name": "Review approved", "wip": True},
+    {"name": "PR merged", "wip": False},
+    {"name": "PR closed without merge", "wip": False},
+    {"name": "Issue opened", "wip": False},
+    {"name": "Issue closed", "wip": False},
+)
+_JIRA_LIFECYCLE_EVENTS = (
+    {"name": "Issue created", "wip": False},
+    {"name": "Assigned", "wip": True},
+    {"name": "Resolved", "wip": False},
+    {"name": "Reopened", "wip": True},
+    {"name": "Closed", "wip": False},
+)
+
+
+def _default_probe_source_vocab(kind: str, target: dict) -> dict:
+    """Production source-vocab probe.
+
+    Returns `{labels, lifecycle_events, warehouse_stages}`:
+      - GitHub `labels`: `/repos/{owner}/{repo}/labels`.
+      - Jira `labels`: `/rest/api/3/project/{key}/statuses`.
+      - `lifecycle_events`: curated per source (constants above).
+      - `warehouse_stages`: filled by the route from
+        `contracts_db` + `warehouse/queries` if available.
+
+    Tests stub via `app.state.probe_source_vocab`. Failures here
+    return empty `labels` so the lifecycle + warehouse subsections
+    still render."""
+    import httpx
+
+    labels: list[dict] = []
+    lifecycle: list[dict] = []
+    if kind == "github":
+        lifecycle = list(_GITHUB_LIFECYCLE_EVENTS)
+        repo = (target or {}).get("repo") or ""
+        if "/" in repo:
+            url = f"https://api.github.com/repos/{repo}/labels?per_page=100"
+            try:
+                r = httpx.get(url, timeout=10.0)
+                if r.status_code == 200:
+                    for label in r.json():
+                        name = label.get("name")
+                        if name:
+                            labels.append({"name": name, "wip": True})
+            except httpx.HTTPError:
+                pass
+    elif kind == "jira":
+        lifecycle = list(_JIRA_LIFECYCLE_EVENTS)
+        base = (target or {}).get("jira_url") or ""
+        project = (target or {}).get("jira_project") or ""
+        if base and project:
+            url = f"{base.rstrip('/')}/rest/api/3/project/{project}/statuses"
+            try:
+                r = httpx.get(url, timeout=10.0)
+                if r.status_code == 200:
+                    seen: set[str] = set()
+                    for issue_type in r.json():
+                        for s in issue_type.get("statuses", []):
+                            name = s.get("name")
+                            if name and name not in seen:
+                                seen.add(name)
+                                labels.append({"name": name, "wip": True})
+            except httpx.HTTPError:
+                pass
+    return {
+        "labels": labels,
+        "lifecycle_events": lifecycle,
+        "warehouse_stages": [],
+    }
+
+
 def _default_probe_stages(kind: str, target: dict) -> dict:
     """Production stage-discovery probe.
 
@@ -790,7 +869,14 @@ def create_app(
             "start": c.start.isoformat() if c.start else None,
             "stop": c.stop.isoformat() if c.stop else None,
             "label": c.label,
+            # Canonical: ordered list of steps with matches.
+            "steps": [
+                {"name": s.name, "wip": s.wip, "matches": list(s.matches)}
+                for s in c.steps
+            ],
         }
+        # Legacy shim for any consumer still reading the 3-bucket
+        # shape (older test fixtures, the CFD/Aging code paths).
         if c.states is not None:
             parsed["states"] = {
                 "backlog": list(c.states.backlog),
@@ -851,6 +937,57 @@ def create_app(
                 "edit_id": contract_id,
             },
         )
+
+    @app.post(
+        "/api/internal/contracts/_probe-source-vocab",
+        dependencies=write_dep,
+    )
+    def probe_source_vocab(payload: dict, request: Request) -> dict:
+        """Source-vocab probe — richer successor to `_probe-stages`.
+        Returns `{labels, lifecycle_events, warehouse_stages}` for
+        the Steps editor's Suggestions panel."""
+        source = payload.get("source")
+        if source not in ("github", "jira"):
+            raise HTTPException(
+                status_code=422,
+                detail=f"unknown source {source!r}; pick github or jira.",
+            )
+        target = {
+            "repo": payload.get("repo"),
+            "jira_url": payload.get("jira_url"),
+            "jira_project": payload.get("jira_project"),
+        }
+        key = ("vocab", source, target.get("repo"),
+               target.get("jira_url"), target.get("jira_project"))
+        force = (request.query_params.get("force") or "").lower() in (
+            "true", "1", "yes",
+        )
+        cache: dict = getattr(app.state, "_probe_vocab_cache", {})
+        if not hasattr(app.state, "_probe_vocab_cache"):
+            app.state._probe_vocab_cache = cache
+        now = datetime.now(UTC).timestamp()
+        if not force:
+            cached = cache.get(key)
+            if cached is not None and now - cached[0] < 15 * 60:
+                return cached[1]
+
+        probe = getattr(
+            app.state, "probe_source_vocab", _default_probe_source_vocab,
+        )
+        try:
+            result = probe(source, target)
+        except Exception as exc:
+            return {
+                "labels": [],
+                "lifecycle_events": (
+                    list(_GITHUB_LIFECYCLE_EVENTS) if source == "github"
+                    else list(_JIRA_LIFECYCLE_EVENTS)
+                ),
+                "warehouse_stages": [],
+                "hint": f"probe failed: {exc}",
+            }
+        cache[key] = (now, result)
+        return result
 
     @app.post(
         "/api/internal/contracts/_probe-stages", dependencies=write_dep,

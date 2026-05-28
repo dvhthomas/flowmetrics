@@ -75,14 +75,14 @@ class TestStepsEditorDom:
         # The "+ Add step" affordance.
         assert "add-step" in html
 
-    def test_discover_button_still_wired(self, workspace):
+    def test_discover_endpoint_is_wired(self, workspace):
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
         with TestClient(app) as client:
             html = client.get("/admin/contracts/new").text
-        # The existing _probe-stages endpoint is the discovery
-        # backend (C4 will swap to a richer _probe-source-vocab).
-        assert "_probe-stages" in html
+        # C4 swapped _probe-stages for the richer
+        # _probe-source-vocab endpoint.
+        assert "_probe-source-vocab" in html
 
 
 class TestSaveRoundTrip:
