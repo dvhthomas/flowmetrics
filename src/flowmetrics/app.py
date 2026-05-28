@@ -135,7 +135,9 @@ def _default_probe_source_vocab(kind: str, target: dict) -> dict:
         base = (target or {}).get("jira_url") or ""
         project = (target or {}).get("jira_project") or ""
         if base and project:
-            url = f"{base.rstrip('/')}/rest/api/3/project/{project}/statuses"
+            # API v2 — Apache's public Jira (the documented demo) is
+            # Jira Server, which exposes v2, not v3.
+            url = f"{base.rstrip('/')}/rest/api/2/project/{project}/statuses"
             try:
                 r = httpx.get(url, timeout=10.0)
                 if r.status_code == 200:
@@ -152,6 +154,167 @@ def _default_probe_source_vocab(kind: str, target: dict) -> dict:
         "labels": labels,
         "lifecycle_events": lifecycle,
         "warehouse_stages": [],
+    }
+
+
+def _bucket_items_by_step(
+    items: list[dict], steps: list[dict],
+) -> list[dict]:
+    """Bucket fetched items per the user's steps.
+
+    Each item carries a `current_stage` string. For each step,
+    `effective_matches` = step['matches'] or (step['name'],) — the
+    list of source-native identifiers this step captures.
+
+    Items whose current stage doesn't match any step land in a
+    special `_unmatched` bucket at the end of the list.
+    """
+    # Build a list of (step_dict, matches_tuple) preserving order.
+    spec: list[dict] = []
+    for s in steps:
+        matches = s.get("matches") or []
+        if not matches:
+            matches = [s.get("name") or ""]
+        spec.append({
+            "step_name": s.get("name") or "",
+            "wip": bool(s.get("wip")),
+            "matches": list(matches),
+            "items": [],
+        })
+
+    unmatched: list[dict] = []
+    for item in items:
+        stage = item.get("current_stage") or ""
+        placed = False
+        for bucket in spec:
+            if stage in bucket["matches"]:
+                bucket["items"].append(item)
+                placed = True
+                break
+        if not placed:
+            unmatched.append(item)
+
+    out: list[dict] = []
+    for bucket in spec:
+        bucket["count"] = len(bucket["items"])
+        out.append(bucket)
+    out.append({
+        "step_name": "_unmatched",
+        "wip": False,
+        "matches": [],
+        "count": len(unmatched),
+        "items": unmatched,
+    })
+    return out
+
+
+def _default_dry_run_fetch(
+    *, source: str, target: dict, since: str, items_cap: int,
+) -> dict:
+    """Production dry-run source fetch.
+
+    Calls the existing source adapter to fetch items in the window
+    `[since, since + 30 days]` capped at `items_cap`. Returns the
+    list of items + which limit bit first ("items_cap" or
+    "time_window").
+
+    Items are dicts with `id, title, url, current_stage`. This
+    layer keeps the dry-run independent of the warehouse
+    materialise path — nothing gets written to disk.
+    """
+    from datetime import date, timedelta
+
+    try:
+        since_date = date.fromisoformat(since)
+    except (TypeError, ValueError):
+        return {
+            "items": [], "stopped_by": "error",
+            "window_to": None,
+        }
+    until_date = since_date + timedelta(days=30)
+
+    items: list[dict] = []
+    if source == "github":
+        repo = (target or {}).get("repo") or ""
+        if "/" not in repo:
+            return {
+                "items": [], "stopped_by": "error",
+                "window_to": until_date.isoformat(),
+            }
+        # Minimal fetch via REST API (search PRs in the window).
+        # Production-grade flow uses the existing source adapter;
+        # this lightweight path keeps the dry-run independent of
+        # the warehouse-writing materialise stack.
+        import httpx
+
+        url = (
+            f"https://api.github.com/search/issues?q=repo:{repo}"
+            f"+is:pr+updated:{since_date.isoformat()}.."
+            f"{until_date.isoformat()}&per_page="
+            f"{min(items_cap, 100)}"
+        )
+        try:
+            r = httpx.get(url, timeout=10.0)
+            if r.status_code == 200:
+                for it in r.json().get("items", [])[:items_cap]:
+                    state = "PR closed"
+                    if it.get("state") == "open":
+                        state = (
+                            "Draft" if it.get("draft") else "PR opened"
+                        )
+                    elif it.get("pull_request", {}).get("merged_at"):
+                        state = "PR merged"
+                    items.append({
+                        "id": str(it.get("number") or ""),
+                        "title": it.get("title") or "",
+                        "url": it.get("html_url"),
+                        "current_stage": state,
+                    })
+        except httpx.HTTPError:
+            pass
+    elif source == "jira":
+        base = (target or {}).get("jira_url") or ""
+        project = (target or {}).get("jira_project") or ""
+        if not (base and project):
+            return {
+                "items": [], "stopped_by": "error",
+                "window_to": until_date.isoformat(),
+            }
+        import httpx
+
+        jql = (
+            f"project = {project} AND updated >= "
+            f"\"{since_date.isoformat()}\" AND updated <= "
+            f"\"{until_date.isoformat()}\""
+        )
+        url = (
+            f"{base.rstrip('/')}/rest/api/2/search?jql="
+            f"{httpx.QueryParams({'jql': jql})['jql']}"
+            f"&maxResults={min(items_cap, 100)}"
+            f"&fields=summary,status"
+        )
+        try:
+            r = httpx.get(url, timeout=10.0)
+            if r.status_code == 200:
+                for it in r.json().get("issues", [])[:items_cap]:
+                    fields = it.get("fields") or {}
+                    status = (fields.get("status") or {}).get("name") or ""
+                    items.append({
+                        "id": it.get("key") or "",
+                        "title": fields.get("summary") or "",
+                        "url": f"{base.rstrip('/')}/browse/{it.get('key')}",
+                        "current_stage": status,
+                    })
+        except httpx.HTTPError:
+            pass
+
+    stopped_by = (
+        "items_cap" if len(items) >= items_cap else "time_window"
+    )
+    return {
+        "items": items,
+        "stopped_by": stopped_by,
+        "window_to": until_date.isoformat(),
     }
 
 
@@ -225,7 +388,8 @@ def _default_probe_source(kind: str, target: dict) -> dict:
                 "ok": False,
                 "error": "jira needs both jira_url and jira_project",
             }
-        url = f"{base.rstrip('/')}/rest/api/3/project/{project}"
+        # API v2 — Apache's public Jira is Jira Server.
+        url = f"{base.rstrip('/')}/rest/api/2/project/{project}"
         try:
             r = httpx.get(url, timeout=10.0)
         except httpx.HTTPError as exc:
@@ -937,6 +1101,102 @@ def create_app(
                 "edit_id": contract_id,
             },
         )
+
+    @app.post(
+        "/api/internal/contracts/_dry-run",
+        dependencies=write_dep,
+    )
+    def dry_run(payload: dict, request: Request) -> dict:
+        """Preview a contract definition against live source data.
+
+        Takes the in-progress contract payload + `{since, items_cap}`,
+        calls a bounded fetch (≤200 items OR ≤30 days from `since`),
+        and buckets items per the user's steps using
+        `Step.effective_matches`. Items whose current stage doesn't
+        map to any step land in `_unmatched`.
+
+        Cached 5 minutes per (source target, since, items_cap, steps
+        signature). `?force=true` busts.
+
+        Items NEVER enter the warehouse — the dry-run is ephemeral.
+        """
+        c_payload = payload.get("contract") or {}
+        source = c_payload.get("source")
+        if source not in ("github", "jira"):
+            raise HTTPException(
+                status_code=422,
+                detail=f"unknown source {source!r}; pick github or jira.",
+            )
+        since = payload.get("since") or ""
+        items_cap = int(payload.get("items_cap") or 200)
+        steps = c_payload.get("steps") or []
+
+        # Cache key: target tuple + cap params + a stable signature
+        # of the user's steps. Changing the steps re-buckets locally
+        # but the underlying fetch is the same — could optimise to
+        # reuse the fetch across step changes; for MVP we key on
+        # steps too to keep behaviour predictable.
+        target = {
+            "repo": c_payload.get("repo"),
+            "jira_url": c_payload.get("jira_url"),
+            "jira_project": c_payload.get("jira_project"),
+        }
+        import hashlib
+        import json as _json
+        steps_sig = hashlib.sha256(
+            _json.dumps(steps, sort_keys=True).encode()
+        ).hexdigest()[:16]
+        cache_key = (
+            "dry-run", source, target.get("repo"), target.get("jira_url"),
+            target.get("jira_project"), since, items_cap, steps_sig,
+        )
+        force = (request.query_params.get("force") or "").lower() in (
+            "true", "1", "yes",
+        )
+        cache: dict = getattr(app.state, "_dry_run_cache", {})
+        if not hasattr(app.state, "_dry_run_cache"):
+            app.state._dry_run_cache = cache
+        now = datetime.now(UTC).timestamp()
+        if not force:
+            cached = cache.get(cache_key)
+            if cached is not None and now - cached[0] < 5 * 60:
+                return cached[1]
+
+        # Fetch (or stub via the injection slot for tests).
+        fetcher = getattr(
+            app.state, "dry_run_fetch", _default_dry_run_fetch,
+        )
+        try:
+            fetched = fetcher(
+                source=source, target=target,
+                since=since, items_cap=items_cap,
+            )
+        except Exception as exc:
+            return {
+                "fetched_at": datetime.now(UTC).isoformat(),
+                "expires_at": datetime.now(UTC).isoformat(),
+                "stopped_by": "error",
+                "items_fetched": 0,
+                "window": {"from": since, "to": None},
+                "per_step": [],
+                "error": f"fetch failed: {exc}",
+            }
+
+        items = fetched.get("items", [])
+        per_step = _bucket_items_by_step(items, steps)
+
+        fetched_at = datetime.now(UTC)
+        expires_at = datetime.fromtimestamp(now + 5 * 60, tz=UTC)
+        result = {
+            "fetched_at": fetched_at.isoformat(),
+            "expires_at": expires_at.isoformat(),
+            "stopped_by": fetched.get("stopped_by", "items_cap"),
+            "items_fetched": len(items),
+            "window": {"from": since, "to": fetched.get("window_to")},
+            "per_step": per_step,
+        }
+        cache[cache_key] = (now, result)
+        return result
 
     @app.post(
         "/api/internal/contracts/_probe-source-vocab",

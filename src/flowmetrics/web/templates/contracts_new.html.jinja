@@ -164,6 +164,26 @@
     </div>
   </fieldset>
 
+  <fieldset id="dry-run-panel">
+    <legend>Preview against live source</legend>
+    <p class="muted" style="font-size: 0.8125rem; margin: 0 0 0.6rem 0;">
+      Test the workflow against real items from the source.
+      Up to 200 items (or 30 days), nothing written to the warehouse.
+    </p>
+    <div style="display: flex; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem;">
+      <label style="font-size: 0.8125rem; color: var(--muted);">
+        From date
+        <input type="date" id="dry-run-since"
+               style="display: block; margin-top: 0.2rem;
+                      padding: 0.3rem 0.4rem; border: 0.0625rem solid var(--border);
+                      border-radius: 0.25rem;">
+      </label>
+      <button type="button" class="filter-apply" onclick="dryRun()">Dry run</button>
+      <span class="probe-status" id="dry-run-status"></span>
+    </div>
+    <div id="dry-run-results"></div>
+  </fieldset>
+
   <fieldset>
     <legend>Window (optional)</legend>
     <label>Start (YYYY-MM-DD)
@@ -630,6 +650,126 @@
   // first probe after the user enters the repo / project.
   refreshSourceKindLabel();
   probeVocab();
+
+  // ---------------------------------------------------------------
+  // Dry-run preview against live source.
+  // ---------------------------------------------------------------
+  // Default From-date: 30 days ago.
+  (function () {
+    var sinceInput = document.getElementById("dry-run-since");
+    var d = new Date();
+    d.setUTCDate(d.getUTCDate() - 30);
+    sinceInput.value = d.toISOString().slice(0, 10);
+  })();
+
+  function dryRun() {
+    var data = readForm();
+    var status = document.getElementById("dry-run-status");
+    status.textContent = "Running…";
+    status.className = "probe-status";
+    var since = document.getElementById("dry-run-since").value;
+    var contractBody = {
+      name: data.name || "tmp",
+      source: data.source,
+      repo: data.repo || null,
+      jira_url: data.jira_url || null,
+      jira_project: data.jira_project || null,
+      steps: readSteps(),
+    };
+    fetch("/api/internal/contracts/_dry-run", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "fetch",
+      },
+      body: JSON.stringify({
+        contract: contractBody, since: since, items_cap: 200,
+      }),
+    }).then(function (r) { return r.json(); }).then(function (body) {
+      renderDryRunResults(body);
+      if (body.error) {
+        status.textContent = "✗ " + body.error;
+        status.className = "probe-status probe-status--fail";
+      } else {
+        status.textContent =
+          "✓ " + body.items_fetched + " items (stopped by " +
+          body.stopped_by + ")";
+        status.className = "probe-status probe-status--ok";
+      }
+    });
+  }
+
+  function renderDryRunResults(body) {
+    var container = document.getElementById("dry-run-results");
+    container.innerHTML = "";
+    if (!body.per_step) return;
+    body.per_step.forEach(function (bucket) {
+      var section = document.createElement("section");
+      section.style.cssText = "margin: 0.6rem 0; border: 0.0625rem solid var(--border); border-radius: 0.25rem;";
+
+      var header = document.createElement("div");
+      header.style.cssText = "display: flex; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--surface); border-bottom: 0.0625rem solid var(--border);";
+
+      var label = document.createElement("strong");
+      if (bucket.step_name === "_unmatched") {
+        label.textContent = "Unmatched";
+        label.style.color = "var(--t-700)";
+      } else {
+        label.textContent = bucket.step_name;
+        label.style.color = bucket.wip ? "var(--p-700)" : "var(--fg)";
+      }
+      header.appendChild(label);
+      var count = document.createElement("span");
+      count.textContent = bucket.count + " item" + (bucket.count === 1 ? "" : "s");
+      count.style.cssText = "color: var(--muted); font-size: 0.8125rem;";
+      header.appendChild(count);
+      if (bucket.step_name === "_unmatched" && bucket.count > 0) {
+        var hint = document.createElement("em");
+        hint.textContent = "your workflow may be missing a step";
+        hint.style.cssText = "color: var(--muted); font-size: 0.75rem; margin-left: auto;";
+        header.appendChild(hint);
+      }
+      section.appendChild(header);
+
+      if (bucket.count === 0) {
+        var empty = document.createElement("p");
+        empty.textContent = bucket.step_name === "_unmatched"
+          ? "" : "no items in this step within the sample window";
+        empty.style.cssText = "color: var(--muted); font-size: 0.75rem; font-style: italic; margin: 0.4rem 0.6rem;";
+        if (empty.textContent) section.appendChild(empty);
+      } else {
+        var list = document.createElement("ul");
+        list.style.cssText = "list-style: none; padding: 0; margin: 0;";
+        bucket.items.slice(0, 10).forEach(function (it) {
+          var li = document.createElement("li");
+          li.style.cssText = "padding: 0.3rem 0.6rem; border-bottom: 0.0625rem solid var(--border); display: flex; gap: 0.6rem; font-size: 0.8125rem;";
+          var stage = document.createElement("code");
+          stage.textContent = it.current_stage;
+          stage.style.cssText = "color: var(--muted); min-width: 8rem;";
+          li.appendChild(stage);
+          var title = document.createElement("span");
+          title.textContent = it.title || it.id;
+          title.style.flex = "1";
+          li.appendChild(title);
+          if (it.url) {
+            var a = document.createElement("a");
+            a.href = it.url; a.target = "_blank"; a.textContent = it.id;
+            a.style.color = "var(--muted)";
+            li.appendChild(a);
+          }
+          list.appendChild(li);
+        });
+        if (bucket.items.length > 10) {
+          var more = document.createElement("li");
+          more.textContent = "… and " + (bucket.items.length - 10) + " more";
+          more.style.cssText = "padding: 0.3rem 0.6rem; color: var(--muted); font-size: 0.75rem; font-style: italic;";
+          list.appendChild(more);
+        }
+        section.appendChild(list);
+      }
+      container.appendChild(section);
+    });
+  }
 
   document.getElementById("wizard").addEventListener("submit", function (ev) {
     ev.preventDefault();
