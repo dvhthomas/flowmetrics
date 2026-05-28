@@ -80,3 +80,20 @@ class TestToVega:
         spec = to_vega(self._model_with_days())
         tooltip_fields = {t["field"] for t in spec["encoding"]["tooltip"]}
         assert tooltip_fields == {"label", "records"}
+
+    def test_single_day_renders_a_fixed_cell_not_a_stretched_block(self):
+        """A one-item warehouse spans a single day, so the heat-map has
+        one week column and one weekday row. With container width + a
+        data-derived domain that cell stretched to fill the whole plot
+        (the reported bug). Fixed `step` cell sizing plus a full
+        seven-weekday y domain keep a lone day a small, correctly-placed
+        square."""
+        spec = to_vega(build_data_source_model([(date(2026, 5, 12), 1)]))
+        # Cells are a fixed pixel size — a lone day cannot stretch.
+        assert isinstance(spec["width"], dict) and "step" in spec["width"]
+        assert isinstance(spec["height"], dict) and "step" in spec["height"]
+        # The weekday axis always shows all seven rows, so the single
+        # (Tuesday) cell sits in its row of a 7-row grid.
+        assert spec["encoding"]["y"]["scale"]["domain"] == [
+            "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+        ]

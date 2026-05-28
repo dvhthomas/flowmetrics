@@ -56,8 +56,12 @@ def _data_source_to_vega(model: DataSourceModel) -> dict[str, Any]:
     return {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "background": "transparent",
-        "width": "container",
-        "height": 140,
+        # Fixed-size cells (the contribution-grid look): each week column
+        # and weekday row is a constant pixel step, so a sparse warehouse
+        # — even a single day — renders as a small square rather than one
+        # block stretched across a container-width / data-height plot.
+        "width": {"step": 16},
+        "height": {"step": 16},
         "title": {
             "text": "Work Items by Creation Date",
             "subtitle": subtitle,
@@ -96,6 +100,15 @@ def _data_source_to_vega(model: DataSourceModel) -> dict[str, Any]:
                 "field": "weekday",
                 "type": "ordinal",
                 "sort": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                # Pin the domain so the grid always has all seven rows —
+                # a single weekday's data still lands in its own row of a
+                # 7-row calendar instead of becoming the only (full-height)
+                # row.
+                "scale": {
+                    "domain": [
+                        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
+                    ],
+                },
                 "axis": {
                     "title": None,
                     "values": ["Mon", "Wed", "Fri"],
