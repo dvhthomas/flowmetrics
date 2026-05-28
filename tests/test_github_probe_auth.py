@@ -5,7 +5,7 @@ auth token the rest of the app uses — otherwise they hit GitHub's
 
 from __future__ import annotations
 
-import flowmetrics.app as app_mod
+from flowmetrics import source_probe as sp
 
 
 class _FakeResp:
@@ -32,7 +32,7 @@ def test_github_helper_adds_auth_header_when_token_available(monkeypatch):
         "flowmetrics.sources.github.resolve_token", lambda: "tok-123"
     )
 
-    out = app_mod._default_probe_source_vocab(
+    out = sp.probe_source_vocab(
         "github", {"repo": "owner/repo"}
     )
     # The repo labels came back…
@@ -60,7 +60,7 @@ def test_github_helper_degrades_to_anonymous_without_token(monkeypatch):
         "flowmetrics.sources.github.resolve_token", _boom
     )
 
-    out = app_mod._default_probe_source_vocab(
+    out = sp.probe_source_vocab(
         "github", {"repo": "owner/repo"}
     )
     assert "labels" in out  # didn't crash
@@ -80,7 +80,7 @@ def test_dry_run_github_fetch_uses_auth(monkeypatch):
         "flowmetrics.sources.github.resolve_token", lambda: "tok-xyz"
     )
 
-    app_mod._default_dry_run_fetch(
+    sp.dry_run_fetch(
         source="github", target={"repo": "owner/repo"},
         since="2026-04-01", items_cap=10,
     )
