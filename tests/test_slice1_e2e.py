@@ -223,6 +223,61 @@ class TestSlice1Acceptance:
         for key in ["run_id", "contract_id", "started_at", "completed_at", "items_fetched"]:
             assert key in manifest, f"missing manifest key {key!r}; have {sorted(manifest)}"
 
+    def test_materialise_reads_db_stored_contract(self, tmp_path):
+        """A contract created in the web builder lives in the SQLite
+        store, not as a YAML file on disk. `flow materialise NAME` must
+        read it from the store — the Data Source page's browser-driven
+        backfill spawns exactly this command, and it was failing with
+        'contract not found ... looked for NAME.yaml' for DB-only
+        contracts."""
+        from flowmetrics.contract import parse_contract_text
+        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+
+        contracts_dir = tmp_path / "contracts"
+        contracts_dir.mkdir()
+        data_dir = tmp_path / "data"
+        name = "astral-uv-week"
+
+        ensure_initialized(contracts_dir)
+        db = ContractsDB(contracts_dir / "contracts.db")
+        db.put(
+            parse_contract_text(
+                "contract:\n"
+                f"  name: {name}\n"
+                "  source: github\n"
+                "  repo: astral-sh/uv\n"
+                "  start: 2026-05-04\n"
+                "  stop: 2026-05-10\n",
+                name,
+            )
+        )
+        # The contract exists ONLY in the DB — no YAML on disk.
+        assert not (contracts_dir / f"{name}.yaml").exists()
+
+        result = CliRunner().invoke(
+            cli,
+            [
+                "materialise",
+                name,
+                "--data-dir",
+                str(data_dir),
+                "--workflows-dir",
+                str(contracts_dir),
+                "--cache-dir",
+                str(FIXTURE_CACHE),
+                "--offline",
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0, (
+            "materialise should read the DB-stored contract "
+            f"(exit={result.exit_code}):\n{result.output}"
+        )
+        work_items_dir = data_dir / "work_items" / f"contract_id={name}"
+        assert list(work_items_dir.rglob("*.parquet")), (
+            f"no work_items parquet written under {work_items_dir}"
+        )
+
     def test_unknown_contract_name_exits_nonzero_with_clear_message(self, tmp_path):
         """When cron is misconfigured (wrong name), `flow materialise`
         must fail loudly — not silently produce empty Parquet."""

@@ -1139,6 +1139,7 @@ def materialise(
 
     from .backfill import write_status
     from .contract import ContractError, load_contract
+    from .contracts_db import ContractsDB
     from .materialise import materialise as run_materialise
 
     since_iso = since.date().isoformat() if since is not None else None
@@ -1166,12 +1167,20 @@ def materialise(
 
     _status("running", "")
 
-    try:
-        contract = load_contract(name, contracts_dir)
-    except ContractError as exc:
-        _status("failed", str(exc))
-        click.echo(f"error: {exc}", err=True)
-        sys.exit(2)
+    # Prefer the SQLite store — that's where the web builder writes and
+    # the runtime server reads. Fall back to a YAML on disk for the
+    # pure-cron / not-yet-migrated path. This only reads; it never runs
+    # the destructive YAML→DB migration (that's `ensure_initialized`'s
+    # job, invoked at serve time).
+    db_path = contracts_dir / "contracts.db"
+    contract = ContractsDB(db_path).get(name) if db_path.exists() else None
+    if contract is None:
+        try:
+            contract = load_contract(name, contracts_dir)
+        except ContractError as exc:
+            _status("failed", str(exc))
+            click.echo(f"error: {exc}", err=True)
+            sys.exit(2)
 
     # Click's DateTime returns datetime; we want date.
     overrides: dict = {}
