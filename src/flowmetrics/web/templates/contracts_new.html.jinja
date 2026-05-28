@@ -1,23 +1,22 @@
 {% extends "_base.html.jinja" %}
 
-{# New-contract wizard. Three fieldsets visible at once (no
-   navigation between steps) — name + source + window. Source
-   probe fires on blur of the repo / jira_project field. Save
-   validates, PUTs, and redirects to the new dashboard. #}
+{# Contract builder. One scrolling form, sections gated so the user
+   can't reach an action before its preconditions are met:
+     Identity + Source are required → unlock Steps → unlock Save.
+   `wizard_mode` is "new" or "edit"; `edit_id` is the locked id in
+   edit mode. #}
 
 {% block filter_bar %}{% endblock %}
 {% block data_source_strip %}{% endblock %}
 
 {% block content %}
 <style>
-  .wizard {
-    max-width: 38rem;
-    margin: 1.5rem 0;
-  }
+  .wizard { max-width: 42rem; margin: 1.5rem 0; }
+
   .wizard fieldset {
     border: 0.0625rem solid var(--border);
     border-radius: 0.5rem;
-    padding: 1rem 1.25rem 0.5rem 1.25rem;
+    padding: 1rem 1.25rem;
     margin: 0 0 1.25rem 0;
   }
   .wizard legend {
@@ -29,58 +28,184 @@
     color: var(--p-600);
     padding: 0 0.4rem;
   }
-  .wizard label {
-    display: block;
-    margin: 0.4rem 0;
-    font-size: 0.875rem;
-    color: var(--muted);
+
+  /* A section that's locked until its preconditions are met. */
+  .wizard fieldset[data-locked="true"] { opacity: 0.55; }
+  .wizard fieldset[data-locked="true"] .lock-note { display: block; }
+  .lock-note {
+    display: none;
+    font-size: 0.8125rem;
+    color: var(--t-700);
+    margin: 0 0 0.5rem 0;
   }
-  .wizard label > input,
-  .wizard label > select {
+
+  /* Consistent field grouping + inputs. */
+  .field { margin: 0 0 0.75rem 0; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 0.25rem;
+  }
+  .field-hint { font-weight: 400; color: var(--muted); font-size: 0.75rem; }
+  .req { color: var(--t-700); margin-left: 0.15rem; }
+  .field-input {
     display: block;
     width: 100%;
-    margin-top: 0.2rem;
-    padding: 0.4rem 0.5rem;
+    padding: 0.45rem 0.55rem;
     border: 0.0625rem solid var(--border);
-    border-radius: 0.25rem;
-    font-size: 1rem;
+    border-radius: 0.3rem;
+    font-size: 0.9375rem;
+    font-family: var(--body-font);
     color: var(--fg);
     background: var(--white);
+    box-sizing: border-box;
   }
-  .source-fields[data-source="jira"] .source-github,
-  .source-fields[data-source="github"] .source-jira {
-    display: none;
+  .field-input:focus {
+    outline: none;
+    border-color: var(--p-500);
+    box-shadow: 0 0 0 0.125rem var(--p-100);
   }
-  .probe-status {
-    font-size: 0.8125rem;
-    margin-top: 0.3rem;
-    min-height: 1.1rem;
+
+  /* Buttons — one scale, three intents. */
+  .btn {
+    font-family: var(--body-font);
+    font-size: 0.875rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.3rem;
+    border: 0.0625rem solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
   }
-  .probe-status--ok { color: var(--p-600); }
-  .probe-status--fail { color: var(--t-700); }
-  .wizard-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin: 0 0 1rem 0;
-  }
-  .wizard-actions button[type="submit"] {
+  .btn:hover:not([disabled]) { border-color: var(--muted); }
+  .btn--primary {
     background: var(--p-500);
     color: var(--white);
-    border: 0;
-    padding: 0.45rem 1.1rem;
-    border-radius: 0.3rem;
+    border-color: var(--p-500);
     font-weight: 600;
-    cursor: pointer;
   }
-  .wizard-actions button[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .btn--danger { color: var(--t-700); border-color: var(--t-700); }
+  .btn--sm { font-size: 0.8rem; padding: 0.2rem 0.5rem; }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  .probe-status { font-size: 0.8125rem; min-height: 1.1rem; }
+  .probe-status--ok { color: var(--p-600); }
+  .probe-status--fail { color: var(--t-700); }
+
+  .source-fields[data-source="jira"] .source-github,
+  .source-fields[data-source="github"] .source-jira { display: none; }
+
+  /* Steps editor. */
+  .steps-list {
+    list-style: none; padding: 0; margin: 0 0 0.75rem 0;
+    border: 0.0625rem solid var(--border); border-radius: 0.3rem;
   }
+  .steps-list:empty { display: none; }
+  .step-row {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr auto auto auto auto;
+    gap: 0.5rem; align-items: center;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 0.0625rem solid var(--border);
+    background: var(--white);
+  }
+  .step-row:last-child { border-bottom: 0; }
+  .step-badge {
+    font-size: 0.625rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .step-center { display: flex; flex-direction: column; gap: 0.3rem; }
+  .step-name-input {
+    padding: 0.3rem 0.45rem;
+    border: 0.0625rem solid var(--border); border-radius: 0.25rem;
+    font-size: 0.9375rem; font-family: var(--body-font);
+  }
+  .step-matches {
+    display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center;
+    min-height: 1.1rem;
+  }
+  .match-pill {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.1rem 0.45rem; border-radius: 0.5rem;
+    background: var(--p-50); color: var(--p-700);
+    font-size: 0.7rem; border: 0.0625rem solid var(--p-200);
+  }
+  .match-pill button {
+    background: transparent; border: 0; cursor: pointer;
+    padding: 0; font-size: 0.75rem; color: var(--p-700); line-height: 1;
+  }
+  .step-by-name { font-size: 0.7rem; color: var(--muted); font-style: italic; }
+  .step-wip-label {
+    display: flex; align-items: center; gap: 0.3rem; font-size: 0.8125rem;
+  }
+
+  .add-step-row {
+    display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
+  }
+  .add-step-row .field-input { flex: 1; min-width: 12rem; width: auto; }
+
+  /* Suggestion chips. */
+  .sugg-group { margin-bottom: 0.6rem; }
+  .sugg-group:last-child { margin-bottom: 0; }
+  .sugg-group-title {
+    font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+  }
+  .sugg-chips {
+    display: flex; flex-wrap: wrap; gap: 0.35rem;
+    margin-top: 0.3rem; min-height: 1.4rem;
+  }
+  .sugg-chip {
+    display: inline-flex; align-items: center;
+    border: 0.0625rem solid var(--border); border-radius: 0.6rem;
+    background: var(--surface); overflow: hidden;
+  }
+  .sugg-chip button {
+    border: 0; background: transparent; cursor: pointer;
+    font-size: 0.75rem; padding: 0.2rem 0.55rem;
+  }
+  .sugg-chip .sugg-chip__step {
+    border-left: 0.0625rem solid var(--border);
+    color: var(--muted); font-size: 0.7rem; padding: 0.2rem 0.45rem;
+  }
+  .sugg-empty { font-size: 0.75rem; color: var(--muted); font-style: italic; }
+
+  .wizard-actions {
+    display: flex; gap: 0.6rem; align-items: center;
+    margin: 0 0 0.5rem 0; flex-wrap: wrap;
+  }
+  .wizard-hint { font-size: 0.8125rem; color: var(--muted); }
   .wizard-errors {
-    color: var(--t-700);
-    font-size: 0.875rem;
-    margin: 0.5rem 0 0 0;
-    min-height: 1.2rem;
+    color: var(--t-700); font-size: 0.875rem;
+    margin: 0.25rem 0 0 0; min-height: 1.2rem;
+  }
+
+  /* Dry-run results. */
+  .dr-section {
+    margin: 0.6rem 0; border: 0.0625rem solid var(--border);
+    border-radius: 0.3rem;
+  }
+  .dr-head {
+    display: flex; align-items: baseline; gap: 0.5rem;
+    padding: 0.4rem 0.6rem; background: var(--surface);
+    border-bottom: 0.0625rem solid var(--border);
+  }
+  .dr-list { list-style: none; padding: 0; margin: 0; }
+  .dr-item {
+    padding: 0.3rem 0.6rem; border-bottom: 0.0625rem solid var(--border);
+    display: flex; gap: 0.6rem; font-size: 0.8125rem;
+  }
+  .dr-item:last-child { border-bottom: 0; }
+  .dr-stage {
+    color: var(--muted); min-width: 9rem;
+    font-family: var(--mono-font); font-size: 0.75rem;
   }
 </style>
 
@@ -88,46 +213,77 @@
 <h1>Edit workflow: {{ edit_id }}</h1>
 {% else %}
 <h1>New workflow</h1>
+<p class="wizard-hint">
+  Fields marked <span class="req">*</span> are required. Define the
+  source, then build the workflow's steps.
+</p>
 {% endif %}
 
 <form class="wizard" id="wizard">
   <fieldset>
     <legend>Identity</legend>
-    <label>Routing ID (lowercase, dashes only)
-      <input type="text" name="name" required pattern="[a-z0-9-]+"
+    <div class="field">
+      <label class="field-label" for="f-name">
+        Routing ID <span class="req" aria-hidden="true">*</span>
+        <span class="field-hint">— lowercase, dashes only; can't change later</span>
+      </label>
+      <input class="field-input" id="f-name" type="text" name="name"
+             required aria-required="true" pattern="[a-z0-9-]+"
              placeholder="astral-uv-week">
-    </label>
-    <label>Display label (optional)
-      <input type="text" name="label" placeholder="Astral uv weekly">
-    </label>
+    </div>
+    <div class="field">
+      <label class="field-label" for="f-label">
+        Display label
+        <span class="field-hint">— optional; shown in the dashboard</span>
+      </label>
+      <input class="field-input" id="f-label" type="text" name="label"
+             placeholder="Astral uv weekly">
+    </div>
   </fieldset>
 
   <fieldset class="source-fields" data-source="github" id="source-fieldset">
     <legend>Source</legend>
-    <label>Source kind
-      <select name="source" onchange="document.getElementById('source-fieldset').dataset.source=this.value; refreshSourceKindLabel(); probeVocab();">
+    <div class="field">
+      <label class="field-label" for="f-source">
+        Source kind <span class="req" aria-hidden="true">*</span>
+      </label>
+      <select class="field-input" id="f-source" name="source"
+              aria-required="true" onchange="onSourceKindChange()">
         <option value="github" selected>GitHub</option>
         <option value="jira">Jira</option>
       </select>
-    </label>
+    </div>
 
     <div class="source-github">
-      <label>Repository (owner/name)
-        <input type="text" name="repo" placeholder="astral-sh/uv"
-               onblur="probeSource()">
-      </label>
+      <div class="field">
+        <label class="field-label" for="f-repo">
+          Repository <span class="req" aria-hidden="true">*</span>
+          <span class="field-hint">— owner/name</span>
+        </label>
+        <input class="field-input" id="f-repo" type="text" name="repo"
+               aria-required="true" placeholder="astral-sh/uv"
+               oninput="updateValidity()" onblur="probeSource()">
+      </div>
     </div>
 
     <div class="source-jira">
-      <label>Jira base URL
-        <input type="text" name="jira_url"
+      <div class="field">
+        <label class="field-label" for="f-jira-url">
+          Jira base URL <span class="req" aria-hidden="true">*</span>
+        </label>
+        <input class="field-input" id="f-jira-url" type="text" name="jira_url"
+               aria-required="true"
                placeholder="https://issues.apache.org/jira"
-               onblur="probeSource()">
-      </label>
-      <label>Project key
-        <input type="text" name="jira_project" placeholder="BIGTOP"
-               onblur="probeSource()">
-      </label>
+               oninput="updateValidity()" onblur="probeSource()">
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-jira-project">
+          Project key <span class="req" aria-hidden="true">*</span>
+        </label>
+        <input class="field-input" id="f-jira-project" type="text"
+               name="jira_project" aria-required="true" placeholder="CASSANDRA"
+               oninput="updateValidity()" onblur="probeSource()">
+      </div>
     </div>
 
     <div class="probe-status" id="probe-status"></div>
@@ -135,50 +291,70 @@
 
   <fieldset id="steps-fieldset">
     <legend>Steps</legend>
-    <ol id="steps-list"
-        style="list-style: none; padding: 0; margin: 0; border: 0.0625rem solid var(--border); border-radius: 0.25rem;"></ol>
-    <div style="margin-top: 0.6rem; display: flex; gap: 0.4rem; align-items: center;">
-      <input type="text" id="new-step-name" placeholder="Step name (e.g. In Progress)"
-             style="flex: 1; padding: 0.3rem 0.5rem; border: 0.0625rem solid var(--border); border-radius: 0.25rem;">
-      <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.875rem;">
-        <input type="checkbox" id="new-step-wip" checked>
-        WIP
+    <p class="lock-note" id="steps-lock-note">
+      Define a valid source above first — steps map to that source's data.
+    </p>
+    <p class="field-hint" style="margin: 0 0 0.75rem 0;">
+      A step is a stage in your workflow. By default a step captures
+      items whose source stage matches the step's name; add explicit
+      matches (chips below) to capture other labels / statuses / events.
+      Toggle WIP per step.
+    </p>
+
+    <ol class="steps-list" id="steps-list"></ol>
+
+    <div class="add-step-row">
+      <input class="field-input" id="new-step-name" type="text"
+             placeholder="New step name (e.g. In Progress)"
+             oninput="updateValidity()"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();addStep();}">
+      <label class="step-wip-label">
+        <input type="checkbox" id="new-step-wip" checked> WIP
       </label>
-      <button type="button" id="add-step" onclick="addStep()">+ Add step</button>
+      <button type="button" class="btn btn--sm" id="add-step"
+              disabled onclick="addStep()">+ Add step</button>
       <span class="probe-status" id="stages-status"></span>
     </div>
 
-    <div id="suggestions-panel" style="margin-top: 1rem;">
-      <div class="sugg-group" style="margin-bottom: 0.4rem;">
-        <strong style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">In your warehouse</strong>
-        <div id="sugg-warehouse" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+    <div id="suggestions-panel" style="margin-top: 1rem;" hidden>
+      <p class="field-hint" style="margin: 0 0 0.5rem 0;">
+        Click a chip to bind it to the selected step (or
+        <em>⇢ step</em> to make a new step from it).
+      </p>
+      {% if wizard_mode == "edit" %}
+      <div class="sugg-group">
+        <div class="sugg-group-title">Stages seen in imported data</div>
+        <div id="sugg-warehouse" class="sugg-chips"></div>
       </div>
-      <div class="sugg-group" style="margin-bottom: 0.4rem;">
-        <strong id="sugg-labels-label" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Labels in the source</strong>
-        <div id="sugg-labels" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+      {% endif %}
+      <div class="sugg-group">
+        <div class="sugg-group-title" id="sugg-labels-label">Labels in the repo</div>
+        <div id="sugg-labels" class="sugg-chips"></div>
       </div>
       <div class="sugg-group">
-        <strong style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);">Lifecycle events</strong>
-        <div id="sugg-lifecycle" class="sugg-chips" style="display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.2rem; min-height: 1.4rem;"></div>
+        <div class="sugg-group-title">Lifecycle events</div>
+        <div id="sugg-lifecycle" class="sugg-chips"></div>
       </div>
     </div>
   </fieldset>
 
   <fieldset id="dry-run-panel">
     <legend>Preview against live source</legend>
-    <p class="muted" style="font-size: 0.8125rem; margin: 0 0 0.6rem 0;">
-      Test the workflow against real items from the source.
-      Up to 200 items (or 30 days), nothing written to the warehouse.
+    <p class="lock-note" id="dry-run-lock-note">
+      Add at least one step (and a valid source) to preview.
     </p>
-    <div style="display: flex; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem;">
-      <label style="font-size: 0.8125rem; color: var(--muted);">
-        From date
-        <input type="date" id="dry-run-since"
-               style="display: block; margin-top: 0.2rem;
-                      padding: 0.3rem 0.4rem; border: 0.0625rem solid var(--border);
-                      border-radius: 0.25rem;">
-      </label>
-      <button type="button" class="filter-apply" onclick="dryRun()">Dry run</button>
+    <p class="field-hint" style="margin: 0 0 0.75rem 0;">
+      Test the workflow against real items — up to 200 (or 30 days).
+      Nothing is written to the warehouse.
+    </p>
+    <div class="add-step-row" style="align-items: end;">
+      <div class="field" style="margin: 0;">
+        <label class="field-label" for="dry-run-since">From date</label>
+        <input class="field-input" id="dry-run-since" type="date"
+               style="width: auto; flex: none; min-width: 0;">
+      </div>
+      <button type="button" class="btn" id="dry-run-btn"
+              disabled onclick="dryRun()">Dry run</button>
       <span class="probe-status" id="dry-run-status"></span>
     </div>
     <div id="dry-run-results"></div>
@@ -186,48 +362,100 @@
 
   <fieldset>
     <legend>Window (optional)</legend>
-    <label>Start (YYYY-MM-DD)
-      <input type="date" name="start">
-    </label>
-    <label>Stop (YYYY-MM-DD)
-      <input type="date" name="stop">
-    </label>
+    <p class="field-hint" style="margin: 0 0 0.75rem 0;">
+      Limit the date range materialise fetches. Leave blank for the
+      source's full history.
+    </p>
+    <div class="field">
+      <label class="field-label" for="f-start">Start</label>
+      <input class="field-input" id="f-start" type="date" name="start"
+             style="width: auto;">
+    </div>
+    <div class="field">
+      <label class="field-label" for="f-stop">Stop</label>
+      <input class="field-input" id="f-stop" type="date" name="stop"
+             style="width: auto;">
+    </div>
   </fieldset>
 
   <div class="wizard-actions">
-    <button type="submit">{% if wizard_mode == "edit" %}Save{% else %}Save &amp; open{% endif %}</button>
-    <a href="/" class="filter-reset">Cancel</a>
+    <button type="submit" class="btn btn--primary" id="save-btn" disabled>
+      {% if wizard_mode == "edit" %}Save{% else %}Save &amp; open{% endif %}
+    </button>
+    <a href="/" class="btn">Cancel</a>
     {% if wizard_mode == "edit" %}
-    <a id="download-yaml-btn" href="/api/internal/contracts/{{ edit_id }}/yaml"
-       style="margin-left: auto; padding: 0.4rem 0.8rem; border: 0.0625rem solid var(--border); border-radius: 0.3rem; text-decoration: none; color: var(--fg);">Download YAML</a>
-    <button type="button" id="copy-yaml-btn"
-            style="background: transparent; border: 0.0625rem solid var(--border); padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer;"
+    <a id="download-yaml-btn" class="btn" style="margin-left: auto;"
+       href="/api/internal/contracts/{{ edit_id }}/yaml">Download YAML</a>
+    <button type="button" class="btn" id="copy-yaml-btn"
             onclick="copyYaml()">Copy YAML</button>
-    <button type="button" id="archive-btn"
-            style="background: transparent; border: 0.0625rem solid var(--t-700); color: var(--t-700); padding: 0.4rem 1rem; border-radius: 0.3rem; cursor: pointer;"
+    <button type="button" class="btn btn--danger" id="archive-btn"
             onclick="confirmArchive()">Archive</button>
     {% endif %}
   </div>
+  <p class="wizard-hint" id="save-blocker"></p>
   <p class="wizard-errors" id="wizard-errors"></p>
 </form>
 
 <script>
-  // -----------------------------------------------------------------
-  // Steps editor: one ordered list, each row = {name, wip}.
-  // READY / WIP / DONE badges derive from order + wip flag on render.
-  // -----------------------------------------------------------------
+  var WIZARD_MODE = {{ wizard_mode | tojson }};
+  var EDIT_ID = {{ edit_id | tojson }};
 
+  function readForm() {
+    var f = document.getElementById("wizard");
+    var data = {};
+    new FormData(f).forEach(function (v, k) { data[k] = v; });
+    return data;
+  }
+
+  // -----------------------------------------------------------------
+  // Validity gating — never let the user reach an impossible action.
+  // -----------------------------------------------------------------
+  function sourceTargetComplete(data) {
+    if (data.source === "github") return !!(data.repo && data.repo.indexOf("/") > 0);
+    if (data.source === "jira") return !!(data.jira_url && data.jira_project);
+    return false;
+  }
+
+  function updateValidity() {
+    var data = readForm();
+    var nameOk = /^[a-z0-9-]+$/.test(data.name || "");
+    var srcOk = sourceTargetComplete(data);
+    var steps = readSteps();
+
+    document.getElementById("steps-fieldset").dataset.locked = srcOk ? "false" : "true";
+
+    var newName = (document.getElementById("new-step-name").value || "").trim();
+    document.getElementById("add-step").disabled = !(srcOk && newName);
+
+    document.getElementById("dry-run-panel").dataset.locked =
+      (srcOk && steps.length) ? "false" : "true";
+    document.getElementById("dry-run-btn").disabled = !(srcOk && steps.length);
+
+    var saveOk = nameOk && srcOk && steps.length > 0;
+    document.getElementById("save-btn").disabled = !saveOk;
+
+    var missing = [];
+    if (!nameOk) missing.push("a routing id (lowercase, dashes)");
+    if (!srcOk) missing.push(
+      data.source === "jira" ? "a Jira URL + project key"
+                             : "a repository (owner/name)"
+    );
+    if (steps.length === 0) missing.push("at least one step");
+    document.getElementById("save-blocker").textContent =
+      missing.length ? "To save, add: " + missing.join(", ") + "." : "";
+  }
+
+  // -----------------------------------------------------------------
+  // Steps editor.
+  // -----------------------------------------------------------------
   function readSteps() {
     var rows = document.querySelectorAll('#steps-list li[data-step]');
     var out = [];
     rows.forEach(function (li) {
       var name = li.querySelector('input.step-name').value.trim();
       if (!name) return;
-      // The row's matches list is stored as a JSON array on a
-      // data attribute; the chip subrow displays it.
-      var raw = li.dataset.matches || '[]';
       var matches = [];
-      try { matches = JSON.parse(raw); } catch (e) { matches = []; }
+      try { matches = JSON.parse(li.dataset.matches || '[]'); } catch (e) {}
       out.push({
         name: name,
         wip: li.querySelector('input.step-wip').checked,
@@ -238,16 +466,11 @@
   }
 
   function categoryBadge(idx, steps) {
-    // Walk forward; the first WIP row ends READY. After any WIP
-    // is seen, every non-WIP row is DONE.
     var seenWip = false;
-    for (var i = 0; i <= idx; i++) {
-      if (steps[i].wip) seenWip = true;
-    }
+    for (var i = 0; i <= idx; i++) { if (steps[i].wip) seenWip = true; }
     if (steps[idx].wip) return { text: 'WIP', color: 'var(--p-600)' };
-    return seenWip
-      ? { text: 'DONE', color: 'var(--muted)' }
-      : { text: 'READY', color: 'var(--muted)' };
+    return seenWip ? { text: 'DONE', color: 'var(--muted)' }
+                   : { text: 'READY', color: 'var(--muted)' };
   }
 
   function refreshBadges() {
@@ -263,36 +486,33 @@
   }
 
   function renderMatchPills(li, matches) {
-    // Re-render the per-row match chips from the row's data-matches.
     var holder = li.querySelector('.step-matches');
     if (!holder) return;
     holder.innerHTML = '';
     if (!matches || matches.length === 0) {
-      var hint = document.createElement('em');
-      hint.className = 'step-no-match';
-      hint.textContent = '⚠ no source match — items won\'t map here';
-      hint.style.cssText = 'font-size: 0.7rem; color: var(--t-700);';
-      holder.appendChild(hint);
+      // No explicit matches → the step captures items whose source
+      // stage equals the step NAME. Informational, not an error.
+      var name = li.querySelector('input.step-name').value.trim() || '(unnamed)';
+      var note = document.createElement('span');
+      note.className = 'step-by-name';
+      note.textContent = 'captures source stage “' + name + '”';
+      holder.appendChild(note);
       return;
     }
     matches.forEach(function (m, idx) {
       var pill = document.createElement('span');
-      pill.className = 'step-match';
-      pill.style.cssText = 'display: inline-flex; align-items: center; ' +
-        'gap: 0.25rem; padding: 0.1rem 0.4rem; border-radius: 0.5rem; ' +
-        'background: var(--p-50); color: var(--p-700); font-size: 0.7rem; ' +
-        'border: 0.0625rem solid var(--p-200);';
+      pill.className = 'match-pill';
       pill.appendChild(document.createTextNode(m));
       var x = document.createElement('button');
       x.type = 'button';
       x.textContent = '×';
-      x.style.cssText = 'background: transparent; border: 0; cursor: pointer; ' +
-        'padding: 0; font-size: 0.7rem; color: var(--p-700);';
+      x.title = 'Remove this match';
       x.onclick = function () {
         var ms = JSON.parse(li.dataset.matches || '[]');
         ms.splice(idx, 1);
         li.dataset.matches = JSON.stringify(ms);
         renderMatchPills(li, ms);
+        updateValidity();
       };
       pill.appendChild(x);
       holder.appendChild(pill);
@@ -303,37 +523,32 @@
     var li = document.createElement('li');
     li.dataset.step = '1';
     li.dataset.matches = JSON.stringify(matches || []);
-    li.style.cssText = 'display: grid; ' +
-      'grid-template-columns: 3rem 1fr auto auto auto auto; ' +
-      'gap: 0.4rem; align-items: center; ' +
-      'padding: 0.4rem 0.5rem; ' +
-      'border-bottom: 0.0625rem solid var(--border); ' +
-      'background: var(--white);';
+    li.className = 'step-row';
 
     var badge = document.createElement('span');
     badge.className = 'step-badge';
-    badge.style.cssText = 'font-size: 0.65rem; font-weight: 600; ' +
-      'letter-spacing: 0.08em; text-transform: uppercase;';
     li.appendChild(badge);
 
     var center = document.createElement('div');
-    center.style.cssText = 'display: flex; flex-direction: column; gap: 0.25rem;';
+    center.className = 'step-center';
     var nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.className = 'step-name';
+    nameInput.className = 'step-name step-name-input';
     nameInput.value = name;
-    nameInput.style.cssText = 'padding: 0.2rem 0.4rem; ' +
-      'border: 0.0625rem solid var(--border); border-radius: 0.2rem;';
+    nameInput.addEventListener('input', function () {
+      if (JSON.parse(li.dataset.matches || '[]').length === 0) {
+        renderMatchPills(li, []);
+      }
+      updateValidity();
+    });
     center.appendChild(nameInput);
     var matchHolder = document.createElement('div');
     matchHolder.className = 'step-matches';
-    matchHolder.style.cssText = 'display: flex; flex-wrap: wrap; gap: 0.25rem; ' +
-      'align-items: center; min-height: 1.1rem;';
     center.appendChild(matchHolder);
     li.appendChild(center);
 
     var wipLabel = document.createElement('label');
-    wipLabel.style.cssText = 'display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem;';
+    wipLabel.className = 'step-wip-label';
     var wipInput = document.createElement('input');
     wipInput.type = 'checkbox';
     wipInput.className = 'step-wip';
@@ -343,37 +558,45 @@
     wipLabel.appendChild(document.createTextNode('WIP'));
     li.appendChild(wipLabel);
 
-    function mkBtn(text, click) {
+    function mkBtn(text, title, click) {
       var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = text;
-      b.style.cssText = 'font-size: 0.8rem; padding: 0.15rem 0.4rem;';
-      b.onclick = click;
+      b.type = 'button'; b.className = 'btn btn--sm';
+      b.textContent = text; b.title = title; b.onclick = click;
       return b;
     }
-    li.appendChild(mkBtn('↑', function () {
+    li.appendChild(mkBtn('↑', 'Move up', function () {
       var prev = li.previousElementSibling;
       if (prev) li.parentElement.insertBefore(li, prev);
       refreshBadges();
     }));
-    li.appendChild(mkBtn('↓', function () {
+    li.appendChild(mkBtn('↓', 'Move down', function () {
       var next = li.nextElementSibling;
       if (next) li.parentElement.insertBefore(next, li);
       refreshBadges();
     }));
-    li.appendChild(mkBtn('×', function () {
+    li.appendChild(mkBtn('×', 'Remove step', function () {
       li.parentElement.removeChild(li);
       refreshBadges();
+      updateValidity();
     }));
 
     renderMatchPills(li, matches || []);
     return li;
   }
 
-  // Track the most recently focused step row — chip clicks append
-  // to it if present, otherwise create a new step.
   var FOCUSED_STEP = null;
+  function revealSuggestions() {
+    document.getElementById('suggestions-panel').hidden = false;
+  }
+  // The Suggestions panel is contextual help for binding source
+  // identifiers to a step — keep it out of sight until the user is
+  // actually working in the Steps area (focuses the new-step input
+  // or any existing step row). Once revealed it stays visible so
+  // chips remain clickable.
   document.addEventListener('focusin', function (ev) {
+    var inSteps = ev.target.closest &&
+      ev.target.closest('#steps-fieldset');
+    if (inSteps) revealSuggestions();
     var li = ev.target.closest && ev.target.closest('#steps-list li[data-step]');
     if (li) FOCUSED_STEP = li;
   });
@@ -385,102 +608,80 @@
       if (!name) return;
       wip = document.getElementById('new-step-wip').checked;
       input.value = '';
-      matches = [];  // custom typed → no source mapping yet
+      matches = [];
     }
     var li = renderStepRow(name, !!wip, matches || []);
     document.getElementById('steps-list').appendChild(li);
     refreshBadges();
     FOCUSED_STEP = li;
+    revealSuggestions();
+    updateValidity();
   }
 
   function addMatchToFocusedStep(match) {
-    // Append `match` to the most-recently-focused step row's
-    // matches. If no row is focused, create a new step whose name
-    // == match and matches == [match].
     if (FOCUSED_STEP && FOCUSED_STEP.parentElement) {
       var existing = JSON.parse(FOCUSED_STEP.dataset.matches || '[]');
       if (existing.indexOf(match) === -1) existing.push(match);
       FOCUSED_STEP.dataset.matches = JSON.stringify(existing);
       renderMatchPills(FOCUSED_STEP, existing);
+      updateValidity();
       return;
     }
     addStep(match, true, [match]);
   }
 
   function renderChip(container, item) {
-    // `item` = {name, wip}. Two click targets:
-    //   - chip body → add as a MATCH to the focused step row
-    //     (or create a new step if none is focused).
-    //   - "as new step" right-side affordance → always create a
-    //     fresh step row with name == match, matches == [match].
     var wrap = document.createElement('span');
     wrap.className = 'sugg-chip';
-    wrap.style.cssText = 'display: inline-flex; align-items: center; ' +
-      'border: 0.0625rem solid var(--border); border-radius: 0.6rem; ' +
-      'background: var(--surface); overflow: hidden;';
-
     var addMatch = document.createElement('button');
     addMatch.type = 'button';
     addMatch.textContent = '+ ' + item.name;
-    addMatch.title = 'Add as a match to the focused step';
-    addMatch.style.cssText = 'font-size: 0.75rem; padding: 0.15rem 0.5rem; ' +
-      'border: 0; background: transparent; cursor: pointer;';
-    addMatch.onclick = function () {
-      addMatchToFocusedStep(item.name);
-    };
+    addMatch.title = 'Bind to the selected step';
+    addMatch.onclick = function () { addMatchToFocusedStep(item.name); };
     wrap.appendChild(addMatch);
-
     var asStep = document.createElement('button');
     asStep.type = 'button';
+    asStep.className = 'sugg-chip__step';
     asStep.textContent = '⇢ step';
-    asStep.title = 'Create a new step whose name = this match';
-    asStep.style.cssText = 'font-size: 0.7rem; padding: 0.15rem 0.4rem; ' +
-      'border: 0; border-left: 0.0625rem solid var(--border); ' +
-      'background: transparent; color: var(--muted); cursor: pointer;';
-    asStep.onclick = function () {
-      addStep(item.name, !!item.wip, [item.name]);
-    };
+    asStep.title = 'Create a new step from this';
+    asStep.onclick = function () { addStep(item.name, !!item.wip, [item.name]); };
     wrap.appendChild(asStep);
-
     container.appendChild(wrap);
   }
 
   function probeVocab() {
     var data = readForm();
+    if (!sourceTargetComplete(data)) return;
     var status = document.getElementById('stages-status');
     status.textContent = 'Discovering…';
     status.className = 'probe-status';
     fetch('/api/internal/contracts/_probe-source-vocab', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'fetch',
-      },
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' },
       body: JSON.stringify(data),
     }).then(function (r) { return r.json(); }).then(function (body) {
-      var warehouseDiv = document.getElementById('sugg-warehouse');
       var labelsDiv = document.getElementById('sugg-labels');
       var lifecycleDiv = document.getElementById('sugg-lifecycle');
-      warehouseDiv.innerHTML = '';
       labelsDiv.innerHTML = '';
       lifecycleDiv.innerHTML = '';
-
       var warehouse = body.warehouse_stages || [];
       var labels = body.labels || [];
       var lifecycle = body.lifecycle_events || [];
 
-      warehouse.forEach(function (item) { renderChip(warehouseDiv, item); });
-      labels.forEach(function (item) { renderChip(labelsDiv, item); });
-      lifecycle.forEach(function (item) { renderChip(lifecycleDiv, item); });
-
-      if (warehouse.length === 0) {
-        warehouseDiv.innerHTML = '<em class="muted" style="font-size: 0.75rem;">' +
-          'no stages observed yet — materialise the workflow to populate this list' +
-          '</em>';
+      var whDiv = document.getElementById('sugg-warehouse');
+      if (whDiv) {
+        whDiv.innerHTML = '';
+        warehouse.forEach(function (it) { renderChip(whDiv, it); });
+        if (warehouse.length === 0) {
+          whDiv.innerHTML = '<span class="sugg-empty">appears after this ' +
+            'workflow imports data</span>';
+        }
       }
+      labels.forEach(function (it) { renderChip(labelsDiv, it); });
+      lifecycle.forEach(function (it) { renderChip(lifecycleDiv, it); });
       if (labels.length === 0) {
-        labelsDiv.innerHTML = '<em class="muted" style="font-size: 0.75rem;">' +
-          (body.hint || 'no labels found') + '</em>';
+        labelsDiv.innerHTML = '<span class="sugg-empty">' +
+          (body.hint || 'none found for this source') + '</span>';
       }
 
       var total = warehouse.length + labels.length + lifecycle.length;
@@ -492,17 +693,29 @@
     });
   }
 
+  function showLifecycleChips() {
+    var div = document.getElementById('sugg-lifecycle');
+    if (div.children.length) return;
+    var data = readForm();
+    var gh = [
+      {name:'PR opened',wip:false},{name:'Marked ready for review',wip:true},
+      {name:'Changes requested',wip:true},{name:'Review approved',wip:true},
+      {name:'PR merged',wip:false},{name:'PR closed without merge',wip:false},
+      {name:'Issue opened',wip:false},{name:'Issue closed',wip:false},
+    ];
+    var jira = [
+      {name:'Issue created',wip:false},{name:'Assigned',wip:true},
+      {name:'Resolved',wip:false},{name:'Reopened',wip:true},{name:'Closed',wip:false},
+    ];
+    (data.source === 'jira' ? jira : gh).forEach(function (it) { renderChip(div, it); });
+  }
+
   function buildYaml(data) {
-    // Compose the YAML body from the form fields. The server's
-    // PUT endpoint re-parses this against parse_contract_text, so
-    // anything malformed surfaces as a 422.
     var lines = ["contract:"];
     lines.push("  name: " + data.name);
     if (data.label) lines.push("  label: " + JSON.stringify(data.label));
     lines.push("  source: " + data.source);
-    if (data.source === "github" && data.repo) {
-      lines.push("  repo: " + data.repo);
-    }
+    if (data.source === "github" && data.repo) lines.push("  repo: " + data.repo);
     if (data.source === "jira") {
       if (data.jira_url) lines.push("  jira_url: " + data.jira_url);
       if (data.jira_project) lines.push("  jira_project: " + data.jira_project);
@@ -517,66 +730,48 @@
         lines.push("      wip: " + (s.wip ? "true" : "false"));
         if (s.matches && s.matches.length) {
           lines.push("      matches:");
-          s.matches.forEach(function (m) {
-            lines.push("        - " + JSON.stringify(m));
-          });
+          s.matches.forEach(function (m) { lines.push("        - " + JSON.stringify(m)); });
         }
       });
     }
     return lines.join("\n") + "\n";
   }
 
-  function readForm() {
-    var f = document.getElementById("wizard");
-    var data = {};
-    new FormData(f).forEach(function (v, k) { data[k] = v; });
-    return data;
+  function onSourceKindChange() {
+    var data = readForm();
+    document.getElementById('source-fieldset').dataset.source = data.source;
+    document.getElementById('sugg-labels-label').textContent =
+      data.source === 'jira' ? 'Statuses in the project' : 'Labels in the repo';
+    document.getElementById('sugg-lifecycle').innerHTML = '';
+    showLifecycleChips();
+    updateValidity();
+    if (sourceTargetComplete(data)) probeVocab();
   }
 
   function probeSource() {
     var data = readForm();
-    if (!data.source) return;
+    if (!sourceTargetComplete(data)) return;
     var status = document.getElementById("probe-status");
     status.textContent = "Checking…";
     status.className = "probe-status";
     fetch("/api/internal/contracts/_probe-source", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch",
-      },
+      headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
       body: JSON.stringify(data),
     }).then(function (r) { return r.json(); }).then(function (body) {
       if (body.ok) {
-        status.textContent = "✓ " + (body.label || "target reachable");
+        status.textContent = "✓ " + (body.label || "source reachable");
         status.className = "probe-status probe-status--ok";
-        // Once the source target validates, auto-load the suggestions
-        // for the Steps editor (labels + lifecycle + warehouse). No
-        // separate button to click.
         probeVocab();
       } else {
-        status.textContent = "✗ " + (body.error || "target not reachable");
+        status.textContent = "✗ " + (body.error || "source not reachable");
         status.className = "probe-status probe-status--fail";
       }
     }).catch(function (err) {
-      status.textContent = "probe failed: " + err;
+      status.textContent = "check failed: " + err;
       status.className = "probe-status probe-status--fail";
     });
   }
-
-  function refreshSourceKindLabel() {
-    // Source dropdown changed → relabel the "Labels in the source"
-    // section to match (Jira's vocab is "statuses", not "labels").
-    var data = readForm();
-    var labelEl = document.getElementById("sugg-labels-label");
-    if (!labelEl) return;
-    labelEl.textContent = data.source === "jira"
-      ? "Statuses in the project"
-      : "Labels in the repo";
-  }
-
-  var WIZARD_MODE = {{ wizard_mode | tojson }};
-  var EDIT_ID = {{ edit_id | tojson }};
 
   function hydrateFromExisting(id) {
     fetch("/api/internal/contracts/" + encodeURIComponent(id))
@@ -586,8 +781,7 @@
         var p = body.parsed || {};
         function setField(name, value) {
           var el = form.elements[name];
-          if (!el) return;
-          if (value !== null && value !== undefined) el.value = value;
+          if (el && value !== null && value !== undefined) el.value = value;
         }
         setField("name", p.name);
         setField("label", p.label);
@@ -597,24 +791,20 @@
         setField("jira_project", p.jira_project);
         setField("start", p.start);
         setField("stop", p.stop);
-        // Toggle conditional fields based on the loaded source.
         document.getElementById("source-fieldset").dataset.source = p.source || "github";
-        // Hydrate steps from the canonical `steps:` list (each
-        // row carries name + wip + matches). Falls back to the
-        // legacy `states:` shim for older payloads.
+        document.getElementById('sugg-labels-label').textContent =
+          p.source === 'jira' ? 'Statuses in the project' : 'Labels in the repo';
         if (Array.isArray(p.steps) && p.steps.length) {
-          p.steps.forEach(function (s) {
-            addStep(s.name, !!s.wip, s.matches || []);
-          });
+          p.steps.forEach(function (s) { addStep(s.name, !!s.wip, s.matches || []); });
         } else if (p.states) {
           (p.states.backlog || []).forEach(function (n) { addStep(n, false, [n]); });
           (p.states.wip || []).forEach(function (n) { addStep(n, true, [n]); });
           (p.states.done || []).forEach(function (n) { addStep(n, false, [n]); });
         }
-        // The id is fixed in edit mode; lock the field.
-        if (WIZARD_MODE === "edit") {
-          form.elements.name.readOnly = true;
-        }
+        if (WIZARD_MODE === "edit") form.elements.name.readOnly = true;
+        showLifecycleChips();
+        updateValidity();
+        if (sourceTargetComplete(readForm())) probeVocab();
       });
   }
 
@@ -622,9 +812,7 @@
     fetch("/api/internal/contracts/" + encodeURIComponent(EDIT_ID) + "/yaml")
       .then(function (r) { return r.text(); })
       .then(function (text) {
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(text);
-        }
+        if (navigator.clipboard) navigator.clipboard.writeText(text);
         var btn = document.getElementById("copy-yaml-btn");
         var orig = btn.textContent;
         btn.textContent = "Copied ✓";
@@ -633,25 +821,15 @@
   }
 
   function confirmArchive() {
-    // Archive (soft delete) — the contract goes to /admin/contracts/archive
-    // where it can be restored or hard-deleted later. The warehouse data
-    // is untouched by archive; permanent erasure is a separate flow.
     var reason = window.prompt(
-      "Archive '" + EDIT_ID + "'? Optional reason for the audit log:",
-      ""
+      "Archive '" + EDIT_ID + "'? Optional reason for the audit log:", ""
     );
-    if (reason === null) return; // cancelled
-    fetch(
-      "/api/internal/contracts/" + encodeURIComponent(EDIT_ID) + "/archive",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "fetch",
-        },
-        body: JSON.stringify({ reason: reason || null }),
-      }
-    ).then(function (r) {
+    if (reason === null) return;
+    fetch("/api/internal/contracts/" + encodeURIComponent(EDIT_ID) + "/archive", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+      body: JSON.stringify({ reason: reason || null }),
+    }).then(function (r) {
       if (r.ok) { window.location.href = "/"; return; }
       r.json().then(function (body) {
         document.getElementById("wizard-errors").textContent =
@@ -660,25 +838,10 @@
     });
   }
 
-  if (WIZARD_MODE === "edit" && EDIT_ID) {
-    hydrateFromExisting(EDIT_ID);
-  }
-
-  // Always pre-fill the lifecycle chips (they're source-kind
-  // constants — no API call). Warehouse + labels come from the
-  // first probe after the user enters the repo / project.
-  refreshSourceKindLabel();
-  probeVocab();
-
-  // ---------------------------------------------------------------
-  // Dry-run preview against live source.
-  // ---------------------------------------------------------------
-  // Default From-date: 30 days ago.
   (function () {
-    var sinceInput = document.getElementById("dry-run-since");
     var d = new Date();
     d.setUTCDate(d.getUTCDate() - 30);
-    sinceInput.value = d.toISOString().slice(0, 10);
+    document.getElementById("dry-run-since").value = d.toISOString().slice(0, 10);
   })();
 
   function dryRun() {
@@ -688,31 +851,22 @@
     status.className = "probe-status";
     var since = document.getElementById("dry-run-since").value;
     var contractBody = {
-      name: data.name || "tmp",
-      source: data.source,
-      repo: data.repo || null,
-      jira_url: data.jira_url || null,
-      jira_project: data.jira_project || null,
-      steps: readSteps(),
+      name: data.name || "tmp", source: data.source,
+      repo: data.repo || null, jira_url: data.jira_url || null,
+      jira_project: data.jira_project || null, steps: readSteps(),
     };
     fetch("/api/internal/contracts/_dry-run", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch",
-      },
-      body: JSON.stringify({
-        contract: contractBody, since: since, items_cap: 200,
-      }),
+      headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+      body: JSON.stringify({ contract: contractBody, since: since, items_cap: 200 }),
     }).then(function (r) { return r.json(); }).then(function (body) {
       renderDryRunResults(body);
       if (body.error) {
         status.textContent = "✗ " + body.error;
         status.className = "probe-status probe-status--fail";
       } else {
-        status.textContent =
-          "✓ " + body.items_fetched + " items (stopped by " +
-          body.stopped_by + ")";
+        status.textContent = "✓ " + body.items_fetched +
+          " items (stopped by " + body.stopped_by + ")";
         status.className = "probe-status probe-status--ok";
       }
     });
@@ -724,64 +878,49 @@
     if (!body.per_step) return;
     body.per_step.forEach(function (bucket) {
       var section = document.createElement("section");
-      section.style.cssText = "margin: 0.6rem 0; border: 0.0625rem solid var(--border); border-radius: 0.25rem;";
-
-      var header = document.createElement("div");
-      header.style.cssText = "display: flex; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--surface); border-bottom: 0.0625rem solid var(--border);";
-
+      section.className = "dr-section";
+      var head = document.createElement("div");
+      head.className = "dr-head";
       var label = document.createElement("strong");
       if (bucket.step_name === "_unmatched") {
-        label.textContent = "Unmatched";
-        label.style.color = "var(--t-700)";
+        label.textContent = "Unmatched"; label.style.color = "var(--t-700)";
       } else {
         label.textContent = bucket.step_name;
         label.style.color = bucket.wip ? "var(--p-700)" : "var(--fg)";
       }
-      header.appendChild(label);
+      head.appendChild(label);
       var count = document.createElement("span");
       count.textContent = bucket.count + " item" + (bucket.count === 1 ? "" : "s");
       count.style.cssText = "color: var(--muted); font-size: 0.8125rem;";
-      header.appendChild(count);
+      head.appendChild(count);
       if (bucket.step_name === "_unmatched" && bucket.count > 0) {
         var hint = document.createElement("em");
         hint.textContent = "your workflow may be missing a step";
         hint.style.cssText = "color: var(--muted); font-size: 0.75rem; margin-left: auto;";
-        header.appendChild(hint);
+        head.appendChild(hint);
       }
-      section.appendChild(header);
-
-      if (bucket.count === 0) {
-        var empty = document.createElement("p");
-        empty.textContent = bucket.step_name === "_unmatched"
-          ? "" : "no items in this step within the sample window";
-        empty.style.cssText = "color: var(--muted); font-size: 0.75rem; font-style: italic; margin: 0.4rem 0.6rem;";
-        if (empty.textContent) section.appendChild(empty);
-      } else {
+      section.appendChild(head);
+      if (bucket.count > 0) {
         var list = document.createElement("ul");
-        list.style.cssText = "list-style: none; padding: 0; margin: 0;";
+        list.className = "dr-list";
         bucket.items.slice(0, 10).forEach(function (it) {
           var li = document.createElement("li");
-          li.style.cssText = "padding: 0.3rem 0.6rem; border-bottom: 0.0625rem solid var(--border); display: flex; gap: 0.6rem; font-size: 0.8125rem;";
+          li.className = "dr-item";
           var stage = document.createElement("code");
+          stage.className = "dr-stage";
           stage.textContent = it.current_stage;
-          stage.style.cssText = "color: var(--muted); min-width: 8rem;";
           li.appendChild(stage);
           var title = document.createElement("span");
           title.textContent = it.title || it.id;
           title.style.flex = "1";
           li.appendChild(title);
-          if (it.url) {
-            var a = document.createElement("a");
-            a.href = it.url; a.target = "_blank"; a.textContent = it.id;
-            a.style.color = "var(--muted)";
-            li.appendChild(a);
-          }
           list.appendChild(li);
         });
         if (bucket.items.length > 10) {
           var more = document.createElement("li");
+          more.className = "dr-item";
           more.textContent = "… and " + (bucket.items.length - 10) + " more";
-          more.style.cssText = "padding: 0.3rem 0.6rem; color: var(--muted); font-size: 0.75rem; font-style: italic;";
+          more.style.color = "var(--muted)";
           list.appendChild(more);
         }
         section.appendChild(list);
@@ -790,24 +929,24 @@
     });
   }
 
+  // ---- init ----
+  document.getElementById("f-name").addEventListener("input", updateValidity);
+  onSourceKindChange();
+  showLifecycleChips();
+  if (WIZARD_MODE === "edit" && EDIT_ID) hydrateFromExisting(EDIT_ID);
+  updateValidity();
+
   document.getElementById("wizard").addEventListener("submit", function (ev) {
     ev.preventDefault();
     var errs = document.getElementById("wizard-errors");
     errs.textContent = "";
     var data = readForm();
-    var yamlText = buildYaml(data);
     fetch("/api/internal/contracts/" + encodeURIComponent(data.name), {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch",
-      },
-      body: JSON.stringify({ yaml: yamlText }),
+      headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+      body: JSON.stringify({ yaml: buildYaml(data) }),
     }).then(function (r) {
-      if (r.ok) {
-        window.location.href = "/workflows/" + encodeURIComponent(data.name);
-        return;
-      }
+      if (r.ok) { window.location.href = "/workflows/" + encodeURIComponent(data.name); return; }
       return r.json().then(function (body) {
         var msg = (body.detail && body.detail.message) || body.detail || "save failed";
         errs.textContent = msg;
