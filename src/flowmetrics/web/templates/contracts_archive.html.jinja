@@ -1,0 +1,96 @@
+{% extends "_base.html.jinja" %}
+
+{% block filter_bar %}{% endblock %}
+{% block data_source_strip %}{% endblock %}
+
+{% block content %}
+<style>
+  .archive-list { list-style: none; padding: 0; margin: 1.5rem 0; }
+  .archive-row {
+    display: flex; align-items: baseline; gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border: 0.0625rem solid var(--border);
+    border-radius: 0.3rem; margin-bottom: 0.5rem;
+    background: var(--white);
+  }
+  .archive-row .arch-label { font-weight: 600; }
+  .archive-row .arch-id {
+    font-family: var(--mono-font); font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .archive-row .arch-meta {
+    font-size: 0.75rem; color: var(--muted); margin-left: auto;
+  }
+  .archive-actions { display: flex; gap: 0.5rem; }
+  .archive-actions a, .archive-actions button {
+    font-size: 0.8125rem; padding: 0.25rem 0.6rem;
+    border: 0.0625rem solid var(--border); border-radius: 0.25rem;
+    background: var(--surface); cursor: pointer; text-decoration: none;
+    color: var(--fg);
+  }
+  .archive-actions .danger {
+    color: var(--t-700); border-color: var(--t-700);
+  }
+</style>
+
+<h1>Archived workflows</h1>
+<p class="muted">
+  Archived workflows are hidden from the dashboard and skipped by
+  scheduled ingest. Restore one to bring it back, or hard-delete to
+  remove it for good.
+</p>
+
+{% if archived %}
+<ul class="archive-list">
+  {% for c in archived %}
+  <li class="archive-row" data-id="{{ c.id }}">
+    <span class="arch-label">{{ c.label }}</span>
+    <span class="arch-id">{{ c.id }}</span>
+    <span class="arch-meta">
+      {{ c.source }}
+      {% if c.archived_reason %}· {{ c.archived_reason }}{% endif %}
+      {% if c.archived_at %}· archived {{ c.archived_at[:10] }}{% endif %}
+    </span>
+    <span class="archive-actions">
+      <button type="button" onclick="restore('{{ c.id }}')">Restore</button>
+      <a href="/api/internal/contracts/{{ c.id }}/yaml?include_archived=true">Export YAML</a>
+      <button type="button" class="danger" onclick="hardDelete('{{ c.id }}')">Delete permanently</button>
+    </span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="aging-empty">
+  <strong class="aging-empty-headline">No archived workflows.</strong>
+  <span class="aging-empty-sub">
+    Archive a workflow from its edit page; it'll show up here where
+    you can restore or permanently delete it.
+  </span>
+</p>
+{% endif %}
+
+<a class="back-link" href="/">← Back to workflows</a>
+
+<script>
+  function restore(id) {
+    fetch("/api/internal/contracts/" + encodeURIComponent(id) + "/restore", {
+      method: "POST", headers: { "X-Requested-With": "fetch" },
+    }).then(function (r) { if (r.ok) window.location.reload(); });
+  }
+  function hardDelete(id) {
+    var typed = window.prompt(
+      "Permanently delete '" + id + "'? This cannot be undone. " +
+      "Type the id to confirm:"
+    );
+    if (typed !== id) return;
+    var purge = window.confirm(
+      "Also delete the materialised warehouse data for this workflow?"
+    );
+    var url = "/api/internal/contracts/" + encodeURIComponent(id);
+    if (purge) url += "?purge_data=true";
+    fetch(url, {
+      method: "DELETE", headers: { "X-Requested-With": "fetch" },
+    }).then(function (r) { if (r.ok) window.location.reload(); });
+  }
+</script>
+{% endblock %}

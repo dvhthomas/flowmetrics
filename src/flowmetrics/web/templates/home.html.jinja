@@ -9,6 +9,11 @@
     <p>
       <a class="filter-apply" href="/admin/contracts/new">+ New workflow</a>
     </p>
+    {% if archived_count and archived_count > 0 %}
+    <p style="font-size: 0.8125rem;">
+      <a href="/admin/contracts/archive" style="color: var(--muted);">View archived ({{ archived_count }})</a>
+    </p>
+    {% endif %}
   </section>
 
   {% if workflows %}

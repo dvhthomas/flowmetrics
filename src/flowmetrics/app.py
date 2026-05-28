@@ -937,12 +937,17 @@ def create_app(
             c = contracts_db.get(name)
             label = c.label if c and c.label else name
             workflows.append({"name": name, "label": label})
+        archived_count = sum(
+            1 for m in contracts_db.list(include_archived=True)
+            if m.archived_at is not None
+        )
         return templates.TemplateResponse(
             request,
             "home.html.jinja",
             {
                 "title": "flowmetrics",
                 "workflows": workflows,
+                "archived_count": archived_count,
                 # Surface the directory we actually scanned —
                 # operators routinely run `flow serve` from a place
                 # where the default `./contracts` is empty/missing
@@ -1099,6 +1104,74 @@ def create_app(
                 "contracts_dir_display": str(contracts_dir.resolve()),
                 "wizard_mode": "edit",
                 "edit_id": contract_id,
+            },
+        )
+
+    @app.get(
+        "/api/internal/contracts/{contract_id}/yaml",
+        dependencies=auth_dep,
+    )
+    def export_contract_yaml(
+        contract_id: str, include_archived: bool = False,
+    ):
+        """Return the contract's canonical YAML as a downloadable
+        attachment. 404 on archived rows unless
+        ?include_archived=true."""
+        from fastapi.responses import Response
+
+        meta = contracts_db.get_meta(contract_id)
+        if meta is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"contract {contract_id!r} not found",
+            )
+        if meta.archived_at is not None and not include_archived:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    f"contract {contract_id!r} is archived. Pass "
+                    "?include_archived=true to export."
+                ),
+            )
+        return Response(
+            content=meta.yaml,
+            media_type="application/x-yaml",
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="{contract_id}.yaml"'
+                ),
+            },
+        )
+
+    @app.get(
+        "/admin/contracts/archive",
+        response_class=HTMLResponse,
+        dependencies=auth_dep,
+    )
+    def archived_contracts_page(request: Request) -> HTMLResponse:
+        """List archived contracts with restore / export / hard-
+        delete actions."""
+        rows = [
+            m for m in contracts_db.list(include_archived=True)
+            if m.archived_at is not None
+        ]
+        archived = [
+            {
+                "id": m.contract.name,
+                "label": m.contract.label or m.contract.name,
+                "source": m.contract.source,
+                "archived_at": m.archived_at,
+                "archived_reason": m.archived_reason,
+            }
+            for m in rows
+        ]
+        return templates.TemplateResponse(
+            request,
+            "contracts_archive.html.jinja",
+            {
+                "title": "Archived workflows · flowmetrics",
+                "contract": None,
+                "archived": archived,
             },
         )
 

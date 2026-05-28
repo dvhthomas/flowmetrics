@@ -198,8 +198,13 @@
     <button type="submit">{% if wizard_mode == "edit" %}Save{% else %}Save &amp; open{% endif %}</button>
     <a href="/" class="filter-reset">Cancel</a>
     {% if wizard_mode == "edit" %}
+    <a id="download-yaml-btn" href="/api/internal/contracts/{{ edit_id }}/yaml"
+       style="margin-left: auto; padding: 0.4rem 0.8rem; border: 0.0625rem solid var(--border); border-radius: 0.3rem; text-decoration: none; color: var(--fg);">Download YAML</a>
+    <button type="button" id="copy-yaml-btn"
+            style="background: transparent; border: 0.0625rem solid var(--border); padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer;"
+            onclick="copyYaml()">Copy YAML</button>
     <button type="button" id="archive-btn"
-            style="margin-left: auto; background: transparent; border: 0.0625rem solid var(--t-700); color: var(--t-700); padding: 0.4rem 1rem; border-radius: 0.3rem; cursor: pointer;"
+            style="background: transparent; border: 0.0625rem solid var(--t-700); color: var(--t-700); padding: 0.4rem 1rem; border-radius: 0.3rem; cursor: pointer;"
             onclick="confirmArchive()">Archive</button>
     {% endif %}
   </div>
@@ -610,6 +615,20 @@
         if (WIZARD_MODE === "edit") {
           form.elements.name.readOnly = true;
         }
+      });
+  }
+
+  function copyYaml() {
+    fetch("/api/internal/contracts/" + encodeURIComponent(EDIT_ID) + "/yaml")
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text);
+        }
+        var btn = document.getElementById("copy-yaml-btn");
+        var orig = btn.textContent;
+        btn.textContent = "Copied ✓";
+        setTimeout(function () { btn.textContent = orig; }, 1500);
       });
   }
 
