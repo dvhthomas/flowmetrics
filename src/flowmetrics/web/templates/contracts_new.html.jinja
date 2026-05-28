@@ -114,6 +114,12 @@
     background: var(--p-50);
     box-shadow: inset 0.1875rem 0 0 var(--p-500);
   }
+  /* Brief pulse when a chip lands a match on this row. */
+  .step-row--flash { animation: step-flash 0.7s ease-out; }
+  @keyframes step-flash {
+    0% { background: var(--p-200); }
+    100% { background: var(--white); }
+  }
   .step-badge {
     font-size: 0.625rem; font-weight: 600;
     letter-spacing: 0.08em; text-transform: uppercase;
@@ -257,7 +263,8 @@
           </label>
           <input class="field-input" id="f-repo" name="repo" type="text"
                  x-model="repo" aria-required="true"
-                 placeholder="astral-sh/uv" @blur="probeSource()">
+                 placeholder="astral-sh/uv"
+                 @input="onSourceChanged()" @blur="probeSource()">
         </div>
       </div>
 
@@ -268,7 +275,8 @@
           </label>
           <input class="field-input" id="f-jira-url" name="jira_url" type="text"
                  x-model="jiraUrl" aria-required="true"
-                 placeholder="https://issues.apache.org/jira" @blur="probeSource()">
+                 placeholder="https://issues.apache.org/jira"
+                 @input="onSourceChanged()" @blur="probeSource()">
         </div>
         <div class="field">
           <label class="field-label" for="f-jira-project">
@@ -276,7 +284,8 @@
           </label>
           <input class="field-input" id="f-jira-project" name="jira_project" type="text"
                  x-model="jiraProject" aria-required="true"
-                 placeholder="CASSANDRA" @blur="probeSource()">
+                 placeholder="CASSANDRA"
+                 @input="onSourceChanged()" @blur="probeSource()">
         </div>
       </div>
 
@@ -284,11 +293,13 @@
            :class="probeClass" x-text="probeStatus"></div>
     </fieldset>
 
-    <fieldset :data-locked="!sourceComplete">
+    <fieldset id="steps-fieldset">
       <legend>Steps</legend>
-      <p class="lock-note" x-show="!sourceComplete">
-        Define a valid source above first — steps map to that source's data.
+      <p class="lock-note" x-show="!sourceVerified">
+        Enter a source above that we can reach — steps map to that
+        source's data, so the source has to resolve first.
       </p>
+      <div x-show="sourceVerified">
       <p class="field-hint" style="margin: 0 0 0.75rem 0;">
         A step is a stage in your workflow. By default a step captures
         items whose source stage matches the step's name; add explicit
@@ -298,7 +309,8 @@
 
       <ol class="steps-list" id="steps-list">
         <template x-for="(step, idx) in steps" :key="idx">
-          <li class="step-row" :class="{ 'step-row--active': idx === activeIdx }"
+          <li class="step-row"
+              :class="{ 'step-row--active': idx === activeIdx, 'step-row--flash': idx === flashIdx }"
               @click="activeIdx = idx">
             <span class="step-badge"
                   :style="`color: ${badge(idx).color}`"
@@ -349,16 +361,14 @@
       </div>
 
       <div id="suggestions-panel" style="margin-top: 1rem;" x-show="showSuggestions">
-        <p class="field-hint" id="binding-target"
-           :style="bindingTargetWarn ? 'color: var(--t-700)' : ''"
-           x-text="bindingTarget"></p>
+        <p class="field-hint" id="binding-target" x-text="bindingTarget"></p>
         {% if wizard_mode == "edit" %}
         <div class="sugg-group">
           <div class="sugg-group-title">Stages seen in imported data</div>
           <div id="sugg-warehouse" class="sugg-chips">
             <template x-for="item in vocab.warehouse" :key="item.name">
               <button type="button" class="sugg-chip"
-                      @click="addMatch(item.name)" x-text="`+ ${item.name}`"></button>
+                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
             </template>
             <span class="sugg-empty" x-show="vocab.warehouse.length === 0">appears after this workflow imports data</span>
           </div>
@@ -369,7 +379,7 @@
           <div id="sugg-labels" class="sugg-chips">
             <template x-for="item in vocab.labels" :key="item.name">
               <button type="button" class="sugg-chip"
-                      @click="addMatch(item.name)" x-text="`+ ${item.name}`"></button>
+                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
             </template>
             <span class="sugg-empty" x-show="vocab.labels.length === 0"
                   x-text="vocabHint || 'none found for this source'"></span>
@@ -380,10 +390,11 @@
           <div id="sugg-lifecycle" class="sugg-chips">
             <template x-for="item in lifecycleChips" :key="item.name">
               <button type="button" class="sugg-chip"
-                      @click="addMatch(item.name)" x-text="`+ ${item.name}`"></button>
+                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
             </template>
           </div>
         </div>
+      </div>
       </div>
     </fieldset>
 
@@ -502,9 +513,11 @@
       repo: '', jiraUrl: '', jiraProject: '', start: '', stop: '',
       steps: [],                 // [{name, wip, matches: []}]
       activeIdx: null,
+      flashIdx: null,            // step row to pulse after a chip click
       newStepName: '', newStepWip: true,
       showSuggestions: false,
       // probe state
+      sourceVerified: false,     // source actually resolved (not just well-formed)
       probeStatus: '', probeClass: 'probe-status',
       vocab: { labels: [], warehouse: [] },
       vocabStatus: '', vocabClass: 'probe-status', vocabHint: '',
@@ -520,24 +533,25 @@
         return false;
       },
       get nameOk() { return /^[a-z0-9-]+$/.test(this.name); },
-      get canAddStep() { return this.sourceComplete && !!this.newStepName.trim(); },
-      get canDryRun() { return this.sourceComplete && this.steps.length > 0; },
-      get canSave() { return this.nameOk && this.sourceComplete && this.steps.length > 0; },
+      get canAddStep() { return this.sourceVerified && !!this.newStepName.trim(); },
+      get canDryRun() { return this.sourceVerified && this.steps.length > 0; },
+      get canSave() { return this.nameOk && this.sourceVerified && this.steps.length > 0; },
       get blocker() {
         const missing = [];
         if (!this.nameOk) missing.push('a routing id (lowercase, dashes)');
-        if (!this.sourceComplete) missing.push(
-          this.source === 'jira' ? 'a Jira URL + project key' : 'a repository (owner/name)');
+        if (!this.sourceVerified) missing.push(
+          this.source === 'jira'
+            ? 'a Jira URL + project key we can reach'
+            : 'a repository (owner/name) we can reach');
         if (this.steps.length === 0) missing.push('at least one step');
         return missing.length ? 'To save, add: ' + missing.join(', ') + '.' : '';
       },
-      get bindingTargetWarn() { return this._warn || false; },
       get bindingTarget() {
         if (this.activeIdx === null || !this.steps[this.activeIdx]) {
-          return 'Add a step, then click chips to bind source data to it.';
+          return 'Click a chip to start a step from it — or name a step above and add it.';
         }
         const nm = this.steps[this.activeIdx].name.trim() || '(unnamed step)';
-        return `Chips add to the selected step: “${nm}”.`;
+        return `Chips add to the selected step: “${nm}”. Click another row to retarget.`;
       },
       get lifecycleChips() {
         return this.source === 'jira' ? JIRA_LIFECYCLE : GH_LIFECYCLE;
@@ -571,7 +585,6 @@
         this.newStepName = '';
         this.activeIdx = this.steps.length - 1;
         this.showSuggestions = true;
-        this._warn = false;
       },
       removeStep(idx) {
         this.steps.splice(idx, 1);
@@ -588,21 +601,44 @@
         this.steps.splice(j, 0, row);
         this.activeIdx = j;
       },
-      // Chips ONLY bind to the active step. They never create one.
-      addMatch(name) {
-        if (this.activeIdx === null || !this.steps[this.activeIdx]) {
-          this._warn = true;
-          this.$nextTick(() => document.getElementById('new-step-name').focus());
-          return;
+      // A chip click always does something visible: it seeds a brand-new
+      // step when none is selected, otherwise it binds the match to the
+      // active step. Either way the affected row pulses.
+      addMatch(item) {
+        const name = typeof item === 'string' ? item : item.name;
+        let idx = this.activeIdx;
+        if (idx === null || !this.steps[idx]) {
+          const wip = (item && typeof item === 'object' && 'wip' in item)
+            ? !!item.wip : true;
+          this.steps.push({ name, wip, matches: [name] });
+          idx = this.steps.length - 1;
+          this.activeIdx = idx;
+          this.showSuggestions = true;
+        } else {
+          const m = this.steps[idx].matches;
+          if (!m.includes(name)) m.push(name);
         }
-        this._warn = false;
-        const m = this.steps[this.activeIdx].matches;
-        if (!m.includes(name)) m.push(name);
+        this.flashStep(idx);
+      },
+      flashStep(idx) {
+        this.flashIdx = idx;
+        this.$nextTick(() => {
+          const rows = document.querySelectorAll('#steps-list .step-row');
+          if (rows[idx]) rows[idx].scrollIntoView({ block: 'nearest' });
+        });
+        setTimeout(() => { if (this.flashIdx === idx) this.flashIdx = null; }, 700);
       },
 
       // ---- source probing ----
+      // Editing any source field invalidates a prior verification — the
+      // steps UI re-locks until the new source resolves.
+      onSourceChanged() {
+        this.sourceVerified = false;
+        this.probeStatus = ''; this.probeClass = 'probe-status';
+      },
       async onSourceKindChange() {
         this.vocab = { labels: [], warehouse: [] };
+        this.onSourceChanged();
         if (this.sourceComplete) this.probeSource();
       },
       async probeSource() {
@@ -613,6 +649,7 @@
             method: 'POST', headers: HEADERS, body: JSON.stringify(this._target()),
           });
           const body = await r.json();
+          this.sourceVerified = !!body.ok;
           if (body.ok) {
             this.probeStatus = '✓ ' + (body.label || 'source reachable');
             this.probeClass = 'probe-status probe-status--ok';
@@ -622,6 +659,7 @@
             this.probeClass = 'probe-status probe-status--fail';
           }
         } catch (e) {
+          this.sourceVerified = false;
           this.probeStatus = 'check failed: ' + e;
           this.probeClass = 'probe-status probe-status--fail';
         }
@@ -750,6 +788,9 @@
           add(p.states.wip, true);
           add(p.states.done, false);
         }
+        // The contract was saved with a working source; trust it so the
+        // steps stay editable even if the network probe is flaky right now.
+        this.sourceVerified = this.sourceComplete;
         if (this.steps.length) { this.activeIdx = 0; this.showSuggestions = true; }
         if (this.sourceComplete) this.probeVocab();
       },

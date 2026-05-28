@@ -105,9 +105,10 @@ class TestSuggestionsHiddenUntilActive:
 
 
 class TestChipsBindToCurrentStep:
-    """Clicking a suggestion chip binds that identifier to the step
-    the user is working on — it never creates a new step. Steps are
-    created only via the explicit "+ Add step" control. The builder
+    """Clicking a suggestion chip is a single action: it binds that
+    identifier to the active step (seeding a step from the chip when
+    none is selected yet, so the click is never a no-op). There is no
+    separate dual "create-step-from-chip" affordance, and the builder
     surfaces which step chips will bind to."""
 
     def test_no_create_step_from_chip_affordance(self, workspace):
@@ -115,7 +116,7 @@ class TestChipsBindToCurrentStep:
         app = create_app(data_dir=data, contracts_dir=contracts)
         with TestClient(app) as client:
             html = _new(client)
-        # The old "⇢ step" (create-step-from-chip) affordance is gone.
+        # The old dual "⇢ step" affordance is gone — one click, one action.
         assert "⇢ step" not in html
         assert "sugg-chip__step" not in html
 
