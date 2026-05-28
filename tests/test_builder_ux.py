@@ -90,18 +90,21 @@ class TestGatedButtonsAreReactivelyDisabled:
 
 
 class TestSuggestionsHiddenUntilActive:
-    def test_suggestions_panel_is_x_show_gated(self, workspace):
-        """The Suggestions panel (labels / lifecycle chips) is
-        revealed reactively (Alpine x-show) only once the user has
-        a step to bind to — it doesn't clutter the initial form."""
+    def test_suggestions_render_inside_the_active_step(self, workspace):
+        """The Suggestions panel (labels / lifecycle chips) lives
+        inside the step it binds to and only renders for the selected
+        (active) row — so it can't clutter the initial form and a chip
+        can only ever land on the step the user is looking at."""
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
         with TestClient(app) as client:
             html = _new(client)
-        import re
-        m = re.search(r'<div[^>]*id="suggestions-panel"[^>]*>', html)
-        assert m is not None
-        assert "x-show" in m.group(0)
+        # The suggestions panel is gated to the active step via x-if.
+        assert 'id="suggestions-panel"' in html
+        assert 'x-if="idx === activeIdx"' in html
+        # And it sits within the steps list, not as a sibling below it.
+        steps_list = html.split('class="steps-list"', 1)[1]
+        assert 'id="suggestions-panel"' in steps_list.split("</ol>", 1)[0]
 
 
 class TestChipsBindToCurrentStep:

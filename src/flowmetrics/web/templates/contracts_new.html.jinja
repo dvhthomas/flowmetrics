@@ -102,13 +102,22 @@
   }
   .steps-list:empty { display: none; }
   .step-row {
-    display: grid;
-    grid-template-columns: 3.5rem 1fr auto auto auto auto;
-    gap: 0.5rem; align-items: center;
     padding: 0.5rem 0.6rem;
     border-bottom: 0.0625rem solid var(--border);
     background: var(--white);
   }
+  .step-row__controls {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr auto auto auto auto;
+    gap: 0.5rem; align-items: center;
+  }
+  /* Per-step suggestion area, shown only inside the active row. */
+  .step-suggestions {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 0.0625rem dashed var(--p-200);
+  }
+  .step-suggestions .binding-target { margin: 0 0 0.5rem 0; }
   .step-row:last-child { border-bottom: 0; }
   .step-row--active {
     background: var(--p-50);
@@ -325,35 +334,80 @@
           <li class="step-row"
               :class="{ 'step-row--active': idx === activeIdx, 'step-row--flash': idx === flashIdx }"
               @click="activeIdx = idx">
-            <span class="step-badge"
-                  :style="`color: ${badge(idx).color}`"
-                  x-text="badge(idx).text"></span>
-            <div class="step-center">
-              <input class="step-name-input" type="text" x-model="step.name"
-                     @focus="activeIdx = idx">
-              <div class="step-matches">
-                <template x-if="step.matches.length === 0">
-                  <span class="step-by-name"
-                        x-text="`captures source stage “${step.name || '(unnamed)'}”`"></span>
-                </template>
-                <template x-for="(m, mi) in step.matches" :key="mi">
-                  <span class="match-pill">
-                    <span x-text="m"></span>
-                    <button type="button" title="Remove this match"
-                            @click="step.matches.splice(mi, 1)">×</button>
-                  </span>
-                </template>
+            <div class="step-row__controls">
+              <span class="step-badge"
+                    :style="`color: ${badge(idx).color}`"
+                    x-text="badge(idx).text"></span>
+              <div class="step-center">
+                <input class="step-name-input" type="text" x-model="step.name"
+                       @focus="activeIdx = idx">
+                <div class="step-matches">
+                  <template x-if="step.matches.length === 0">
+                    <span class="step-by-name"
+                          x-text="`captures source stage “${step.name || '(unnamed)'}”`"></span>
+                  </template>
+                  <template x-for="(m, mi) in step.matches" :key="mi">
+                    <span class="match-pill">
+                      <span x-text="m"></span>
+                      <button type="button" title="Remove this match"
+                              @click.stop="step.matches.splice(mi, 1)">×</button>
+                    </span>
+                  </template>
+                </div>
               </div>
+              <label class="step-wip-label">
+                <input type="checkbox" x-model="step.wip"> WIP
+              </label>
+              <button type="button" class="btn btn--sm" title="Move up"
+                      @click.stop="moveStep(idx, -1)">↑</button>
+              <button type="button" class="btn btn--sm" title="Move down"
+                      @click.stop="moveStep(idx, 1)">↓</button>
+              <button type="button" class="btn btn--sm" title="Remove step"
+                      @click.stop="removeStep(idx)">×</button>
             </div>
-            <label class="step-wip-label">
-              <input type="checkbox" x-model="step.wip"> WIP
-            </label>
-            <button type="button" class="btn btn--sm" title="Move up"
-                    @click="moveStep(idx, -1)">↑</button>
-            <button type="button" class="btn btn--sm" title="Move down"
-                    @click="moveStep(idx, 1)">↓</button>
-            <button type="button" class="btn btn--sm" title="Remove step"
-                    @click="removeStep(idx)">×</button>
+
+            {# Suggestion chips live inside the step they bind to. Only
+               the selected (green) row renders them, so a chip can only
+               ever land on the step the user is looking at. #}
+            <template x-if="idx === activeIdx">
+              <div class="step-suggestions" id="suggestions-panel">
+                <p class="field-hint binding-target">
+                  Add labels &amp; lifecycle events to this step:
+                </p>
+                {% if wizard_mode == "edit" %}
+                <div class="sugg-group">
+                  <div class="sugg-group-title">Stages seen in imported data</div>
+                  <div id="sugg-warehouse" class="sugg-chips">
+                    <template x-for="item in vocab.warehouse" :key="item.name">
+                      <button type="button" class="sugg-chip"
+                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                    </template>
+                    <span class="sugg-empty" x-show="vocab.warehouse.length === 0">appears after this workflow imports data</span>
+                  </div>
+                </div>
+                {% endif %}
+                <div class="sugg-group">
+                  <div class="sugg-group-title" x-text="labelsTitle"></div>
+                  <div id="sugg-labels" class="sugg-chips">
+                    <template x-for="item in vocab.labels" :key="item.name">
+                      <button type="button" class="sugg-chip"
+                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                    </template>
+                    <span class="sugg-empty" x-show="vocab.labels.length === 0"
+                          x-text="vocabHint || 'none found for this source'"></span>
+                  </div>
+                </div>
+                <div class="sugg-group">
+                  <div class="sugg-group-title">Lifecycle events</div>
+                  <div id="sugg-lifecycle" class="sugg-chips">
+                    <template x-for="item in lifecycleChips" :key="item.name">
+                      <button type="button" class="sugg-chip"
+                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </template>
           </li>
         </template>
       </ol>
@@ -364,7 +418,6 @@
           <input class="field-input" id="new-step-name" type="text"
                  x-model="newStepName"
                  placeholder="Name a new step (e.g. In Progress), then Add"
-                 @focus="showSuggestions = true"
                  @keydown.enter.prevent="addStep()">
           <label class="step-wip-label">
             <input type="checkbox" x-model="newStepWip"> WIP
@@ -373,42 +426,6 @@
                   :disabled="!canAddStep" @click="addStep()">+ Add step</button>
           <span class="probe-status" id="stages-status"
                 :class="vocabClass" x-text="vocabStatus"></span>
-        </div>
-      </div>
-
-      <div id="suggestions-panel" style="margin-top: 1rem;" x-show="showSuggestions">
-        <p class="field-hint" id="binding-target" x-text="bindingTarget"></p>
-        {% if wizard_mode == "edit" %}
-        <div class="sugg-group">
-          <div class="sugg-group-title">Stages seen in imported data</div>
-          <div id="sugg-warehouse" class="sugg-chips">
-            <template x-for="item in vocab.warehouse" :key="item.name">
-              <button type="button" class="sugg-chip"
-                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
-            </template>
-            <span class="sugg-empty" x-show="vocab.warehouse.length === 0">appears after this workflow imports data</span>
-          </div>
-        </div>
-        {% endif %}
-        <div class="sugg-group">
-          <div class="sugg-group-title" x-text="labelsTitle"></div>
-          <div id="sugg-labels" class="sugg-chips">
-            <template x-for="item in vocab.labels" :key="item.name">
-              <button type="button" class="sugg-chip"
-                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
-            </template>
-            <span class="sugg-empty" x-show="vocab.labels.length === 0"
-                  x-text="vocabHint || 'none found for this source'"></span>
-          </div>
-        </div>
-        <div class="sugg-group">
-          <div class="sugg-group-title">Lifecycle events</div>
-          <div id="sugg-lifecycle" class="sugg-chips">
-            <template x-for="item in lifecycleChips" :key="item.name">
-              <button type="button" class="sugg-chip"
-                      @click="addMatch(item)" x-text="`+ ${item.name}`"></button>
-            </template>
-          </div>
         </div>
       </div>
       </div>
@@ -531,7 +548,6 @@
       activeIdx: null,
       flashIdx: null,            // step row to pulse after a chip click
       newStepName: '', newStepWip: true,
-      showSuggestions: false,
       // probe state
       sourceVerified: false,     // source actually resolved (not just well-formed)
       probeStatus: '', probeClass: 'probe-status',
@@ -561,13 +577,6 @@
             : 'a repository (owner/name) we can reach');
         if (this.steps.length === 0) missing.push('at least one step');
         return missing.length ? 'To save, add: ' + missing.join(', ') + '.' : '';
-      },
-      get bindingTarget() {
-        if (this.activeIdx === null || !this.steps[this.activeIdx]) {
-          return 'Click a chip to start a step from it — or name a step above and add it.';
-        }
-        const nm = this.steps[this.activeIdx].name.trim() || '(unnamed step)';
-        return `Chips add to the selected step: “${nm}”. Click another row to retarget.`;
       },
       get lifecycleChips() {
         return this.source === 'jira' ? JIRA_LIFECYCLE : GH_LIFECYCLE;
@@ -600,7 +609,6 @@
         this.steps.push({ name, wip: this.newStepWip, matches: [] });
         this.newStepName = '';
         this.activeIdx = this.steps.length - 1;
-        this.showSuggestions = true;
       },
       removeStep(idx) {
         this.steps.splice(idx, 1);
@@ -617,35 +625,13 @@
         this.steps.splice(j, 0, row);
         this.activeIdx = j;
       },
-      // A chip click is always a single, visible action that lands on
-      // exactly one step. Target precedence:
-      //   1. a selected step      → bind the match to it (the hint promises this)
-      //   2. a typed-but-uncommitted name in the add-step field
-      //                           → commit THAT step and bind the chip to it
-      //                             (so the typed name isn't orphaned as a
-      //                              phantom second step)
-      //   3. nothing yet          → seed a step named after the chip itself
+      // Chips live inside the active step, so they only ever bind to it.
       addMatch(item) {
+        const idx = this.activeIdx;
+        if (idx === null || !this.steps[idx]) return;
         const name = typeof item === 'string' ? item : item.name;
-        let idx = this.activeIdx;
-        const draft = this.newStepName.trim();
-        if (idx !== null && this.steps[idx]) {
-          const m = this.steps[idx].matches;
-          if (!m.includes(name)) m.push(name);
-        } else if (draft) {
-          this.steps.push({ name: draft, wip: this.newStepWip, matches: [name] });
-          this.newStepName = '';
-          idx = this.steps.length - 1;
-          this.activeIdx = idx;
-          this.showSuggestions = true;
-        } else {
-          const wip = (item && typeof item === 'object' && 'wip' in item)
-            ? !!item.wip : true;
-          this.steps.push({ name, wip, matches: [name] });
-          idx = this.steps.length - 1;
-          this.activeIdx = idx;
-          this.showSuggestions = true;
-        }
+        const m = this.steps[idx].matches;
+        if (!m.includes(name)) m.push(name);
         this.flashStep(idx);
       },
       flashStep(idx) {
@@ -819,7 +805,7 @@
         // The contract was saved with a working source; trust it so the
         // steps stay editable even if the network probe is flaky right now.
         this.sourceVerified = this.sourceComplete;
-        if (this.steps.length) { this.activeIdx = 0; this.showSuggestions = true; }
+        if (this.steps.length) this.activeIdx = 0;
         if (this.sourceComplete) this.probeVocab();
       },
     }));

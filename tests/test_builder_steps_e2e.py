@@ -1,14 +1,12 @@
 """E2E: the contract builder's Steps editor (Alpine component).
 
 Drives the real Alpine component in Chromium with the source probes
-stubbed via `app.state` — no network. Pins the chip-binding contract
-that bit users in the UX pass:
+stubbed via `app.state` — no network. Pins the chip-binding contract:
 
-  - Typing a name into the add-step field and then clicking a label
-    chip must commit *one* step with the typed name (not spawn a
-    second phantom step named after the chip), and clear the add-step
-    field. The leftover text in a step-shaped input was the confusing
-    "two steps" the user reported.
+  - Suggestion chips live *inside* the step they bind to. Only the
+    selected (green) row renders them, so a chip can only ever land on
+    the step the user is looking at — no phantom steps, no ambiguity.
+  - Selecting another step row retargets the chips to that step.
 """
 
 from __future__ import annotations
@@ -93,55 +91,80 @@ def _verify_source(page: Page) -> None:
     page.wait_for_selector("#add-step:visible", timeout=4000)
 
 
-class TestChipCommitsTypedStep:
-    def test_typed_name_plus_chip_makes_one_named_step(
+def _add_step(page: Page, name: str) -> None:
+    page.fill("#new-step-name", name)
+    page.click("#add-step")
+    page.wait_for_function(
+        "n => [...document.querySelectorAll('#steps-list .step-name-input')]"
+        ".some(i => i.value === n)",
+        arg=name,
+        timeout=4000,
+    )
+
+
+class TestChipsLiveInsideActiveStep:
+    def test_no_chips_before_a_step_exists(
+        self, server_url: str, page: Page
+    ):
+        """With a verified source but no step yet, there's no step to
+        bind to — so no suggestion chips are rendered anywhere."""
+        page.goto(server_url + "/admin/contracts/new")
+        _verify_source(page)
+        assert page.query_selector(".sugg-chip") is None
+
+    def test_chip_binds_to_the_step_it_sits_in(
         self, server_url: str, page: Page
     ):
         page.goto(server_url + "/admin/contracts/new")
         _verify_source(page)
+        _add_step(page, "Ready")
 
-        # Type a step name but DON'T press "+ Add step".
-        page.click("#new-step-name")
-        page.fill("#new-step-name", "Ready")
+        # The active row now renders its own suggestion chips...
+        chip = page.wait_for_selector(
+            "#steps-list .step-row #sugg-labels .sugg-chip >> text=ready",
+            timeout=4000,
+        )
+        # ...and the suggestions panel is a descendant of the step row.
+        inside = page.eval_on_selector(
+            "#suggestions-panel", "el => !!el.closest('.step-row')"
+        )
+        assert inside, "suggestions must live inside the step row"
 
-        # Click the "ready" label chip.
-        page.click("#sugg-labels .sugg-chip >> text=ready")
+        chip.click()
         page.wait_for_timeout(300)
-
         rows = page.query_selector_all("#steps-list .step-row")
-        assert len(rows) == 1, (
-            f"expected exactly one step, got {len(rows)} — a phantom "
-            "step was spawned from the chip"
-        )
-        name = rows[0].query_selector(".step-name-input").input_value()
-        assert name == "Ready", (
-            f"step should keep the typed name 'Ready', got {name!r}"
-        )
+        assert len(rows) == 1, f"a chip must not spawn a step, got {len(rows)}"
+        assert rows[0].query_selector(".step-name-input").input_value() == "Ready"
         pills = rows[0].query_selector_all(".match-pill")
-        assert len(pills) == 1
-        assert "ready" in pills[0].inner_text()
+        assert len(pills) == 1 and "ready" in pills[0].inner_text()
 
-        # The add-step field is consumed — no leftover step-shaped input.
-        assert page.input_value("#new-step-name") == "", (
-            "the add-step field must clear after committing the step"
-        )
-
-    def test_chip_binds_to_active_step_without_new_row(
+    def test_selecting_a_row_retargets_the_chips(
         self, server_url: str, page: Page
     ):
         page.goto(server_url + "/admin/contracts/new")
         _verify_source(page)
-        # Commit a step explicitly.
-        page.fill("#new-step-name", "Ready")
-        page.click("#add-step")
-        page.wait_for_selector("#steps-list .step-row", timeout=3000)
-        # Now click a chip — it should bind to the active step, not add a row.
-        page.click("#sugg-labels .sugg-chip >> text=in-review")
-        page.wait_for_timeout(300)
+        _add_step(page, "Ready")
+        _add_step(page, "Done")  # this one is now active
+
+        # Select the first row; its chips appear, the second row's vanish.
         rows = page.query_selector_all("#steps-list .step-row")
-        assert len(rows) == 1
-        pills = rows[0].query_selector_all(".match-pill")
-        assert any("in-review" in pl.inner_text() for pl in pills)
+        rows[0].click()
+        page.wait_for_function(
+            "() => { const p = document.querySelector('#suggestions-panel');"
+            "return p && p.closest('.step-row')"
+            "  .querySelector('.step-name-input').value === 'Ready'; }",
+            timeout=4000,
+        )
+        page.click(
+            "#steps-list .step-row #sugg-labels .sugg-chip >> text=in-review"
+        )
+        page.wait_for_timeout(300)
+
+        rows = page.query_selector_all("#steps-list .step-row")
+        ready_pills = [p.inner_text() for p in rows[0].query_selector_all(".match-pill")]
+        done_pills = [p.inner_text() for p in rows[1].query_selector_all(".match-pill")]
+        assert any("in-review" in t for t in ready_pills), ready_pills
+        assert not any("in-review" in t for t in done_pills), done_pills
 
 
 class TestAddStepIsVisuallyDistinct:
