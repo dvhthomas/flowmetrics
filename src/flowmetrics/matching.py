@@ -15,8 +15,15 @@ An `event` matcher targets `signal` (via the source's code→signal map);
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from . import signals
+from .canonical import StageTransition
 from .contract import Matcher, Step
+
+# Stage assigned to a transition that matches no step — surfaced as a
+# coverage-gap bucket rather than silently dropped.
+UNMATCHED_STAGE = "_unmatched"
 
 
 def matcher_matches(
@@ -39,3 +46,28 @@ def step_for(
         matcher_matches(m, source=source, stage=stage, signal=signal)
         for m in step.effective_matchers
     )
+
+
+def remap_transitions(
+    transitions: list[StageTransition],
+    steps: list[Step],
+    *,
+    source: str,
+) -> list[StageTransition]:
+    """Relabel each transition's `stage` to the step it belongs to.
+
+    First step wins (steps are in kanban order); a transition matching
+    no step is relabelled `_unmatched`. With no steps, transitions pass
+    through unchanged (adapter-native stages — backward compatible).
+    """
+    if not steps:
+        return list(transitions)
+    out: list[StageTransition] = []
+    for t in transitions:
+        stage = UNMATCHED_STAGE
+        for step in steps:
+            if step_for(step, source=source, stage=t.stage, signal=t.signal):
+                stage = step.name
+                break
+        out.append(replace(t, stage=stage))
+    return out

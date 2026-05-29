@@ -32,6 +32,7 @@ from pathlib import Path
 import duckdb
 
 from .contract import Contract
+from .matching import remap_transitions
 from .service import make_github_source, make_jira_source
 from .sources.intervals import (
     github_workitem_to_transitions,
@@ -311,6 +312,11 @@ def materialise(
     transitions = []
     for item in items:
         transitions.extend(to_txs(item))
+    # Relabel adapter-native stages to the contract's step names (the
+    # user's workflow). No-op when the contract defines no steps.
+    transitions = remap_transitions(
+        transitions, contract.steps, source=contract.source
+    )
     _write_transitions_parquet(
         transitions=transitions,
         contract_source=contract.source,
