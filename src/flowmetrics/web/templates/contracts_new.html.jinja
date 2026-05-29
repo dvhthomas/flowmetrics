@@ -356,8 +356,8 @@
                           x-text="`captures source stage “${step.name || '(unnamed)'}”`"></span>
                   </template>
                   <template x-for="(m, mi) in step.matches" :key="mi">
-                    <span class="match-pill">
-                      <span x-text="m"></span>
+                    <span class="match-pill" :title="m.kind">
+                      <span x-text="m.label || m.value"></span>
                       <button type="button" title="Remove this match"
                               @click.stop="step.matches.splice(mi, 1)">×</button>
                     </span>
@@ -389,7 +389,8 @@
                   <div id="sugg-warehouse" class="sugg-chips">
                     <template x-for="item in vocab.warehouse" :key="item.name">
                       <button type="button" class="sugg-chip"
-                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                              @click.stop="addMatch({kind: 'stage', value: item.name, label: item.name})"
+                              x-text="`+ ${item.name}`"></button>
                     </template>
                     <span class="sugg-empty" x-show="vocab.warehouse.length === 0">appears after this workflow imports data</span>
                   </div>
@@ -400,7 +401,8 @@
                   <div id="sugg-labels" class="sugg-chips">
                     <template x-for="item in vocab.labels" :key="item.name">
                       <button type="button" class="sugg-chip"
-                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                              @click.stop="addMatch({kind: labelKind, value: item.name, label: item.name})"
+                              x-text="`+ ${item.name}`"></button>
                     </template>
                     <span class="sugg-empty" x-show="vocab.labels.length === 0"
                           x-text="vocabHint || 'none found for this source'"></span>
@@ -409,9 +411,10 @@
                 <div class="sugg-group">
                   <div class="sugg-group-title">Lifecycle events</div>
                   <div id="sugg-lifecycle" class="sugg-chips">
-                    <template x-for="item in lifecycleChips" :key="item.name">
+                    <template x-for="item in lifecycleChips" :key="item.code">
                       <button type="button" class="sugg-chip"
-                              @click.stop="addMatch(item)" x-text="`+ ${item.name}`"></button>
+                              @click.stop="addMatch({kind: 'event', value: item.code, label: item.name})"
+                              x-text="`+ ${item.name}`"></button>
                     </template>
                   </div>
                 </div>
@@ -525,23 +528,26 @@
 </div>
 
 <script>
+  // Lifecycle chips: `name` is the friendly label shown on the chip;
+  // `code` is the stable matcher code stored (signals.event_codes_for).
   const GH_LIFECYCLE = [
-    {name: 'PR opened', wip: false},
-    {name: 'Marked ready for review', wip: true},
-    {name: 'Changes requested', wip: true},
-    {name: 'Review approved', wip: true},
-    {name: 'PR merged', wip: false},
-    {name: 'PR closed without merge', wip: false},
-    {name: 'Issue opened', wip: false},
-    {name: 'Issue closed', wip: false},
+    {name: 'PR opened', code: 'pr-opened', wip: false},
+    {name: 'Ready for review', code: 'pr-ready', wip: true},
+    {name: 'Changes requested', code: 'changes-requested', wip: true},
+    {name: 'Review approved', code: 'approved', wip: true},
+    {name: 'PR merged', code: 'pr-merged', wip: false},
+    {name: 'Issue opened', code: 'issue-opened', wip: false},
+    {name: 'Issue closed', code: 'issue-closed', wip: false},
   ];
   const JIRA_LIFECYCLE = [
-    {name: 'Issue created', wip: false},
-    {name: 'Assigned', wip: true},
-    {name: 'Resolved', wip: false},
-    {name: 'Reopened', wip: true},
-    {name: 'Closed', wip: false},
+    {name: 'Issue created', code: 'created', wip: false},
+    {name: 'Status changed', code: 'status-changed', wip: true},
+    {name: 'Resolved', code: 'resolved', wip: false},
   ];
+  // Map an event code back to its friendly label (for hydrate).
+  const EVENT_LABELS = Object.fromEntries(
+    [...GH_LIFECYCLE, ...JIRA_LIFECYCLE].map((e) => [e.code, e.name])
+  );
   const HEADERS = {
     'Content-Type': 'application/json', 'X-Requested-With': 'fetch',
   };
@@ -599,6 +605,9 @@
       get labelsTitle() {
         return this.source === 'jira' ? 'Statuses in the project' : 'Labels in the repo';
       },
+      get labelKind() {
+        return this.source === 'jira' ? 'status' : 'label';
+      },
 
       // ---- lifecycle ----
       init() {
@@ -647,12 +656,15 @@
         this.activeIdx = j;
       },
       // Chips live inside the active step, so they only ever bind to it.
-      addMatch(item) {
+      // `matcher` is a typed {kind, value, label}.
+      addMatch(matcher) {
         const idx = this.activeIdx;
         if (idx === null || !this.steps[idx]) return;
-        const name = typeof item === 'string' ? item : item.name;
         const m = this.steps[idx].matches;
-        if (!m.includes(name)) m.push(name);
+        const dup = m.some(
+          (x) => x.kind === matcher.kind && x.value === matcher.value
+        );
+        if (!dup) m.push(matcher);
         this.flashStep(idx);
       },
       flashStep(idx) {
@@ -747,7 +759,9 @@
             lines.push(`      wip: ${s.wip ? 'true' : 'false'}`);
             if (s.matches.length) {
               lines.push('      matches:');
-              for (const m of s.matches) lines.push(`        - ${q(m)}`);
+              for (const m of s.matches) {
+                lines.push(`        - ${m.kind}: ${q(m.value)}`);
+              }
             }
           }
         }
@@ -810,11 +824,20 @@
         this.jiraProject = p.jira_project || '';
         if (Array.isArray(p.steps) && p.steps.length) {
           this.steps = p.steps.map((s) => ({
-            name: s.name, wip: !!s.wip, matches: (s.matches || []).slice(),
+            name: s.name, wip: !!s.wip,
+            matches: (s.matches || []).map((m) => ({
+              kind: m.kind, value: m.value,
+              // Event codes show their friendly label; others show value.
+              label: m.kind === 'event'
+                ? (EVENT_LABELS[m.value] || m.value) : m.value,
+            })),
           }));
         } else if (p.states) {
           const add = (names, wip) => (names || []).forEach(
-            (n) => this.steps.push({ name: n, wip, matches: [n] }));
+            (n) => this.steps.push({
+              name: n, wip,
+              matches: [{ kind: 'stage', value: n, label: n }],
+            }));
           add(p.states.backlog, false);
           add(p.states.wip, true);
           add(p.states.done, false);
