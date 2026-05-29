@@ -108,8 +108,7 @@ Validation rejects an `event:` code outside this set with a message that
 lists the valid codes — so a hand-edited typo fails loudly at save/parse,
 not silently at materialise.
 
-YAML shape (backward compatible — a bare string keeps today's meaning,
-"match the stage text"):
+YAML shape (each matcher is a typed mapping; no bare strings):
 
 ```yaml
 steps:
@@ -129,8 +128,8 @@ steps:
   transition. (Matches today's mental model.)
 - **No cross-criteria AND in v1.** "Label A AND label B AND open" needs
   point-in-time snapshot state, which only the label-mode snapshot has
-  (not the transition stream). Defer; OR-of-typed-matchers covers the
-  common cases. (Open question below.)
+  (not the transition stream). Deferred to its own spec; OR-of-typed-
+  matchers covers the common cases.
 
 ### 2. A remap layer at materialise time
 
@@ -140,8 +139,8 @@ step names before they're written to the warehouse:
 ```
 remap_transitions(raw: list[StageTransition], steps) -> list[StageTransition]
 # each raw transition whose (signal|stage) matches a step's matcher
-# is rewritten stage=<step.name>; unmatched transitions are dropped
-# (or kept under an "_unmatched" stage — see open questions).
+# is rewritten stage=<step.name>; a transition matching no step is
+# relabelled stage="_unmatched" (surfaced as a coverage-gap bucket).
 ```
 
 Result: the warehouse `stage` column holds the user's step names, so
@@ -169,30 +168,37 @@ compatible).
 - **Always:** keep a no-steps contract working exactly as today
   (adapter-native stages); share one matcher evaluator between
   preview and materialise.
-- **Ask first:** changing the warehouse `stage` semantics (remap vs
-  raw); dropping vs bucketing unmatched transitions; the YAML schema
-  change.
-- **Never:** silently change existing windowed/role contracts' output
-  without a migration path.
+- **Ask first:** any change to the settled decisions above (remap
+  timing, `_unmatched` handling, OR-only, no-migration clean break).
+- **Never:** silently drop transitions (unmatched ones go to
+  `_unmatched`, never the floor).
 
-## Open questions (need a decision before implementation)
+## Decisions (settled)
 
-1. **Remap at materialise (rewrite `stage`) vs. remap at query time
-   (keep raw, map in the view)?** Materialise-time is simpler downstream
-   but requires re-materialising when steps change; query-time is
-   flexible but spreads matcher logic into every metric.
-2. **Unmatched transitions:** drop them, or keep under an `_unmatched`
-   stage surfaced in CFD/aging (so the user sees coverage gaps)?
-3. **Do we actually need cross-criteria AND** (e.g., "open AND
-   label:blocked")? If yes, it's a bigger change (snapshot state, not
-   stream) and should be its own spec.
-4. **Schema migration:** bare-string `matches` stay valid (= `stage`
-   match); do we auto-upgrade the builder's existing contracts' chips to
-   typed matchers, or only new ones?
-5. **Event-code names:** confirm the kebab codes in the table above
-   (`pr-ready`, `changes-requested`, …). Alternative: reuse the full
-   `signals.py` slugs verbatim (`github-pr-ready-for-review`) — stabler
-   (literally the constant) but longer and platform-prefixed.
+All open questions are resolved — ready to implement.
+
+1. **Event-code vocabulary:** short kebab codes (`pr-ready`,
+   `changes-requested`, `pr-merged`, …) scoped by source, mapped 1:1 to
+   `signals.py`. The UI chip shows the friendly label.
+2. **Remap timing:** **at materialise.** Each transition's `stage` is
+   rewritten to the matching step name during backfill, so the warehouse
+   stores step names and every downstream metric + `states.wip` works
+   unchanged. Editing steps requires a re-backfill to take effect.
+3. **Unmatched transitions:** **surface as `_unmatched`** — relabel
+   strays to a single `_unmatched` stage so the dashboard shows a
+   coverage-gap bucket (parity with the dry-run preview). Nothing is
+   silently dropped.
+4. **AND logic:** **OR-only in v1.** A step matches on *any* of its
+   matchers. Cross-criteria AND ("open AND label:blocked") needs
+   point-in-time snapshot state and is deferred to its own spec.
+5. **Migration:** **none — clean break.** Nobody uses this yet, so there
+   is no translator/upgrade code. The few existing test contracts are
+   rewritten by hand to the typed schema as part of the work, and
+   **bare-string `matches` support is dropped**: a matcher must be a
+   typed mapping (`{event|label|status|stage: value}`). A step with an
+   *empty* `matches` still falls back to `stage: <step.name>` (the
+   existing `effective_matches` behavior), so simple "stage named like
+   the step" workflows need no matchers at all.
 
 ## Success criteria
 
