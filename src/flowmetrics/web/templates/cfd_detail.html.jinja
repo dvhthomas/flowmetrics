@@ -14,8 +14,12 @@
 
 {% block content %}
   <style>
-    .cfd-layout { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .cfd-layout { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.4rem; }
     .cfd-chart-col { flex: 1; min-width: 0; }
+    /* The chart tile's own margin would offset its border box inside the
+       column while the panel stretches to the full row — making the panel
+       taller top and bottom. Zero it so tile and panel align exactly. */
+    .cfd-chart-col > .metric { margin: 0; }
     .cfd-panel {
       flex: 0 0 17rem; align-self: stretch;
       border: 0.0625rem solid var(--border); border-radius: 0.5rem;
