@@ -177,6 +177,71 @@ def probe_source_vocab(source: str, target: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 
+def _github_pr_stage(it: dict) -> str:
+    """Map a GitHub search-result PR to the dry-run preview stage."""
+    if it.get("state") == "open":
+        return "Draft" if it.get("draft") else "PR opened"
+    if it.get("pull_request", {}).get("merged_at"):
+        return "PR merged"
+    return "PR closed"
+
+
+def _github_dry_run_items(
+    repo: str, since_date: date, until_date: date, items_cap: int,
+) -> list[dict]:
+    url = (
+        f"https://api.github.com/search/issues?q=repo:{repo}"
+        f"+is:pr+updated:{since_date.isoformat()}.."
+        f"{until_date.isoformat()}&per_page={min(items_cap, 100)}"
+    )
+    try:
+        r = httpx.get(url, timeout=10.0, headers=github_headers())
+    except httpx.HTTPError:
+        return []
+    if r.status_code != 200:
+        return []
+    return [
+        {
+            "id": str(it.get("number") or ""),
+            "title": it.get("title") or "",
+            "url": it.get("html_url"),
+            "current_stage": _github_pr_stage(it),
+        }
+        for it in r.json().get("items", [])[:items_cap]
+    ]
+
+
+def _jira_dry_run_items(
+    base: str, project: str, since_date: date, until_date: date, items_cap: int,
+) -> list[dict]:
+    jql = (
+        f"project = {project} AND updated >= "
+        f"\"{since_date.isoformat()}\" AND updated <= "
+        f"\"{until_date.isoformat()}\""
+    )
+    url = (
+        f"{base.rstrip('/')}/rest/api/2/search?jql="
+        f"{httpx.QueryParams({'jql': jql})['jql']}"
+        f"&maxResults={min(items_cap, 100)}&fields=summary,status"
+    )
+    try:
+        r = httpx.get(url, timeout=10.0)
+    except httpx.HTTPError:
+        return []
+    if r.status_code != 200:
+        return []
+    out: list[dict] = []
+    for it in r.json().get("issues", [])[:items_cap]:
+        fields = it.get("fields") or {}
+        out.append({
+            "id": it.get("key") or "",
+            "title": fields.get("summary") or "",
+            "url": f"{base.rstrip('/')}/browse/{it.get('key')}",
+            "current_stage": (fields.get("status") or {}).get("name") or "",
+        })
+    return out
+
+
 def dry_run_fetch(
     *, source: str, target: dict, since: str, items_cap: int,
 ) -> dict:
@@ -193,76 +258,26 @@ def dry_run_fetch(
     except (TypeError, ValueError):
         return {"items": [], "stopped_by": "error", "window_to": None}
     until_date = since_date + timedelta(days=30)
+    window_to = until_date.isoformat()
+    target = target or {}
+    err = {"items": [], "stopped_by": "error", "window_to": window_to}
 
-    items: list[dict] = []
     if source == "github":
-        repo = (target or {}).get("repo") or ""
+        repo = target.get("repo") or ""
         if "/" not in repo:
-            return {
-                "items": [], "stopped_by": "error",
-                "window_to": until_date.isoformat(),
-            }
-        url = (
-            f"https://api.github.com/search/issues?q=repo:{repo}"
-            f"+is:pr+updated:{since_date.isoformat()}.."
-            f"{until_date.isoformat()}&per_page={min(items_cap, 100)}"
-        )
-        try:
-            r = httpx.get(url, timeout=10.0, headers=github_headers())
-            if r.status_code == 200:
-                for it in r.json().get("items", [])[:items_cap]:
-                    state = "PR closed"
-                    if it.get("state") == "open":
-                        state = "Draft" if it.get("draft") else "PR opened"
-                    elif it.get("pull_request", {}).get("merged_at"):
-                        state = "PR merged"
-                    items.append({
-                        "id": str(it.get("number") or ""),
-                        "title": it.get("title") or "",
-                        "url": it.get("html_url"),
-                        "current_stage": state,
-                    })
-        except httpx.HTTPError:
-            pass
+            return err
+        items = _github_dry_run_items(repo, since_date, until_date, items_cap)
     elif source == "jira":
-        base = (target or {}).get("jira_url") or ""
-        project = (target or {}).get("jira_project") or ""
+        base = target.get("jira_url") or ""
+        project = target.get("jira_project") or ""
         if not (base and project):
-            return {
-                "items": [], "stopped_by": "error",
-                "window_to": until_date.isoformat(),
-            }
-        jql = (
-            f"project = {project} AND updated >= "
-            f"\"{since_date.isoformat()}\" AND updated <= "
-            f"\"{until_date.isoformat()}\""
-        )
-        url = (
-            f"{base.rstrip('/')}/rest/api/2/search?jql="
-            f"{httpx.QueryParams({'jql': jql})['jql']}"
-            f"&maxResults={min(items_cap, 100)}&fields=summary,status"
-        )
-        try:
-            r = httpx.get(url, timeout=10.0)
-            if r.status_code == 200:
-                for it in r.json().get("issues", [])[:items_cap]:
-                    fields = it.get("fields") or {}
-                    status = (fields.get("status") or {}).get("name") or ""
-                    items.append({
-                        "id": it.get("key") or "",
-                        "title": fields.get("summary") or "",
-                        "url": f"{base.rstrip('/')}/browse/{it.get('key')}",
-                        "current_stage": status,
-                    })
-        except httpx.HTTPError:
-            pass
+            return err
+        items = _jira_dry_run_items(base, project, since_date, until_date, items_cap)
+    else:
+        items = []
 
     stopped_by = "items_cap" if len(items) >= items_cap else "time_window"
-    return {
-        "items": items,
-        "stopped_by": stopped_by,
-        "window_to": until_date.isoformat(),
-    }
+    return {"items": items, "stopped_by": stopped_by, "window_to": window_to}
 
 
 def bucket_items_by_step(
