@@ -64,14 +64,26 @@ def open_warehouse(data_dir: Path) -> duckdb.DuckDBPyConnection:
         data_dir / "transitions" / "**" / "*.parquet"
     ).as_posix()
     try:
-        # Transitions are append-only stage-entry events; identical
-        # rows across snapshots collapse via DISTINCT. No
-        # materialised_at column to order by (transitions don't
-        # carry one), but exact-row dedup is enough.
+        # Keep every transition from the LATEST run per item. Remap
+        # rewrites `stage` at materialise time, so re-running after a
+        # step change yields the same (item_id, entered_at) with a
+        # different stage — exact-row DISTINCT would keep both and
+        # pollute the warehouse with stale vocab. DENSE_RANK by
+        # (materialised_at, run_id) keeps all rows of the winning run
+        # and drops superseded ones (NULLS LAST so any pre-upgrade rows
+        # without the stamp lose to a re-materialised run).
+        # union_by_name tolerates that schema bump across snapshots.
         con.execute(
             f"CREATE VIEW transitions AS "
-            f"SELECT DISTINCT * FROM read_parquet("
-            f"'{transitions_glob}', hive_partitioning = true)"
+            f"SELECT * EXCLUDE (_rr) FROM ( "
+            f"  SELECT *, DENSE_RANK() OVER ( "
+            f"    PARTITION BY contract_id, source, item_id "
+            f"    ORDER BY materialised_at DESC NULLS LAST, "
+            f"             run_id DESC NULLS LAST"
+            f"  ) AS _rr "
+            f"  FROM read_parquet('{transitions_glob}', "
+            f"    hive_partitioning = true, union_by_name = true)"
+            f") WHERE _rr = 1"
         )
     except duckdb.IOException:
         con.execute(
@@ -81,7 +93,9 @@ def open_warehouse(data_dir: Path) -> duckdb.DuckDBPyConnection:
             "NULL::TIMESTAMP AS entered_at, "
             "NULL::VARCHAR AS stage, "
             "NULL::VARCHAR AS signal, "
-            "NULL::VARCHAR AS contract_id "
+            "NULL::VARCHAR AS contract_id, "
+            "NULL::TIMESTAMP AS materialised_at, "
+            "NULL::VARCHAR AS run_id "
             "WHERE FALSE"
         )
 

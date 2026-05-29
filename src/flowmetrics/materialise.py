@@ -135,8 +135,12 @@ def _compact_one(
         # No hive_partitioning: read the pure data columns so the
         # compacted file's schema matches a normal snapshot —
         # year/month/day stay path-only, never baked in as columns.
+        # union_by_name tolerates a schema bump across snapshots (e.g.
+        # transitions gaining materialised_at/run_id); older files get
+        # NULL for the new columns and are superseded at dedup time.
         con.execute(
-            f"CREATE VIEW src AS SELECT * FROM read_parquet([{file_list}])"
+            f"CREATE VIEW src AS SELECT * FROM read_parquet("
+            f"[{file_list}], union_by_name = true)"
         )
         out_literal = str(tmp_path).replace("'", "''")
         con.execute(f"COPY ({dedup_sql}) TO '{out_literal}' (FORMAT PARQUET)")
@@ -154,9 +158,9 @@ def compact_contract(
 ) -> None:
     """Collapse a contract's accumulated snapshot files into one
     file per table. Reads every snapshot, applies the read view's
-    dedup (latest per work item; DISTINCT for transitions), writes
-    a single file, then deletes the originals — never dropping a
-    work item, only the redundant older snapshots of it.
+    dedup (latest run per work item AND per transition), writes a
+    single file, then deletes the originals — never dropping a work
+    item, only redundant/superseded older snapshots of it.
     """
     _compact_one(
         contract_dir=(
@@ -177,7 +181,17 @@ def compact_contract(
             data_dir / "transitions" / f"contract_id={contract_name}"
         ),
         stem="transitions",
-        dedup_sql="SELECT DISTINCT * FROM src",
+        # Keep every transition from the LATEST run per item (DENSE_RANK
+        # so all rows sharing the winning (materialised_at, run_id) stay).
+        # Must mirror the read view exactly.
+        dedup_sql=(
+            "SELECT * EXCLUDE (_rr) FROM ("
+            " SELECT *, DENSE_RANK() OVER ("
+            "  PARTITION BY contract_id, source, item_id"
+            "  ORDER BY materialised_at DESC NULLS LAST,"
+            "           run_id DESC NULLS LAST) AS _rr"
+            " FROM src) WHERE _rr = 1"
+        ),
         now=now,
     )
 
@@ -322,6 +336,8 @@ def materialise(
         contract_source=contract.source,
         contract_id=contract.name,
         out_path=transitions_path,
+        materialised_at=completed_at,
+        run_id=run_id,
     )
 
     manifest = RunManifest(
@@ -364,7 +380,9 @@ CREATE TEMPORARY TABLE transitions (
     entered_at          TIMESTAMP,
     stage               VARCHAR,
     signal              VARCHAR,
-    contract_id         VARCHAR
+    contract_id         VARCHAR,
+    materialised_at     TIMESTAMP,
+    run_id              VARCHAR
 )
 """
 
@@ -464,9 +482,14 @@ def _write_transitions_parquet(
     contract_source: str,
     contract_id: str,
     out_path: Path,
+    materialised_at: datetime,
+    run_id: str,
 ) -> None:
     # `source` comes from the contract — we already dispatched on it
     # to build the transitions, so the column is constant per call.
+    # `materialised_at` + `run_id` stamp the run so the read view can
+    # keep only the latest run per item (remap rewrites `stage`, so
+    # otherwise stale stage vocab would linger across re-materialises).
     rows = [
         (
             contract_source,
@@ -475,6 +498,8 @@ def _write_transitions_parquet(
             t.stage,
             t.signal,
             contract_id,
+            materialised_at,
+            run_id,
         )
         for t in transitions
     ]
@@ -484,7 +509,7 @@ def _write_transitions_parquet(
         con.execute(_TRANSITIONS_DDL)
         if rows:
             con.executemany(
-                "INSERT INTO transitions VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO transitions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 rows,
             )
         path_literal = str(tmp_path).replace("'", "''")
