@@ -140,7 +140,7 @@ def flow_balance_spec_json(model: CfdModel) -> str:
             ],
         },
         "config": {
-            "view": {"stroke": None},
+            "view": {"fill": None, "stroke": None},
             "axis": {
                 "labelColor": "__theme:fg__",
                 "titleColor": "__theme:muted__",
@@ -268,7 +268,7 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
             # just clutter.
         },
         "config": {
-            "view": {"stroke": None},
+            "view": {"fill": None, "stroke": None},
             "axis": {
                 "labelFont": (
                     "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"

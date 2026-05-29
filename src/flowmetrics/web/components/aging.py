@@ -297,7 +297,7 @@ def _aging_to_vega(model: AgingModel) -> dict[str, Any]:
             },
         ],
         "config": {
-            "view": {"stroke": None},
+            "view": {"fill": None, "stroke": None},
             "axis": {
                 "labelFont": (
                     "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"

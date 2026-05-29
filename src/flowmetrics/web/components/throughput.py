@@ -286,7 +286,7 @@ def _throughput_to_vega(model: ThroughputModel) -> dict[str, Any]:
             *band_layers,
         ],
         "config": {
-            "view": {"stroke": None},
+            "view": {"fill": None, "stroke": None},
             "axis": {
                 "labelFont": (
                     "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"

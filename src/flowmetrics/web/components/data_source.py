@@ -161,7 +161,7 @@ def _data_source_to_vega(model: DataSourceModel) -> dict[str, Any]:
             ],
         },
         "config": {
-            "view": {"stroke": None},
+            "view": {"fill": None, "stroke": None},
             "axis": {
                 "labelColor": "__theme:muted__",
                 "titleColor": "__theme:muted__",
