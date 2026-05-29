@@ -57,6 +57,10 @@
   </div>
   <a class="filter-reset" href="{{ request.url.path }}">Reset</a>
 
+  {# The reference period only drives aging thresholds + forecasts.
+     Pages that don't use it (e.g. the CFD) pass `hide_reference` so
+     the control isn't shown as confusing dead UI. #}
+  {% if not hide_reference %}
   <details class="filter-advanced"{% if contract.window.is_advanced %} open{% endif %}>
     <summary>Advanced</summary>
     <p class="filter-hint">
@@ -76,6 +80,7 @@
       </select>
     </label>
   </details>
+  {% endif %}
 </form>
 <script>
   // Submit the filter form, emitting only the params the
@@ -91,9 +96,10 @@
       form.elements.anchor.disabled = true;
       form.elements.view_days.disabled = true;
     }
-    // A default-length reference needn't ride in the URL.
+    // A default-length reference needn't ride in the URL. (Absent on
+    // pages that hide the reference control, e.g. the CFD.)
     const ref = form.elements.ref_days;
-    if (ref.value === ref.dataset.default) ref.disabled = true;
+    if (ref && ref.value === ref.dataset.default) ref.disabled = true;
     form.requestSubmit();
   }
   // Period dropdown changed. A preset applies immediately;

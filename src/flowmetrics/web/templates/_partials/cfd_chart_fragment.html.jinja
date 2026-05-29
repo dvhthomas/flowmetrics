@@ -30,16 +30,23 @@
     const METRICS = {{ cfd_daily_metrics(data) | safe }};
     const spec = {{ vega_spec(data) | safe }};
     spec.height = {{ _h }};
-    vegaEmbed("#{{ chart_container_id }}", window.applyTheme(spec), {
-      actions: false,
-      renderer: "svg"
-    }).then(function (res) {
-      window.__flowmetricsCfdView = res.view;
-      setupCfdHover(res.view, METRICS);
-    }).catch(function (err) {
-      const el = document.getElementById("{{ chart_container_id }}");
-      el.innerText = "Chart render failed: " + err;
-    });
+    function embed() {
+      vegaEmbed("#{{ chart_container_id }}", window.applyTheme(spec), {
+        actions: false,
+        renderer: "svg"
+      }).then(function (res) {
+        window.__flowmetricsCfdView = res.view;
+        setupCfdHover(res.view, METRICS);
+      }).catch(function (err) {
+        const el = document.getElementById("{{ chart_container_id }}");
+        el.innerText = "Chart render failed: " + err;
+      });
+    }
+    // Defer one frame so the side panel (parsed AFTER this inline script
+    // on first load) is laid out before Vega measures the container —
+    // otherwise the chart renders at full width and overflows the panel.
+    if (window.requestAnimationFrame) { requestAnimationFrame(embed); }
+    else { embed(); }
 
     // Vertical hover guideline linked to the x-axis: as the cursor
     // moves, snap a dashed line to the nearest day and (if a side
@@ -131,8 +138,16 @@
         rule.style.opacity = "1";
         renderPanel(nd.iso);
       }
+      // Default the panel to the most recent day, so it's never an empty
+      // block; restore that when the cursor leaves.
+      const dates = Object.keys(metrics);
+      const defaultIso = dates.length ? dates[dates.length - 1] : null;
+      if (defaultIso) renderPanel(defaultIso);
       svg.addEventListener("mousemove", onMove);
-      svg.addEventListener("mouseleave", function () { rule.style.opacity = "0"; });
+      svg.addEventListener("mouseleave", function () {
+        rule.style.opacity = "0";
+        if (defaultIso) renderPanel(defaultIso);
+      });
     }
   })();
 </script>

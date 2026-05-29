@@ -1,5 +1,17 @@
 {% extends "_base.html.jinja" %}
 
+{# The CFD only uses the Period (window); the reference period drives
+   aging thresholds + forecasts, not the CFD — so hide it here. #}
+{% block filter_bar %}
+  <nav class="filter-bar" aria-label="Filters">
+    <div class="container">
+      {% with hide_reference = True %}
+        {% include "_partials/period_filter.html.jinja" %}
+      {% endwith %}
+    </div>
+  </nav>
+{% endblock %}
+
 {% block content %}
   <style>
     .cfd-layout { display: flex; gap: 1.25rem; align-items: flex-start; }

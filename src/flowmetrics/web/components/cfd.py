@@ -28,6 +28,13 @@ from ...warehouse.queries import (
 from ...windows import Window
 from ._vega import to_vega
 
+# A categorical palette derived from the brand hue: nine colours evenly
+# spaced around the wheel at a shared saturation / lightness — distinct
+# but thematically linked (brand green first). Defined as CSS theme
+# tokens (`--cfd-1`…`--cfd-9`) so they resolve from the theme at embed
+# time, like every other chart colour. Replaces Vega's off-brand "set3".
+_CFD_PALETTE = [f"__theme:cfd-{i}__" for i in range(1, 10)]
+
 
 def render(
     con: duckdb.DuckDBPyConnection,
@@ -177,7 +184,7 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
                 "type": "nominal",
                 "scale": {
                     "domain": list(model.stages),
-                    "scheme": "set3",
+                    "range": _CFD_PALETTE,
                 },
                 "legend": {"title": None, "orient": "top-right"},
             },
@@ -190,20 +197,9 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
                 "type": "quantitative",
                 "sort": "descending",
             },
-            "tooltip": [
-                {"field": "date_display", "type": "nominal", "title": "Date"},
-                {"field": "stage", "type": "nominal", "title": "Stage"},
-                {
-                    "field": "wip",
-                    "type": "quantitative",
-                    "title": "WIP in stage",
-                },
-                {
-                    "field": "cumulative",
-                    "type": "quantitative",
-                    "title": "Cumulative arrivals",
-                },
-            ],
+            # No per-band Vega tooltip — the hover side panel is the
+            # readout (full per-day breakdown), so a second popup would
+            # just clutter.
         },
         "config": {
             "view": {"stroke": None},
