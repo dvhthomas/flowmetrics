@@ -333,8 +333,11 @@
     .home-workflow-item {
       margin: 0;
       border-bottom: 0.0625rem solid var(--border);
+      display: flex;
+      align-items: stretch;
     }
     .home-workflow-link {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -345,6 +348,19 @@
     }
     .home-workflow-link:hover {
       background: var(--surface);
+    }
+    .home-workflow-edit {
+      display: flex;
+      align-items: center;
+      padding: 0 0.9rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8125rem;
+      border-left: 0.0625rem solid var(--border);
+    }
+    .home-workflow-edit:hover {
+      background: var(--surface);
+      color: var(--p-600);
     }
     .home-workflow-name {
       font-family: var(--head-font);
