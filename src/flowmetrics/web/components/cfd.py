@@ -84,6 +84,72 @@ def cfd_daily_metrics_json(model: CfdModel) -> str:
     return json.dumps(obj, separators=(",", ":"))
 
 
+def flow_balance_spec_json(model: CfdModel) -> str:
+    """Vega spec for the daily flow-balance view — arrivals vs
+    departures per day. When the two track each other the system is
+    balanced; arrivals persistently above departures means WIP is
+    growing. Skips day 0 (its 'arrivals' is the window carry-in, not a
+    daily rate) so the scale reflects true per-day flow."""
+    metrics = daily_flow_metrics(model)
+    values: list[dict] = []
+    for m in metrics[1:]:
+        values.append({
+            "date_iso": m.date_iso, "date_display": m.date_display,
+            "kind": "Arrivals", "count": m.arrivals,
+        })
+        values.append({
+            "date_iso": m.date_iso, "date_display": m.date_display,
+            "kind": "Departures", "count": m.departures,
+        })
+    step = max(1, (len(metrics) + 9) // 10)
+    axis_label_values = [m.date_iso for m in metrics[1::step]]
+    spec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "background": "transparent",
+        "padding": 12,
+        "width": "container",
+        "height": 200,
+        "data": {"values": values},
+        "mark": {"type": "line", "point": True, "interpolate": "monotone"},
+        "encoding": {
+            "x": {
+                "field": "date_iso", "type": "nominal",
+                "sort": [m.date_iso for m in metrics[1:]],
+                "axis": {
+                    "title": "Date (UTC)", "labelAngle": 0,
+                    "values": axis_label_values,
+                    "labelExpr": "utcFormat(datetime(datum.value), '%b %d')",
+                },
+            },
+            "y": {
+                "field": "count", "type": "quantitative",
+                "axis": {"title": "Items / day"},
+            },
+            "color": {
+                "field": "kind", "type": "nominal",
+                "scale": {
+                    "domain": ["Arrivals", "Departures"],
+                    "range": ["__theme:cfd-1__", "__theme:cfd-3__"],
+                },
+                "legend": {"title": None, "orient": "top-right"},
+            },
+            "tooltip": [
+                {"field": "date_display", "type": "nominal", "title": "Date"},
+                {"field": "kind", "type": "nominal", "title": "Flow"},
+                {"field": "count", "type": "quantitative", "title": "Items"},
+            ],
+        },
+        "config": {
+            "view": {"stroke": None},
+            "axis": {
+                "labelColor": "__theme:fg__",
+                "titleColor": "__theme:muted__",
+            },
+        },
+    }
+    return json.dumps(spec, separators=(",", ":"))
+
+
 @to_vega.register
 def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
     """Translate a `CfdModel` into a Vega-Lite stacked-area spec.

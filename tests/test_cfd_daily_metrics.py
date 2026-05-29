@@ -84,3 +84,20 @@ def test_daily_metrics_json_is_keyed_by_date_with_all_fields():
     assert rec["throughput"] == 1.0
     assert rec["avg_cycle_time"] == 4.0
     assert rec["date_display"] == "May 01, 2026"
+
+
+def test_flow_balance_spec_has_two_series_and_skips_carry_in_day():
+    import json
+
+    from flowmetrics.web.components.cfd import flow_balance_spec_json
+
+    spec = json.loads(flow_balance_spec_json(_model()))
+    vals = spec["data"]["values"]
+    # Day 0 (carry-in) is skipped; only day 2's deltas remain.
+    assert {v["kind"] for v in vals} == {"Arrivals", "Departures"}
+    by_kind = {v["kind"]: v["count"] for v in vals}
+    assert by_kind == {"Arrivals": 3, "Departures": 2}
+    # Themed colours, not literal hsl.
+    assert spec["encoding"]["color"]["scale"]["range"] == [
+        "__theme:cfd-1__", "__theme:cfd-3__",
+    ]

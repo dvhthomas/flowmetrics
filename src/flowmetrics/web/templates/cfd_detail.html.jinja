@@ -60,6 +60,32 @@
     </aside>
   </div>
 
+  {% if cfd.daily %}
+  <section class="ds-section" style="margin-top: 1.5rem;">
+    <h2>Flow balance — daily arrivals vs departures</h2>
+    <p class="filter-hint" style="margin: 0 0 0.5rem 0;">
+      When the two lines track each other the system is balanced;
+      arrivals persistently above departures means WIP is growing.
+    </p>
+    <div id="flow-balance-chart" class="metric-chart"></div>
+    <script>
+      (function () {
+        const spec = {{ cfd_flow_balance(cfd) | safe }};
+        function go() {
+          vegaEmbed("#flow-balance-chart", window.applyTheme(spec), {
+            actions: false, renderer: "svg"
+          }).catch(function (err) {
+            document.getElementById("flow-balance-chart").innerText =
+              "Chart render failed: " + err;
+          });
+        }
+        if (window.requestAnimationFrame) requestAnimationFrame(go);
+        else go();
+      })();
+    </script>
+  </section>
+  {% endif %}
+
   <section class="detail-extras">
     <h2>How to read this</h2>
     <p>

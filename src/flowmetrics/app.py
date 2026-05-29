@@ -485,9 +485,10 @@ def create_app(
     # `cfd_daily_metrics` — per-day flow numbers (WIP per stage,
     # arrivals, departures, throughput, cycle time) keyed by date, for
     # the CFD hover panel to read client-side.
-    from .web.components.cfd import cfd_daily_metrics_json
+    from .web.components.cfd import cfd_daily_metrics_json, flow_balance_spec_json
 
     templates.env.globals["cfd_daily_metrics"] = cfd_daily_metrics_json
+    templates.env.globals["cfd_flow_balance"] = flow_balance_spec_json
 
     # Auth dependency — pass-through when no password configured.
     # FastAPI's idiomatic `Depends(...)` lives in the parameter default
