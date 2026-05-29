@@ -95,6 +95,10 @@ class TestToVegaStructure:
         ]
         assert marks == ["point", "rule", "text"]
 
+    def test_background_is_transparent_so_the_page_shows_through(self):
+        # Matches every other chart — the cream page color, not white.
+        assert to_vega(_model())["background"] == "transparent"
+
     def test_points_reach_the_scatter_data(self):
         model = _model(n_items=7)
         scatter = to_vega(model)["layer"][0]

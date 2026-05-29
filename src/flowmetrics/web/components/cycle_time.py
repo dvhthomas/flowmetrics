@@ -289,6 +289,7 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
 
     spec: dict[str, Any] = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "background": "transparent",
         "width": "container",
         "height": 360,
         "padding": {"top": 10, "right": 20, "bottom": 30, "left": 50},
