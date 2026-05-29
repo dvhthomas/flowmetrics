@@ -57,6 +57,71 @@ class CfdModel:
         return not self.daily
 
 
+@dataclass(frozen=True)
+class CfdDayMetrics:
+    """The basic flow numbers for one day, derived from the CFD's
+    cumulative counts. Surfaced on the CFD hover panel."""
+
+    date_iso: str
+    date_display: str
+    wip_by_stage: dict[str, int]      # band heights, per stage
+    total_wip: int                    # cumulative arrivals - departures
+    arrivals: int                     # entered the system that day
+    departures: int                   # completed that day
+    throughput: float                 # avg departures/day, to date
+    avg_cycle_time: float | None      # Little's Law: WIP / throughput
+
+
+def daily_flow_metrics(model: CfdModel) -> tuple[CfdDayMetrics, ...]:
+    """Per-day flow metrics from a `CfdModel`'s cumulative counts.
+
+    `counts[stage]` is the cumulative arrivals that have reached
+    `stage` (or later) by that day, so for stages in workflow order:
+      - top line  = counts[first stage] = cumulative arrivals,
+      - bottom    = counts[last stage]  = cumulative departures,
+      - band[s]   = counts[s] - counts[next(s)] = WIP in stage s.
+
+    Arrivals/departures are daily deltas of those cumulatives (the
+    first day reports the cumulative-to-date, i.e. window carry-in +
+    that day). Throughput is the to-date average departures/day (the
+    slope of the bottom line); average cycle time is Little's Law,
+    WIP / throughput.
+    """
+    if not model.daily or not model.stages:
+        return ()
+    stages = model.stages
+    first, last = stages[0], stages[-1]
+    out: list[CfdDayMetrics] = []
+    prev_arrivals = prev_departures = 0
+    for i, d in enumerate(model.daily):
+        cum_arrivals = d.counts.get(first, 0)
+        cum_departures = d.counts.get(last, 0)
+        wip_by_stage: dict[str, int] = {}
+        for j, s in enumerate(stages):
+            cur = d.counts.get(s, 0)
+            nxt = d.counts.get(stages[j + 1], 0) if j < len(stages) - 1 else 0
+            wip_by_stage[s] = max(0, cur - nxt)
+        total_wip = max(0, cum_arrivals - cum_departures)
+        arrivals = cum_arrivals - prev_arrivals if i > 0 else cum_arrivals
+        departures = (
+            cum_departures - prev_departures if i > 0 else cum_departures
+        )
+        throughput = cum_departures / (i + 1)
+        avg_cycle = (total_wip / throughput) if throughput > 0 else None
+        out.append(CfdDayMetrics(
+            date_iso=d.date_iso,
+            date_display=d.date_display,
+            wip_by_stage=wip_by_stage,
+            total_wip=total_wip,
+            arrivals=arrivals,
+            departures=departures,
+            throughput=throughput,
+            avg_cycle_time=avg_cycle,
+        ))
+        prev_arrivals, prev_departures = cum_arrivals, cum_departures
+    return tuple(out)
+
+
 def infer_stage_order(
     pairs: list[tuple[str, str, int]], all_stages: list[str],
 ) -> tuple[str, ...]:
