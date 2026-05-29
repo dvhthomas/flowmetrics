@@ -92,6 +92,13 @@ def _data_source_to_vega(model: DataSourceModel) -> dict[str, Any]:
                     "labelExpr": (
                         "utcFormat(datetime(datum.value), '%b %Y')"
                     ),
+                    # Flush the boundary month labels to the plot edges so
+                    # the leftmost ("Nov 2025") doesn't overflow into the
+                    # weekday (Mon/Wed/Fri) labels, and keep them from
+                    # colliding with each other.
+                    "labelFlush": True,
+                    "labelSeparation": 6,
+                    "labelOverlap": False,
                     "domain": False,
                     "ticks": False,
                 },

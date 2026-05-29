@@ -9,23 +9,46 @@
 
 {% block content %}
   <style>
-    .ds-section { margin: 1.75rem 0; }
-    .ds-section h2 { margin-bottom: 0.2rem; }
+    /* One consistent vertical rhythm; everything shares the container's
+       left edge. */
+    .ds-section { margin: 2rem 0; }
+    .ds-section > h2 { margin: 0 0 0.25rem 0; }
+    .ds-section > .ds-hint { margin: 0 0 1rem 0; }
     .ds-coverage-chart { width: 100%; min-height: 11rem; }
+    .ds-hint { font-size: 0.875rem; color: var(--muted); }
+
+    /* Backfill control: labelled fields + button, all the SAME height,
+       bottom-aligned on one baseline — no choppy vertical drift. */
+    .ds-backfill {
+      border: 0.0625rem solid var(--border);
+      border-radius: 0.5rem;
+      background: var(--surface);
+      padding: 1rem 1.1rem;
+    }
     .ds-backfill-form {
-      display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end;
-      margin-top: 0.5rem;
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+      margin: 0;
     }
-    .ds-field {
-      display: flex; flex-direction: column; gap: 0.15rem;
-      font-size: 0.8125rem; color: var(--muted);
+    .ds-field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .ds-field-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted);
     }
-    .ds-range {
-      font-size: 0.8125rem; color: var(--muted); padding-bottom: 0.3rem;
+    .ds-control, .ds-static {
+      height: 2.25rem; box-sizing: border-box;
+      display: inline-flex; align-items: center;
+      font-family: inherit; font-size: 0.875rem;
     }
-    .ds-range strong { color: var(--fg); }
+    .ds-control {
+      padding: 0 0.55rem;
+      border: 0.0625rem solid var(--border); border-radius: 0.3rem;
+      background: var(--white); color: var(--fg);
+    }
+    .ds-static { color: var(--muted); }
+    .ds-static strong { color: var(--fg); font-weight: 600; }
+    .ds-backfill-form .btn { height: 2.25rem; }
     .backfill-progress {
-      margin-top: 0.75rem; padding: 0.5rem 0.75rem;
+      margin-top: 1rem; padding: 0.5rem 0.75rem;
       border-radius: 0.3rem; font-size: 0.875rem;
       display: flex; gap: 0.6rem; align-items: center;
     }
@@ -83,35 +106,43 @@
   </section>
 
   <section class="ds-section">
-    <p class="filter-hint">
-      Fill the gaps. Data is imported every day; use the date
-      picker below.
+    <h2>Backfill</h2>
+    <p class="ds-hint">
+      Import history into the warehouse — pick a window and run it.
+      (Data is also imported automatically every day.)
     </p>
-    <form class="ds-backfill-form"
-          hx-post="/api/internal/backfill"
-          hx-target="#backfill-progress"
-          hx-swap="innerHTML">
-      <input type="hidden" name="workflow" value="{{ contract.name }}">
-      {# since / until are derived (read-only) from window + anchor. #}
-      <input type="hidden" name="since" id="ds-since">
-      <input type="hidden" name="until" id="ds-until">
-      <label class="ds-field">Window
-        <select id="ds-days" onchange="dsRecalc()">
-          <option value="1">1 day</option>
-          <option value="7">7 days</option>
-          <option value="30" selected>30 days</option>
-          <option value="60">60 days</option>
-          <option value="90">90 days</option>
-        </select>
-      </label>
-      <label class="ds-field">Up to &amp; including
-        <input type="date" id="ds-anchor"
-               max="{{ today }}" value="{{ today }}"
-               onchange="dsRecalc()">
-      </label>
-      <span class="ds-range" id="ds-range"></span>
-      <button type="submit" class="btn btn--primary">Backfill</button>
-    </form>
+    <div class="ds-backfill">
+      <form class="ds-backfill-form"
+            hx-post="/api/internal/backfill"
+            hx-target="#backfill-progress"
+            hx-swap="innerHTML">
+        <input type="hidden" name="workflow" value="{{ contract.name }}">
+        {# since / until are derived (read-only) from window + anchor. #}
+        <input type="hidden" name="since" id="ds-since">
+        <input type="hidden" name="until" id="ds-until">
+        <label class="ds-field">
+          <span class="ds-field-label">Window</span>
+          <select id="ds-days" class="ds-control" onchange="dsRecalc()">
+            <option value="1">1 day</option>
+            <option value="7">7 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+          </select>
+        </label>
+        <label class="ds-field">
+          <span class="ds-field-label">Up to &amp; including</span>
+          <input type="date" id="ds-anchor" class="ds-control"
+                 max="{{ today }}" value="{{ today }}"
+                 onchange="dsRecalc()">
+        </label>
+        <div class="ds-field">
+          <span class="ds-field-label">Will fetch</span>
+          <span class="ds-static" id="ds-range"></span>
+        </div>
+        <button type="submit" class="btn btn--primary">Backfill</button>
+      </form>
+    </div>
     <div id="backfill-progress">
       {% include "_partials/backfill_progress.html.jinja" %}
     </div>
@@ -135,8 +166,7 @@
       document.getElementById("ds-since").value = sinceStr;
       document.getElementById("ds-until").value = anchor;
       document.getElementById("ds-range").innerHTML =
-        "Will fetch <strong>" + sinceStr + "</strong> → " +
-        "<strong>" + anchor + "</strong>";
+        "<strong>" + sinceStr + "</strong> → <strong>" + anchor + "</strong>";
     }
     dsRecalc();
   </script>
