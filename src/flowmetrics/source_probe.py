@@ -28,6 +28,8 @@ from datetime import date, timedelta
 
 import httpx
 
+from . import signals
+
 # Curated lifecycle-event chips per source. User-facing names; the
 # `wip` per chip is the typical default (clickable, overridable in
 # the editor). Constants — no source API call needed.
@@ -186,6 +188,17 @@ def _github_pr_stage(it: dict) -> str:
     return "PR closed"
 
 
+def _github_pr_signal(it: dict) -> str | None:
+    """Representative lifecycle signal for a PR's *current* state, so the
+    preview's event matchers line up with the shared evaluator. The
+    snapshot can't replay history, so this reflects the latest state."""
+    if it.get("state") == "open":
+        return signals.SIGNAL_GITHUB_PR_CREATED
+    if it.get("pull_request", {}).get("merged_at"):
+        return signals.SIGNAL_GITHUB_PR_MERGED
+    return None  # closed-without-merge has no modelled signal
+
+
 def _github_dry_run_items(
     repo: str, since_date: date, until_date: date, items_cap: int,
 ) -> list[dict]:
@@ -206,6 +219,7 @@ def _github_dry_run_items(
             "title": it.get("title") or "",
             "url": it.get("html_url"),
             "current_stage": _github_pr_stage(it),
+            "signal": _github_pr_signal(it),
         }
         for it in r.json().get("items", [])[:items_cap]
     ]
@@ -238,6 +252,9 @@ def _jira_dry_run_items(
             "title": fields.get("summary") or "",
             "url": f"{base.rstrip('/')}/browse/{it.get('key')}",
             "current_stage": (fields.get("status") or {}).get("name") or "",
+            # The snapshot shows current status; represent it as a
+            # status-change so `event: status-changed` matchers preview.
+            "signal": signals.SIGNAL_JIRA_STATUS_CHANGED,
         })
     return out
 
@@ -281,33 +298,42 @@ def dry_run_fetch(
 
 
 def bucket_items_by_step(
-    items: list[dict], steps: list[dict],
+    items: list[dict], steps: list[dict], *, source: str = "github",
 ) -> list[dict]:
     """Bucket fetched items per the user's steps.
 
-    Each item carries a `current_stage`. For each step, its
-    effective matches = `step['matches']` or `[step['name']]`.
-    Items matching no step land in a trailing `_unmatched` bucket.
-    Pure — no I/O, fully unit-testable.
+    Each item carries `current_stage` (and, for event matchers, a
+    representative `signal`). Steps carry typed matchers; bucketing
+    uses the SAME `matching` evaluator as the materialise remap, so the
+    preview can't drift from what materialise will write. Items matching
+    no step land in a trailing `_unmatched` bucket. Pure — no I/O.
     """
-    spec: list[dict] = []
-    for s in steps:
-        matches = s.get("matches") or []
-        if not matches:
-            matches = [s.get("name") or ""]
-        spec.append({
-            "step_name": s.get("name") or "",
-            "wip": bool(s.get("wip")),
-            "matches": list(matches),
-            "items": [],
-        })
+    from .contract import Step
+    from .matching import step_for
 
+    parsed: list[Step] = []
+    for s in steps:
+        try:
+            parsed.append(Step(
+                name=s.get("name") or "",
+                wip=bool(s.get("wip")),
+                matches=s.get("matches") or [],
+            ))
+        except Exception:
+            # A malformed step shouldn't crash the preview; skip it.
+            continue
+
+    spec = [
+        {"step_name": st.name, "wip": st.wip, "items": []}
+        for st in parsed
+    ]
     unmatched: list[dict] = []
     for item in items:
         stage = item.get("current_stage") or ""
+        signal = item.get("signal")
         placed = False
-        for bucket in spec:
-            if stage in bucket["matches"]:
+        for st, bucket in zip(parsed, spec, strict=True):
+            if step_for(st, source=source, stage=stage, signal=signal):
                 bucket["items"].append(item)
                 placed = True
                 break
@@ -319,7 +345,7 @@ def bucket_items_by_step(
         bucket["count"] = len(bucket["items"])
         out.append(bucket)
     out.append({
-        "step_name": "_unmatched", "wip": False, "matches": [],
+        "step_name": "_unmatched", "wip": False,
         "count": len(unmatched), "items": unmatched,
     })
     return out

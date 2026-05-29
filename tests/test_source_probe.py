@@ -24,15 +24,20 @@ class _Resp:
 
 
 class TestBucketItemsByStep:
-    """Pure function — no I/O. The heart of the dry-run preview."""
+    """Pure function — no I/O. The heart of the dry-run preview. Uses
+    the same typed matchers + evaluator as materialise."""
 
-    def _item(self, stage):
-        return {"id": stage, "title": stage, "url": None, "current_stage": stage}
+    def _item(self, stage, signal=None):
+        return {
+            "id": stage, "title": stage, "url": None,
+            "current_stage": stage, "signal": signal,
+        }
 
-    def test_buckets_by_explicit_matches(self):
+    def test_buckets_by_explicit_stage_matchers(self):
         steps = [
-            {"name": "Ready", "wip": False, "matches": ["Open"]},
-            {"name": "WIP", "wip": True, "matches": ["In Progress", "Review"]},
+            {"name": "Ready", "wip": False, "matches": [{"stage": "Open"}]},
+            {"name": "WIP", "wip": True,
+             "matches": [{"stage": "In Progress"}, {"stage": "Review"}]},
         ]
         items = [self._item("Open"), self._item("Review"), self._item("Review")]
         out = sp.bucket_items_by_step(items, steps)
@@ -41,6 +46,19 @@ class TestBucketItemsByStep:
         assert by["WIP"] == 2
         assert by["_unmatched"] == 0
 
+    def test_event_matcher_buckets_by_signal(self):
+        steps = [
+            {"name": "Done", "wip": False, "matches": [{"event": "pr-merged"}]},
+        ]
+        items = [
+            self._item("Merged", signal="github-pr-merged"),
+            self._item("PR opened", signal="github-pr-created"),
+        ]
+        out = sp.bucket_items_by_step(items, steps, source="github")
+        by = {b["step_name"]: b["count"] for b in out}
+        assert by["Done"] == 1
+        assert by["_unmatched"] == 1
+
     def test_falls_back_to_name_when_no_matches(self):
         steps = [{"name": "Draft", "wip": False, "matches": []}]
         out = sp.bucket_items_by_step([self._item("Draft")], steps)
@@ -48,7 +66,7 @@ class TestBucketItemsByStep:
         assert out[0]["count"] == 1
 
     def test_unmatched_bucket_collects_strays(self):
-        steps = [{"name": "WIP", "wip": True, "matches": ["In Progress"]}]
+        steps = [{"name": "WIP", "wip": True, "matches": [{"stage": "In Progress"}]}]
         out = sp.bucket_items_by_step(
             [self._item("In Progress"), self._item("Blocked")], steps
         )

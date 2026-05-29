@@ -70,9 +70,9 @@ class TestEndpointShape:
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
         steps = [
-            {"name": "Ready", "wip": False, "matches": ["Open"]},
-            {"name": "WIP", "wip": True, "matches": ["In Progress", "Review"]},
-            {"name": "Done", "wip": False, "matches": ["Closed"]},
+            {"name": "Ready", "wip": False, "matches": [{"stage": "Open"}]},
+            {"name": "WIP", "wip": True, "matches": [{"stage": "In Progress"}, {"stage": "Review"}]},
+            {"name": "Done", "wip": False, "matches": [{"stage": "Closed"}]},
         ]
         items = [
             _item("Open"), _item("Open"),
@@ -101,7 +101,7 @@ class TestEndpointShape:
         with TestClient(app) as client:
             r = _post(
                 client,
-                _payload([{"name": "WIP", "wip": True, "matches": ["X"]}]),
+                _payload([{"name": "WIP", "wip": True, "matches": [{"stage": "X"}]}]),
                 mock_fetch=lambda **kw: {
                     "items": [_item("X")],
                     "stopped_by": "items_cap",
@@ -126,7 +126,7 @@ class TestUnmatchedBucket:
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
         steps = [
-            {"name": "WIP", "wip": True, "matches": ["In Progress"]},
+            {"name": "WIP", "wip": True, "matches": [{"stage": "In Progress"}]},
         ]
         items = [
             _item("In Progress"),
@@ -190,7 +190,7 @@ class TestCache:
                 "stopped_by": "items_cap", "window_to": "2026-04-30",
             }
 
-        payload = _payload([{"name": "WIP", "wip": True, "matches": ["WIP"]}])
+        payload = _payload([{"name": "WIP", "wip": True, "matches": [{"stage": "WIP"}]}])
         with TestClient(app) as client:
             _post(client, payload, mock_fetch=fetch)
             _post(client, payload)
@@ -206,7 +206,7 @@ class TestCache:
                 "items": [],
                 "stopped_by": "time_window", "window_to": "2026-04-30",
             }
-        payload = _payload([{"name": "A", "wip": True, "matches": ["A"]}])
+        payload = _payload([{"name": "A", "wip": True, "matches": [{"stage": "A"}]}])
         with TestClient(app) as client:
             _post(client, payload, mock_fetch=fetch)
             r = client.post(
@@ -232,7 +232,7 @@ class TestCapSemantics:
                 "items": [],
                 "stopped_by": "items_cap", "window_to": "2026-04-30",
             }
-        payload = _payload([{"name": "A", "wip": True, "matches": ["A"]}])
+        payload = _payload([{"name": "A", "wip": True, "matches": [{"stage": "A"}]}])
         payload["items_cap"] = 50
         with TestClient(app) as client:
             _post(client, payload, mock_fetch=fetch)

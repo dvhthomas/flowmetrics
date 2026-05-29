@@ -968,7 +968,7 @@ def create_app(
             }
 
         items = fetched.get("items", [])
-        per_step = _bucket_items_by_step(items, steps)
+        per_step = _bucket_items_by_step(items, steps, source=source)
 
         fetched_at = datetime.now(UTC)
         expires_at = datetime.fromtimestamp(now + 5 * 60, tz=UTC)
