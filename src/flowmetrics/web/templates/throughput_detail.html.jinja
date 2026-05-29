@@ -16,30 +16,31 @@
   <section class="detail-extras">
     <h2>How to read this</h2>
     <p>
-      Each bar is one calendar day. The bar's height is the count of
-      items that finished on that exact UTC date. Days with zero
-      completions are included as zero bars — they are real
-      observations of capacity, not missing data.
+      Each bar is one calendar day; the height is the count of
+      items completed on that UTC date. Zero-completion days are
+      real observations of capacity, not gaps — the chart marks
+      gaps from missing data separately.
     </p>
-
-    <h2>Caveats</h2>
     <ul>
-      <li>Window endpoints are derived from the data itself: the
-        first and last completion in this contract.</li>
-      <li>Throughput counts only items with both a created date and
-        a completion date — partial-lifecycle rows are excluded.</li>
+      <li>The <em>shape</em> of the distribution matters more
+        than the mean — a wide spread signals an unstable system.</li>
+      <li>A sustained drop in throughput while WIP holds steady
+        means cycle time is growing (Little's Law).</li>
+      <li>The reference band shows the rolling P50 / P85 from
+        the chosen baseline — bars above the P85 are unusually
+        productive days, not a new normal.</li>
     </ul>
 
-    <h2>Methodology</h2>
-    <p>
-      Enumerate every date from first to last completion, count items
-      finishing on each date, keep zero-count days. The empirical
-      distribution feeds Monte Carlo forecasting in a later slice.
-    </p>
-
-    <h2>Actions</h2>
-    <p><em>Reserved for future "now what?" suggestions — filter by
-       team / tag, run a forecast against this distribution. Empty in v1.</em></p>
+    <h2>Possible next steps</h2>
+    <ul>
+      <li>Treat this distribution — not its average — as the
+        input to forecasting. The Forecast tile already does.</li>
+      <li>If throughput is trending down: cap new work pulls
+        until the trend reverses, rather than adding capacity.</li>
+      <li>If the spread is widening: look for growing batch size,
+        rework loops, or unplanned work — those are the typical
+        variance amplifiers Reinertsen flags.</li>
+    </ul>
   </section>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>

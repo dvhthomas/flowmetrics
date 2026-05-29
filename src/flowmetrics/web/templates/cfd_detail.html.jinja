@@ -93,53 +93,37 @@
   <section class="detail-extras">
     <h2>How to read this</h2>
     <p>
-      Each band is a stage in the workflow. The band's height at a
-      given date equals the count of items currently in that
-      stage (work in progress for that stage). Bands stack in
-      workflow order from top to bottom — the first stage at the
-      top, the terminal stage (departures) at the bottom. The
-      total stack height = items currently in the system.
+      Each band is a stage. Its height on a given date is the
+      count of items currently in that stage. Bands stack in
+      workflow order top-to-bottom (entry stage at the top,
+      terminal stage at the bottom); total stack height = items
+      currently in the system.
     </p>
-    <p>
-      Slope of the top boundary = arrival rate. Slope of the
-      bottom boundary = throughput (departure rate). The
-      horizontal distance between top and bottom at any date
-      gives you approximate lead time. A widening middle band =
-      a bottleneck stage piling up.
-    </p>
-
-    <h2>Caveats</h2>
     <ul>
-      <li>Stage workflow order is inferred from data using
-        pairwise precedence — for every pair of stages, the one
-        that more often comes earlier wins. Robust against items
-        skipping a stage (e.g. PRs opened directly into Awaiting
-        Review without ever being Draft). A future contract YAML
-        override will let you pin the order explicitly.</li>
-      <li>The time axis is clamped to the contract window
-        (start → stop). Items that reached a stage BEFORE start
-        are still counted at start — the math is unchanged, only
-        the visible range is scoped.</li>
-      <li>Items that skip a stage are counted as having "reached"
-        that stage from the moment they entered any later stage.
-        Without this, bands would cross — mathematically nonsense
-        for a CFD.</li>
-      <li>If the source emits the same stage twice for an item
-        (ping-pong back to a prior state), only the first entry
-        counts toward the cumulative. Flow cycling is a separate
-        analysis.</li>
+      <li>Slope of the <em>top</em> = arrival rate. Slope of
+        the <em>bottom</em> = throughput. Horizontal distance
+        between them at any date ≈ lead time.</li>
+      <li>A widening band for one stage = WIP piling up there,
+        a likely bottleneck. A flattening band = work
+        evaporating without progressing.</li>
+      <li>Arrivals and departures tracking each other = balanced
+        flow. The flow-balance chart below is the easier read
+        for spotting the days WIP actually grew.</li>
     </ul>
 
-    <h2>Methodology</h2>
-    <p>
-      For each (date, stage), the value plotted is the cumulative
-      count of items that have reached that stage or any later
-      stage by that date. Stack in workflow order; the band heights
-      are the per-stage differences. The bottom band's cumulative
-      at the final date equals the count of completed items in
-      the warehouse — a cross-check between transitions and
-      work_items.
-    </p>
+    <h2>Possible next steps</h2>
+    <ul>
+      <li>If a single band stays consistently widest, set a
+        <strong>WIP limit</strong> on that stage and review it
+        weekly. WIP limits drive flow more reliably than
+        adding capacity.</li>
+      <li>Hover the flow-balance chart on a deficit run to find
+        the exact date WIP started accumulating — that's where
+        the operational change to investigate lives.</li>
+      <li>If the top band is steepening (arrivals accelerating)
+        while the bottom is flat: stop intake or split work
+        before cycle time degrades.</li>
+    </ul>
   </section>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>

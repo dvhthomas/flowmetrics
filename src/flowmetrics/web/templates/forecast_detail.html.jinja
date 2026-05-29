@@ -65,35 +65,35 @@
     <h2>How to read this</h2>
     <p>
       Both panels run 10,000 Monte Carlo simulations against the
-      historical daily throughput captured by the warehouse. Each
-      simulation samples completed-items-per-day (with replacement)
-      from that distribution. The bars show how often each
-      outcome occurred across the 10K runs.
+      historical daily-throughput distribution, sampling with
+      replacement. The bars show how often each outcome occurred
+      across the 10K runs.
     </p>
-
-    <h2>Caveats</h2>
     <ul>
-      <li>Forecasts assume the future looks like the past. If your
-        team composition, scope, or process changed recently, the
-        baseline is a less reliable predictor.</li>
-      <li>Both panels share the same daily-throughput distribution.
-        Widening the historical window means more samples but
-        risks mixing regimes; narrowing trades stability for
-        responsiveness.</li>
-      <li>Date-direction (P85 by) means "85% of simulations
-        completed by this date or earlier." Count-direction
-        (P85 ≥) means "at least this many in 85% of simulations" —
-        a high-confidence floor, not a high-likelihood expectation.</li>
+      <li><strong>P85 by</strong> a date = "done by this date in
+        85% of simulations" — the right number for a commitment.</li>
+      <li><strong>P85 ≥</strong> a count = "at least this many
+        finished in 85% of runs" — a high-confidence floor, not
+        a likely expectation.</li>
+      <li>Forecasts assume the future looks like the past. After
+        a process, team, or scope change, the baseline window is
+        a weaker predictor — rebaseline once enough new
+        throughput data exists.</li>
     </ul>
 
-    <h2>Methodology</h2>
-    <p>
-      Empirical Monte Carlo simulation outperforms point estimates
-      because the daily throughput distribution carries the
-      operational variance directly. Each run is independent;
-      convergence to stable percentiles is typically achieved by
-      10K runs.
-    </p>
+    <h2>Possible next steps</h2>
+    <ul>
+      <li>Commit on <strong>P85</strong>, plan on P50 (Vacanti).
+        Reporting only P50 understates risk; reporting only P95
+        leaves money on the table.</li>
+      <li>If the distribution is wide, reduce variance before
+        adding capacity — smaller batches, WIP limits and fewer
+        in-progress threads move P85 down faster than more
+        people do.</li>
+      <li>If forecast and actuals drift apart, rebaseline the
+        historical window rather than nudging the forecast by
+        hand — the distribution carries the truth.</li>
+    </ul>
   </section>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>

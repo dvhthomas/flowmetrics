@@ -16,34 +16,34 @@
   <section class="detail-extras">
     <h2>How to read this</h2>
     <p>
-      Each point is one completed work item plotted at its
-      <em>completion date (UTC)</em> against its <em>cycle time</em>
-      (days from open to merge). The reference lines are the
-      empirical percentiles of cycle time across all completed
-      items in this window: P50 (median), P85 (the standard
-      commitment threshold), and P95 (high-stakes).
+      Each point is one completed item plotted at its completion
+      date (x) against its cycle time in days (y). Dashed lines
+      are empirical percentiles of those cycle times: P50, P85,
+      P95.
     </p>
-
-    <h2>Caveats</h2>
     <ul>
-      <li>Percentiles are empirical — read from the items completed
-        in this window, not Monte Carlo simulated.</li>
-      <li>Outliers shift P85 / P95 up. A single stuck-then-finished
-        item can swing the deep-tail percentiles.</li>
-      <li>Intra-day x-position is random (jitter within the day
-        column); the date in the tooltip is the truth.</li>
+      <li>Cycle time is almost always right-skewed — commit on
+        <strong>P85</strong>, not the mean (Vacanti).</li>
+      <li>P85 rising while throughput holds steady = WIP is
+        growing; rising P95 = process exceptions are piling up.</li>
+      <li>Each long-tail outlier is a story worth tracing
+        (rework, blocked dependencies, scope creep) — don't
+        average them away.</li>
     </ul>
 
-    <h2>Methodology</h2>
-    <p>
-      Cycle time = <code>completed_at − created_at</code> in days.
-      Per-item details and the canonical definitions live in
-      <a href="https://github.com/dvhthomas/flowmetrics/blob/main/docs/METRICS.md">METRICS.md</a>.
-    </p>
-
-    <h2>Actions</h2>
-    <p><em>Reserved for future "now what?" suggestions — filter presets,
-       experiment ideas, drill-into-outliers. Empty in v1.</em></p>
+    <h2>Possible next steps</h2>
+    <ul>
+      <li>Commit externally to <strong>P85</strong>; reserve P50
+        for internal planning. If the gap between P50 and P85
+        is wide, the system is unpredictable — fix variability
+        before promising a date.</li>
+      <li>Pick the most recent outlier and trace why it tailed.
+        Almost always it's a queue or a handoff, not the work
+        itself.</li>
+      <li>Track P85 over time as the predictability KPI — a
+        falling P85 with stable throughput is the canonical
+        flow improvement signal.</li>
+    </ul>
   </section>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>

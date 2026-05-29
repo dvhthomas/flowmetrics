@@ -21,41 +21,37 @@
   <section class="detail-extras">
     <h2>How to read this</h2>
     <p>
-      Each point is one <em>in-flight</em> work item (started but
-      not yet completed at the snapshot date), positioned at its
-      current workflow state on the x-axis and elapsed age in days
-      on the y-axis. The dashed reference lines are commitment
-      thresholds from completed-item cycle times: P50, P85
-      (the standard commitment threshold), and P95 (high-stakes).
-      An item aged past P85 is statistically likely to miss the
-      forecast.
+      Each point is one in-flight item plotted at its current
+      state (x) against its elapsed age in days (y). The dashed
+      lines are empirical percentiles of completed-item cycle
+      times: P50, P85, P95. A <em>"right now"</em> snapshot —
+      pinned to the latest materialise, not the Period picker.
     </p>
-
-    <h2>Caveats</h2>
     <ul>
-      <li>Aging WIP is a <em>"right now"</em> snapshot. The as-of
-        date is pinned to the most recent materialise (the
-        in-flight snapshot date shown in the headline) — it does
-        not follow the Period picker, so this page has no Period
-        bar. Backfill on the Data Source page to refresh it.</li>
-      <li>Reference lines come from the same empirical percentile
-        distribution the cycle-time chart shows — they update only
-        with the underlying completed-item data.</li>
+      <li>Items above <strong>P85</strong> are statistically
+        unlikely to finish within the standard cycle-time
+        commitment — they need attention today.</li>
+      <li>Items above <strong>P95</strong> are deep-tail
+        outliers; expect them to need re-scoping, splitting,
+        or escalation, not just patience.</li>
+      <li>A cluster of aging items in one stage points at a
+        bottleneck in that stage, not the items themselves.</li>
     </ul>
 
-    <h2>Methodology</h2>
+    <h2>Possible next steps</h2>
     <p>
-      In-flight items are those created on or before the as-of date
-      with no completion (or a completion strictly after the as-of
-      date). Age = (asof − created_at.date()) in calendar days.
-      Current state is the latest stage entered at or before the
-      as-of date.
+      Vacanti's headline rule for aging WIP is <em>"stop
+      starting, start finishing"</em> — work the oldest item
+      first.
     </p>
-
-    <h2>Actions</h2>
-    <p><em>Reserved for future "now what?" suggestions — pull the
-       oldest item into the standup, flag stalled work, etc.
-       Empty in v1.</em></p>
+    <ul>
+      <li>Open standup with the rightmost / oldest point: what's
+        blocking it, and what would unblock it today?</li>
+      <li>Items breaching P85: split the work, swarm it, or
+        explicitly accept the new forecast and tell stakeholders.</li>
+      <li>Items breaching P95: assume it won't finish as scoped
+        — re-plan rather than wait it out.</li>
+    </ul>
   </section>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
