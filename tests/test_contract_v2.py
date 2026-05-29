@@ -43,16 +43,19 @@ class TestStepModel:
             Step(name="", wip=True)
 
     def test_step_carries_match_identifiers(self):
-        """A step is a logical bucket; `matches` lists the
-        source-native identifiers (labels, statuses, lifecycle
-        events) whose materialized data lands in this step."""
-        from flowmetrics.contract import Step
+        """A step is a logical bucket; `matches` lists the typed
+        conditions (labels, statuses, lifecycle events) whose
+        materialized data lands in this step."""
+        from flowmetrics.contract import Matcher, Step
         s = Step(
             name="Ready",
             wip=False,
-            matches=["status:ready", "label:ready"],
+            matches=[{"status": "ready"}, {"label": "ready"}],
         )
-        assert s.matches == ["status:ready", "label:ready"]
+        assert s.matches == [
+            Matcher(kind="status", value="ready"),
+            Matcher(kind="label", value="ready"),
+        ]
 
     def test_step_matches_default_to_empty_list(self):
         """Empty `matches` triggers the legacy lookup: the step's
@@ -63,15 +66,17 @@ class TestStepModel:
         s = Step(name="Draft")
         assert s.matches == []
 
-    def test_effective_matches_falls_back_to_name(self):
-        """`Step.effective_matches` is the lookup helper: empty
-        list → `[name]`. Use this everywhere the query layer
-        needs "what source identifiers does this step capture"."""
-        from flowmetrics.contract import Step
+    def test_effective_matchers_falls_back_to_name(self):
+        """`Step.effective_matchers` is the lookup helper: empty
+        list → a single `stage` matcher on the step's name. Use this
+        wherever the query layer needs "what does this step capture"."""
+        from flowmetrics.contract import Matcher, Step
         bare = Step(name="Draft")
-        with_matches = Step(name="Ready", matches=["status:ready"])
-        assert bare.effective_matches == ("Draft",)
-        assert with_matches.effective_matches == ("status:ready",)
+        with_matches = Step(name="Ready", matches=[{"status": "ready"}])
+        assert bare.effective_matchers == (Matcher(kind="stage", value="Draft"),)
+        assert with_matches.effective_matchers == (
+            Matcher(kind="status", value="ready"),
+        )
 
 
 class TestContractModel:
@@ -193,8 +198,9 @@ class TestParseNewShape:
         assert [s.wip for s in c.steps] == [False, True, False]
 
     def test_steps_with_matches_round_trip(self):
-        """The `matches:` per-step list survives parse + emit."""
+        """The typed `matches:` per-step list survives parse + emit."""
         from flowmetrics.contract import (
+            Matcher,
             emit_canonical_yaml,
             parse_contract_text,
         )
@@ -207,16 +213,19 @@ class TestParseNewShape:
             "    - name: Ready\n"
             "      wip: false\n"
             "      matches:\n"
-            "        - status:ready\n"
-            "        - label:ready\n"
+            "        - label: ready\n"
+            "        - label: triage\n"
             "    - name: Review\n"
             "      wip: true\n"
             "      matches:\n"
-            "        - Marked ready for review\n",
+            "        - event: pr-ready\n",
             "x",
         )
-        assert c.steps[0].matches == ["status:ready", "label:ready"]
-        assert c.steps[1].matches == ["Marked ready for review"]
+        assert c.steps[0].matches == [
+            Matcher(kind="label", value="ready"),
+            Matcher(kind="label", value="triage"),
+        ]
+        assert c.steps[1].matches == [Matcher(kind="event", value="pr-ready")]
         # And re-emitting + re-parsing is identity.
         again = parse_contract_text(emit_canonical_yaml(c), "x")
         assert again == c

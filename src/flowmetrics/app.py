@@ -743,9 +743,16 @@ def create_app(
             "start": c.start.isoformat() if c.start else None,
             "stop": c.stop.isoformat() if c.stop else None,
             "label": c.label,
-            # Canonical: ordered list of steps with matches.
+            # Canonical: ordered list of steps with typed matchers
+            # ({kind, value}) for the builder to hydrate.
             "steps": [
-                {"name": s.name, "wip": s.wip, "matches": list(s.matches)}
+                {
+                    "name": s.name,
+                    "wip": s.wip,
+                    "matches": [
+                        {"kind": m.kind, "value": m.value} for m in s.matches
+                    ],
+                }
                 for s in c.steps
             ],
         }

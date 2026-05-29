@@ -26,11 +26,62 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, ValidationError, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
+
+from . import signals
 
 
 class ContractError(ValueError):
     """Raised when a contract YAML is missing, malformed, or invalid."""
+
+
+MatcherKind = Literal["event", "label", "status", "stage"]
+
+
+class Matcher(BaseModel):
+    """One typed condition a step matches on.
+
+      - `event`  → a lifecycle event; `value` is a source-scoped code
+        (`pr-merged`, `status-changed`, …) → compared to a transition's
+        `signal`.
+      - `label` / `status` / `stage` → `value` is compared to a
+        transition's `stage` text (a GitHub label, a Jira status, or a
+        raw adapter stage).
+
+    YAML shape is the single-key mapping `{event: pr-merged}`; the
+    before-validator normalises it into `{kind, value}`. Bare strings are
+    rejected — a matcher must declare its kind.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    kind: MatcherKind
+    value: str
+
+    @model_validator(mode="before")
+    @classmethod
+    def _from_single_key_mapping(cls, data: object) -> object:
+        # Already {kind, value} (e.g. constructed directly) → pass through.
+        if isinstance(data, dict) and "kind" in data and "value" in data:
+            return data
+        if isinstance(data, dict) and len(data) == 1:
+            (k, v), = data.items()
+            if k in ("event", "label", "status", "stage"):
+                return {"kind": k, "value": str(v)}
+            raise ValueError(
+                f"unknown matcher kind {k!r}; use one of "
+                "event / label / status / stage"
+            )
+        raise ValueError(
+            "a matcher must be a typed mapping like {event: pr-merged}; "
+            f"got {data!r}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -78,17 +129,16 @@ class Step(BaseModel):
       - `name`: the user's display name ("Ready", "In Review", …).
       - `wip`: does this step count as Work-In-Progress? Drives the
         CFD bands and the Aging WIP columns.
-      - `matches`: the source-native identifiers (labels, statuses,
-        lifecycle events) whose data fills this step. Empty list →
-        legacy lookup: the step's `name` itself is treated as the
-        identifier (backward-compat with the demo YAMLs).
+      - `matches`: the typed conditions (labels, statuses, lifecycle
+        events) whose data fills this step. Empty list → the step's
+        `name` is treated as a raw `stage` to match.
     """
 
     model_config = ConfigDict(frozen=True)
 
     name: str
     wip: bool = False
-    matches: list[str] = []
+    matches: list[Matcher] = []
 
     @field_validator("name")
     @classmethod
@@ -98,13 +148,12 @@ class Step(BaseModel):
         return v
 
     @property
-    def effective_matches(self) -> tuple[str, ...]:
-        """What source identifiers does this step capture?
-        `matches` if non-empty, else `(name,)` — the legacy
-        "name IS the identifier" rule."""
+    def effective_matchers(self) -> tuple[Matcher, ...]:
+        """What this step captures: `matches` if non-empty, else a
+        single `stage` matcher on the step's own name."""
         if self.matches:
             return tuple(self.matches)
-        return (self.name,)
+        return (Matcher(kind="stage", value=self.name),)
 
 
 class Contract(BaseModel):
@@ -127,6 +176,20 @@ class Contract(BaseModel):
     # Ordered list of workflow steps. Empty list = no states block;
     # CFD / Aging fall back to data-derived ordering.
     steps: list[Step] = []
+
+    @model_validator(mode="after")
+    def _validate_event_codes(self) -> Contract:
+        """An `event:` matcher must use a code valid for this source."""
+        valid = signals.event_codes_for(self.source)
+        for step in self.steps:
+            for m in step.matches:
+                if m.kind == "event" and m.value not in valid:
+                    raise ValueError(
+                        f"step {step.name!r}: unknown {self.source} event "
+                        f"code {m.value!r}; valid codes: "
+                        f"{', '.join(sorted(valid))}"
+                    )
+        return self
 
     @property
     def states(self) -> WorkflowStates | None:
@@ -382,7 +445,7 @@ def emit_canonical_yaml(contract: Contract) -> str:
         for s in contract.steps:
             row: dict = {"name": s.name, "wip": s.wip}
             if s.matches:
-                row["matches"] = list(s.matches)
+                row["matches"] = [{m.kind: m.value} for m in s.matches]
             body["steps"].append(row)
     return yaml.safe_dump(
         {"contract": body},

@@ -58,3 +58,35 @@ SIGNAL_GITHUB_PR_CLOSES_ISSUE = "github-pr-closes-issue"
 SIGNAL_JIRA_ISSUE_CREATED = "jira-issue-created"
 SIGNAL_JIRA_STATUS_CHANGED = "jira-status-changed"
 SIGNAL_JIRA_RESOLVED = "jira-resolved"
+
+
+# ----------------------------------------------------------------------
+# Step-matcher event codes.
+#
+# A contract step can match on a lifecycle `event`. Users (and
+# hand-edited YAML) reference the event by a short, source-scoped code
+# rather than the verbose signal string — `pr-ready`, not
+# `github-pr-ready-for-review`. These maps are the single source of
+# truth: code → signal constant, per source.
+# ----------------------------------------------------------------------
+
+GITHUB_EVENT_CODES: dict[str, str] = {
+    "pr-opened": SIGNAL_GITHUB_PR_CREATED,
+    "pr-ready": SIGNAL_GITHUB_PR_READY_FOR_REVIEW,
+    "changes-requested": SIGNAL_GITHUB_PR_REVIEW_CHANGES_REQUESTED,
+    "approved": SIGNAL_GITHUB_PR_REVIEW_APPROVED,
+    "pr-merged": SIGNAL_GITHUB_PR_MERGED,
+    "issue-opened": SIGNAL_GITHUB_ISSUE_CREATED,
+    "issue-closed": SIGNAL_GITHUB_ISSUE_CLOSED,
+}
+
+JIRA_EVENT_CODES: dict[str, str] = {
+    "created": SIGNAL_JIRA_ISSUE_CREATED,
+    "status-changed": SIGNAL_JIRA_STATUS_CHANGED,
+    "resolved": SIGNAL_JIRA_RESOLVED,
+}
+
+
+def event_codes_for(source: str) -> dict[str, str]:
+    """The code→signal map for a source ('github' or 'jira')."""
+    return GITHUB_EVENT_CODES if source == "github" else JIRA_EVENT_CODES
