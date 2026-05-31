@@ -63,6 +63,15 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{# Mirror the current sort + direction into a hidden meta element
+   so other chart drill-downs (e.g. the throughput bar click) can
+   read them and preserve the user's sort across the swap. Lives
+   INSIDE the swap target so it updates on every re-render. #}
+<div id="work-items-state"
+     hidden
+     data-sort="{{ data.sort }}"
+     data-direction="{{ data.direction }}"></div>
+
 {% if data.completed_on %}
 <div class="work-items-active-filter">
   <span class="work-items-active-filter-label">Filtered to</span>

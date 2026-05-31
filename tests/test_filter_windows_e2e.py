@@ -479,3 +479,69 @@ class TestFilterPropagationThroughInteractions:
             f"throughput drill-down must carry the Period; "
             f"url={info.value.url}"
         )
+
+    def test_throughput_bar_click_drilldown_keeps_the_table_sort(
+        self, server_url: str, page: Page
+    ):
+        """Once the user sorts the work-items table — say by Cycle
+        descending — clicking a different chart bar must preserve
+        that sort. Wiping it on every drill-down is silent state
+        loss."""
+        page.goto(
+            f"{server_url}/workflows/wide-demo/metrics/throughput"
+            "?period=last-90-days"
+        )
+        page.wait_for_selector("#throughput-chart svg", timeout=15000)
+        page.wait_for_selector("#work-items", timeout=10000)
+        page.wait_for_timeout(800)
+
+        # Sort by Cycle (d) descending. The header link toggles to
+        # desc on first click when the column is not yet active.
+        with page.expect_request("**/api/internal/work-items**"):
+            page.evaluate(
+                """() => {
+                    const links = document.querySelectorAll(
+                        '#work-items-body th a');
+                    for (const a of links) {
+                        if ((a.textContent || '').includes('Cycle')) {
+                            a.click();
+                            return;
+                        }
+                    }
+                    throw new Error('cycle header link not found');
+                }"""
+            )
+        page.wait_for_timeout(600)
+
+        # Now click a chart bar; the new request must carry the
+        # current sort + direction.
+        with page.expect_request(
+            "**/api/internal/work-items**"
+        ) as info:
+            page.evaluate(
+                """() => {
+                    const groups = document.querySelectorAll(
+                        '#throughput-chart svg g.mark-rect');
+                    const bars = groups[groups.length - 1]
+                        .querySelectorAll('path');
+                    let tallest = null, h = 0;
+                    for (const p of bars) {
+                        const r = p.getBoundingClientRect();
+                        if (r.height > h) { h = r.height; tallest = p; }
+                    }
+                    const r = tallest.getBoundingClientRect();
+                    tallest.dispatchEvent(new MouseEvent('click', {
+                        bubbles: true, cancelable: true,
+                        clientX: r.x + r.width / 2,
+                        clientY: r.y + r.height / 2,
+                        view: window}));
+                }"""
+            )
+        url = info.value.url
+        assert "sort=cycle_time_days" in url, (
+            f"drill-down must carry the active table sort; url={url}"
+        )
+        assert "direction=desc" in url, (
+            f"drill-down must carry the active sort direction; "
+            f"url={url}"
+        )

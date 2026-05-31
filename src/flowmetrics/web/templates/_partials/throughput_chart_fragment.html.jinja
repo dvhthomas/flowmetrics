@@ -73,6 +73,19 @@
           encodeURIComponent(contract) +
           "&completed_on=" + encodeURIComponent(item.datum.date_iso)
         );
+        // Preserve the table's current sort + direction across the
+        // drill-down. The state is mirrored into a hidden meta div
+        // inside the swap target, so it always reflects the last
+        // render.
+        const state = document.getElementById("work-items-state");
+        if (state) {
+          if (state.dataset.sort) {
+            url += "&sort=" + encodeURIComponent(state.dataset.sort);
+          }
+          if (state.dataset.direction) {
+            url += "&direction=" + encodeURIComponent(state.dataset.direction);
+          }
+        }
         // Carry the page's filter params (period / anchor / …) so
         // the drill-down table keeps the selected view window — a
         // bar for a date outside the default window would
