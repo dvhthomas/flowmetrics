@@ -162,12 +162,12 @@ class TestToVegaCrop:
         assert "params" not in to_vega(model)
 
 
-class TestVacantiBoundaryLines:
+class TestBoundaryLines:
     """The spec is layered: a stacked area for the bands, plus two
     cumulative lines bracketing the WIP zone — the top boundary is
     cumulative arrivals (slope = arrival rate), the bottom of WIP
-    is cumulative departures (slope = throughput). The classical
-    Vacanti CFD interpretation, Figure 9.7."""
+    is cumulative departures (slope = throughput). Standard CFD
+    reads."""
 
     def test_spec_layers_are_area_then_arrival_then_departure(self):
         spec = to_vega(_model_with_crop())
@@ -213,6 +213,18 @@ class TestVacantiBoundaryLines:
         arrival_color = spec["layer"][1]["mark"]["color"]
         departure_color = spec["layer"][2]["mark"]["color"]
         assert arrival_color != departure_color
+
+    def test_boundary_lines_use_dedicated_bright_tokens_not_brand_shades(self):
+        # The lines need to pop against the pastel WIP bands AND
+        # the dark "above" zone. Generic `p-700`/`t-700` blend with
+        # the band hues they sit on top of, so they reach for
+        # purpose-built tokens that are tuned for contrast and
+        # don't move when the brand palette is retuned.
+        spec = to_vega(_model_with_crop())
+        assert (spec["layer"][1]["mark"]["color"]
+                == "__theme:cfd-line-arrival__")
+        assert (spec["layer"][2]["mark"]["color"]
+                == "__theme:cfd-line-throughput__")
 
     def test_layered_spec_shares_the_y_scale(self):
         # The area's y = sum(wip) (stack: zero) and the line layers'

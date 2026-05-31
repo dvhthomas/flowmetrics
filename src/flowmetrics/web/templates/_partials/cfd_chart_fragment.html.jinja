@@ -31,12 +31,16 @@
     const spec = {{ vega_spec(data) | safe }};
     spec.height = {{ _h }};
     {% if mode == 'detail' %}
-    // The floating panel lists every stage with its colour swatch
-    // and count, so the top-right legend is redundant — and worse,
-    // sits in the same column as the per-band "N items" labels
-    // when the panel parks on the left of the rule.
-    if (spec.encoding && spec.encoding.color) {
-      spec.encoding.color.legend = null;
+    // The floating panel lists every stage with its count, so the
+    // legend is redundant on the detail page. The colour encoding
+    // lives inside the area layer of the layered spec; find it
+    // and null its legend.
+    if (spec.layer) {
+      for (const layer of spec.layer) {
+        if (layer.encoding && layer.encoding.color) {
+          layer.encoding.color.legend = null;
+        }
+      }
     }
     {% endif %}
     function embed() {
@@ -87,13 +91,12 @@
       // go on the OPPOSITE side so the panel doesn't occlude them.
       let panelSide = "right";
 
-      // Snap-time CFD annotations à la Vacanti Figure 9.8: at each
-      // band boundary at the snap date, a dashed horizontal line
-      // extending LEFT to where the top-of-stack first reached that
-      // y-level (i.e. the lead time for items currently at that
-      // boundary), labelled "N days"; plus a "N items" count label
-      // beside the rule for each band. Built lazily once we know
-      // the stage count.
+      // Snap-time annotations: at each band boundary at the snap
+      // date, a dashed horizontal line extending LEFT to where the
+      // top-of-stack first reached that y-level (i.e. the lead
+      // time for items currently at that boundary), labelled
+      // "N days"; plus a "N items" count label beside the rule for
+      // each band. Built lazily once we know the stage count.
       const guides = {
         built: false, leadLines: [], dayLabels: [],
         labelBoxes: [], itemLabels: [], itemBoxes: [],
@@ -215,9 +218,17 @@
           // Hide the actual line at zero length; the label still
           // pins to the rule so the reader sees "0 days" rather
           // than nothing.
-          ln.style.opacity = D === iso ? "0" : "0.85";
-          // Brighter stroke so it reads on the dark "above" zone.
-          ln.setAttribute("stroke", "rgba(245, 240, 226, 0.9)");
+          ln.style.opacity = D === iso ? "0" : "0.9";
+          // Each lead-time line takes the colour of the band it
+          // measures — a deep version of the band's pastel so it
+          // belongs to that band visually. Band i is the one above
+          // boundary i; band i uses palette slot i, which maps to
+          // `--cfd-{i+1}`. The boundary loop only runs for
+          // i < stages.length - 1, so it never hits the terminal.
+          const theme = window.flowmetricsTheme || {};
+          const lineColor = theme["cfd-" + (i + 1) + "-deep"] || "#1a1a1a";
+          ln.setAttribute("stroke", lineColor);
+          ln.setAttribute("stroke-width", "1.5");
           const days = isoDiffDays(D, iso);
           lbl.textContent = days + " days";
           // Anchor the day label on the side OPPOSITE the panel so
@@ -275,6 +286,34 @@
           txBox.setAttribute("width", tb.width + 6);
           txBox.setAttribute("height", tb.height + 2);
           txBox.style.opacity = "1";
+        }
+
+        // Collision pass — Vega(-Lite) only ships `labelOverlap`
+        // for axis ticks, so this overlay does its own bbox
+        // intersection. The "N days" labels carry information that
+        // isn't in the panel; the "N items" labels are redundant
+        // with the panel's stage table, so they yield first.
+        function bbOverlap(a, b) {
+          return !(a.x + a.width  <= b.x ||
+                   b.x + b.width  <= a.x ||
+                   a.y + a.height <= b.y ||
+                   b.y + b.height <= a.y);
+        }
+        const visibleDays = guides.dayLabels.filter(
+          function (l) { return l.style.opacity !== "0"; }
+        ).map(function (l) { return l.getBBox(); });
+        for (let i = 0; i < guides.itemLabels.length; i++) {
+          const tx = guides.itemLabels[i];
+          const txBox = guides.itemBoxes[i];
+          if (tx.style.opacity === "0") continue;
+          const ib = tx.getBBox();
+          for (const db of visibleDays) {
+            if (bbOverlap(ib, db)) {
+              tx.style.opacity = "0";
+              txBox.style.opacity = "0";
+              break;
+            }
+          }
         }
       }
 

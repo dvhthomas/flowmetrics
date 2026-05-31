@@ -45,13 +45,32 @@
       --cfd-7: hsl(22, 45%, 72%);
       --cfd-8: hsl(62, 45%, 72%);
       --cfd-9: hsl(102, 45%, 72%);
+      /* Per-band "deep" variants — same hue, much lower lightness
+         and a touch more saturation — used for the lead-time
+         horizontal lines so the line visually belongs to the band
+         whose lead time it measures. */
+      --cfd-1-deep: hsl(142, 70%, 28%);
+      --cfd-2-deep: hsl(182, 70%, 28%);
+      --cfd-3-deep: hsl(222, 70%, 30%);
+      --cfd-4-deep: hsl(262, 70%, 32%);
+      --cfd-5-deep: hsl(302, 70%, 30%);
+      --cfd-6-deep: hsl(342, 70%, 32%);
+      --cfd-7-deep: hsl( 22, 80%, 36%);
+      --cfd-8-deep: hsl( 62, 80%, 28%);
+      --cfd-9-deep: hsl(102, 70%, 26%);
       /* Terminal stage on the CFD — darker / muted so the active
          WIP bands above it visually dominate. Same warm hue family
          as the cream canvas, dropped to mid-grey. */
       --cfd-terminal: hsl(45, 14%, 60%);
-      /* The empty plot region above the highest band (Vacanti's
-         "items not yet started" gray). Painted via a chart layer. */
+      /* The empty plot region above the highest band ("items not
+         yet started"). Painted via a chart layer. */
       --cfd-above:    hsl(45, 8%, 28%);
+      /* Boundary lines bracketing the WIP zone. The deep `p-700` /
+         `t-700` shades blend with the band pastels they ride on
+         top of; these dedicated tokens are tuned for contrast
+         against both the band tops and the dark "above" zone. */
+      --cfd-line-arrival:    hsl( 12, 88%, 48%);
+      --cfd-line-throughput: hsl(248, 78%, 52%);
 
       --t-100: hsla(calc(var(--hue) - 60), 30%, 90%, 1);
       --t-500: hsla(calc(var(--hue) - 60), 32%, 54%, 1);
@@ -1179,7 +1198,11 @@
         "muted", "fg", "bg", "surface", "border",
         "cfd-1", "cfd-2", "cfd-3", "cfd-4", "cfd-5",
         "cfd-6", "cfd-7", "cfd-8", "cfd-9",
-        "cfd-terminal", "cfd-above"
+        "cfd-1-deep", "cfd-2-deep", "cfd-3-deep", "cfd-4-deep",
+        "cfd-5-deep", "cfd-6-deep", "cfd-7-deep", "cfd-8-deep",
+        "cfd-9-deep",
+        "cfd-terminal", "cfd-above",
+        "cfd-line-arrival", "cfd-line-throughput"
       ];
       const obj = {};
       for (const t of tokens) obj[t] = cs.getPropertyValue("--" + t).trim();

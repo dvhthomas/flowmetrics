@@ -39,8 +39,7 @@ _CFD_BAND_TOKENS = [f"__theme:cfd-{i}__" for i in range(1, 10)]
 def _palette_for_stages(stage_count: int) -> list[str]:
     """One theme token per stage, in workflow order. The terminal
     stage (last) always uses the muted `cfd-terminal` token so the
-    active WIP bands above it visually dominate the read — same
-    intent as Vacanti's pale-blue "Done" band in Figure 9.8."""
+    active WIP bands above it visually dominate the read."""
     if stage_count <= 0:
         return []
     if stage_count == 1:
@@ -199,7 +198,14 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
                     "domain": list(model.stages),
                     "range": _palette_for_stages(len(model.stages)),
                 },
-                "legend": {"title": None, "orient": "top-right"},
+                # Bottom-orient so the legend sits under the x-axis
+                # (its own row, no overlap with the bands). The
+                # detail page strips the legend entirely client-side
+                # because the floating panel lists every stage.
+                "legend": {
+                    "title": None, "orient": "bottom",
+                    "direction": "horizontal",
+                },
             },
             # Explicit stack order — Vega-Lite's `order` ascending
             # means the lowest stack_order paints at the bottom of
@@ -218,10 +224,12 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
 
     layers: list[dict] = [area_layer]
 
-    # Boundary lines bracketing the WIP zone — Vacanti Figure 9.7.
-    # Top line (arrivals) at cumulative-to-workflow-first; bottom of
-    # WIP (departures) at cumulative-to-terminal. Skip for a
-    # degenerate 1-stage model because the two lines would overplot.
+    # Boundary lines bracketing the WIP zone. Top line (arrivals)
+    # at cumulative-to-workflow-first; bottom of WIP (departures)
+    # at cumulative-to-terminal. Their slopes are the arrival rate
+    # and the throughput; the vertical gap between them at any date
+    # is total WIP. Skip for a 1-stage model — both lines would
+    # overplot.
     if len(model.stages) >= 2:
         terminal_order = len(model.stages) - 1
         # Arrival rate — slope of the top of the stack.
@@ -229,8 +237,8 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
             "transform": [{"filter": "datum.stage_order === 0"}],
             "mark": {
                 "type": "line",
-                "color": "__theme:p-700__",
-                "strokeWidth": 1.75,
+                "color": "__theme:cfd-line-arrival__",
+                "strokeWidth": 2,
                 "interpolate": "linear",
                 "clip": True,
             },
@@ -245,8 +253,8 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
             ],
             "mark": {
                 "type": "line",
-                "color": "__theme:t-700__",
-                "strokeWidth": 1.75,
+                "color": "__theme:cfd-line-throughput__",
+                "strokeWidth": 2,
                 "interpolate": "linear",
                 "clip": True,
             },
@@ -269,10 +277,10 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
         # would no longer match what the reader sees.
         "resolve": {"scale": {"y": "shared"}},
         "config": {
-            # The plot rectangle paints dark — Vacanti's "items not
-            # yet started" gray. Anywhere a stacked band paints over
-            # it disappears; anywhere ABOVE the topmost band the dark
-            # fill shows through, framing the active WIP region.
+            # The plot rectangle paints dark. Anywhere a stacked
+            # band paints over it disappears; anywhere ABOVE the
+            # topmost band the dark fill shows through, framing the
+            # active WIP region.
             "view": {"fill": "__theme:cfd-above__", "stroke": None},
             "axis": {
                 "labelFont": (
