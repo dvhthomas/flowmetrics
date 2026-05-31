@@ -30,6 +30,15 @@
     const METRICS = {{ cfd_daily_metrics(data) | safe }};
     const spec = {{ vega_spec(data) | safe }};
     spec.height = {{ _h }};
+    {% if mode == 'detail' %}
+    // The floating panel lists every stage with its colour swatch
+    // and count, so the top-right legend is redundant — and worse,
+    // sits in the same column as the per-band "N items" labels
+    // when the panel parks on the left of the rule.
+    if (spec.encoding && spec.encoding.color) {
+      spec.encoding.color.legend = null;
+    }
+    {% endif %}
     function embed() {
       vegaEmbed("#{{ chart_container_id }}", window.applyTheme(spec), {
         actions: false,

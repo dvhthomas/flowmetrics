@@ -96,14 +96,17 @@ class TestRenderWiresQueryToModel:
 class TestToVegaStructure:
     def test_spec_uses_a_clipped_stacked_area(self):
         spec = to_vega(_model_with_crop())
-        mark = spec["mark"]
+        # The bands now live in the first layer of a layered spec
+        # (the Vacanti boundary lines stack on top).
+        mark = spec["layer"][0]["mark"]
         assert mark["type"] == "area"
         assert mark["clip"] is True
 
     def test_stage_color_domain_matches_the_model(self):
         model = _model_with_crop()
         spec = to_vega(model)
-        assert spec["encoding"]["color"]["scale"]["domain"] == list(model.stages)
+        area = spec["layer"][0]
+        assert area["encoding"]["color"]["scale"]["domain"] == list(model.stages)
 
     def test_x_scale_fills_edge_to_edge(self):
         # The cumulative area fills the plot edge-to-edge: a `point`
@@ -146,13 +149,87 @@ class TestToVegaCrop:
         assert floor["bind"]["min"] == model.crop.floor
         assert floor["bind"]["max"] == model.crop.ceiling
         assert floor["value"] == model.crop.default
-        # The y scale's domainMin follows the floor param.
-        assert spec["encoding"]["y"]["scale"]["domainMin"] == {
-            "expr": floor["name"],
-        }
+        # The y scale's domainMin follows the floor param. The y
+        # encoding now lives on the area layer; the shared y-scale
+        # (resolve: shared) propagates the floor to the line layers.
+        area_y_scale = spec["layer"][0]["encoding"]["y"]["scale"]
+        assert area_y_scale["domainMin"] == {"expr": floor["name"]}
 
     def test_no_floor_param_when_model_has_no_crop(self):
         entries = [_entry("#1", "A", date(2026, 1, 1))]
         model = build_cfd_model(entries, ("A",))
         assert model.crop is None
         assert "params" not in to_vega(model)
+
+
+class TestVacantiBoundaryLines:
+    """The spec is layered: a stacked area for the bands, plus two
+    cumulative lines bracketing the WIP zone — the top boundary is
+    cumulative arrivals (slope = arrival rate), the bottom of WIP
+    is cumulative departures (slope = throughput). The classical
+    Vacanti CFD interpretation, Figure 9.7."""
+
+    def test_spec_layers_are_area_then_arrival_then_departure(self):
+        spec = to_vega(_model_with_crop())
+        layers = spec["layer"]
+        assert len(layers) == 3
+        marks = [layer["mark"]["type"] for layer in layers]
+        assert marks == ["area", "line", "line"]
+
+    def test_arrival_line_uses_cumulative_at_workflow_first_stage(self):
+        # Top of stack = cumulative arrivals to the first stage = the
+        # row whose stage_order is 0.
+        spec = to_vega(_model_with_crop())
+        arrival = spec["layer"][1]
+        assert arrival["transform"] == [
+            {"filter": "datum.stage_order === 0"},
+        ]
+        assert arrival["encoding"]["y"]["field"] == "cumulative"
+
+    def test_departure_line_uses_cumulative_at_the_terminal_stage(self):
+        # Top of Done = cumulative departures = the row whose
+        # stage_order is the last (terminal) stage.
+        model = _model_with_crop()
+        terminal_order = len(model.stages) - 1
+        spec = to_vega(model)
+        departure = spec["layer"][2]
+        assert departure["transform"] == [
+            {"filter": f"datum.stage_order === {terminal_order}"},
+        ]
+        assert departure["encoding"]["y"]["field"] == "cumulative"
+
+    def test_boundary_lines_each_use_a_themed_colour(self):
+        # Theme tokens so the boundary lines pick up the brand
+        # palette via applyTheme, like every other chart colour.
+        spec = to_vega(_model_with_crop())
+        for line in spec["layer"][1:]:
+            color = line["mark"]["color"]
+            assert color.startswith("__theme:"), color
+
+    def test_arrival_and_departure_lines_are_distinct_colours(self):
+        # The reader needs to be able to tell the arrival slope
+        # apart from the throughput slope without a legend.
+        spec = to_vega(_model_with_crop())
+        arrival_color = spec["layer"][1]["mark"]["color"]
+        departure_color = spec["layer"][2]["mark"]["color"]
+        assert arrival_color != departure_color
+
+    def test_layered_spec_shares_the_y_scale(self):
+        # The area's y = sum(wip) (stack: zero) and the line layers'
+        # y = cumulative carry different field names. Without an
+        # explicit `resolve.scale.y = "shared"`, Vega-Lite would
+        # build a separate y-scale per layer and the hover overlay's
+        # `view.scale("y")` would no longer match the visible chart.
+        spec = to_vega(_model_with_crop())
+        assert spec.get("resolve", {}).get("scale", {}).get("y") == "shared"
+
+    def test_single_stage_model_omits_boundary_lines(self):
+        # Degenerate workflow: terminal only, no WIP zone exists.
+        # Drawing arrival and departure boundaries would just
+        # overplot one line, so the spec falls back to area-only.
+        single = build_cfd_model(
+            [_entry("#1", "A", date(2026, 1, 1))], ("A",),
+        )
+        spec = to_vega(single)
+        assert len(spec["layer"]) == 1
+        assert spec["layer"][0]["mark"]["type"] == "area"

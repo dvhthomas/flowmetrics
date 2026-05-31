@@ -153,37 +153,34 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
             },
         }
 
-    spec: dict = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "background": "transparent",
-        "padding": 12,
-        "width": "container",
-        "data": {"values": values},
+    # x encoding is shared by every layer so the bands, the arrival
+    # line, and the departure line all sit on the same time axis.
+    x_encoding = {
+        "field": "date_iso",
+        "type": "nominal",
+        # A `point` scale anchors first / last data points at
+        # the plot extremes (the default `band` scale anchors
+        # them at band centres, leaving ~half-bandwidth empty
+        # strips at each edge). `padding: 0` removes any
+        # remaining slack so the cumulative area truly fills
+        # edge-to-edge.
+        "scale": {"type": "point", "padding": 0},
+        "axis": {
+            "title": "Date (UTC)",
+            "labelAngle": 0,
+            "values": axis_label_values,
+            "labelExpr": "utcFormat(datetime(datum.value), '%b %d')",
+        },
+        "sort": [d.date_iso for d in model.daily],
+    }
+
+    # Area layer — the existing stacked bands.
+    area_layer = {
         # `clip` keeps the bands inside the plot rectangle so
         # raising the y-floor slider crops them cleanly instead
         # of spilling the cumulative areas below the axis.
         "mark": {"type": "area", "opacity": 0.95, "clip": True},
         "encoding": {
-            "x": {
-                "field": "date_iso",
-                "type": "nominal",
-                # A `point` scale anchors first / last data points at
-                # the plot extremes (the default `band` scale anchors
-                # them at band centres, leaving ~half-bandwidth empty
-                # strips at each edge). `paddingOuter: 0` removes any
-                # remaining slack so the cumulative area truly fills
-                # edge-to-edge.
-                "scale": {"type": "point", "padding": 0},
-                "axis": {
-                    "title": "Date (UTC)",
-                    "labelAngle": 0,
-                    "values": axis_label_values,
-                    "labelExpr": (
-                        "utcFormat(datetime(datum.value), '%b %d')"
-                    ),
-                },
-                "sort": [d.date_iso for d in model.daily],
-            },
             "y": {
                 "field": "wip",
                 "type": "quantitative",
@@ -217,6 +214,60 @@ def _cfd_to_vega(model: CfdModel) -> dict[str, Any]:
             # readout (full per-day breakdown), so a second popup would
             # just clutter.
         },
+    }
+
+    layers: list[dict] = [area_layer]
+
+    # Boundary lines bracketing the WIP zone — Vacanti Figure 9.7.
+    # Top line (arrivals) at cumulative-to-workflow-first; bottom of
+    # WIP (departures) at cumulative-to-terminal. Skip for a
+    # degenerate 1-stage model because the two lines would overplot.
+    if len(model.stages) >= 2:
+        terminal_order = len(model.stages) - 1
+        # Arrival rate — slope of the top of the stack.
+        layers.append({
+            "transform": [{"filter": "datum.stage_order === 0"}],
+            "mark": {
+                "type": "line",
+                "color": "__theme:p-700__",
+                "strokeWidth": 1.75,
+                "interpolate": "linear",
+                "clip": True,
+            },
+            "encoding": {
+                "y": {"field": "cumulative", "type": "quantitative"},
+            },
+        })
+        # Throughput / departure rate — slope of the top of Done.
+        layers.append({
+            "transform": [
+                {"filter": f"datum.stage_order === {terminal_order}"},
+            ],
+            "mark": {
+                "type": "line",
+                "color": "__theme:t-700__",
+                "strokeWidth": 1.75,
+                "interpolate": "linear",
+                "clip": True,
+            },
+            "encoding": {
+                "y": {"field": "cumulative", "type": "quantitative"},
+            },
+        })
+
+    spec: dict = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "background": "transparent",
+        "padding": 12,
+        "width": "container",
+        "data": {"values": values},
+        "encoding": {"x": x_encoding},
+        "layer": layers,
+        # Without explicit sharing, Vega-Lite would build a separate
+        # y-scale for area (field=wip, stacked sum) vs the lines
+        # (field=cumulative) — and the hover overlay's view.scale("y")
+        # would no longer match what the reader sees.
+        "resolve": {"scale": {"y": "shared"}},
         "config": {
             # The plot rectangle paints dark — Vacanti's "items not
             # yet started" gray. Anywhere a stacked band paints over
