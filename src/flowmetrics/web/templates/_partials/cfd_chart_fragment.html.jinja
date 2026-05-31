@@ -48,10 +48,14 @@
     if (window.requestAnimationFrame) { requestAnimationFrame(embed); }
     else { embed(); }
 
-    // Vertical hover guideline linked to the x-axis: as the cursor
-    // moves, snap a dashed line to the nearest day and (if a side
-    // panel exists) fill it with that day's full flow metrics. Reads
-    // the rendered SVG + Vega's x scale — no extra round-trip.
+    // Vertical guideline + floating-panel readout linked to the
+    // x-axis. Hovering snaps a dashed rule to the nearest day and
+    // fills the floating panel with that day's flow metrics; the
+    // panel always parks on the side of the rule with more room so
+    // it can't occlude the date line itself. Clicking pins the
+    // panel to that day (solid rule, outlined panel); clicking the
+    // same day again releases. Reads the rendered SVG + Vega's x
+    // scale — no extra round-trip.
     function setupCfdHover(view, metrics) {
       const container = document.getElementById("{{ chart_container_id }}");
       const svg = container && container.querySelector("svg");
@@ -66,6 +70,8 @@
       rule.style.opacity = "0";
       rule.style.transition = "opacity 80ms";
       svg.appendChild(rule);
+
+      let pinnedIso = null;
 
       function plotBox() {
         const bg = svg.querySelector(".role-frame .background");
@@ -92,7 +98,7 @@
         return best === null ? null : { iso: best, cx: bestCx };
       }
       function val(n) { return (n === null || n === undefined) ? "—" : n; }
-      function renderPanel(iso) {
+      function renderPanel(iso, isPinned) {
         // Look the panel up lazily — it may be parsed into the DOM after
         // this embed callback first runs.
         const panel = document.getElementById("cfd-hover-panel");
@@ -102,7 +108,10 @@
         const bands = Object.keys(m.stages).map(function (s) {
           return "<tr><td>" + s + "</td><td>" + m.stages[s] + "</td></tr>";
         }).join("");
-        panel.innerHTML =
+        const pinHeader = isPinned
+          ? '<p class="cfd-panel-pin">📌 Pinned · click to release</p>'
+          : '';
+        panel.innerHTML = pinHeader +
           '<div class="cfd-panel-date">' + m.date_display + '</div>' +
           '<table class="cfd-panel-table"><thead><tr>' +
           '<th>Stage</th><th>Items</th></tr></thead><tbody>' + bands +
@@ -114,8 +123,50 @@
           '<tr><td>Throughput (avg/day)</td><td>' + val(m.throughput) + '</td></tr>' +
           '<tr><td>Avg cycle time (days)</td><td>' + val(m.avg_cycle_time) +
           '</td></tr></tbody></table>';
+        if (isPinned) panel.classList.add("is-pinned");
+        else panel.classList.remove("is-pinned");
+      }
+      function placePanel(cxSvg) {
+        // Convert the SVG-coord x of the rule to a pixel offset
+        // inside the .cfd-tile-wrap that owns the panel's position,
+        // then park the panel on whichever side of the rule has more
+        // room. Skip on the narrow-viewport breakpoint, where CSS
+        // forces the panel back to static.
+        const panel = document.getElementById("cfd-hover-panel");
+        if (!panel) return;
+        const cs = window.getComputedStyle(panel);
+        if (cs.position !== "absolute") return;
+        const wrap = panel.offsetParent;
+        if (!wrap) return;
+        const svgRect = svg.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        const vb = svg.viewBox.baseVal;
+        const vbw = (vb && vb.width) || svg.clientWidth || 1;
+        const screenCx = svgRect.left + cxSvg * svgRect.width / vbw;
+        const wrapCx = screenCx - wrapRect.left;
+        const panelW = panel.offsetWidth || 200;
+        const gap = 16;
+        const pad = 12;
+        // Prefer the right side of the rule; flip when the panel
+        // would clip the chart's right edge.
+        let left = wrapCx + gap;
+        if (left + panelW > wrapRect.width - pad) {
+          left = wrapCx - gap - panelW;
+        }
+        // Last-resort clamp — never run off the left edge either.
+        if (left < pad) left = pad;
+        panel.style.left = left + "px";
+        panel.style.right = "auto";
+      }
+      function moveRule(cx, box) {
+        rule.setAttribute("x1", cx);
+        rule.setAttribute("x2", cx);
+        rule.setAttribute("y1", box.top);
+        rule.setAttribute("y2", box.bottom);
+        rule.style.opacity = "1";
       }
       function onMove(e) {
+        if (pinnedIso !== null) return;
         const rect = svg.getBoundingClientRect();
         const vb = svg.viewBox.baseVal;
         const vbw = (vb && vb.width) || svg.clientWidth;
@@ -131,22 +182,73 @@
         }
         const nd = nearestDay(svgX, box);
         if (!nd) return;
-        rule.setAttribute("x1", nd.cx);
-        rule.setAttribute("x2", nd.cx);
-        rule.setAttribute("y1", box.top);
-        rule.setAttribute("y2", box.bottom);
-        rule.style.opacity = "1";
-        renderPanel(nd.iso);
+        rule.setAttribute("stroke-dasharray", "3 3");
+        moveRule(nd.cx, box);
+        placePanel(nd.cx);
+        renderPanel(nd.iso, false);
       }
-      // Default the panel to the most recent day, so it's never an empty
-      // block; restore that when the cursor leaves.
+      function onClick(e) {
+        const rect = svg.getBoundingClientRect();
+        const vb = svg.viewBox.baseVal;
+        const vbw = (vb && vb.width) || svg.clientWidth;
+        const svgX = (e.clientX - rect.left) * vbw / rect.width;
+        const box = plotBox();
+        if (!box) return;
+        if (svgX < box.left || svgX > box.right) return;
+        const nd = nearestDay(svgX, box);
+        if (!nd) return;
+        if (pinnedIso === nd.iso) {
+          // Click the pinned day → release.
+          pinnedIso = null;
+          rule.setAttribute("stroke-dasharray", "3 3");
+          moveRule(nd.cx, box);
+          placePanel(nd.cx);
+          renderPanel(nd.iso, false);
+        } else {
+          pinnedIso = nd.iso;
+          rule.setAttribute("stroke-dasharray", "");
+          moveRule(nd.cx, box);
+          placePanel(nd.cx);
+          renderPanel(nd.iso, true);
+        }
+      }
+      // Default the panel to the most recent day so it's never an
+      // empty block; restore that when the cursor leaves and nothing
+      // is pinned.
       const dates = Object.keys(metrics);
       const defaultIso = dates.length ? dates[dates.length - 1] : null;
-      if (defaultIso) renderPanel(defaultIso);
+      function snapDefault() {
+        if (!defaultIso) return;
+        const xs = view.scale("x");
+        const box = plotBox();
+        if (!xs || !box) { renderPanel(defaultIso, false); return; }
+        const bw = xs.bandwidth ? xs.bandwidth() / 2 : 0;
+        const cx = box.left + xs(defaultIso) + bw;
+        placePanel(cx);
+        renderPanel(defaultIso, false);
+      }
+      // Two animation frames to let CSS layout settle before we
+      // measure widths and place the panel.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(snapDefault);
+      });
       svg.addEventListener("mousemove", onMove);
       svg.addEventListener("mouseleave", function () {
+        if (pinnedIso !== null) return;
         rule.style.opacity = "0";
-        if (defaultIso) renderPanel(defaultIso);
+        snapDefault();
+      });
+      svg.addEventListener("click", onClick);
+      window.addEventListener("resize", function () {
+        // Keep a pinned panel anchored to its rule across resizes.
+        if (pinnedIso === null) { snapDefault(); return; }
+        const xs = view.scale("x");
+        const box = plotBox();
+        if (!xs || !box) return;
+        const bw = xs.bandwidth ? xs.bandwidth() / 2 : 0;
+        const cx = box.left + xs(pinnedIso) + bw;
+        moveRule(cx, box);
+        placePanel(cx);
       });
     }
   })();

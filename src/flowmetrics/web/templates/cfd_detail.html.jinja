@@ -14,36 +14,74 @@
 
 {% block content %}
   <style>
-    .cfd-layout { display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.4rem; }
-    .cfd-chart-col { flex: 1; min-width: 0; }
-    /* The chart tile's own margin would offset its border box inside the
-       column while the panel stretches to the full row — making the panel
-       taller top and bottom. Zero it so tile and panel align exactly. */
-    .cfd-chart-col > .metric { margin: 0; }
-    .cfd-panel {
-      flex: 0 0 17rem; align-self: stretch;
-      border: 0.0625rem solid var(--border); border-radius: 0.5rem;
-      background: var(--surface); padding: 0.85rem 1rem;
-      font-size: 0.8125rem;
+    /* The tile owns the panel's offset parent so the panel can
+       float against the chart's coordinates, not the page's. */
+    .cfd-tile-wrap { position: relative; margin-bottom: 0.4rem; }
+    .cfd-tile-wrap > .metric { margin: 0; }
+
+    .cfd-panel-float {
+      position: absolute;
+      top: 3.2rem;
+      width: 12.5rem;
+      z-index: 4;
+      background: var(--surface);
+      border: 0.0625rem solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.75rem;
+      font-size: 0.8rem;
+      box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06);
+      /* Don't intercept chart hover/click — the click handler lives
+         on the SVG itself, and clicking the panel would mean the
+         reader has to aim past it. */
+      pointer-events: none;
+      transition: left 80ms ease;
     }
-    .cfd-panel-hint { color: var(--muted); margin: 0; }
+    .cfd-panel-float.is-pinned {
+      outline: 0.125rem solid var(--p-500);
+      outline-offset: -0.125rem;
+    }
+    .cfd-panel-pin {
+      font-size: 0.65rem; color: var(--p-700);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin: 0 0 0.3rem 0;
+    }
     .cfd-panel-date {
       font-family: var(--head-font); font-weight: 600;
-      color: var(--p-600); margin-bottom: 0.5rem;
+      color: var(--p-600); margin-bottom: 0.4rem;
     }
-    .cfd-panel-table { width: 100%; border-collapse: collapse; margin-bottom: 0.6rem; }
+    .cfd-panel-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 0.45rem;
+    }
     .cfd-panel-table th {
-      text-align: left; font-size: 0.7rem; text-transform: uppercase;
+      text-align: left; font-size: 0.65rem; text-transform: uppercase;
       letter-spacing: 0.05em; color: var(--muted);
-      border-bottom: 0.0625rem solid var(--border); padding: 0.15rem 0;
+      border-bottom: 0.0625rem solid var(--border); padding: 0.12rem 0;
     }
-    .cfd-panel-table td { padding: 0.15rem 0; }
-    .cfd-panel-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-    .cfd-panel-flow { border-top: 0.0625rem dashed var(--border); padding-top: 0.3rem; }
+    .cfd-panel-table td { padding: 0.12rem 0; }
+    .cfd-panel-table td:last-child {
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+    .cfd-panel-flow {
+      border-top: 0.0625rem dashed var(--border); padding-top: 0.3rem;
+    }
     .cfd-panel-flow td:first-child { color: var(--muted); }
+    .cfd-scrub-hint {
+      font-size: 0.75rem; color: var(--muted); margin: 0 0 1.4rem 0;
+    }
+    .cfd-scrub-hint kbd {
+      font-family: var(--mono-font); font-size: 0.7rem;
+      background: var(--surface); border: 0.0625rem solid var(--border);
+      border-radius: 0.2rem; padding: 0 0.3rem;
+    }
+
+    /* Narrow viewports: the floating overlay falls back to a static
+       block below the chart so it doesn't crowd a phone-width chart. */
     @media (max-width: 56rem) {
-      .cfd-layout { flex-direction: column; }
-      .cfd-panel { flex: none; width: 100%; box-sizing: border-box; }
+      .cfd-panel-float {
+        position: static; width: 100%; box-sizing: border-box;
+        margin-top: 0.75rem; left: auto !important; right: auto;
+      }
+      .cfd-scrub-hint { display: none; }
     }
   </style>
 
@@ -51,18 +89,16 @@
     {% include "_partials/metric_summary.html.jinja" %}
   {% endwith %}
 
-  <div class="cfd-layout">
-    <div class="cfd-chart-col">
-      {% with mode = 'detail', data = cfd %}
-        {% include "_partials/cfd_tile.html.jinja" %}
-      {% endwith %}
-    </div>
-    <aside id="cfd-hover-panel" class="cfd-panel">
-      <p class="cfd-panel-hint">Hover a day on the chart to see its flow
-        metrics — items per stage, WIP, arrivals, departures, throughput
-        and average cycle time.</p>
-    </aside>
+  <div class="cfd-tile-wrap">
+    {% with mode = 'detail', data = cfd %}
+      {% include "_partials/cfd_tile.html.jinja" %}
+    {% endwith %}
+    <aside id="cfd-hover-panel" class="cfd-panel-float" aria-live="polite"></aside>
   </div>
+  <p class="cfd-scrub-hint">
+    Hover any day to scrub; <kbd>click</kbd> to pin the panel there.
+    Click the pinned day again to release.
+  </p>
 
   {% if cfd.daily %}
   <section class="ds-section" style="margin-top: 1.5rem;">
