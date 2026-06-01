@@ -133,7 +133,7 @@ starters: [`samples/`](../samples/).
 First, see what's configured:
 
 ```bash
-flow contracts list --workflows-dir CONTRACTS_DIR
+flow workflows list --workflows-dir CONTRACTS_DIR
 # NAME           SOURCE  TARGET
 # astral-uv      db      astral-sh/uv
 # kno-shaping    db      dvhthomas/kno

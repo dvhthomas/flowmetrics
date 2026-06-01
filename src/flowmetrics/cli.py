@@ -673,7 +673,7 @@ def materialize(
 
     NAME is looked up DB-first in `<workflows-dir>/contracts.db`
     (where the wizard writes), then falls back to a `NAME.yaml` file
-    in the same directory. `flow contracts list` shows what's
+    in the same directory. `flow workflows list` shows what's
     resolvable. Use `flow materialize-all` for the whole set.
 
     Invoked by external cron / systemd-timer / k8s CronJob. Exits 0
@@ -826,7 +826,7 @@ def materialize_all(
     """Iterate every configured workflow and materialize each one.
 
     Workflows come from contracts.db (the wizard's store) plus any
-    un-migrated YAML files in --workflows-dir. `flow contracts list`
+    un-migrated YAML files in --workflows-dir. `flow workflows list`
     shows what would run.
 
     Scheduler-friendly: a single failing contract doesn't block the
@@ -909,12 +909,12 @@ def materialize_all(
 
 
 @cli.group(short_help="Inspect configured workflows")
-def contracts() -> None:
-    """Read-only inspection of configured workflows (contracts.db +
+def workflows() -> None:
+    """Read-only inspection of configured workflows (workflows.db +
     un-migrated YAML files in --workflows-dir)."""
 
 
-@contracts.command("list", short_help="List configured workflows")
+@workflows.command("list", short_help="List configured workflows")
 @click.option(
     "--workflows-dir", "contracts_dir",
     type=click.Path(path_type=Path),

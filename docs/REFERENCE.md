@@ -111,7 +111,7 @@ is verified **before** any byte is written.
 (data-only) archives restore with the default invocation; trying
 `--config-only` against one is a hard error.
 
-### `flow contracts list`
+### `flow workflows list`
 
 Read-only enumeration of configured workflows.
 

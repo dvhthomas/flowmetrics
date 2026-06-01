@@ -1,4 +1,4 @@
-"""`flow contracts list` — read-only enumeration of configured
+"""`flow workflows list` — read-only enumeration of configured
 workflows.
 
 The materialize commands silently read from contracts.db (DB-first)
@@ -97,7 +97,7 @@ class TestEmpty:
     def test_empty_workflows_dir_shows_helpful_message(self, tmp_path):
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(tmp_path / "contracts")],
+            ["workflows", "list", "--workflows-dir", str(tmp_path / "contracts")],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
@@ -116,7 +116,7 @@ class TestListsDbRows:
 
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(wf)],
+            ["workflows", "list", "--workflows-dir", str(wf)],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
@@ -133,7 +133,7 @@ class TestListsYamlFallback:
     def test_shows_unmigrated_yaml_files_with_source_marker(self, tmp_path):
         """A user can drop a YAML into the workflows-dir without
         having run `flow serve` (which is what migrates YAMLs into
-        the DB). `flow contracts list` must still see them so
+        the DB). `flow workflows list` must still see them so
         `flow materialize NAME` against a YAML-only contract is
         discoverable."""
         wf = tmp_path / "contracts"
@@ -141,7 +141,7 @@ class TestListsYamlFallback:
 
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(wf)],
+            ["workflows", "list", "--workflows-dir", str(wf)],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
@@ -160,7 +160,7 @@ class TestDbWinsWhenBothPresent:
 
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(wf)],
+            ["workflows", "list", "--workflows-dir", str(wf)],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
@@ -179,7 +179,7 @@ class TestArchived:
 
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(wf)],
+            ["workflows", "list", "--workflows-dir", str(wf)],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
@@ -193,7 +193,7 @@ class TestArchived:
 
         result = CliRunner().invoke(
             cli,
-            ["contracts", "list", "--workflows-dir", str(wf), "--all"],
+            ["workflows", "list", "--workflows-dir", str(wf), "--all"],
             catch_exceptions=False,
         )
         assert result.exit_code == 0, result.output
