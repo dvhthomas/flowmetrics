@@ -1,129 +1,55 @@
-{# Page-level Percentile Filter slider.
+{# Page-level Percentile Filter — single-select chip bar.
 
-   Two-handle range that narrows BOTH the chart's scatter AND the
-   work-items table to items inside [ptile_min, ptile_max]. Lives
-   above the chart so the reader sees it as a top-level page
-   control, not a table-only filter.
+   One click filters BOTH the chart's scatter AND the work-items
+   table to items inside the chosen percentile bucket. `All` is
+   the default and lifts the filter.
 
-   Handles snap to {0} ∪ {50, 55, 60, …, 100}. The script clamps
-   min ≤ max, snaps off-ladder values, and writes a live
-   "P50 (4d) – P85 (12d)" readout from `data.ptile_values`.
-
-   On `change` the slider posts to the work-items endpoint with
-   `from=slider` so the server fires `HX-Trigger-After-Settle:
-   flowmetrics:ptile-changed`. The chart fragment listens for
-   that event and re-fetches itself with the same bounds out of
-   #work-items-state. Sort + direction come from that meta too,
-   so the table's current ordering survives a slider move.
+   Each chip carries `data-ptile-min` / `data-ptile-max` and
+   posts to the work-items endpoint via HTMX on click. The
+   response carries `HX-Trigger-After-Settle:
+   flowmetrics:ptile-changed` so the chart fragment above
+   refetches itself with the same bounds.
 
    Required context:
      data           — WorkItemsTableData (carries ptile_min /
                       ptile_max / ptile_values / ptile_unit).
      contract.name  — for the HTMX URL.
 #}
+{%- set unit = data.ptile_unit -%}
+{%- set values = data.ptile_values -%}
+{# Bucket label helper — renders e.g. "P50–P85" or with the
+   actual metric value alongside when available. #}
+{%- macro chip(label, lo, hi, current_lo, current_hi) -%}
+  {%- set is_active = (lo == current_lo and hi == current_hi) -%}
+  <button type="button"
+          class="ptile-chip{% if is_active %} ptile-chip--active{% endif %}"
+          data-ptile-min="{{ lo }}"
+          data-ptile-max="{{ hi }}"
+          hx-get="/api/internal/work-items?workflow={{ contract.name }}&from=slider&ptile_min={{ lo }}&ptile_max={{ hi }}"
+          hx-target="#work-items-body"
+          hx-swap="innerHTML"
+          hx-vals='js:{sort: document.getElementById("work-items-state")?.dataset.sort || "", direction: document.getElementById("work-items-state")?.dataset.direction || ""}'
+          hx-include="#work-items-search, #work-items-completed-on, #work-items-in-flight-at">
+    {{ label }}
+  </button>
+{%- endmacro -%}
 <div class="ptile-toolbar">
-  <div class="ptile-slider">
-    <div class="ptile-slider-label">
-      <span>Percentile Filter</span>
-      <strong id="ptile-display">—</strong>
-    </div>
-    <script type="application/json" id="ptile-values">
-      {"unit": {{ data.ptile_unit | tojson }},
-       "values": {{ data.ptile_values | tojson }}}
-    </script>
-    <div class="ptile-slider-handles">
-      <input type="range" min="0" max="100" step="5"
-             id="ptile-min" name="ptile_min"
-             value="{{ data.ptile_min }}"
-             hx-get="/api/internal/work-items?workflow={{ contract.name }}&from=slider"
-             hx-target="#work-items-body"
-             hx-swap="innerHTML"
-             hx-trigger="change"
-             hx-vals='js:{sort: document.getElementById("work-items-state")?.dataset.sort || "", direction: document.getElementById("work-items-state")?.dataset.direction || ""}'
-             hx-include="#ptile-max, #work-items-search, #work-items-completed-on, #work-items-in-flight-at">
-      <input type="range" min="0" max="100" step="5"
-             id="ptile-max" name="ptile_max"
-             value="{{ data.ptile_max }}"
-             hx-get="/api/internal/work-items?workflow={{ contract.name }}&from=slider"
-             hx-target="#work-items-body"
-             hx-swap="innerHTML"
-             hx-trigger="change"
-             hx-vals='js:{sort: document.getElementById("work-items-state")?.dataset.sort || "", direction: document.getElementById("work-items-state")?.dataset.direction || ""}'
-             hx-include="#ptile-min, #work-items-search, #work-items-completed-on, #work-items-in-flight-at">
-      <div class="ptile-slider-ticks" aria-hidden="true">
-        <span style="left: 0%">P0</span>
-        <span style="left: 50%">P50</span>
-        <span style="left: 85%">P85</span>
-        <span style="left: 95%">P95</span>
-      </div>
-    </div>
+  <span class="ptile-toolbar-label">Percentile</span>
+  <div class="ptile-chips" role="group" aria-label="Percentile filter">
+    {{ chip("All", 0, 100, data.ptile_min, data.ptile_max) }}
+    {{ chip("≤ P50", 0, 50, data.ptile_min, data.ptile_max) }}
+    {{ chip("P50–P85", 50, 85, data.ptile_min, data.ptile_max) }}
+    {{ chip("P85–P95", 85, 95, data.ptile_min, data.ptile_max) }}
+    {{ chip("> P95", 95, 100, data.ptile_min, data.ptile_max) }}
   </div>
+  <span class="ptile-toolbar-bounds">
+    {%- set p50 = values.get(50) -%}
+    {%- set p85 = values.get(85) -%}
+    {%- set p95 = values.get(95) -%}
+    {%- if p50 is not none -%}
+      P50 {{ p50 | round(1) }}{{ unit }}
+      · P85 {{ p85 | round(1) }}{{ unit }}
+      · P95 {{ p95 | round(1) }}{{ unit }}
+    {%- endif -%}
+  </span>
 </div>
-
-<script>
-  (function () {
-    const pmin = document.getElementById('ptile-min');
-    const pmax = document.getElementById('ptile-max');
-    const display = document.getElementById('ptile-display');
-    const ptileMeta = JSON.parse(
-      document.getElementById('ptile-values').textContent
-    );
-    const unit = ptileMeta.unit || '';
-    const values = ptileMeta.values || {};
-    function snap(v) {
-      v = parseInt(v, 10);
-      if (v <= 25) return 0;
-      if (v < 50) return 50;
-      return Math.round(v / 5) * 5;
-    }
-    function fmtValue(p) {
-      const v = values[String(p)];
-      if (v === undefined || v === null) return '—';
-      const rounded = v >= 10 ? Math.round(v) : Math.round(v * 10) / 10;
-      return rounded + unit;
-    }
-    function clampAndShow() {
-      let lo = snap(pmin.value);
-      let hi = snap(pmax.value);
-      if (lo > hi) {
-        if (document.activeElement === pmin) hi = lo;
-        else lo = hi;
-      }
-      pmin.value = lo;
-      pmax.value = hi;
-      // Single textContent write — no nested spans, no
-      // collapsed whitespace, no baseline-jitter between
-      // glyphs. Em-dash between bounds.
-      display.textContent =
-        'P' + lo + ' (' + fmtValue(lo) + ') – P' + hi + ' (' + fmtValue(hi) + ')';
-    }
-    pmin.addEventListener('input', clampAndShow);
-    pmax.addEventListener('input', clampAndShow);
-
-    // Click on the empty track → move the nearer handle to that
-    // position. Two stacked <input type="range"> with
-    // `pointer-events: none` only let the thumbs catch events;
-    // without this hook, clicking the track does nothing —
-    // which reads as the slider being broken.
-    const handles = pmin.parentElement;
-    handles.addEventListener('pointerdown', function (e) {
-      // Ignore events that landed on a thumb (its computed
-      // pointer-events is `auto`) — the browser already handles
-      // those.
-      if (e.target.tagName === 'INPUT') return;
-      const rect = handles.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(100,
-        ((e.clientX - rect.left) / rect.width) * 100
-      ));
-      const newVal = snap(pct);
-      const distMin = Math.abs(newVal - parseInt(pmin.value, 10));
-      const distMax = Math.abs(newVal - parseInt(pmax.value, 10));
-      const target = distMin <= distMax ? pmin : pmax;
-      target.value = newVal;
-      clampAndShow();
-      target.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-
-    clampAndShow();
-  })();
-</script>

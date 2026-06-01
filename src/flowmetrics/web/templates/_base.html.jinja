@@ -780,106 +780,47 @@
       margin-bottom: 0.4rem;
     }
 
-    /* Page-level Percentile Filter toolbar. Sits between the
-       metric strip and the chart so the slider is the FIRST
-       interaction the reader sees after the headline, not a
-       below-the-fold control. */
+    /* Page-level Percentile Filter — single-select chip bar.
+       Sits between the metric strip and the chart so it's the
+       first thing the reader sees after the headline. */
     .ptile-toolbar {
-      display: flex; align-items: stretch;
+      display: flex; align-items: center;
+      flex-wrap: wrap;
+      gap: 0.55rem;
       margin: 0.35rem 0 0.5rem 0;
     }
-
-    /* Compact "Percentile Filter" slider. The two range inputs
-       are stacked on the same row so their tracks overlay; pointer
-       events still route to whichever handle the user grabs. */
-    .ptile-slider {
-      display: flex; flex-direction: column; gap: 0.1rem;
-      flex: 1 1 auto; min-width: 18rem;
-      padding: 0.1rem 0.55rem 0.45rem 0.55rem;
-      background: var(--surface);
+    .ptile-toolbar-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      font-weight: 600;
+    }
+    .ptile-chips {
+      display: inline-flex;
       border: 0.0625rem solid var(--border);
       border-radius: 0.3rem;
+      overflow: hidden;
+      background: var(--white);
     }
-    .ptile-slider-label {
-      display: flex; gap: 0.45rem; align-items: baseline;
-      font-size: 0.7rem; color: var(--muted);
-      letter-spacing: 0.02em;
+    .ptile-chip {
+      appearance: none;
+      border: 0; background: var(--white);
+      color: var(--fg);
+      font-family: inherit; font-size: 0.78rem;
+      padding: 0.32rem 0.7rem;
+      cursor: pointer;
+      border-right: 0.0625rem solid var(--border);
+      transition: background 0.12s, color 0.12s;
     }
-    .ptile-slider-label > span:first-child {
-      text-transform: uppercase; font-weight: 600;
-      letter-spacing: 0.06em;
+    .ptile-chip:last-child { border-right: 0; }
+    .ptile-chip:hover { background: var(--surface); }
+    .ptile-chip--active {
+      background: var(--p-500); color: var(--white);
+      font-weight: 600;
     }
-    .ptile-slider-label strong {
+    .ptile-chip--active:hover { background: var(--p-700); }
+    .ptile-toolbar-bounds {
+      font-size: 0.72rem; color: var(--muted);
       font-family: var(--mono-font);
-      color: var(--fg); font-weight: 600;
-      font-size: 0.72rem;
-      margin-left: auto;
-    }
-    .ptile-slider-handles {
-      position: relative; height: 1.3rem;
-    }
-    .ptile-slider-handles > input[type="range"] {
-      position: absolute; inset: 0;
-      width: 100%; margin: 0;
-      background: transparent;
-      /* Input itself doesn't catch pointer events — only the
-         thumb does (see ::-thumb rules below). A click on the
-         empty track is handled by the JS click hook (move the
-         nearest handle) so users get the expected "click track
-         to jump" behaviour. */
-      pointer-events: none;
-      -webkit-appearance: none; appearance: none;
-    }
-    /* Hide the default track on each input so the two stacked
-       ranges don't paint two faint tracks on top of each other. */
-    .ptile-slider-handles > input[type="range"]::-webkit-slider-runnable-track {
-      height: 0.3rem; background: transparent;
-    }
-    .ptile-slider-handles > input[type="range"]::-moz-range-track {
-      height: 0.3rem; background: transparent;
-    }
-    /* Background track behind both handles. */
-    .ptile-slider-handles::before {
-      content: "";
-      position: absolute; left: 0; right: 0;
-      top: 50%; height: 0.3rem;
-      transform: translateY(-50%);
-      background: var(--bg);
-      border: 0.0625rem solid var(--border);
-      border-radius: 0.15rem;
-    }
-    /* WebKit thumb. */
-    .ptile-slider-handles > input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 0.8rem; height: 0.8rem; border-radius: 50%;
-      background: var(--p-500); border: 0.125rem solid var(--white);
-      box-shadow: 0 0 0 0.0625rem var(--border);
-      pointer-events: auto; cursor: ew-resize;
-    }
-    .ptile-slider-handles > input[type="range"]::-moz-range-thumb {
-      width: 0.8rem; height: 0.8rem; border-radius: 50%;
-      background: var(--p-500); border: 0.125rem solid var(--white);
-      box-shadow: 0 0 0 0.0625rem var(--border);
-      pointer-events: auto; cursor: ew-resize;
-    }
-    .ptile-slider-ticks {
-      position: absolute; left: 0; right: 0; top: 100%;
-      pointer-events: none; height: 0.65rem;
-    }
-    .ptile-slider-ticks > span {
-      position: absolute; transform: translateX(-50%);
-      font-size: 0.55rem; color: var(--muted);
-      font-family: var(--mono-font); top: 0;
-    }
-    /* P0 and P100 stick to the edges; keep the label inside the
-       rail so they aren't clipped by the slider container's pad. */
-    .ptile-slider-ticks > span:first-child { transform: translateX(0); }
-    .ptile-slider-ticks > span:last-child { transform: translateX(-100%); }
-    .ptile-slider-ticks > span::before {
-      content: ""; display: block;
-      position: absolute; left: 50%; top: -0.4rem;
-      width: 0.0625rem; height: 0.3rem;
-      background: var(--muted); transform: translateX(-50%);
     }
     .work-items-search {
       flex: 0 1 20rem;
