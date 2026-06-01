@@ -106,6 +106,31 @@
     }
     pmin.addEventListener('input', clampAndShow);
     pmax.addEventListener('input', clampAndShow);
+
+    // Click on the empty track → move the nearer handle to that
+    // position. Two stacked <input type="range"> with
+    // `pointer-events: none` only let the thumbs catch events;
+    // without this hook, clicking the track does nothing —
+    // which reads as the slider being broken.
+    const handles = pmin.parentElement;
+    handles.addEventListener('pointerdown', function (e) {
+      // Ignore events that landed on a thumb (its computed
+      // pointer-events is `auto`) — the browser already handles
+      // those.
+      if (e.target.tagName === 'INPUT') return;
+      const rect = handles.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(100,
+        ((e.clientX - rect.left) / rect.width) * 100
+      ));
+      const newVal = snap(pct);
+      const distMin = Math.abs(newVal - parseInt(pmin.value, 10));
+      const distMax = Math.abs(newVal - parseInt(pmax.value, 10));
+      const target = distMin <= distMax ? pmin : pmax;
+      target.value = newVal;
+      clampAndShow();
+      target.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
     clampAndShow();
   })();
 </script>

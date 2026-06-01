@@ -863,6 +863,11 @@
       position: absolute; inset: 0;
       width: 100%; margin: 0;
       background: transparent;
+      /* Input itself doesn't catch pointer events — only the
+         thumb does (see ::-thumb rules below). A click on the
+         empty track is handled by the JS click hook (move the
+         nearest handle) so users get the expected "click track
+         to jump" behaviour. */
       pointer-events: none;
       -webkit-appearance: none; appearance: none;
     }
