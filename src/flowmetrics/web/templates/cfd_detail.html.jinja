@@ -112,13 +112,13 @@
   </section>
   {% endif %}
 
-  <section class="detail-extras">
+  <details class="detail-extras">
+    <summary>Help · how to read, what to do next</summary>
     <h2>How to read this</h2>
     <p>
       Each band is a stage. Its height on a given date is the
       count of items currently in that stage. Bands stack in
-      workflow order top-to-bottom (entry stage at the top,
-      terminal stage at the bottom); total stack height = items
+      workflow order top-to-bottom; total stack height = items
       currently in the system.
     </p>
     <ul>
@@ -137,16 +137,13 @@
     <ul>
       <li>If a single band stays consistently widest, set a
         <strong>WIP limit</strong> on that stage and review it
-        weekly. WIP limits drive flow more reliably than
-        adding capacity.</li>
+        weekly.</li>
       <li>Hover the flow-balance chart on a deficit run to find
-        the exact date WIP started accumulating — that's where
-        the operational change to investigate lives.</li>
-      <li>If the top band is steepening (arrivals accelerating)
-        while the bottom is flat: stop intake or split work
-        before cycle time degrades.</li>
+        the exact date WIP started accumulating.</li>
+      <li>If the top band is steepening while the bottom is flat:
+        stop intake or split work before cycle time degrades.</li>
     </ul>
-  </section>
+  </details>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
 {% endblock %}

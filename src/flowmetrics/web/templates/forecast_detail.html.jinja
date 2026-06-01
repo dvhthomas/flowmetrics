@@ -61,40 +61,36 @@
     </section>
   </div>
 
-  <section class="detail-extras">
+  <details class="detail-extras">
+    <summary>Help · how to read, what to do next</summary>
     <h2>How to read this</h2>
     <p>
       Both panels run 10,000 Monte Carlo simulations against the
       historical daily-throughput distribution, sampling with
-      replacement. The bars show how often each outcome occurred
-      across the 10K runs.
+      replacement.
     </p>
     <ul>
       <li><strong>P85 by</strong> a date = "done by this date in
         85% of simulations" — the right number for a commitment.</li>
       <li><strong>P85 ≥</strong> a count = "at least this many
-        finished in 85% of runs" — a high-confidence floor, not
-        a likely expectation.</li>
-      <li>Forecasts assume the future looks like the past. After
-        a process, team, or scope change, the baseline window is
-        a weaker predictor — rebaseline once enough new
-        throughput data exists.</li>
+        finished in 85% of runs" — a high-confidence floor.</li>
+      <li>Forecasts assume the future looks like the past — after
+        process, team, or scope change, rebaseline.</li>
     </ul>
 
     <h2>Possible next steps</h2>
     <ul>
-      <li>Commit on <strong>P85</strong>, plan on P50 (Vacanti).
-        Reporting only P50 understates risk; reporting only P95
-        leaves money on the table.</li>
+      <li>Commit on <strong>P85</strong>, plan on P50. Reporting
+        only P50 understates risk; only P95 leaves money on the
+        table.</li>
       <li>If the distribution is wide, reduce variance before
-        adding capacity — smaller batches, WIP limits and fewer
-        in-progress threads move P85 down faster than more
-        people do.</li>
+        adding capacity — smaller batches and WIP limits move
+        P85 down faster than more people.</li>
       <li>If forecast and actuals drift apart, rebaseline the
         historical window rather than nudging the forecast by
-        hand — the distribution carries the truth.</li>
+        hand.</li>
     </ul>
-  </section>
+  </details>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
 {% endblock %}

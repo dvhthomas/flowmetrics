@@ -59,17 +59,13 @@
 
   {# The reference period only drives aging thresholds + forecasts.
      Pages that don't use it (e.g. the CFD) pass `hide_reference` so
-     the control isn't shown as confusing dead UI. #}
+     the control isn't shown as confusing dead UI. The <details>
+     sits inline on the bar; open reveals the Reference dropdown
+     beside it. No long help paragraph — the dropdown's own label
+     and the tooltip on `summary` carry the meaning. #}
   {% if not hide_reference %}
   <details class="filter-advanced"{% if contract.window.is_advanced %} open{% endif %}>
-    <summary>Advanced</summary>
-    <p class="filter-hint">
-      The <strong>reference period</strong> is the recent
-      sample the aging thresholds and forecasts draw from.
-      It matches the Period above by default; override here
-      to draw the sample from a different number of days.
-      It always ends on the most recent data.
-    </p>
+    <summary title="Reference period — the recent sample the aging thresholds and forecasts draw from. Defaults to match Period.">Advanced</summary>
     <label class="filter-compact">Reference
       <select name="ref_days"
               data-default="{{ contract.default_ref_days }}"

@@ -18,14 +18,15 @@
     {% include "_partials/work_items_table.html.jinja" %}
   {% endwith %}
 
-  <section class="detail-extras">
+  <details class="detail-extras">
+    <summary>Help · how to read, what to do next</summary>
     <h2>How to read this</h2>
     <p>
       Each point is one in-flight item plotted at its current
-      state (x) against its elapsed age in days (y). The dashed
-      lines are empirical percentiles of completed-item cycle
-      times: P50, P85, P95. A <em>"right now"</em> snapshot —
-      pinned to the latest materialise, not the Period picker.
+      state (x) against its elapsed age in days (y). Dashed lines
+      are empirical percentiles of completed-item cycle times:
+      P50, P85, P95. A <em>"right now"</em> snapshot — pinned
+      to the latest materialise, not the Period picker.
     </p>
     <ul>
       <li>Items above <strong>P85</strong> are statistically
@@ -40,8 +41,7 @@
 
     <h2>Possible next steps</h2>
     <p>
-      Vacanti's headline rule for aging WIP is <em>"stop
-      starting, start finishing"</em> — work the oldest item
+      "Stop starting, start finishing" — work the oldest item
       first.
     </p>
     <ul>
@@ -52,7 +52,7 @@
       <li>Items breaching P95: assume it won't finish as scoped
         — re-plan rather than wait it out.</li>
     </ul>
-  </section>
+  </details>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
 {% endblock %}

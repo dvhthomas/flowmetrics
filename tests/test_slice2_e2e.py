@@ -364,21 +364,26 @@ class TestDetailPageCycleTime:
     def test_detail_page_has_placeholder_sections(
         self, server_url: str, page: Page
     ):
-        """The detail page reserves space for two sections below the
-        tile: a short description + interpret bullets, and a separate
-        actionable-guidance section. (Earlier slices also had
-        Caveats and Methodology stubs — those were folded into the
-        description when the extras were tightened to "how to read"
-        + "possible next steps".)
+        """The detail page reserves space for a collapsible help
+        block below the tile, carrying both 'How to read this' and
+        'Possible next steps'. The block is closed by default so
+        the page reads clean; opening it surfaces both H2s.
         """
         page.goto(server_url + "/workflows/astral-uv-week/metrics/cycle-time")
         page.wait_for_selector("#cycle-time-tile svg", timeout=10000)
-        # Section H2s render UPPERCASE per Knox eyebrow style;
-        # compare case-insensitively so the assertion survives
-        # display-case changes.
-        text = page.locator("body").inner_text().lower()
-        assert "how to read" in text, "missing 'How to read' section"
-        assert "possible next steps" in text, "missing 'Possible next steps' section"
+        # The collapsible <details class="detail-extras"> exists
+        # and is closed by default.
+        details = page.locator("details.detail-extras")
+        assert details.count() == 1
+        assert details.evaluate("el => el.open") is False
+        # Open it and confirm both H2s sit inside.
+        details.evaluate("el => { el.open = true; }")
+        headings = [
+            h.lower()
+            for h in details.locator("h2").all_inner_texts()
+        ]
+        assert "how to read this" in headings
+        assert "possible next steps" in headings
 
     def test_detail_page_shows_metric_summary_above_tile(
         self, server_url: str, page: Page

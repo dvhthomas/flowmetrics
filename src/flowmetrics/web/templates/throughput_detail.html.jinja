@@ -13,7 +13,8 @@
     {% include "_partials/work_items_table.html.jinja" %}
   {% endwith %}
 
-  <section class="detail-extras">
+  <details class="detail-extras">
+    <summary>Help · how to read, what to do next</summary>
     <h2>How to read this</h2>
     <p>
       Each bar is one calendar day; the height is the count of
@@ -38,10 +39,10 @@
       <li>If throughput is trending down: cap new work pulls
         until the trend reverses, rather than adding capacity.</li>
       <li>If the spread is widening: look for growing batch size,
-        rework loops, or unplanned work — those are the typical
-        variance amplifiers Reinertsen flags.</li>
+        rework loops, or unplanned work — typical variance
+        amplifiers.</li>
     </ul>
-  </section>
+  </details>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
 {% endblock %}

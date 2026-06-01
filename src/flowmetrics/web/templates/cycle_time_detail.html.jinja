@@ -13,7 +13,8 @@
     {% include "_partials/work_items_table.html.jinja" %}
   {% endwith %}
 
-  <section class="detail-extras">
+  <details class="detail-extras">
+    <summary>Help · how to read, what to do next</summary>
     <h2>How to read this</h2>
     <p>
       Each point is one completed item plotted at its completion
@@ -23,7 +24,7 @@
     </p>
     <ul>
       <li>Cycle time is almost always right-skewed — commit on
-        <strong>P85</strong>, not the mean (Vacanti).</li>
+        <strong>P85</strong>, not the mean.</li>
       <li>P85 rising while throughput holds steady = WIP is
         growing; rising P95 = process exceptions are piling up.</li>
       <li>Each long-tail outlier is a story worth tracing
@@ -34,8 +35,7 @@
     <h2>Possible next steps</h2>
     <ul>
       <li>Commit externally to <strong>P85</strong>; reserve P50
-        for internal planning. If the gap between P50 and P85
-        is wide, the system is unpredictable — fix variability
+        for internal planning. If the gap is wide, fix variability
         before promising a date.</li>
       <li>Pick the most recent outlier and trace why it tailed.
         Almost always it's a queue or a handoff, not the work
@@ -44,7 +44,7 @@
         falling P85 with stable throughput is the canonical
         flow improvement signal.</li>
     </ul>
-  </section>
+  </details>
 
   <a class="back-link" href="{{ ("/workflows/" ~ contract.name ~ "/") | keep_filters }}">← Back to dashboard</a>
 {% endblock %}
