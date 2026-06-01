@@ -51,15 +51,15 @@ in five minutes.
 
 ## Two ways to use it
 
-**Interactive dashboard** — point at a workflow YAML, materialise into
-a local Parquet warehouse, browse charts in your browser. Period picker
-drives Throughput, Cycle Time, CFD, and Forecast; Aging WIP is pinned to
-the latest data.
+**Interactive dashboard** — start the server, configure workflows in
+the browser, browse charts. The wizard probes your GitHub repo or
+Jira project, suggests stages, and writes a `contracts.db` — no
+hand-edited YAML needed.
 
 ```
-flow materialise astral-uv-week --workflows-dir contracts/
-flow serve --workflows-dir contracts/
-# → http://127.0.0.1:8000
+flow serve              # → http://127.0.0.1:8000 → "+ New workflow"
+# macOS: `flow serve --bg` installs a persistent LaunchAgent so the
+# dashboard survives logout / reboot.
 ```
 
 **Ad-hoc reports** — one-shot CLI for terminal pipelines, static HTML

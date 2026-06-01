@@ -8,7 +8,8 @@ For canonical detail on every flag, file, and schema, see
 [REFERENCE.md](REFERENCE.md).
 
 - [Install on macOS, Linux, Windows](#install)
-- [Write a workflow YAML](#write-a-workflow-yaml)
+- [Add a workflow in the browser](#add-a-workflow-in-the-browser)
+- [Write a workflow YAML by hand](#write-a-workflow-yaml-by-hand)
 - [Fetch data once](#fetch-data-once)
 - [Schedule data fetches](#schedule-data-fetches)
 - [Run the dashboard locally](#run-the-dashboard-locally)
@@ -59,10 +60,33 @@ where flow                          # Windows
   `https://issues.apache.org/jira`) need no credentials. Private
   instances: see [REFERENCE § Workflow YAML](REFERENCE.md#workflow-yaml).
 
-## Write a workflow YAML
+## Add a workflow in the browser
+
+The simplest path. Start the dashboard, click **+ New workflow**, fill
+in the wizard.
+
+```bash
+flow serve            # or `flow serve --bg` on macOS for persistent
+# → http://127.0.0.1:8000
+```
+
+The wizard probes your source (GitHub repo or Jira project) to
+auto-suggest labels / statuses, lets you pick stages, and writes to
+`<workflows-dir>/contracts.db`. Walkthrough with screenshots:
+[TUTORIAL § 5](TUTORIAL.md#5-add-a-workflow-in-the-browser).
+
+Once saved, hit **Data source** → **Backfill** to materialise.
+
+## Write a workflow YAML by hand
+
+For scripted setups, code review, or committing workflows to version
+control. The wizard's output IS YAML under the hood; hand-authoring
+just skips the UI.
 
 One YAML per workflow, in a directory you control (e.g.
-`~/flow/contracts/`).
+`~/flow/contracts/`). On `flow serve` first-boot, any YAMLs in the
+workflows-dir are imported into `contracts.db` and moved to
+`migrated/` — so YAML-edits round-trip into the wizard.
 
 ```yaml
 # Minimal GitHub PR-review workflow.
