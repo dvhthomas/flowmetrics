@@ -1,285 +1,88 @@
-"""`flow serve --bg` — install + start the dashboard as a persistent
-native service.
+"""Dispatcher for `flow serve --bg` — picks launchd vs systemd vs
+"unsupported" off `sys.platform`.
 
-Slice 1: macOS launchd. The bg module hides launchctl mechanics
-behind two verbs: `install_and_start` (idempotent — restart if
-already installed) and `stop_and_uninstall` (full teardown).
-
-These tests pin three things:
-
-  1. The plist we generate has the load-bearing keys (`Label`,
-     `ProgramArguments`, `RunAtLoad`, `KeepAlive`, working dir,
-     log paths). The plist file IS the contract with launchd —
-     a typo here means the service silently doesn't behave like
-     a persistent service.
-
-  2. `install_and_start` writes the plist to the right LaunchAgents
-     dir AND calls `launchctl bootstrap` (after bootout if it was
-     already loaded). subprocess is mocked so the test doesn't
-     need a real launchd.
-
-  3. Non-macOS platforms refuse with a clear error pointing at the
-     templated path — we never want a Linux user to get a cryptic
-     "launchctl not found" traceback.
+Platform-specific behaviour lives in `bg/launchd.py` and
+`bg/systemd.py` and is covered by its own test file. Here we only
+pin the routing: each platform string lands at the right module and
+unknown platforms raise BgError with an actionable message.
 """
 from __future__ import annotations
 
-import plistlib
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
 
 
-def _skip_unless_supported_test_host() -> None:
-    """The pure-rendering tests work on any host. The subprocess
-    + filesystem tests assume a POSIX-y layout (Path semantics +
-    fake LaunchAgents dir under tmp_path); they're fine on Linux
-    CI even though launchd doesn't run there because we mock
-    launchctl."""
+class TestPlatformRouting:
+    """We monkeypatch `sys.platform` AND replace the platform-specific
+    `install_and_start` / `stop_and_uninstall` with spies so the
+    test asserts on dispatch behaviour without needing the actual
+    launchctl / systemctl binaries available."""
 
+    def _common_args(self, tmp_path):
+        return {
+            "flow_bin": Path("/usr/local/bin/flow"),
+            "workflows_dir": Path("/srv/contracts"),
+            "data_dir": Path("/srv/data"),
+            "port": 8000,
+            "host": "127.0.0.1",
+            "password": None,
+            "log_dir": tmp_path / "logs",
+        }
 
-class TestRenderServePlist:
-    """Pure function: dict-in, plist-XML-bytes-out. Authoritative
-    contract with launchd lives in this dict."""
+    def test_macos_routes_to_launchd(self, tmp_path, monkeypatch):
+        import flowmetrics.bg as bg
+        from flowmetrics.bg import launchd
 
-    def test_renders_a_valid_plist_with_load_bearing_keys(self, tmp_path):
-        from flowmetrics.bg import render_serve_plist
+        monkeypatch.setattr("sys.platform", "darwin")
+        captured = {}
 
-        xml = render_serve_plist(
-            label="com.flowmetrics.serve",
-            flow_bin=Path("/Users/me/.local/bin/flow"),
-            workflows_dir=Path("/Users/me/flow/contracts"),
-            data_dir=Path("/Users/me/flow/data"),
-            port=8000,
-            host="127.0.0.1",
-            password=None,
-            log_dir=Path("/Users/me/flow/data/_status"),
+        def fake_install(*, launchagents_dir, uid, **rest):
+            captured["called"] = "launchd"
+            captured["uid"] = uid
+            return launchagents_dir / "fake.plist"
+
+        monkeypatch.setattr(launchd, "install_and_start", fake_install)
+        monkeypatch.setattr(launchd, "current_uid", lambda: 501)
+
+        bg.install_and_start(**self._common_args(tmp_path))
+        assert captured["called"] == "launchd"
+        assert captured["uid"] == 501
+
+    def test_linux_routes_to_systemd(self, tmp_path, monkeypatch):
+        import flowmetrics.bg as bg
+        from flowmetrics.bg import systemd
+
+        monkeypatch.setattr("sys.platform", "linux")
+        captured = {}
+
+        def fake_install(*, unit_dir, **rest):
+            captured["called"] = "systemd"
+            captured["unit_dir"] = unit_dir
+            return unit_dir / "fake.service"
+
+        monkeypatch.setattr(systemd, "install_and_start", fake_install)
+        monkeypatch.setattr(
+            systemd,
+            "default_user_unit_dir",
+            lambda: tmp_path / ".config" / "systemd" / "user",
         )
-        # plistlib parses the round-trip — if we emitted invalid
-        # XML, this throws.
-        d = plistlib.loads(xml)
-        assert d["Label"] == "com.flowmetrics.serve"
-        # ProgramArguments is the launchd "ARGV" — must lead with
-        # the flow binary and carry the resolved dirs.
-        assert d["ProgramArguments"][0] == "/Users/me/.local/bin/flow"
-        assert "serve" in d["ProgramArguments"]
-        assert "--workflows-dir" in d["ProgramArguments"]
-        assert "/Users/me/flow/contracts" in d["ProgramArguments"]
-        assert "--data-dir" in d["ProgramArguments"]
-        assert "/Users/me/flow/data" in d["ProgramArguments"]
-        assert "--port" in d["ProgramArguments"]
-        assert "8000" in d["ProgramArguments"]
-        # Persistence: both keys load-bearing.
-        assert d["RunAtLoad"] is True
-        assert d["KeepAlive"] is True
-        # Logs land under data/_status by convention (matches the
-        # static template; users know where to look).
-        assert d["StandardOutPath"].endswith("serve.out.log")
-        assert d["StandardErrorPath"].endswith("serve.err.log")
-        # WorkingDirectory must be absolute — launchd doesn't
-        # inherit a CWD.
-        assert Path(d["WorkingDirectory"]).is_absolute()
 
-    def test_omits_password_arg_when_none_for_loopback(self, tmp_path):
-        """Loopback bind doesn't need a password. The plist must
-        NOT carry `--password` then — a stray empty value would
-        confuse Click."""
-        from flowmetrics.bg import render_serve_plist
+        bg.install_and_start(**self._common_args(tmp_path))
+        assert captured["called"] == "systemd"
 
-        xml = render_serve_plist(
-            label="com.flowmetrics.serve",
-            flow_bin=Path("/usr/local/bin/flow"),
-            workflows_dir=Path("/srv/contracts"),
-            data_dir=Path("/srv/data"),
-            port=8000,
-            host="127.0.0.1",
-            password=None,
-            log_dir=Path("/srv/data/_status"),
-        )
-        d = plistlib.loads(xml)
-        assert "--password" not in d["ProgramArguments"]
-
-    def test_includes_password_arg_when_set(self):
-        """Non-loopback binds need a password. When supplied, the
-        plist carries `--password VALUE` so the agent boots clean."""
-        from flowmetrics.bg import render_serve_plist
-
-        xml = render_serve_plist(
-            label="com.flowmetrics.serve",
-            flow_bin=Path("/usr/local/bin/flow"),
-            workflows_dir=Path("/srv/contracts"),
-            data_dir=Path("/srv/data"),
-            port=8000,
-            host="0.0.0.0",
-            password="hunter2",
-            log_dir=Path("/srv/data/_status"),
-        )
-        d = plistlib.loads(xml)
-        args = d["ProgramArguments"]
-        assert "--password" in args
-        assert "hunter2" in args
-        assert "--host" in args
-        assert "0.0.0.0" in args
-
-
-class TestInstallAndStart:
-    """install_and_start writes the plist + invokes launchctl.
-    subprocess is mocked so the test doesn't depend on launchd."""
-
-    def _capture_subprocess(self, monkeypatch):
-        calls: list[list[str]] = []
-
-        def fake_run(cmd, *args, **kwargs):
-            calls.append(list(cmd))
-            # Mimic the success exit code launchctl returns on
-            # bootstrap / bootout. Real return codes are 0 on
-            # success; on bootout when not loaded, 113 (no such
-            # service) — install_and_start tolerates that.
-            return subprocess.CompletedProcess(cmd, returncode=0)
-
-        monkeypatch.setattr(subprocess, "run", fake_run)
-        return calls
-
-    def test_writes_plist_to_user_launchagents_dir(self, tmp_path, monkeypatch):
-        from flowmetrics.bg import install_and_start
-
-        calls = self._capture_subprocess(monkeypatch)
-        launchagents = tmp_path / "LaunchAgents"
-        log_dir = tmp_path / "logs"
-
-        plist_path = install_and_start(
-            launchagents_dir=launchagents,
-            flow_bin=Path("/Users/me/.local/bin/flow"),
-            workflows_dir=Path("/Users/me/flow/contracts"),
-            data_dir=Path("/Users/me/flow/data"),
-            port=8000,
-            host="127.0.0.1",
-            password=None,
-            log_dir=log_dir,
-            uid=501,
-        )
-        # File on disk, in the LaunchAgents dir.
-        assert plist_path.parent == launchagents
-        assert plist_path.exists()
-        # Parses as a valid plist with the expected label.
-        d = plistlib.loads(plist_path.read_bytes())
-        assert d["Label"] == "com.flowmetrics.serve"
-        # Log dir was created (launchd opens these files; if the
-        # dir doesn't exist the agent fails to spawn).
-        assert log_dir.is_dir()
-        # We called launchctl bootstrap with the resolved plist
-        # path. We DO NOT care about the bootout call's exit code
-        # (it's a noop when the agent isn't loaded yet), but the
-        # ORDER matters: bootout first, then bootstrap, so the
-        # second call always installs a fresh state.
-        bootstrap_calls = [c for c in calls if "bootstrap" in c]
-        assert len(bootstrap_calls) == 1
-        cmd = bootstrap_calls[0]
-        assert "launchctl" in cmd[0]
-        assert "gui/501" in cmd
-        assert str(plist_path) in cmd
-
-    def test_idempotent_install_runs_bootout_then_bootstrap(
+    def test_unsupported_platform_raises_bg_error_with_pointer(
         self, tmp_path, monkeypatch
     ):
-        """Re-running `flow serve --bg` while already installed
-        should NOT error out — it should reload (bootout then
-        bootstrap)."""
-        from flowmetrics.bg import install_and_start
+        """Windows + BSD + anything we don't carry a native unit for
+        must surface a clear pointer at the templated path under
+        scripts/scheduling/ — never a `command not found` from the
+        wrong service manager."""
+        import flowmetrics.bg as bg
 
-        calls = self._capture_subprocess(monkeypatch)
-        launchagents = tmp_path / "LaunchAgents"
-        log_dir = tmp_path / "logs"
-
-        # Pretend the agent was already installed.
-        launchagents.mkdir()
-        (launchagents / "com.flowmetrics.serve.plist").write_bytes(b"stale")
-
-        install_and_start(
-            launchagents_dir=launchagents,
-            flow_bin=Path("/Users/me/.local/bin/flow"),
-            workflows_dir=Path("/Users/me/flow/contracts"),
-            data_dir=Path("/Users/me/flow/data"),
-            port=8000,
-            host="127.0.0.1",
-            password=None,
-            log_dir=log_dir,
-            uid=501,
-        )
-        # Expect: bootout (best-effort) THEN bootstrap.
-        verbs = [next((v for v in c if v in ("bootstrap", "bootout")), None)
-                 for c in calls]
-        verbs = [v for v in verbs if v is not None]
-        assert verbs == ["bootout", "bootstrap"], verbs
-
-
-class TestStopAndUninstall:
-    def test_bootouts_then_removes_plist(self, tmp_path, monkeypatch):
-        from flowmetrics.bg import stop_and_uninstall
-
-        calls: list[list[str]] = []
-
-        def fake_run(cmd, *args, **kwargs):
-            calls.append(list(cmd))
-            return subprocess.CompletedProcess(cmd, returncode=0)
-
-        monkeypatch.setattr(subprocess, "run", fake_run)
-
-        launchagents = tmp_path / "LaunchAgents"
-        launchagents.mkdir()
-        plist = launchagents / "com.flowmetrics.serve.plist"
-        plist.write_bytes(b"<plist/>")
-
-        stop_and_uninstall(launchagents_dir=launchagents, uid=501)
-
-        # launchctl bootout fired with our agent label.
-        assert any("bootout" in c for c in calls)
-        # File on disk gone.
-        assert not plist.exists()
-
-    def test_uninstall_is_noop_when_already_gone(self, tmp_path, monkeypatch):
-        """Idempotent: running `--bg --stop` twice in a row must
-        not error. Real-world: an operator runs it once, isn't
-        sure it worked, runs again."""
-        from flowmetrics.bg import stop_and_uninstall
-
-        monkeypatch.setattr(
-            subprocess,
-            "run",
-            lambda *a, **kw: subprocess.CompletedProcess(a[0], 0),
-        )
-        launchagents = tmp_path / "LaunchAgents"
-        launchagents.mkdir()
-        # No plist file → still should not raise.
-        stop_and_uninstall(launchagents_dir=launchagents, uid=501)
-
-
-class TestPlatformGuard:
-    @pytest.mark.skipif(
-        sys.platform == "darwin",
-        reason="this test asserts the non-macOS refusal path",
-    )
-    def test_install_refuses_on_non_macos(self, tmp_path):
-        """On Linux/Windows, install_and_start should refuse with
-        a clear error pointing at the templated path under
-        scripts/scheduling/. We never want to leave a user looking
-        at a launchctl traceback on a host that doesn't have
-        launchctl."""
-        from flowmetrics.bg import BgError, install_and_start
-
-        with pytest.raises(BgError) as exc:
-            install_and_start(
-                launchagents_dir=tmp_path / "LaunchAgents",
-                flow_bin=Path("/usr/local/bin/flow"),
-                workflows_dir=Path("/srv/contracts"),
-                data_dir=Path("/srv/data"),
-                port=8000,
-                host="127.0.0.1",
-                password=None,
-                log_dir=tmp_path / "logs",
-                uid=501,
-            )
-        # The error must point at something actionable.
-        assert "macOS" in str(exc.value) or "launchd" in str(exc.value)
+        monkeypatch.setattr("sys.platform", "win32")
+        with pytest.raises(bg.BgError) as exc:
+            bg.install_and_start(**self._common_args(tmp_path))
+        msg = str(exc.value)
+        assert "scripts/scheduling" in msg
+        assert "macOS" in msg or "Linux" in msg

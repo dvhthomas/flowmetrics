@@ -1606,16 +1606,17 @@ def _port_busy_hints(port: int, os_name: str | None = None) -> str:
     default=False,
     help=(
         "Install + start the dashboard as a persistent native "
-        "service (macOS launchd). Idempotent: re-running reloads "
-        "with the latest flags. Use `--bg --stop` to tear it down."
+        "service (macOS launchd / Linux systemd --user). "
+        "Idempotent: re-running reloads with the latest flags. "
+        "Use `--bg --stop` to tear it down."
     ),
 )
 @click.option(
     "--stop/--no-stop",
     default=False,
     help=(
-        "With --bg: bootout the agent and remove its plist. "
-        "Without --bg: ignored."
+        "With --bg: stop the service and remove its unit file. "
+        "Without --bg: error."
     ),
 )
 def serve(
@@ -1633,9 +1634,9 @@ def serve(
     `flow materialise`). Never touches GitHub or Jira during a request.
 
     Pass `--bg` to install + start as a persistent native service
-    (macOS launchd). `--bg --stop` tears it down. Linux + Windows
-    operators: use the templated units under scripts/scheduling/
-    (see docs/HOWTO.md#run-as-a-persistent-web-server).
+    (macOS launchd or Linux systemd --user). `--bg --stop` tears it
+    down. Windows operators: use the templated NSSM wrapper (see
+    docs/HOWTO.md#run-as-a-persistent-web-server).
     """
     # --stop only makes sense alongside --bg (its inverse). Catch
     # `flow serve --stop` (no --bg) as an operator typo so we don't
@@ -1651,10 +1652,7 @@ def serve(
 
         if stop:
             try:
-                bg_mod.stop_and_uninstall(
-                    launchagents_dir=bg_mod.default_launchagents_dir(),
-                    uid=bg_mod.current_uid(),
-                )
+                bg_mod.stop_and_uninstall()
             except bg_mod.BgError as exc:
                 raise click.ClickException(str(exc)) from exc
             click.echo("flow serve --bg stopped + uninstalled.")
@@ -1662,14 +1660,14 @@ def serve(
 
         # Off-localhost binds are network-exposed; require a password.
         # Same rule as foreground — checked here too because the
-        # plist will encode the chosen flags as-is.
+        # service unit will encode the chosen flags as-is.
         if host != "127.0.0.1" and not password:
             raise click.ClickException(
                 f"--host {host} is network-exposed and requires "
                 "--password (or $FLOW_PASSWORD)."
             )
-        # launchd doesn't inherit a CWD; resolve everything to
-        # absolutes before writing the plist.
+        # launchd / systemd don't inherit a CWD; resolve everything to
+        # absolutes before writing the unit.
         flow_bin_str = shutil.which("flow")
         if flow_bin_str is None:
             raise click.ClickException(
@@ -1682,8 +1680,7 @@ def serve(
         contracts_dir_abs = contracts_dir.resolve()
         log_dir = data_dir_abs / "_status"
         try:
-            plist_path = bg_mod.install_and_start(
-                launchagents_dir=bg_mod.default_launchagents_dir(),
+            unit_path = bg_mod.install_and_start(
                 flow_bin=flow_bin,
                 workflows_dir=contracts_dir_abs,
                 data_dir=data_dir_abs,
@@ -1691,16 +1688,25 @@ def serve(
                 host=host,
                 password=password,
                 log_dir=log_dir,
-                uid=bg_mod.current_uid(),
             )
         except bg_mod.BgError as exc:
             raise click.ClickException(str(exc)) from exc
         click.echo(
-            f"flow serve --bg installed at {plist_path}\n"
+            f"flow serve --bg installed at {unit_path}\n"
             f"  → http://{host}:{port}/\n"
             f"  logs:  {log_dir}/serve.{{out,err}}.log\n"
             f"  stop:  flow serve --bg --stop"
         )
+        # Linux user-units die on session logout unless the user
+        # has lingering enabled. We can't enable it ourselves (it's
+        # root-only) but we can name the one-liner the operator
+        # needs to run.
+        if sys.platform.startswith("linux"):
+            click.echo(
+                "\nNote: a systemd --user service stops on logout. "
+                "To keep the dashboard alive across logout, run once:\n"
+                "  sudo loginctl enable-linger $USER"
+            )
         return
 
     import uvicorn

@@ -1,8 +1,6 @@
-"""`flow serve --bg` — install + start the dashboard as a native
-service.
+"""`flow serve --bg` — macOS launchd implementation.
 
-Slice 1: macOS. The implementation hides launchctl mechanics behind
-two verbs:
+Hides launchctl mechanics behind two verbs:
 
   - `install_and_start(…)`  → idempotent install (writes the plist,
                               bootouts any existing instance, then
@@ -19,18 +17,15 @@ PATH but doesn't ship the repo's `scripts/` tree. The plist has to
 be generated at install time from the user's actual `flow` binary
 path and chosen flags. The templated file remains the documentation
 artifact (and the advanced-user manual path).
-
-Linux + Windows: we refuse with a clear pointer at the templated
-units under `scripts/scheduling/` — better than a `launchctl: command
-not found` traceback.
 """
 from __future__ import annotations
 
 import os
 import plistlib
 import subprocess
-import sys
 from pathlib import Path
+
+from . import BgError
 
 # Canonical agent label. Mirrors the templated plist so a user
 # switching between `--bg` and the manual install path doesn't end
@@ -40,12 +35,6 @@ SERVE_LABEL = "com.flowmetrics.serve"
 # launchctl exit code when bootout is called on an agent that isn't
 # loaded. Not an error — just nothing to undo.
 _BOOTOUT_NOT_LOADED = 113
-
-
-class BgError(Exception):
-    """Raised when --bg can't proceed (unsupported platform, missing
-    launchctl, malformed paths, etc.). The CLI surfaces .args[0] as
-    the user-facing message."""
 
 
 def render_serve_plist(
@@ -100,16 +89,6 @@ def render_serve_plist(
     return plistlib.dumps(spec)
 
 
-def _require_macos() -> None:
-    if sys.platform != "darwin":
-        raise BgError(
-            "`flow serve --bg` ships with macOS launchd support only "
-            "in this release. Linux + Windows: use the templated "
-            "service units under scripts/scheduling/. See "
-            "docs/HOWTO.md#run-as-a-persistent-web-server."
-        )
-
-
 def install_and_start(
     *,
     launchagents_dir: Path,
@@ -128,8 +107,11 @@ def install_and_start(
 
     `launchagents_dir`, `log_dir`, and the path arguments should be
     absolute; the CLI resolves them before calling.
+
+    Platform routing is the dispatcher's job (`flowmetrics.bg`); this
+    function will happily run anywhere that has `launchctl` on PATH,
+    which makes it cleanly testable with mocked subprocess.
     """
-    _require_macos()
 
     launchagents_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -184,8 +166,6 @@ def stop_and_uninstall(*, launchagents_dir: Path, uid: int) -> None:
     """Bootout the agent and remove its plist. Both steps are
     best-effort: missing plist + unloaded agent both round-trip to
     "nothing to do"."""
-    _require_macos()
-
     target = f"gui/{uid}/{SERVE_LABEL}"
     subprocess.run(
         ["launchctl", "bootout", target],

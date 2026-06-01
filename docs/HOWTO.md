@@ -210,11 +210,11 @@ Terminal tab to leave open.
 
 | Host | Path |
 |----|----|
-| macOS | `flow serve --bg` (built-in) |
-| Linux (systemd) | [`flowmetrics-serve.service`](../scripts/scheduling/linux-systemd/flowmetrics-serve.service) |
+| macOS | `flow serve --bg` (built-in, launchd) |
+| Linux | `flow serve --bg` (built-in, systemd --user) |
 | Windows | NSSM wrapper, see below |
 
-### macOS — `flow serve --bg`
+### macOS + Linux — `flow serve --bg`
 
 ```bash
 # Install + start. Idempotent: re-run to reload with new flags.
@@ -228,40 +228,44 @@ flow serve --bg \
 
 What it does:
 
-- Writes a LaunchAgent plist to `~/Library/LaunchAgents/com.flowmetrics.serve.plist`
-  with the flags you pass (resolved to absolute paths).
-- `launchctl bootout` (best-effort, in case it was already loaded)
-  then `launchctl bootstrap` it. Starts immediately.
-- `RunAtLoad=true` + `KeepAlive=true`: launchd restarts the agent on
-  login, crash, or clean exit. Survives logout and reboot.
+- **macOS**: writes a LaunchAgent plist to
+  `~/Library/LaunchAgents/com.flowmetrics.serve.plist`,
+  `launchctl bootout` (in case it was already loaded), then
+  `launchctl bootstrap`. `RunAtLoad=true` + `KeepAlive=true` so the
+  agent starts at login and respawns after crashes.
+- **Linux**: writes a user unit to
+  `~/.config/systemd/user/flowmetrics-serve.service`, runs
+  `systemctl --user daemon-reload`, then `enable` + `restart`.
+  `Restart=on-failure` respawns the dashboard on crash. To survive
+  logout, run `sudo loginctl enable-linger $USER` once — `flow
+  serve --bg` prints the reminder.
 
-Tear it down:
+Tear it down (same command, both OSes):
 
 ```bash
 flow serve --bg --stop
 ```
 
-Want the plist by hand? The templated path under
+Want to tweak the unit by hand? The templated paths under
 [`scripts/scheduling/macos-launchd/`](../scripts/scheduling/macos-launchd/)
-ships the same shape — useful when you need to tweak schedule keys
-the `--bg` flag doesn't expose.
+and
+[`scripts/scheduling/linux-systemd/`](../scripts/scheduling/linux-systemd/)
+ship the same shape. `flow serve --bg` writes equivalent files —
+manual editing is just for tweaks the flag doesn't expose
+(per-second restart, custom journald routing, etc.).
 
-### Linux (systemd — user unit)
+### Status + logs
 
 ```bash
-cd scripts/scheduling/linux-systemd
+# macOS
+launchctl print gui/$UID/com.flowmetrics.serve | grep state
+tail -F ~/flow/data/_status/serve.{out,err}.log
 
-$EDITOR flowmetrics-serve.service
-mkdir -p ~/.config/systemd/user
-cp flowmetrics-serve.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now flowmetrics-serve.service
-loginctl enable-linger $USER          # survive logout
-curl -fsS http://127.0.0.1:8000/healthz
+# Linux
+systemctl --user status flowmetrics-serve
+journalctl --user -u flowmetrics-serve -f
+tail -F ~/flow/data/_status/serve.{out,err}.log
 ```
-
-Status: `systemctl --user status flowmetrics-serve`. Logs:
-`journalctl --user -u flowmetrics-serve -f`.
 
 ### Windows (Task Scheduler / NSSM)
 
