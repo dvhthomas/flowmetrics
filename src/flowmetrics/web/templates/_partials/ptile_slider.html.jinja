@@ -25,12 +25,7 @@
   <div class="ptile-slider">
     <div class="ptile-slider-label">
       <span>Percentile Filter</span>
-      <strong id="ptile-display">
-        P<span id="ptile-min-disp">{{ data.ptile_min }}</span>
-        (<span id="ptile-min-val">—</span>)
-        – P<span id="ptile-max-disp">{{ data.ptile_max }}</span>
-        (<span id="ptile-max-val">—</span>)
-      </strong>
+      <strong id="ptile-display">—</strong>
     </div>
     <script type="application/json" id="ptile-values">
       {"unit": {{ data.ptile_unit | tojson }},
@@ -69,10 +64,7 @@
   (function () {
     const pmin = document.getElementById('ptile-min');
     const pmax = document.getElementById('ptile-max');
-    const minDisp = document.getElementById('ptile-min-disp');
-    const maxDisp = document.getElementById('ptile-max-disp');
-    const minVal = document.getElementById('ptile-min-val');
-    const maxVal = document.getElementById('ptile-max-val');
+    const display = document.getElementById('ptile-display');
     const ptileMeta = JSON.parse(
       document.getElementById('ptile-values').textContent
     );
@@ -99,10 +91,11 @@
       }
       pmin.value = lo;
       pmax.value = hi;
-      minDisp.textContent = lo;
-      maxDisp.textContent = hi;
-      minVal.textContent = fmtValue(lo);
-      maxVal.textContent = fmtValue(hi);
+      // Single textContent write — no nested spans, no
+      // collapsed whitespace, no baseline-jitter between
+      // glyphs. Em-dash between bounds.
+      display.textContent =
+        'P' + lo + ' (' + fmtValue(lo) + ') – P' + hi + ' (' + fmtValue(hi) + ')';
     }
     pmin.addEventListener('input', clampAndShow);
     pmax.addEventListener('input', clampAndShow);

@@ -1517,9 +1517,16 @@ class TestWorkItemsTableOnDetailPages:
         page.wait_for_selector("#work-items", timeout=10000)
 
         def _cycle_values() -> list[float]:
-            cells = page.locator(
-                "table.work-items-grid tbody td.num"
-            ).all_inner_texts()
+            # First `td.num` in each row is the Cycle (d) column;
+            # the second is the Pctile column, which would otherwise
+            # interleave into the numbers and break the sort check.
+            cells = page.evaluate(
+                "() => Array.from("
+                "document.querySelectorAll("
+                "'table.work-items-grid tbody tr'"
+                ")).map(tr => tr.querySelector('td.num')?.innerText"
+                ").filter(Boolean)"
+            )
             return [float(c) for c in cells]
 
         default_order = _cycle_values()
@@ -1673,15 +1680,19 @@ class TestWorkItemsFragmentEndpoint:
         # cycle_time_days inside <td class="num">.
         import re
 
-        # Cycle time is whole-day integer per Vacanti's strict
-        # formula — match either bare integers or legacy decimal
-        # form so the test survives display-format tweaks.
-        nums = [
-            float(m.group(1))
-            for m in re.finditer(
-                r'<td class="num">([0-9]+(?:\.[0-9]+)?)</td>', html
-            )
-        ]
+        # Cycle (d) column AND the Pctile column both render as
+        # `<td class="num">`; pick only the FIRST numeric cell in
+        # each row so the percentile rank doesn't interleave into
+        # the sort check.
+        row_re = re.compile(r"<tr>(.*?)</tr>", re.DOTALL)
+        num_re = re.compile(
+            r'<td class="num">([0-9]+(?:\.[0-9]+)?)</td>'
+        )
+        nums = []
+        for row_match in row_re.finditer(html):
+            first_num = num_re.search(row_match.group(1))
+            if first_num:
+                nums.append(float(first_num.group(1)))
         assert nums, "expected at least one numeric cycle-time cell"
         assert nums == sorted(nums, reverse=True), (
             f"sort=cycle_time_days&direction=desc should return rows in "
