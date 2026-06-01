@@ -113,11 +113,26 @@ class WorkItemsTableData:
     # AND so sort / pagination links carry them forward.
     ptile_min: int
     ptile_max: int
+    # Pre-computed metric value at each snap stop on the slider —
+    # the JS readout shows e.g. "P50 (4d) – P85 (12d)" by reading
+    # this dict at the handles' current positions.
+    ptile_values: dict[int, float]
+    ptile_unit: str  # short unit label ("d" for days)
 
 
 # Whitelist for sort keys so we can safely interpolate into SQL
 # without parameter binding (DuckDB doesn't support parameterised
 # ORDER BY column names). Keep the list closed.
+# Snap stops on the two-handle Percentile Filter slider: 0 and the
+# 5%-step ladder from P50 upward. The same ladder feeds the
+# server-side `percentile_cont` so the readout can show e.g.
+# "P50 (4d) – P85 (12d)" without an extra round-trip when the
+# user drags.
+PTILE_STOPS: tuple[int, ...] = (
+    0, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+)
+
+
 _SORT_COLUMN_SQL: dict[str, str] = {
     "item_id": "item_id",
     "title": "title",
@@ -446,6 +461,36 @@ def render(
         ) in rows
     )
 
+    # Per-snap-stop metric value — `percentile_cont` interpolates
+    # over the same filtered set the table reads from (q, scope,
+    # window) BUT before the ptile bound itself, so the slider's
+    # readout doesn't shift while the user drags. Empty filter set
+    # returns 0s for every stop.
+    # The rank_metric SQL is repeated once per PERCENTILE_CONT call,
+    # so its parameters multiply by len(PTILE_STOPS).
+    ptile_value_select = ", ".join(
+        f"PERCENTILE_CONT({stop / 100.0}) WITHIN GROUP "
+        f"(ORDER BY {rank_metric_sql}) AS p{stop}"
+        for stop in PTILE_STOPS
+    )
+    ptile_params: list = []
+    for _ in PTILE_STOPS:
+        ptile_params.extend(rank_metric_params)
+    ptile_params.extend(where_params)
+    ptile_row = con.execute(
+        f"SELECT {ptile_value_select} FROM work_items"
+        + wip_join
+        + where_clause,
+        ptile_params,
+    ).fetchone() if total_count > 0 else None
+    if ptile_row is None:
+        ptile_values: dict[int, float] = {stop: 0.0 for stop in PTILE_STOPS}
+    else:
+        ptile_values = {
+            stop: float(ptile_row[i]) if ptile_row[i] is not None else 0.0
+            for i, stop in enumerate(PTILE_STOPS)
+        }
+
     # Pre-format the date filter's display string so the template
     # doesn't have to.
     if completed_on_arg:
@@ -484,4 +529,6 @@ def render(
         total_pages=total_pages,
         ptile_min=ptile_min,
         ptile_max=ptile_max,
+        ptile_values=ptile_values,
+        ptile_unit="d",
     )

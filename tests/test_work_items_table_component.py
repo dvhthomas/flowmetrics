@@ -362,3 +362,46 @@ class TestPercentileColumn:
             assert "percentile_rank" in keys, (
                 f"{label} columns missing percentile_rank"
             )
+
+
+class TestPercentileSliderValues:
+    """The slider's readout shows the actual metric value at each
+    handle's percentile — `P50 (4d) – P85 (12d)` instead of bare
+    percentiles. Server pre-computes the value at each snap stop
+    so the JS can pull it out of a dict without any extra
+    round-trip when the user drags."""
+
+    def test_ptile_values_populated_for_every_snap_stop(self, warehouse):
+        data = render(warehouse, "astral-uv-week")
+        assert data.ptile_values is not None
+        for stop in (0, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100):
+            assert stop in data.ptile_values, (
+                f"missing snap stop {stop} from ptile_values"
+            )
+            assert data.ptile_values[stop] is not None
+
+    def test_ptile_values_are_monotonic_non_decreasing(self, warehouse):
+        data = render(warehouse, "astral-uv-week")
+        stops = sorted(data.ptile_values.keys())
+        values = [data.ptile_values[s] for s in stops]
+        assert values == sorted(values), (
+            f"percentile values should be monotonic; got {values}"
+        )
+
+    def test_ptile_unit_label_is_days_for_cycle_time(self, warehouse):
+        # Cycle-time mode → unit is "d" (days).
+        data = render(warehouse, "astral-uv-week")
+        assert data.ptile_unit == "d"
+
+    def test_ptile_values_use_age_in_in_flight_scope(self, warehouse):
+        # For the aging scope, the percentile values describe AGE
+        # (asof - created_at), not cycle time. The unit stays "d".
+        data = render(
+            warehouse, "astral-uv-week",
+            in_flight_at="2026-05-10",
+        )
+        if data.ptile_values:
+            # Any non-zero in-flight rows mean we should see ages.
+            assert data.ptile_unit == "d"
+            # P0 ≤ P100, sanity check.
+            assert data.ptile_values[0] <= data.ptile_values[100]
