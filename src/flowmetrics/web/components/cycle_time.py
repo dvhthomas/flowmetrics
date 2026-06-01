@@ -46,15 +46,42 @@ def render(
     contract_name: str,
     *,
     view: Window | None = None,
+    ptile_min: int = 0,
+    ptile_max: int = 100,
 ) -> CycleTimeModel:
     """Query completed items and resolve the cycle-time model.
 
     `view` clamps the scatter — and the P50/P85/P95 percentile
     sample — to its inclusive window; None uses the full
     materialised history.
+
+    `ptile_min` / `ptile_max` (0..100) narrow the SCATTER to dots
+    whose cycle-time rank falls inside that band — the
+    page-level Percentile Filter slider. The reference lines
+    stay computed from the FULL windowed sample so the bands
+    don't shift while the user drags.
     """
-    return build_cycle_time_model(
+    model = build_cycle_time_model(
         completed_items(con, contract_name), view=view
+    )
+    if ptile_min <= 0 and ptile_max >= 100:
+        return model
+    sorted_pts = sorted(model.points, key=lambda p: p.cycle_time_days)
+    n = len(sorted_pts)
+    if n == 0:
+        return model
+    keep: list = []
+    for i, p in enumerate(sorted_pts):
+        rank = round((i / max(1, n - 1)) * 100) if n > 1 else 0
+        if ptile_min <= rank <= ptile_max:
+            keep.append(p)
+    # Replace points; percentiles + headline + ticks + cap stay
+    # as-computed from the full sample.
+    from dataclasses import replace
+    return replace(
+        model,
+        points=tuple(keep),
+        item_count=len(keep),
     )
 
 

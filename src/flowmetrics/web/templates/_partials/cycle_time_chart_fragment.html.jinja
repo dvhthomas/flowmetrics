@@ -11,7 +11,15 @@
 {%- set _h = chart_height|default(320) -%}
 
 <div id="{{ chart_container_id }}" class="metric-chart"
-     data-chart-height="{{ _h }}">
+     data-chart-height="{{ _h }}"
+     {# Re-fetch on Percentile Filter slider change. The slider's
+        work-items request returns with HX-Trigger: ptile-changed;
+        the chart reads the current bounds out of #work-items-state
+        and swaps its own outerHTML with the filtered fragment. #}
+     hx-get="/api/internal/cycle-time?workflow={{ contract.name }}"
+     hx-trigger="flowmetrics:ptile-changed from:body"
+     hx-swap="outerHTML"
+     hx-vals='js:{ptile_min: document.getElementById("work-items-state")?.dataset.ptileMin || "0", ptile_max: document.getElementById("work-items-state")?.dataset.ptileMax || "100"}'>
   {% if data.item_count == 0 %}
     <p class="aging-empty">
       <strong class="aging-empty-headline">No completed items in this window.</strong>

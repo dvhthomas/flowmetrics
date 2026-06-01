@@ -114,6 +114,45 @@ class TestRenderWiresQueryToModel:
         assert render(_warehouse(), "absent", asof=ASOF).is_empty
 
 
+class TestAgingPercentileFilter:
+    """The page-level Percentile Filter slider narrows the aging
+    scatter AND the table. `ptile_min` / `ptile_max` defaults of
+    0 / 100 are the no-op. Percentile reference lines stay
+    computed from the FULL set so the bands don't shift under
+    the user's slider drag."""
+
+    def test_default_bounds_preserve_every_in_flight_item(self):
+        unbounded = render(_warehouse(), "c", asof=ASOF)
+        defaulted = render(
+            _warehouse(), "c", asof=ASOF,
+            ptile_min=0, ptile_max=100,
+        )
+        assert defaulted.count == unbounded.count
+
+    def test_ptile_max_drops_the_oldest_items(self):
+        # The lower-percentile items are the youngest (smallest
+        # age). ptile_max=50 keeps only those.
+        full = render(_warehouse(), "c", asof=ASOF)
+        narrowed = render(
+            _warehouse(), "c", asof=ASOF, ptile_max=50,
+        )
+        assert narrowed.count <= full.count
+        if narrowed.count > 0 and full.count > narrowed.count:
+            max_kept = max(i.age_days for i in narrowed.items)
+            min_dropped = min(
+                i.age_days for i in full.items
+                if i.item_id not in {q.item_id for q in narrowed.items}
+            )
+            assert max_kept <= min_dropped
+
+    def test_percentile_lines_stay_computed_from_full_sample(self):
+        full = render(_warehouse(), "c", asof=ASOF)
+        narrowed = render(
+            _warehouse(), "c", asof=ASOF, ptile_min=0, ptile_max=50,
+        )
+        assert narrowed.percentiles == full.percentiles
+
+
 class TestToVegaStructure:
     def test_spec_has_dot_badge_and_rule_layers(self):
         assert _layer_marks(to_vega(_model())) == ["point", "text", "rule"]

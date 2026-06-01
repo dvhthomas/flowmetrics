@@ -41,6 +41,8 @@ def render(
     asof: date,
     states: WorkflowStates | None = None,
     reference: Window | None = None,
+    ptile_min: int = 0,
+    ptile_max: int = 100,
 ) -> AgingModel:
     """Query the in-flight snapshot + completed items and resolve
     the aging-WIP model.
@@ -50,14 +52,37 @@ def render(
     aging can only be faithfully computed at that date).
     `states.wip` restricts the chart to WIP states; `reference`
     windows the percentile sample.
+
+    `ptile_min` / `ptile_max` (0..100) narrow the scatter to
+    in-flight items whose AGE rank falls inside that band — the
+    page-level Percentile Filter slider. The reference lines
+    stay computed from the FULL completed-items sample so the
+    bands don't shift while the user drags.
     """
-    return build_aging_model(
+    model = build_aging_model(
         in_flight_snapshot(con, contract_name, asof),
         completed_items(con, contract_name),
         asof=asof,
         open_item_count=count_open_items(con, contract_name),
         reference=reference,
         wip_states=frozenset(states.wip) if states is not None else None,
+    )
+    if ptile_min <= 0 and ptile_max >= 100:
+        return model
+    sorted_items = sorted(model.items, key=lambda i: i.age_days)
+    n = len(sorted_items)
+    if n == 0:
+        return model
+    keep: list = []
+    for i, it in enumerate(sorted_items):
+        rank = round((i / max(1, n - 1)) * 100) if n > 1 else 0
+        if ptile_min <= rank <= ptile_max:
+            keep.append(it)
+    from dataclasses import replace
+    return replace(
+        model,
+        items=tuple(keep),
+        count=len(keep),
     )
 
 

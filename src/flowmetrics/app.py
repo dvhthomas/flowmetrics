@@ -346,7 +346,7 @@ class WorkflowView:
             view=self.view_window,
         )
 
-    def render_aging(self, con):
+    def render_aging(self, con, *, ptile_min: int = 0, ptile_max: int = 100):
         # Aging WIP is a "right now" snapshot — pinned to the
         # in-flight snapshot date (the latest materialise), NOT
         # the Period anchor. The warehouse holds one in-flight
@@ -358,15 +358,17 @@ class WorkflowView:
             asof=asof,
             states=self.contract.states,
             reference=self.selection.reference,
+            ptile_min=ptile_min, ptile_max=ptile_max,
         )
 
-    def render_cycle_time(self, con):
+    def render_cycle_time(self, con, *, ptile_min: int = 0, ptile_max: int = 100):
         return render_cycle_time(
             con, self.id,
             # Cycle-time's percentile lines summarise the dots on
             # screen — so they sample the view window, not the
             # reference. The reference is for aging + forecasts.
             view=self.selection.view,
+            ptile_min=ptile_min, ptile_max=ptile_max,
         )
 
     def render_throughput(self, con):
@@ -1519,12 +1521,20 @@ def create_app(
         response_class=HTMLResponse,
         dependencies=auth_dep,
     )
-    def cycle_time_detail(request: Request, workflow_id: str) -> HTMLResponse:
+    def cycle_time_detail(
+        request: Request, workflow_id: str,
+        ptile_min: int = 0, ptile_max: int = 100,
+    ) -> HTMLResponse:
         view = _open_view(workflow_id, request)
+        pmin = max(0, min(100, int(ptile_min)))
+        pmax = max(0, min(100, int(ptile_max)))
         with view.warehouse() as con:
-            cycle_time = view.render_cycle_time(con)
+            cycle_time = view.render_cycle_time(
+                con, ptile_min=pmin, ptile_max=pmax,
+            )
             work_items = render_work_items_table(
                 con, workflow_id, view=view.view_window,
+                ptile_min=pmin, ptile_max=pmax,
             )
         return templates.TemplateResponse(
             request,
@@ -1553,11 +1563,16 @@ def create_app(
         dependencies=auth_dep,
     )
     def cycle_time_fragment(
-        request: Request, workflow: str
+        request: Request, workflow: str,
+        ptile_min: int = 0, ptile_max: int = 100,
     ) -> HTMLResponse:
         view = _open_view(workflow, request)
+        pmin = max(0, min(100, int(ptile_min)))
+        pmax = max(0, min(100, int(ptile_max)))
         with view.warehouse() as con:
-            cycle_time = view.render_cycle_time(con)
+            cycle_time = view.render_cycle_time(
+                con, ptile_min=pmin, ptile_max=pmax,
+            )
         return templates.TemplateResponse(
             request,
             "_partials/cycle_time_chart_fragment.html.jinja",
@@ -1625,10 +1640,13 @@ def create_app(
     def aging_detail(
         request: Request,
         workflow_id: str,
+        ptile_min: int = 0, ptile_max: int = 100,
     ) -> HTMLResponse:
         view = _open_view(workflow_id, request)
+        pmin = max(0, min(100, int(ptile_min)))
+        pmax = max(0, min(100, int(ptile_max)))
         with view.warehouse() as con:
-            aging = view.render_aging(con)
+            aging = view.render_aging(con, ptile_min=pmin, ptile_max=pmax)
             # Table scope mirrors the chart: in-flight items only,
             # at the same asof. Completed items aren't part of
             # aging-WIP and don't belong here. Sort by start date
@@ -1644,6 +1662,7 @@ def create_app(
                     view.contract.states.wip
                     if view.contract.states else None
                 ),
+                ptile_min=pmin, ptile_max=pmax,
             )
         return templates.TemplateResponse(
             request,
@@ -1780,11 +1799,14 @@ def create_app(
         dependencies=auth_dep,
     )
     def aging_fragment(
-        request: Request, workflow: str
+        request: Request, workflow: str,
+        ptile_min: int = 0, ptile_max: int = 100,
     ) -> HTMLResponse:
         view = _open_view(workflow, request)
+        pmin = max(0, min(100, int(ptile_min)))
+        pmax = max(0, min(100, int(ptile_max)))
         with view.warehouse() as con:
-            aging = view.render_aging(con)
+            aging = view.render_aging(con, ptile_min=pmin, ptile_max=pmax)
         return templates.TemplateResponse(
             request,
             "_partials/aging_chart_fragment.html.jinja",
@@ -1931,7 +1953,7 @@ def create_app(
                 ptile_min=pmin,
                 ptile_max=pmax,
             )
-        return templates.TemplateResponse(
+        response = templates.TemplateResponse(
             request,
             # Return only the BODY partial — the search input lives
             # outside the swap target on the page (see
@@ -1944,6 +1966,23 @@ def create_app(
                 "contract": view.template_context(),
             },
         )
+        # Tell the chart above the table to refetch itself with the
+        # same ptile bounds. The chart reads the bounds out of
+        # #work-items-state which is INSIDE the swap target, so
+        # we have to fire the event AFTER the swap settles
+        # (`HX-Trigger-After-Swap`) — otherwise the chart's hx-vals
+        # JS reads stale values. The slider's HTMX request carries
+        # a sentinel `from=slider` so sort / pagination / search
+        # round-trips — which carry ptile_* via keep_filters too —
+        # don't thrash the chart.
+        if request.query_params.get("from") == "slider":
+            # `After-Settle` (not After-Swap): the swap mutation
+            # is queued asynchronously, so the meta element only
+            # carries the new bounds after the settle phase runs.
+            response.headers["HX-Trigger-After-Settle"] = (
+                "flowmetrics:ptile-changed"
+            )
+        return response
 
     @app.get("/healthz")
     def healthz() -> dict:

@@ -86,6 +86,66 @@ class TestRenderWiresQueryToModel:
         assert model.is_empty
 
 
+class TestRenderPercentileFilter:
+    """The Percentile Filter slider is page-level — it has to
+    narrow the chart's scatter as well as the table below it.
+    `ptile_min` / `ptile_max` defaults of 0 / 100 are the no-op;
+    any narrower bound drops dots whose cycle-time rank sits
+    outside the range. The percentile reference lines stay
+    computed from the FULL set so the bands don't move while
+    the user drags."""
+
+    def test_default_bounds_preserve_every_point(self):
+        unbounded = render(_warehouse(), "c")
+        defaulted = render(
+            _warehouse(), "c", ptile_min=0, ptile_max=100,
+        )
+        assert defaulted.item_count == unbounded.item_count
+        assert (
+            {p.item_id for p in defaulted.points}
+            == {p.item_id for p in unbounded.points}
+        )
+
+    def test_ptile_max_drops_upper_tail_points(self):
+        # ptile_max=50: keep only the lower-half points. The
+        # warehouse fixture has 5 items with distinct cycle times
+        # (1d, 2d, 3d, 4d, 5d), so the bottom half = the smaller
+        # three.
+        full = render(_warehouse(), "c")
+        narrowed = render(_warehouse(), "c", ptile_max=50)
+        assert narrowed.item_count < full.item_count
+        assert narrowed.item_count > 0
+        max_kept = max(p.cycle_time_days for p in narrowed.points)
+        min_dropped = min(
+            p.cycle_time_days for p in full.points
+            if p.item_id not in {q.item_id for q in narrowed.points}
+        )
+        assert max_kept <= min_dropped
+
+    def test_ptile_min_drops_lower_tail_points(self):
+        full = render(_warehouse(), "c")
+        narrowed = render(_warehouse(), "c", ptile_min=85)
+        assert narrowed.item_count < full.item_count
+        assert narrowed.item_count > 0
+        min_kept = min(p.cycle_time_days for p in narrowed.points)
+        max_dropped = max(
+            p.cycle_time_days for p in full.points
+            if p.item_id not in {q.item_id for q in narrowed.points}
+        )
+        assert min_kept >= max_dropped
+
+    def test_percentile_lines_stay_computed_from_the_full_sample(self):
+        # The reference lines summarise the whole window, NOT just
+        # the narrowed slice — otherwise the bands would shift
+        # under the user's slider drag, which makes the chart
+        # impossible to read.
+        full = render(_warehouse(), "c")
+        narrowed = render(
+            _warehouse(), "c", ptile_min=0, ptile_max=50,
+        )
+        assert narrowed.percentiles == full.percentiles
+
+
 class TestToVegaStructure:
     def test_spec_has_scatter_rule_and_text_layers(self):
         spec = to_vega(_model())
