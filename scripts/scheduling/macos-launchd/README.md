@@ -1,7 +1,50 @@
 # launchd (macOS)
 
-Daily ingest under launchd, the macOS equivalent of systemd timers /
-cron. User-agent install (no root needed).
+Two units, both LaunchAgents (user-level — no root):
+
+| Plist | Job | Trigger |
+|----|----|----|
+| `com.flowmetrics.materialise.plist` | Daily ingest | `StartCalendarInterval` |
+| `com.flowmetrics.serve.plist` | Persistent dashboard | `RunAtLoad` + `KeepAlive` |
+
+Use one or both. Together they give you a Mac that fetches data on a
+schedule and always has the dashboard reachable at
+http://127.0.0.1:8000 across logout, sleep, and reboot — no Terminal
+tab to leave open.
+
+## Persistent dashboard (serve)
+
+```bash
+# 1. Edit the plist: replace REPLACE_HOME and REPLACE_FLOW with
+#    absolute paths. REPLACE_FLOW is the `flow` binary —
+#    `which flow` will tell you (typically $HOME/.local/bin/flow
+#    after `uv tool install`).
+$EDITOR com.flowmetrics.serve.plist
+
+# 2. Drop into the user LaunchAgents dir.
+cp com.flowmetrics.serve.plist ~/Library/LaunchAgents/
+
+# 3. Register + start.
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.flowmetrics.serve.plist
+
+# 4. Verify.
+launchctl print gui/$UID/com.flowmetrics.serve | grep state
+open http://127.0.0.1:8000
+```
+
+The agent restarts on login, after a crash, and after a clean exit
+(`KeepAlive=true`). To bind on a different port, edit the
+`ProgramArguments` block. To bind on a non-loopback host, add
+`--password <…>` to the args (or set `FLOW_PASSWORD` in
+`EnvironmentVariables`) — `flow serve` refuses to bind otherwise.
+
+```bash
+# Stop / uninstall.
+launchctl bootout gui/$UID/com.flowmetrics.serve
+rm ~/Library/LaunchAgents/com.flowmetrics.serve.plist
+```
+
+## Daily ingest (materialise)
 
 ## Install
 

@@ -1,7 +1,59 @@
-# systemd timer
+# systemd
 
-Daily ingest under a user-level systemd timer. Pick the user that owns
-your install (e.g. `flowmetrics`).
+Two units:
+
+| File | Job | Type |
+|----|----|----|
+| `flowmetrics-materialise.{service,timer}` | Daily ingest | Oneshot, fired by a timer |
+| `flowmetrics-serve.service` | Persistent dashboard | Long-running, restarted on failure |
+
+Use one or both. Together they give you a host that fetches data on
+a schedule and always has the dashboard reachable across reboots.
+
+## Persistent dashboard (serve)
+
+```bash
+# 1. Edit the unit: set FLOWMETRICS_HOME and FLOWMETRICS_FLOW to
+#    absolute paths. FLOWMETRICS_FLOW is the `flow` binary
+#    (`which flow` shows it; typically ~/.local/bin/flow after
+#    `uv tool install`).
+$EDITOR flowmetrics-serve.service
+
+# 2a. User-level install (single-user host, no root needed) —
+#     dashboard runs as your user, dies on logout unless
+#     `loginctl enable-linger $USER` is set.
+mkdir -p ~/.config/systemd/user
+cp flowmetrics-serve.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now flowmetrics-serve.service
+loginctl enable-linger $USER   # keep alive across logout
+
+# 2b. System-wide install (server box) — runs under the user
+#     declared by `User=` (add a `User=flowmetrics` line under
+#     [Service] before copying).
+sudo cp flowmetrics-serve.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now flowmetrics-serve.service
+
+# 3. Verify.
+systemctl --user status flowmetrics-serve   # or: sudo systemctl status …
+curl -fsS http://127.0.0.1:8000/healthz
+```
+
+For non-loopback binds add `--password <…>` to the `ExecStart` (or
+set `FLOW_PASSWORD` via `Environment=`) — `flow serve` refuses to
+bind otherwise.
+
+```bash
+# Stop / uninstall (user install).
+systemctl --user disable --now flowmetrics-serve.service
+rm ~/.config/systemd/user/flowmetrics-serve.service
+systemctl --user daemon-reload
+```
+
+## Daily ingest (materialise timer)
+
+Pick the user that owns your install (e.g. `flowmetrics`).
 
 ## Install
 

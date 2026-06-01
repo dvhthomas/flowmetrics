@@ -1,0 +1,27 @@
+[Unit]
+Description=flowmetrics dashboard (persistent web server)
+# Don't start until the network is reachable — the dashboard binds
+# a TCP port. We never hit upstream APIs from the request path, so
+# network-online.target is enough.
+After=network.target
+
+[Service]
+Type=simple
+# Adjust these three to match your install. The user named below
+# must own (or have read+write on) $FLOWMETRICS_HOME.
+Environment="FLOWMETRICS_HOME=/srv/flowmetrics"
+Environment="FLOWMETRICS_FLOW=/srv/flowmetrics/.local/bin/flow"
+WorkingDirectory=${FLOWMETRICS_HOME}
+ExecStart=${FLOWMETRICS_FLOW} serve \
+    --workflows-dir ${FLOWMETRICS_HOME}/contracts \
+    --data-dir ${FLOWMETRICS_HOME}/data \
+    --port 8000
+# Keep the dashboard alive across crashes and clean exits, with a
+# 5-second backoff to avoid tight restart loops on misconfiguration.
+Restart=on-failure
+RestartSec=5
+# Bound startup so a stuck import doesn't wedge systemd.
+TimeoutStartSec=30
+
+[Install]
+WantedBy=default.target

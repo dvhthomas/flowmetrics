@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  flowmetrics dashboard as a persistent macOS LaunchAgent.
+
+  Behaves as a login-independent server: launchd starts it on user
+  login (or boot, if loaded with `enable`), keeps it alive across
+  crashes, and re-spawns it after a clean exit. No Terminal tab to
+  leave open.
+
+  Adjust the two placeholders before installing:
+    REPLACE_HOME  → your install root (holds contracts/ and data/)
+    REPLACE_FLOW  → absolute path to the `flow` executable
+                    (usually $HOME/.local/bin/flow after
+                    `uv tool install`).
+
+  Install:
+    cp com.flowmetrics.serve.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.flowmetrics.serve.plist
+    # Open http://127.0.0.1:8000 in your browser.
+
+  Verify it's running:
+    launchctl print gui/$UID/com.flowmetrics.serve | grep state
+
+  Tail the logs:
+    tail -F REPLACE_HOME/data/_status/serve.{out,err}.log
+
+  Stop / uninstall:
+    launchctl bootout gui/$UID/com.flowmetrics.serve
+    rm ~/Library/LaunchAgents/com.flowmetrics.serve.plist
+
+  Bind on a different port (default 8000), or to all interfaces:
+    Edit the ProgramArguments block below. For non-loopback binds,
+    add `--password <…>` (or set FLOW_PASSWORD in
+    EnvironmentVariables) — `flow serve` refuses to bind to a
+    non-127.0.0.1 host without one.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.flowmetrics.serve</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>REPLACE_FLOW</string>
+    <string>serve</string>
+    <string>--workflows-dir</string>
+    <string>REPLACE_HOME/contracts</string>
+    <string>--data-dir</string>
+    <string>REPLACE_HOME/data</string>
+    <string>--port</string>
+    <string>8000</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>REPLACE_HOME</string>
+
+  <!-- Start on user login AND keep it running. launchd respawns the
+       process if it dies; combined with `RunAtLoad`, the dashboard
+       is up the moment the user logs in. -->
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>REPLACE_HOME/data/_status/serve.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>REPLACE_HOME/data/_status/serve.err.log</string>
+
+  <!-- Inherit user's PATH so /opt/homebrew/bin etc. are visible. -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>

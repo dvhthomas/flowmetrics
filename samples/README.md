@@ -27,8 +27,9 @@ Every contract takes these keys:
 
 ## See also
 
-- [Operations guide](../docs/OPERATIONS.md) — scheduled ingest, backup,
-  Docker, and the dashboard URLs.
-- [HOWTO](../docs/HOWTO.md) — the install → materialise → serve loop.
-- [`flow serve --help`](../docs/HOWTO.md#serve-the-dashboard) — every
-  CLI flag.
+- [Tutorial](../docs/TUTORIAL.md) — install → materialise → serve in
+  one linear walkthrough.
+- [How-to guides](../docs/HOWTO.md) — scheduling, backup, persistent
+  server, Docker.
+- [Reference](../docs/REFERENCE.md) — every CLI flag and the full
+  workflow YAML schema.

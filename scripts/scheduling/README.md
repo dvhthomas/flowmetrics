@@ -45,6 +45,8 @@ contracts directory is the source of truth.
 
 ## See also
 
-- [docs/OPERATIONS.md](../../docs/OPERATIONS.md) — full ops guide
-  including backup, restore, and troubleshooting.
+- [docs/HOWTO.md](../../docs/HOWTO.md) — scheduling, backup, restore,
+  persistent server, Docker, troubleshooting.
+- [docs/REFERENCE.md](../../docs/REFERENCE.md) — every `flow` flag
+  with defaults.
 - `flow materialise-all --help` — current flag list.

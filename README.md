@@ -30,6 +30,25 @@ pages, the contract builder, and the data-source page.
 [**Example workflow YAMLs →**](samples/) — copy-paste starters for
 GitHub PR cycles, label-driven workflows, and Atlassian Jira projects.
 
+## Install
+
+```bash
+# 1. Install uv (Python toolchain). macOS / Linux / Windows one-liners
+#    at https://docs.astral.sh/uv/.
+brew install uv                                  # macOS
+# curl -LsSf https://astral.sh/uv/install.sh | sh   # Linux
+# irm https://astral.sh/uv/install.ps1 | iex        # Windows PowerShell
+
+# 2. Install flowmetrics as a global tool (isolated env, exposes `flow`).
+uv tool install git+https://github.com/dvhthomas/flowmetrics
+
+# 3. Smoke-test.
+flow --help
+```
+
+Full walkthrough: **[Tutorial](docs/TUTORIAL.md)** — zero to dashboard
+in five minutes.
+
 ## Two ways to use it
 
 **Interactive dashboard** — point at a workflow YAML, materialise into
@@ -38,8 +57,8 @@ drives Throughput, Cycle Time, CFD, and Forecast; Aging WIP is pinned to
 the latest data.
 
 ```
-uv run flow materialise astral-uv-week --workflows-dir contracts/
-uv run flow serve --workflows-dir contracts/
+flow materialise astral-uv-week --workflows-dir contracts/
+flow serve --workflows-dir contracts/
 # → http://127.0.0.1:8000
 ```
 
@@ -47,16 +66,14 @@ uv run flow serve --workflows-dir contracts/
 exports, or agent consumption (`--format json`).
 
 ```
-$ uv run flow efficiency --repo astral-sh/uv
+$ flow efficiency --repo astral-sh/uv
 Portfolio flow efficiency for astral-sh/uv May 5 → May 11:
 8.4% across 46 completed items.
 
-$ uv run flow forecast when-done --repo astral-sh/uv --items 50 --format json \
+$ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
     | jq '.summary.percentiles'
 {"50": "2026-05-19", "70": "2026-05-21", "85": "2026-05-23", "95": "2026-05-26"}
 ```
-
-See **[How to install and run](docs/HOWTO.md)** for the full walkthrough.
 
 ## What you get
 
@@ -87,19 +104,37 @@ be misread. It's a learning artifact, not a product.
 
 ## Documentation
 
-- **[How to install and run](docs/HOWTO.md)** — install, the dashboard
-  workflow, ad-hoc CLI commands, output formats, testing.
-- **[Operations](docs/OPERATIONS.md)** — scheduled ingest on every
-  major OS, backup + restore, Docker + GH Actions, troubleshooting.
-- **[Screenshots](docs/SCREENSHOTS.md)** — every page, both source
-  types (GitHub PRs + Atlassian Jira), captured against live data.
+Organised by [Diátaxis](https://diataxis.fr/): a tutorial to learn
+from, how-to guides for specific tasks, reference for canonical
+facts, plus background explainers.
+
+**Get started**
+
+- **[Tutorial](docs/TUTORIAL.md)** — zero to dashboard in five
+  minutes. Install, write a YAML, materialise, serve.
+
+**Task-specific guides**
+
+- **[How-to guides](docs/HOWTO.md)** — install on each OS, schedule
+  fetches, run as a persistent web server, back up + restore (data /
+  config / both), Docker, ad-hoc reports, JSON for agents,
+  troubleshooting.
+
+**Reference**
+
+- **[CLI + YAML + file layout](docs/REFERENCE.md)** — every command,
+  every flag, every file. Output envelope schemas.
 - **[Metrics](docs/METRICS.md)** — how cycle / active / wait time and
   flow efficiency are computed; the clustering algorithm; assumptions.
 - **[Forecasting](docs/FORECAST.md)** — Monte Carlo when-done and
   how-many, with worked examples.
+- **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms
+  we deliberately avoid (Scrum-contaminated "backlog" and "velocity").
+
+**Explanation**
+
 - **[Decisions](docs/DECISIONS.md)** — architectural trade-offs and
   known constraints (GitHub API caps, cache strategy, WIP-tracking
   source scope).
-- **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms
-  we deliberately avoid (Scrum-contaminated "backlog" and "velocity");
-  a concrete Portfolio-FE-vs-mean-FE worked example.
+- **[Screenshots](docs/SCREENSHOTS.md)** — every page, both source
+  types (GitHub PRs + Atlassian Jira), captured against live data.
