@@ -151,7 +151,7 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
                 "min": model.cap.floor,
                 "max": model.cap.ceiling,
                 "step": 1,
-                "name": "Max cycle time shown (days)  ",
+                "name": "Cap (d) ",
             },
         }
         cap_filter = {"filter": "datum.cycle_time_days <= cyclecap"}

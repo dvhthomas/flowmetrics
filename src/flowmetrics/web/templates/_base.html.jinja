@@ -593,19 +593,40 @@
        by each chart fragment) moves the strip into
        `.metric-header-controls` post-embed so it sits next to
        Reset in the tile header — the chart starts immediately
-       below, not after a slider row. */
+       below, not after a slider row. Vega's default form layout
+       sprawls; force a tight, fixed-width chip and ensure the
+       label / value / track all sit on one line. */
     .metric-header .vega-bindings {
-      display: flex;
-      gap: 0.55rem;
+      display: inline-flex;
+      flex-wrap: nowrap;
+      gap: 0.45rem;
       align-items: center;
-      font-size: 0.72rem;
+      margin: 0;
+      padding: 0.2rem 0.55rem;
+      background: var(--surface);
+      border: 0.0625rem solid var(--border);
+      border-radius: 0.3rem;
+      font-size: 0.7rem;
       color: var(--muted);
+      white-space: nowrap;
     }
-    .metric-header .vega-bindings label {
-      display: inline-flex; align-items: center; gap: 0.35rem;
+    .metric-header .vega-bindings .vega-bind {
+      display: inline-flex;
+      gap: 0.35rem;
+      align-items: center;
+      margin: 0;
+    }
+    .metric-header .vega-bindings .vega-bind-name {
+      letter-spacing: 0.02em;
     }
     .metric-header .vega-bindings input[type="range"] {
-      height: 0.85rem; width: 7rem;
+      width: 5.5rem; height: 0.85rem; margin: 0;
+      vertical-align: middle;
+    }
+    .metric-header .vega-bindings .vega-bind-radio,
+    .metric-header .vega-bindings select {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.3rem;
     }
     .metric-header-controls {
       display: flex;

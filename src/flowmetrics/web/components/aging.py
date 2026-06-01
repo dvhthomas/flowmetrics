@@ -158,7 +158,7 @@ def _aging_to_vega(model: AgingModel) -> dict[str, Any]:
                 "min": model.cap.floor,
                 "max": model.cap.ceiling,
                 "step": 1,
-                "name": "Max age shown (days)  ",
+                "name": "Cap (d) ",
             },
         }
         cap_filter = {"filter": "datum.age_days <= agecap"}
