@@ -191,30 +191,24 @@ class TestToVegaStructure:
         assert "rule" not in _layer_marks(to_vega(model))
 
 
-class TestToVegaCapControl:
-    def test_cap_becomes_a_param_and_a_filter_when_present(self):
-        model = _model()
-        assert model.cap is not None
-        spec = to_vega(model)
-        cap = next(
-            p for p in spec["params"]
-            if isinstance(p.get("bind"), dict)
-            and p["bind"].get("input") == "range"
-        )
-        assert cap["bind"]["min"] == model.cap.floor
-        assert cap["bind"]["max"] == model.cap.ceiling
-        assert cap["value"] == model.cap.default
-        filters = [
-            t.get("filter") for t in spec["layer"][0].get("transform", [])
-        ]
-        assert any("agecap" in str(f) for f in filters)
+class TestNoInChartCapSlider:
+    """The in-chart `agecap` slider is gone — the page-level
+    Percentile Filter is the single knob for cropping outliers.
+    The chart spec should ship no params and no `agecap` filter
+    in any layer, regardless of whether the model resolved a
+    cap range."""
 
-    def test_no_cap_param_when_the_model_has_none(self):
-        model = build_aging_model(
-            [_inflight(1, ASOF)], [], asof=ASOF, open_item_count=5,
-        )
-        assert model.cap is None
-        assert "params" not in to_vega(model)
+    def test_spec_carries_no_params_block(self):
+        spec = to_vega(_model())
+        assert "params" not in spec
+
+    def test_dot_layer_has_no_agecap_filter(self):
+        spec = to_vega(_model())
+        for layer in spec["layer"]:
+            for t in layer.get("transform", []):
+                assert "agecap" not in str(t.get("filter", "")), (
+                    f"unexpected agecap filter in layer: {t}"
+                )
 
 
 class TestToVegaInteraction:

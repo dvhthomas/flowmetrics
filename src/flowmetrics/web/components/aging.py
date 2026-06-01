@@ -144,24 +144,8 @@ def _aging_to_vega(model: AgingModel) -> dict[str, Any]:
         for s, n in model.wip_badges
     ]
 
-    # Y-axis cap slider — present only when the model resolved one.
-    # FILTERS the dots so the y-axis auto-scales to what's shown;
-    # the percentile rules are a separate layer, unaffected.
-    cap_param: dict | None = None
-    cap_filter: dict | None = None
-    if model.cap is not None:
-        cap_param = {
-            "name": "agecap",
-            "value": model.cap.default,
-            "bind": {
-                "input": "range",
-                "min": model.cap.floor,
-                "max": model.cap.ceiling,
-                "step": 1,
-                "name": "Cap (d) ",
-            },
-        }
-        cap_filter = {"filter": "datum.age_days <= agecap"}
+    # No in-chart cap slider — the page-level Percentile Filter
+    # is the single knob for cropping outliers.
 
     spec: dict = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -193,10 +177,6 @@ def _aging_to_vega(model: AgingModel) -> dict[str, Any]:
                     },
                 ],
                 "data": {"values": item_values},
-                # Cap filter (when present) drops dots older than
-                # the slider value; the y-axis auto-scales to what
-                # remains.
-                "transform": [cap_filter] if cap_filter else [],
                 "mark": {
                     "type": "point",
                     "filled": True,
@@ -347,12 +327,6 @@ def _aging_to_vega(model: AgingModel) -> dict[str, Any]:
             },
         },
     }
-    # The cap value param is top-level: the y scale is shared
-    # across layers, so a layer-scoped param would be out of scope
-    # for the filter's `agecap` signal.
-    if cap_param is not None:
-        spec["params"] = [cap_param]
-
     # No completions in the reference window → percentiles are
     # 0/0/0. Drop the rule layer entirely; three dashed rules
     # stacked on y=0 read as a real threshold.

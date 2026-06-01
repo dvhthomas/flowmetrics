@@ -587,47 +587,6 @@
       margin-bottom: 0.25rem;
       min-height: 1.4rem;
     }
-    /* Vega-Lite renders bound inputs (e.g. `Max cycle time shown`)
-       inside `.vega-bindings` at the TOP of the chart container.
-       A `relocateBindings` script (in _base.html.jinja, invoked
-       by each chart fragment) moves the strip into
-       `.metric-header-controls` post-embed so it sits next to
-       Reset in the tile header — the chart starts immediately
-       below, not after a slider row. Vega's default form layout
-       sprawls; force a tight, fixed-width chip and ensure the
-       label / value / track all sit on one line. */
-    .metric-header .vega-bindings {
-      display: inline-flex;
-      flex-wrap: nowrap;
-      gap: 0.45rem;
-      align-items: center;
-      margin: 0;
-      padding: 0.2rem 0.55rem;
-      background: var(--surface);
-      border: 0.0625rem solid var(--border);
-      border-radius: 0.3rem;
-      font-size: 0.7rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .metric-header .vega-bindings .vega-bind {
-      display: inline-flex;
-      gap: 0.35rem;
-      align-items: center;
-      margin: 0;
-    }
-    .metric-header .vega-bindings .vega-bind-name {
-      letter-spacing: 0.02em;
-    }
-    .metric-header .vega-bindings input[type="range"] {
-      width: 5.5rem; height: 0.85rem; margin: 0;
-      vertical-align: middle;
-    }
-    .metric-header .vega-bindings .vega-bind-radio,
-    .metric-header .vega-bindings select {
-      font-size: 0.7rem;
-      padding: 0.1rem 0.3rem;
-    }
     .metric-header-controls {
       display: flex;
       gap: 0.55rem;
@@ -1382,26 +1341,6 @@
         ));
       };
 
-      // Move Vega-Lite's `.vega-bindings` strip out of the chart
-      // container and into the enclosing `.metric-header-controls`
-      // (next to the Reset button) so the chart starts immediately
-      // under the tile header rather than after a slider row. A
-      // no-op when the chart isn't inside a `.metric` tile or
-      // there are no bindings (most non-cycle-time charts).
-      window.relocateBindings = function (containerEl) {
-        if (!containerEl) return;
-        const bindings = containerEl.querySelector(".vega-bindings");
-        if (!bindings) return;
-        const tile = containerEl.closest(".metric");
-        if (!tile) return;
-        const controls = tile.querySelector(".metric-header-controls");
-        if (!controls) return;
-        // Insert BEFORE the Reset button so the visual order reads
-        // [slider · Reset · Details →].
-        const resetBtn = controls.querySelector(".reset-btn");
-        if (resetBtn) controls.insertBefore(bindings, resetBtn);
-        else controls.appendChild(bindings);
-      };
     })();
   </script>
 </head>

@@ -50,13 +50,6 @@
       renderer: "svg"
     }).then(function (res) {
       window.__flowmetricsCycleTimeView = res.view;
-      // Lift the Vega bindings (Max-cycle-time-shown slider) into
-      // the tile header beside Reset.
-      if (window.relocateBindings) {
-        window.relocateBindings(
-          document.getElementById("{{ chart_container_id }}")
-        );
-      }
       // Click a dot → navigate to that item's lifecycle page.
       // Hover keeps showing the tooltip (Vega-Lite default
       // behaviour for the `tooltip` encoding); click is the

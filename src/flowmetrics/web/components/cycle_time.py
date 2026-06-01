@@ -135,26 +135,10 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
     )
     x_tick_count = {"interval": model.ticks.interval, "step": model.ticks.step}
 
-    # Y-axis cap slider — present only when the model resolved one
-    # (≥ 2 items and P95 below the slowest). It FILTERS the dots so
-    # the y-axis auto-scales to what's shown.
-    cap_param: dict | None = None
-    cap_filter: dict | None = None
-    if model.cap is not None:
-        cap_param = {
-            "name": "cyclecap",
-            # Default = max → the chart opens showing ALL data;
-            # the operator drags down to exclude outliers.
-            "value": model.cap.default,
-            "bind": {
-                "input": "range",
-                "min": model.cap.floor,
-                "max": model.cap.ceiling,
-                "step": 1,
-                "name": "Cap (d) ",
-            },
-        }
-        cap_filter = {"filter": "datum.cycle_time_days <= cyclecap"}
+    # No in-chart cap slider — the page-level Percentile Filter
+    # is the single knob for cropping outliers. Set ptile_max=85
+    # to hide everything above the P85 line; the chart's
+    # y-domain auto-scales to what remains.
 
     scatter_layer = {
         "mark": {
@@ -182,11 +166,7 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
         # 04" dot lives in [May 04 tick, May 05 tick); jittering
         # forward keeps it strictly to the right of its tick label
         # and never inside the previous date's column.
-        # Cap filter (when present) drops dots above the slider
-        # value BEFORE the jitter calculate; the y-axis then
-        # auto-scales to what remains.
         "transform": [
-            *([cap_filter] if cap_filter else []),
             {
                 "calculate": (
                     "time(datum.completed_at) + random() * 86400000"
@@ -345,9 +325,4 @@ def _cycle_time_to_vega(model: CycleTimeModel) -> dict[str, Any]:
             ),
         },
     }
-    # The cap value param is top-level: the y scale is shared
-    # across layers, so a param scoped to one layer would be out
-    # of scope for the filter's `cyclecap` signal.
-    if cap_param is not None:
-        spec["params"] = [cap_param]
     return spec
