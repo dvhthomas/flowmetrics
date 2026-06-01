@@ -19,6 +19,12 @@ The single executable is `flow`. Run `flow --help` for the dispatcher
 and `flow <command> --help` for a command's full surface. Defaults
 are shown where they exist.
 
+`flow --version` prints the installed version. Versions come from
+`hatch-vcs`: tagged commits → plain PEP-440 (`0.1.0`); intermediate
+commits → `0.1.0.devN+g<sha>` where `N` counts commits since the
+last tag and `<sha>` is the short hash. The same value appears in
+`uv tool list` and `pip show flowmetrics`.
+
 ### `flow serve`
 
 Run the dashboard. Reads only the local Parquet warehouse — never
