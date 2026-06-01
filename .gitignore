@@ -21,3 +21,6 @@ src/flowmetrics/_version.py
 
 # Generated HTML reports (per-user; samples/ is committed but reports/ isn't)
 reports/
+
+# IDE / Antigravity CLI local state
+.antigravitycli/
