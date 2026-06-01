@@ -589,28 +589,22 @@
     }
     /* Vega-Lite renders bound inputs (e.g. `Max cycle time shown`)
        inside `.vega-bindings` at the TOP of the chart container.
-       Pull that strip into the tile's top-right corner so the
-       chart starts immediately — same horizontal band as Reset
-       and the Details link, rather than its own row above the
-       chart that pushes the visualization further down. */
-    .metric .vega-bindings {
-      position: absolute;
-      top: 0.45rem;
-      right: 6.5rem;
+       A `relocateBindings` script (in _base.html.jinja, invoked
+       by each chart fragment) moves the strip into
+       `.metric-header-controls` post-embed so it sits next to
+       Reset in the tile header — the chart starts immediately
+       below, not after a slider row. */
+    .metric-header .vega-bindings {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.55rem;
       align-items: center;
       font-size: 0.72rem;
       color: var(--muted);
-      max-width: 60%;
-      pointer-events: none;
-      z-index: 1;
     }
-    .metric .vega-bindings > * { pointer-events: auto; }
-    .metric .vega-bindings label {
+    .metric-header .vega-bindings label {
       display: inline-flex; align-items: center; gap: 0.35rem;
     }
-    .metric .vega-bindings input[type="range"] {
+    .metric-header .vega-bindings input[type="range"] {
       height: 0.85rem; width: 7rem;
     }
     .metric-header-controls {
@@ -806,12 +800,21 @@
       margin-bottom: 0.4rem;
     }
 
+    /* Page-level Percentile Filter toolbar. Sits between the
+       metric strip and the chart so the slider is the FIRST
+       interaction the reader sees after the headline, not a
+       below-the-fold control. */
+    .ptile-toolbar {
+      display: flex; align-items: stretch;
+      margin: 0.35rem 0 0.5rem 0;
+    }
+
     /* Compact "Percentile Filter" slider. The two range inputs
        are stacked on the same row so their tracks overlay; pointer
        events still route to whichever handle the user grabs. */
     .ptile-slider {
       display: flex; flex-direction: column; gap: 0.1rem;
-      flex: 0 1 22rem; min-width: 18rem;
+      flex: 1 1 auto; min-width: 18rem;
       padding: 0.1rem 0.55rem 0.45rem 0.55rem;
       background: var(--surface);
       border: 0.0625rem solid var(--border);
@@ -1351,6 +1354,27 @@
           /__theme:([a-z0-9-]+)__/g,
           function (_, key) { return window.flowmetricsTheme[key] || ""; }
         ));
+      };
+
+      // Move Vega-Lite's `.vega-bindings` strip out of the chart
+      // container and into the enclosing `.metric-header-controls`
+      // (next to the Reset button) so the chart starts immediately
+      // under the tile header rather than after a slider row. A
+      // no-op when the chart isn't inside a `.metric` tile or
+      // there are no bindings (most non-cycle-time charts).
+      window.relocateBindings = function (containerEl) {
+        if (!containerEl) return;
+        const bindings = containerEl.querySelector(".vega-bindings");
+        if (!bindings) return;
+        const tile = containerEl.closest(".metric");
+        if (!tile) return;
+        const controls = tile.querySelector(".metric-header-controls");
+        if (!controls) return;
+        // Insert BEFORE the Reset button so the visual order reads
+        // [slider · Reset · Details →].
+        const resetBtn = controls.querySelector(".reset-btn");
+        if (resetBtn) controls.insertBefore(bindings, resetBtn);
+        else controls.appendChild(bindings);
       };
     })();
   </script>

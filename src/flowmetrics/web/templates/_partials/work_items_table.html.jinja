@@ -22,60 +22,11 @@
     <input id="work-items-in-flight-at" type="hidden" name="in_flight_at"
            value="{{ data.in_flight_at }}">
 
-    {# Compact two-handle Percentile Filter. The handles snap to
-       {0, 50, 55, …, 100} — 0 + the 5%-step ladder from P50 up.
-       Each handle is an independent <input type="range">; the
-       script clamps min <= max, snaps off-ladder values, and
-       writes a live readout. On `change` the slider posts to the
-       work-items endpoint AND dispatches `flowmetrics:ptile-changed`
-       so the chart above the table re-fetches itself with the new
-       bounds. The current sort/direction come from the hidden
-       state meta that the body partial keeps fresh. #}
-    <div class="ptile-slider">
-      <div class="ptile-slider-label">
-        <span>Percentile Filter</span>
-        <strong id="ptile-display">
-          P<span id="ptile-min-disp">{{ data.ptile_min }}</span>
-          (<span id="ptile-min-val">—</span>)
-          – P<span id="ptile-max-disp">{{ data.ptile_max }}</span>
-          (<span id="ptile-max-val">—</span>)
-        </strong>
-      </div>
-      {# Per-snap-stop metric values, embedded so the JS can show the
-         actual cycle time / age at the handle's percentile without an
-         extra round-trip. #}
-      <script type="application/json" id="ptile-values">
-        {"unit": {{ data.ptile_unit | tojson }},
-         "values": {{ data.ptile_values | tojson }}}
-      </script>
-      <div class="ptile-slider-handles">
-        <input type="range" min="0" max="100" step="5"
-               id="ptile-min" name="ptile_min"
-               value="{{ data.ptile_min }}"
-               hx-get="/api/internal/work-items?workflow={{ contract.name }}&from=slider"
-               hx-target="#work-items-body"
-               hx-swap="innerHTML"
-               hx-trigger="change"
-               hx-vals='js:{sort: document.getElementById("work-items-state")?.dataset.sort || "", direction: document.getElementById("work-items-state")?.dataset.direction || ""}'
-               hx-include="#ptile-max, #work-items-search, #work-items-completed-on, #work-items-in-flight-at">
-        <input type="range" min="0" max="100" step="5"
-               id="ptile-max" name="ptile_max"
-               value="{{ data.ptile_max }}"
-               hx-get="/api/internal/work-items?workflow={{ contract.name }}&from=slider"
-               hx-target="#work-items-body"
-               hx-swap="innerHTML"
-               hx-trigger="change"
-               hx-vals='js:{sort: document.getElementById("work-items-state")?.dataset.sort || "", direction: document.getElementById("work-items-state")?.dataset.direction || ""}'
-               hx-include="#ptile-min, #work-items-search, #work-items-completed-on, #work-items-in-flight-at">
-        <div class="ptile-slider-ticks" aria-hidden="true">
-          <span style="left: 0%">P0</span>
-          <span style="left: 50%">P50</span>
-          <span style="left: 85%">P85</span>
-          <span style="left: 95%">P95</span>
-        </div>
-      </div>
-    </div>
-
+    {# The Percentile Filter slider is a page-level control —
+       lives in `_partials/ptile_slider.html.jinja`, included
+       ABOVE the chart by the detail-page template. The table
+       still includes the search input and the hidden filter
+       inputs below. #}
     <input id="work-items-search"
            class="work-items-search"
            type="search"
@@ -90,57 +41,6 @@
            hx-trigger="keyup changed delay:200ms, search">
   </div>
 
-  <script>
-    (function () {
-      const pmin = document.getElementById('ptile-min');
-      const pmax = document.getElementById('ptile-max');
-      const minDisp = document.getElementById('ptile-min-disp');
-      const maxDisp = document.getElementById('ptile-max-disp');
-      const minVal = document.getElementById('ptile-min-val');
-      const maxVal = document.getElementById('ptile-max-val');
-      const ptileMeta = JSON.parse(
-        document.getElementById('ptile-values').textContent
-      );
-      const unit = ptileMeta.unit || '';
-      const values = ptileMeta.values || {};
-      // The handle only snaps to {0} ∪ {50, 55, 60, …, 100}. With
-      // step=5 the range input already lands on multiples of 5; we
-      // just collapse the off-ladder zone (5..45) toward whichever
-      // side of the gap is nearer.
-      function snap(v) {
-        v = parseInt(v, 10);
-        if (v <= 25) return 0;
-        if (v < 50) return 50;
-        return Math.round(v / 5) * 5;
-      }
-      function fmtValue(p) {
-        const v = values[String(p)];
-        if (v === undefined || v === null) return '—';
-        // Days are integers visually; show one decimal only when
-        // sub-day precision matters.
-        const rounded = v >= 10 ? Math.round(v) : Math.round(v * 10) / 10;
-        return rounded + unit;
-      }
-      function clampAndShow() {
-        let lo = snap(pmin.value);
-        let hi = snap(pmax.value);
-        if (lo > hi) {
-          // Whichever handle just crossed the other "pushes" it.
-          if (document.activeElement === pmin) hi = lo;
-          else lo = hi;
-        }
-        pmin.value = lo;
-        pmax.value = hi;
-        minDisp.textContent = lo;
-        maxDisp.textContent = hi;
-        minVal.textContent = fmtValue(lo);
-        maxVal.textContent = fmtValue(hi);
-      }
-      pmin.addEventListener('input', clampAndShow);
-      pmax.addEventListener('input', clampAndShow);
-      clampAndShow();
-    })();
-  </script>
 
   <div id="work-items-body">
     {% include "_partials/work_items_table_body.html.jinja" %}

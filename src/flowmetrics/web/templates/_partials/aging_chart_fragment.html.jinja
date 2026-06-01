@@ -107,6 +107,13 @@
       renderer: "svg"
     }).then(function (res) {
       window.__flowmetricsAgingView = res.view;
+      // Lift bindings (Max-age-shown slider) into the tile header
+      // beside Reset so the chart starts immediately.
+      if (window.relocateBindings) {
+        window.relocateBindings(
+          document.getElementById("{{ chart_container_id }}")
+        );
+      }
       // Click a dot → navigate to that item's lifecycle page.
       // Hover keeps showing the tooltip (default Vega-Lite
       // behaviour for the `tooltip` encoding); click is the

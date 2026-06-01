@@ -10,6 +10,10 @@
     {% include "_partials/metric_summary.html.jinja" %}
   {% endwith %}
 
+  {% with data = work_items %}
+    {% include "_partials/ptile_slider.html.jinja" %}
+  {% endwith %}
+
   {% with mode = 'detail', data = aging %}
     {% include "_partials/aging_tile.html.jinja" %}
   {% endwith %}
