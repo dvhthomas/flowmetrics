@@ -19,6 +19,7 @@ the documentation artifact (and the advanced-user manual path).
 """
 from __future__ import annotations
 
+import contextlib
 import subprocess
 from pathlib import Path
 
@@ -179,10 +180,8 @@ def stop_and_uninstall(*, unit_dir: Path) -> None:
     _systemctl_user("disable", "--now", SERVE_UNIT)
 
     unit_path = unit_dir / SERVE_UNIT
-    try:
+    with contextlib.suppress(FileNotFoundError):
         unit_path.unlink()
-    except FileNotFoundError:
-        pass
 
     # Re-read state so systemd forgets the now-removed unit.
     _systemctl_user("daemon-reload")

@@ -308,8 +308,8 @@ def bucket_items_by_step(
     preview can't drift from what materialize will write. Items matching
     no step land in a trailing `_unmatched` bucket. Pure — no I/O.
     """
-    from .workflow import Step
     from .matching import step_for
+    from .workflow import Step
 
     parsed: list[Step] = []
     for s in steps:

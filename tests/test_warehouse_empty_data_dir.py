@@ -16,7 +16,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import duckdb
 from starlette.testclient import TestClient
 
 from flowmetrics.warehouse.connection import open_warehouse

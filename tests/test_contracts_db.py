@@ -29,7 +29,7 @@ def db(tmp_path):
 
 
 def _c(name="x", source="github", repo="a/b", steps=None, **kw):
-    from flowmetrics.workflow import Workflow, Step
+    from flowmetrics.workflow import Step, Workflow
     return Workflow(
         name=name, source=source, repo=repo,
         steps=[Step(**s) for s in (steps or [])],

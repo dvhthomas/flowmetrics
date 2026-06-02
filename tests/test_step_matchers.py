@@ -11,13 +11,13 @@ from __future__ import annotations
 
 import pytest
 
+from flowmetrics.matching import matcher_matches
 from flowmetrics.workflow import (
-    WorkflowError,
     Matcher,
+    WorkflowError,
     emit_canonical_yaml,
     parse_workflow_text,
 )
-from flowmetrics.matching import matcher_matches
 
 
 def _parse(steps_yaml: str, source: str = "github", target: str = "  repo: o/r\n"):

@@ -99,7 +99,7 @@ class TestContractModel:
         assert c.source == "jira"
 
     def test_steps_preserve_insertion_order(self):
-        from flowmetrics.workflow import Workflow, Step
+        from flowmetrics.workflow import Step, Workflow
         c = Workflow(
             name="x", source="github", repo="a/b",
             steps=[
@@ -124,7 +124,7 @@ class TestStatesCompatibilityShim:
     """
 
     def _c(self, *steps):
-        from flowmetrics.workflow import Workflow, Step
+        from flowmetrics.workflow import Step, Workflow
         return Workflow(
             name="x", source="github", repo="a/b",
             steps=[Step(name=n, wip=w) for n, w in steps],
@@ -278,8 +278,8 @@ class TestParseLegacyShape:
 class TestEmitCanonical:
     def test_emit_writes_steps_shape(self):
         from flowmetrics.workflow import (
-            Workflow,
             Step,
+            Workflow,
             emit_canonical_yaml,
             parse_workflow_text,
         )

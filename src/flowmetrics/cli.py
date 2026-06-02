@@ -18,7 +18,6 @@ import json
 import shutil
 import sys
 from collections.abc import Callable
-from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from random import Random
@@ -26,7 +25,6 @@ from typing import Any
 
 import click
 
-from .compute import WindowResult  # compute_pr_flow used in aging path
 from .forecast import (
     ResultsHistogram,
     backward_percentile,
@@ -36,15 +34,12 @@ from .forecast import (
     monte_carlo_when_done,
 )
 from .interpretation import (
-    interpret_efficiency,
     interpret_how_many,
     interpret_when_done,
 )
 from .logcapture import LogCapture
 from .renderers import json_renderer, text_renderer
 from .report import (
-    EfficiencyInput,
-    EfficiencyReport,
     HowManyInput,
     HowManyReport,
     SimulationSummary,
@@ -53,16 +48,13 @@ from .report import (
     build_training_summary,
 )
 from .service import (
-    DEFAULT_ACTIVE_STATUSES,
     DEFAULT_CACHE_DIR,
     DEFAULT_GAP,
     DEFAULT_MIN_CLUSTER,
     DEFAULT_TRAINING_DAYS,
-    flowmetrics_for_window,
     historical_throughput_samples,
     make_github_source,
     make_jira_source,
-    this_week_window,
 )
 from .sources import Source
 from .sources.github_labels import WipLabels
@@ -655,7 +647,6 @@ def metric_throughput(
     window. The workflow (`--workflow-name` or `--workflow-yaml`) supplies the source.
 
     Schema: `flowmetrics.metric.throughput.v1`."""
-    from datetime import date
 
     from .throughput import daily_counts
 
@@ -730,7 +721,6 @@ def metric_cumulative(
     the source AND the stage order.
 
     Schema: `flowmetrics.metric.cumulative.v1`."""
-    from datetime import timedelta
 
     from .cfd import build_cfd
     from .service import fetch_items_active_in_window
@@ -821,7 +811,8 @@ def metric_aging(
     order.
 
     Schema: `flowmetrics.metric.aging.v1`."""
-    from datetime import date, timedelta as _td
+    from datetime import date
+    from datetime import timedelta as _td
 
     from .aging import compute_aging, cycle_time_percentiles
     from .compute import compute_pr_flow

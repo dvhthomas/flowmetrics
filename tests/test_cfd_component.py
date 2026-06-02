@@ -18,10 +18,10 @@ from datetime import date, datetime, timedelta
 import duckdb
 
 from flowmetrics.charts.cfd import build_cfd_model
-from flowmetrics.workflow import WorkflowStates
 from flowmetrics.warehouse.queries import StageEntry
 from flowmetrics.web.components.cfd import render, to_vega
 from flowmetrics.windows import Window
+from flowmetrics.workflow import WorkflowStates
 
 
 def _entry(item_id: str, stage: str, d: date) -> StageEntry:

@@ -15,13 +15,13 @@ from typing import Any
 import duckdb
 
 from ...charts.aging import AgingModel, build_aging_model
-from ...workflow import WorkflowStates
 from ...warehouse.queries import (
     completed_items,
     count_open_items,
     in_flight_snapshot,
 )
 from ...windows import Window
+from ...workflow import WorkflowStates
 from ._vega import to_vega
 
 # Chart colors are CSS-theme-driven; see _base.html.jinja's

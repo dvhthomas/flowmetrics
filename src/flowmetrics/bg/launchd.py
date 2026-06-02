@@ -20,6 +20,7 @@ artifact (and the advanced-user manual path).
 """
 from __future__ import annotations
 
+import contextlib
 import os
 import plistlib
 import subprocess
@@ -175,10 +176,8 @@ def stop_and_uninstall(*, launchagents_dir: Path, uid: int) -> None:
     )
 
     plist_path = launchagents_dir / f"{SERVE_LABEL}.plist"
-    try:
+    with contextlib.suppress(FileNotFoundError):
         plist_path.unlink()
-    except FileNotFoundError:
-        pass
 
 
 def render_materialize_plist(
@@ -283,10 +282,8 @@ def stop_materialize_schedule(
         check=False, capture_output=True,
     )
     plist_path = launchagents_dir / f"{MATERIALIZE_LABEL}.plist"
-    try:
+    with contextlib.suppress(FileNotFoundError):
         plist_path.unlink()
-    except FileNotFoundError:
-        pass
 
 
 def default_launchagents_dir() -> Path:

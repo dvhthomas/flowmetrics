@@ -38,12 +38,6 @@ from .backfill import (
     status_path,
     write_status,
 )
-from .workflow import (
-    WorkflowError,
-    load_contract,
-    parse_workflow_text,
-    validate_yaml_text_structured,
-)
 from .utc_dates import to_utc_display_date
 from .warehouse.connection import open_warehouse
 from .warehouse.queries import completion_date_range, latest_materialized_at
@@ -72,6 +66,12 @@ from .web.components.work_items_table import (
     render as render_work_items_table,
 )
 from .windows import parse_windows
+from .workflow import (
+    WorkflowError,
+    load_contract,
+    parse_workflow_text,
+    validate_yaml_text_structured,
+)
 
 _TEMPLATES_DIR = Path(__file__).parent / "web" / "templates"
 
