@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from flowmetrics.contract import Contract
+from flowmetrics.workflow import Contract
 from flowmetrics.materialize import DEFAULT_FETCH_WINDOW_DAYS, _resolve_window
 
 

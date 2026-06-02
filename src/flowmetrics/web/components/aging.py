@@ -15,7 +15,7 @@ from typing import Any
 import duckdb
 
 from ...charts.aging import AgingModel, build_aging_model
-from ...contract import WorkflowStates
+from ...workflow import WorkflowStates
 from ...warehouse.queries import (
     completed_items,
     count_open_items,

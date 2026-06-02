@@ -11,7 +11,7 @@ keeps each contract as a YAML text body so adding fields to the
 Pydantic model never requires a DB migration.
 
 Legacy `states: {backlog, wip, done}` YAMLs are still accepted on
-import; `parse_contract_text` normalises them into the new
+import; `parse_workflow_text` normalises them into the new
 `steps: [{name, wip}]` shape. A `Contract.states` compatibility
 property synthesises the legacy `WorkflowStates(backlog, wip, done)`
 object so every existing CFD / Aging / charts caller keeps working
@@ -37,7 +37,7 @@ from pydantic import (
 from . import signals
 
 
-class ContractError(ValueError):
+class WorkflowError(ValueError):
     """Raised when a contract YAML is missing, malformed, or invalid."""
 
 
@@ -229,42 +229,42 @@ class Contract(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-def parse_contract_text(text: str, name: str) -> Contract:
+def parse_workflow_text(text: str, name: str) -> Contract:
     """Parse a YAML string into a Contract. Accepts both the new
     `steps:` shape and the legacy `states: {backlog, wip, done}`
     shape; both produce the same canonical Contract object."""
     try:
         raw = yaml.safe_load(text)
     except yaml.YAMLError as exc:
-        raise ContractError(
+        raise WorkflowError(
             f"contract {name!r} is not valid YAML: {exc}"
         ) from exc
 
     if not isinstance(raw, dict) or "contract" not in raw:
-        raise ContractError("must have a top-level `contract:` key")
+        raise WorkflowError("must have a top-level `contract:` key")
 
     body = raw["contract"]
     if not isinstance(body, dict):
-        raise ContractError(
+        raise WorkflowError(
             f"`contract:` must be a mapping; got {type(body).__name__}"
         )
 
     declared_name = body.get("name")
     if declared_name != name:
-        raise ContractError(
+        raise WorkflowError(
             f"contract file is for name={declared_name!r} "
             f"but loaded as {name!r}"
         )
 
     label = body.get("label")
     if label is not None and not isinstance(label, str):
-        raise ContractError(
+        raise WorkflowError(
             f"contract.label must be a string; got {type(label).__name__}"
         )
 
     source = body.get("source")
     if source not in ("github", "jira"):
-        raise ContractError(
+        raise WorkflowError(
             f"contract.source must be 'github' or 'jira'; got {source!r}"
         )
 
@@ -272,9 +272,9 @@ def parse_contract_text(text: str, name: str) -> Contract:
     jira_url = body.get("jira_url")
     jira_project = body.get("jira_project")
     if source == "github" and not repo:
-        raise ContractError("github contract requires `repo: OWNER/NAME`")
+        raise WorkflowError("github contract requires `repo: OWNER/NAME`")
     if source == "jira" and not (jira_url and jira_project):
-        raise ContractError(
+        raise WorkflowError(
             "jira contract requires `jira_url` and `jira_project`"
         )
 
@@ -287,7 +287,7 @@ def parse_contract_text(text: str, name: str) -> Contract:
         try:
             return date.fromisoformat(str(v))
         except (TypeError, ValueError) as exc:
-            raise ContractError(
+            raise WorkflowError(
                 f"contract.{field_name} must be YYYY-MM-DD; got {v!r}"
             ) from exc
 
@@ -306,7 +306,7 @@ def parse_contract_text(text: str, name: str) -> Contract:
             steps=steps,
         )
     except ValidationError as exc:
-        raise ContractError(_summarise_pydantic_errors(exc)) from exc
+        raise WorkflowError(_summarise_pydantic_errors(exc)) from exc
 
 
 def _read_steps(body: dict) -> list[Step]:
@@ -315,7 +315,7 @@ def _read_steps(body: dict) -> list[Step]:
     new_shape = body.get("steps")
     legacy_shape = body.get("states")
     if new_shape is not None and legacy_shape is not None:
-        raise ContractError(
+        raise WorkflowError(
             "contract may carry `steps:` or `states:` but not both"
         )
     if new_shape is not None:
@@ -327,20 +327,20 @@ def _read_steps(body: dict) -> list[Step]:
 
 def _read_new_steps(raw: object) -> list[Step]:
     if not isinstance(raw, list):
-        raise ContractError(
+        raise WorkflowError(
             f"contract.steps must be a list; got {type(raw).__name__}"
         )
     out: list[Step] = []
     for i, row in enumerate(raw):
         if not isinstance(row, dict):
-            raise ContractError(
+            raise WorkflowError(
                 f"contract.steps[{i}] must be a mapping; "
                 f"got {type(row).__name__}"
             )
         try:
             out.append(Step(**row))
         except ValidationError as exc:
-            raise ContractError(
+            raise WorkflowError(
                 f"contract.steps[{i}]: {_summarise_pydantic_errors(exc)}"
             ) from exc
     return out
@@ -351,7 +351,7 @@ def _read_legacy_states(raw: object) -> list[Step]:
     list. Order: backlog rows (wip=False), then wip rows (wip=True),
     then done rows (wip=False)."""
     if not isinstance(raw, dict):
-        raise ContractError(
+        raise WorkflowError(
             f"contract.states must be a mapping of "
             f"category → [state_name, …]; got {type(raw).__name__}"
         )
@@ -360,19 +360,19 @@ def _read_legacy_states(raw: object) -> list[Step]:
     buckets: dict[str, list[str]] = {"backlog": [], "wip": [], "done": []}
     for category, names in raw.items():
         if category not in valid:
-            raise ContractError(
+            raise WorkflowError(
                 f"unknown category {category!r} in contract.states; "
                 f"valid categories are: backlog, wip, done"
             )
         if not isinstance(names, list):
-            raise ContractError(
+            raise WorkflowError(
                 f"contract.states.{category} must be a list of "
                 f"state names; got {type(names).__name__}"
             )
         for n in names:
             name = str(n)
             if name in seen:
-                raise ContractError(
+                raise WorkflowError(
                     f"state {name!r} appears in more than one "
                     f"category: {seen[name]!r} and {category!r}. "
                     f"Each state name can be in at most one "
@@ -403,10 +403,10 @@ def load_contract(name: str, contracts_dir: Path) -> Contract:
     """Load and validate a contract YAML by name from
     `contracts_dir`.
 
-    Looks for `<name>.yaml` then `<name>.yml`. Raises `ContractError`
+    Looks for `<name>.yaml` then `<name>.yml`. Raises `WorkflowError`
     on any failure. Kept as a thin helper for tests + the CLI's
     --from-yaml path; the runtime server reads from the SQLite
-    store via `flowmetrics.contracts_db.ContractsDB.get` instead.
+    store via `flowmetrics.contracts_db.WorkflowsDB.get` instead.
     """
     path = contracts_dir / f"{name}.yaml"
     if not path.exists():
@@ -414,17 +414,17 @@ def load_contract(name: str, contracts_dir: Path) -> Contract:
         if alt.exists():
             path = alt
         else:
-            raise ContractError(
+            raise WorkflowError(
                 f"contract {name!r} not found under {contracts_dir}/ "
                 f"(looked for {name}.yaml and {name}.yml)"
             )
-    return parse_contract_text(path.read_text(), name)
+    return parse_workflow_text(path.read_text(), name)
 
 
 def emit_canonical_yaml(contract: Contract) -> str:
     """Render a Contract in the canonical `steps:` YAML shape.
 
-    The output is what `parse_contract_text` would round-trip
+    The output is what `parse_workflow_text` would round-trip
     against; what the export-YAML endpoint serves; what the SQLite
     store keeps in its `yaml` column."""
     body: dict = {"name": contract.name, "source": contract.source}
@@ -479,10 +479,10 @@ def validate_yaml_text_structured(
                     "line": None, "column": None,
                 }]
             inferred = doc["contract"].get("name") or ""
-            parse_contract_text(text, inferred)
+            parse_workflow_text(text, inferred)
         else:
-            parse_contract_text(text, name)
-    except ContractError as exc:
+            parse_workflow_text(text, name)
+    except WorkflowError as exc:
         cause = exc.__cause__
         if isinstance(cause, yaml.YAMLError):
             return [_yaml_err_to_struct(cause)]

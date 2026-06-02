@@ -23,11 +23,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .contract import (
+from .workflow import (
     Contract,
-    ContractError,
+    WorkflowError,
     emit_canonical_yaml,
-    parse_contract_text,
+    parse_workflow_text,
 )
 
 _SCHEMA = """
@@ -44,13 +44,13 @@ CREATE INDEX IF NOT EXISTS contracts_archived_at_idx
 """
 
 
-class ContractsDBError(Exception):
-    """Raised by ContractsDB on operations the caller can recover
+class WorkflowsDBError(Exception):
+    """Raised by WorkflowsDB on operations the caller can recover
     from (live-row delete attempt, restore-collision, etc.)."""
 
 
 @dataclass(frozen=True)
-class ContractMeta:
+class WorkflowMeta:
     """A row's wrapper carrying lifecycle metadata alongside the
     parsed Contract object."""
 
@@ -68,7 +68,7 @@ class ContractMeta:
         return self.contract.name
 
 
-class ContractsDB:
+class WorkflowsDB:
     """Thin wrapper over the `contracts` SQLite table.
 
     Connections are short-lived (one per method call) — the volume
@@ -93,9 +93,9 @@ class ContractsDB:
     def _now() -> str:
         return datetime.now(UTC).isoformat()
 
-    def _row_to_meta(self, row: sqlite3.Row) -> ContractMeta:
-        contract = parse_contract_text(row["yaml"], row["id"])
-        return ContractMeta(
+    def _row_to_meta(self, row: sqlite3.Row) -> WorkflowMeta:
+        contract = parse_workflow_text(row["yaml"], row["id"])
+        return WorkflowMeta(
             contract=contract,
             yaml=row["yaml"],
             created_at=row["created_at"],
@@ -134,7 +134,7 @@ class ContractsDB:
                     (contract.name, yaml_text, now, now),
                 )
             elif existing["archived_at"] is not None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"a contract with id {contract.name!r} is "
                     "archived. Restore it (or hard-delete it) "
                     "before creating a new contract with the "
@@ -151,14 +151,14 @@ class ContractsDB:
         meta = self.get_meta(contract_id)
         return meta.contract if meta else None
 
-    def get_meta(self, contract_id: str) -> ContractMeta | None:
+    def get_meta(self, contract_id: str) -> WorkflowMeta | None:
         with self._connect() as con:
             row = con.execute(
                 "SELECT * FROM contracts WHERE id = ?", (contract_id,)
             ).fetchone()
             return self._row_to_meta(row) if row else None
 
-    def list(self, *, include_archived: bool = False) -> list[ContractMeta]:
+    def list(self, *, include_archived: bool = False) -> list[WorkflowMeta]:
         with self._connect() as con:
             if include_archived:
                 rows = con.execute(
@@ -183,7 +183,7 @@ class ContractsDB:
                 (contract_id,),
             ).fetchone()
             if row is None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"contract {contract_id!r} not found"
                 )
             if row["archived_at"] is None:
@@ -209,7 +209,7 @@ class ContractsDB:
                 (contract_id,),
             ).fetchone()
             if row is None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"contract {contract_id!r} not found"
                 )
             if row["archived_at"] is None:
@@ -226,7 +226,7 @@ class ContractsDB:
                 (contract_id,),
             ).fetchone()
             if collide is not None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"a live contract with id {contract_id!r} "
                     "already exists; rename it before restoring."
                 )
@@ -245,11 +245,11 @@ class ContractsDB:
                 (contract_id,),
             ).fetchone()
             if row is None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"contract {contract_id!r} not found"
                 )
             if row["archived_at"] is None:
-                raise ContractsDBError(
+                raise WorkflowsDBError(
                     f"contract {contract_id!r} is live; archive it "
                     "first before hard-deleting."
                 )
@@ -311,7 +311,7 @@ def ensure_initialized(workflows_dir: Path) -> None:
     """
     workflows_dir = Path(workflows_dir)
     workflows_dir.mkdir(parents=True, exist_ok=True)
-    db = ContractsDB(_resolve_db_path(workflows_dir))
+    db = WorkflowsDB(_resolve_db_path(workflows_dir))
     migrated_dir = workflows_dir / "migrated"
 
     for path in sorted(workflows_dir.iterdir()):
@@ -323,8 +323,8 @@ def ensure_initialized(workflows_dir: Path) -> None:
             continue
         name = path.stem
         try:
-            contract = parse_contract_text(path.read_text(), name)
-        except ContractError:
+            contract = parse_workflow_text(path.read_text(), name)
+        except WorkflowError:
             # Leave the bad YAML where it is so the user sees it.
             continue
         # DB wins — if the row already exists, don't clobber it.
@@ -335,11 +335,11 @@ def ensure_initialized(workflows_dir: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# ContractStore — the single persistence adapter (DB + YAML fallback).
+# WorkflowStore — the single persistence adapter (DB + YAML fallback).
 # ---------------------------------------------------------------------------
 
 
-class ContractStore:
+class WorkflowStore:
     """The one contract-persistence adapter for both the web app and
     the CLI, so the "YAML vs DB read/write" decision lives in exactly
     one place.
@@ -365,7 +365,7 @@ class ContractStore:
         # is a no-op when there's nothing to rename.
         self.workflows_dir.mkdir(parents=True, exist_ok=True)
         db_path = _resolve_db_path(self.workflows_dir)
-        self.db = ContractsDB(db_path)
+        self.db = WorkflowsDB(db_path)
 
     # -------------------------------------------------------- migration
 
@@ -374,7 +374,7 @@ class ContractStore:
 
     # ------------------------------------------------------------ reads
 
-    def get_meta(self, contract_id: str) -> ContractMeta | None:
+    def get_meta(self, contract_id: str) -> WorkflowMeta | None:
         meta = self.db.get_meta(contract_id)
         return meta if meta is not None else self._yaml_meta(contract_id)
 
@@ -382,7 +382,7 @@ class ContractStore:
         meta = self.get_meta(contract_id)
         return meta.contract if meta is not None else None
 
-    def list(self, *, include_archived: bool = False) -> list[ContractMeta]:
+    def list(self, *, include_archived: bool = False) -> list[WorkflowMeta]:
         return self.db.list(include_archived=include_archived)
 
     # ----------------------------------------------------------- writes
@@ -401,7 +401,7 @@ class ContractStore:
 
     # --------------------------------------------------------- internal
 
-    def _yaml_meta(self, contract_id: str) -> ContractMeta | None:
+    def _yaml_meta(self, contract_id: str) -> WorkflowMeta | None:
         """Resolve a contract from a YAML file on disk (read-only). The
         file is never moved — that's `ensure_initialized`'s job."""
         for ext in (".yaml", ".yml"):
@@ -410,11 +410,11 @@ class ContractStore:
                 continue
             text = path.read_text()
             try:
-                contract = parse_contract_text(text, contract_id)
-            except ContractError:
+                contract = parse_workflow_text(text, contract_id)
+            except WorkflowError:
                 return None
             stamp = datetime.fromtimestamp(path.stat().st_mtime, UTC).isoformat()
-            return ContractMeta(
+            return WorkflowMeta(
                 contract=contract,
                 yaml=text,
                 created_at=stamp,

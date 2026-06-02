@@ -230,8 +230,8 @@ class TestSlice1Acceptance:
         backfill spawns exactly this command, and it was failing with
         'contract not found ... looked for NAME.yaml' for DB-only
         contracts."""
-        from flowmetrics.contract import parse_contract_text
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflow import parse_workflow_text
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
 
         contracts_dir = tmp_path / "contracts"
         contracts_dir.mkdir()
@@ -239,9 +239,9 @@ class TestSlice1Acceptance:
         name = "astral-uv-week"
 
         ensure_initialized(contracts_dir)
-        db = ContractsDB(contracts_dir / "workflows.db")
+        db = WorkflowsDB(contracts_dir / "workflows.db")
         db.put(
-            parse_contract_text(
+            parse_workflow_text(
                 "contract:\n"
                 f"  name: {name}\n"
                 "  source: github\n"

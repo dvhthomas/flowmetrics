@@ -22,7 +22,7 @@ def _write_yaml(dirpath: Path, name: str, **fields) -> None:
 
 class TestEnsureInitialized:
     def test_creates_db_and_imports_every_yaml(self, tmp_path):
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         _write_yaml(workflows, "alpha", label="Alpha")
@@ -32,12 +32,12 @@ class TestEnsureInitialized:
 
         ensure_initialized(workflows)
 
-        db = ContractsDB(workflows / "workflows.db")
+        db = WorkflowsDB(workflows / "workflows.db")
         ids = {c.name for c in db.list()}
         assert ids == {"alpha", "beta"}
 
     def test_processed_yamls_move_to_migrated_subdir(self, tmp_path):
-        from flowmetrics.contracts_db import ensure_initialized
+        from flowmetrics.workflows_db import ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         _write_yaml(workflows, "alpha")
@@ -53,7 +53,7 @@ class TestEnsureInitialized:
         assert (workflows / "migrated" / "beta.yaml").exists()
 
     def test_idempotent_when_no_yamls_present(self, tmp_path):
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         # Run once with one YAML.
@@ -62,11 +62,11 @@ class TestEnsureInitialized:
         # Run a second time — no YAMLs in the top-level dir now.
         ensure_initialized(workflows)
         # DB unchanged, no errors.
-        db = ContractsDB(workflows / "workflows.db")
+        db = WorkflowsDB(workflows / "workflows.db")
         assert [c.name for c in db.list()] == ["alpha"]
 
     def test_yaml_in_dir_after_first_run_imports_on_re_run(self, tmp_path):
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         _write_yaml(workflows, "alpha")
@@ -74,7 +74,7 @@ class TestEnsureInitialized:
         # User drops a new YAML in later. Next call picks it up.
         _write_yaml(workflows, "gamma")
         ensure_initialized(workflows)
-        db = ContractsDB(workflows / "workflows.db")
+        db = WorkflowsDB(workflows / "workflows.db")
         assert {c.name for c in db.list()} == {"alpha", "gamma"}
 
     def test_existing_row_not_overwritten_if_yaml_returns(self, tmp_path):
@@ -82,14 +82,14 @@ class TestEnsureInitialized:
         ID matches a row already in the DB, the existing row wins
         (the DB is the source of truth). The YAML still moves so
         the user knows it was processed."""
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         _write_yaml(workflows, "alpha", label="from-yaml")
         ensure_initialized(workflows)
-        db = ContractsDB(workflows / "workflows.db")
+        db = WorkflowsDB(workflows / "workflows.db")
         # User edits the DB row through the API (simulated here).
-        from flowmetrics.contract import Contract
+        from flowmetrics.workflow import Contract
         c = db.get("alpha")
         db.put(Contract(**{**c.model_dump(), "label": "from-api"}))
         # User restores the original YAML.
@@ -103,14 +103,14 @@ class TestEnsureInitialized:
     def test_malformed_yaml_does_not_crash(self, tmp_path):
         """A broken YAML in the dir is skipped (left in place so the
         user can fix it); ensure_initialized returns normally."""
-        from flowmetrics.contracts_db import ContractsDB, ensure_initialized
+        from flowmetrics.workflows_db import WorkflowsDB, ensure_initialized
         workflows = tmp_path / "workflows"
         workflows.mkdir()
         _write_yaml(workflows, "good")
         # Missing source: → contract parse fails.
         (workflows / "bad.yaml").write_text("contract: {name: bad}\n")
         ensure_initialized(workflows)
-        db = ContractsDB(workflows / "workflows.db")
+        db = WorkflowsDB(workflows / "workflows.db")
         assert [c.name for c in db.list()] == ["good"]
         # Bad YAML left where it was so the user can see it.
         assert (workflows / "bad.yaml").exists()

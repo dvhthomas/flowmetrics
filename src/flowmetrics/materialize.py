@@ -31,7 +31,7 @@ from pathlib import Path
 
 import duckdb
 
-from .contract import Contract
+from .workflow import Contract
 from .matching import remap_transitions
 from .service import make_github_source, make_jira_source
 from .sources.intervals import (

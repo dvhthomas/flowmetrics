@@ -20,16 +20,16 @@ import time
 
 import pytest
 
-from flowmetrics.contracts_db import ContractsDB, ContractsDBError
+from flowmetrics.workflows_db import WorkflowsDB, WorkflowsDBError
 
 
 @pytest.fixture
 def db(tmp_path):
-    return ContractsDB(tmp_path / "contracts.db")
+    return WorkflowsDB(tmp_path / "contracts.db")
 
 
 def _c(name="x", source="github", repo="a/b", steps=None, **kw):
-    from flowmetrics.contract import Contract, Step
+    from flowmetrics.workflow import Contract, Step
     return Contract(
         name=name, source=source, repo=repo,
         steps=[Step(**s) for s in (steps or [])],
@@ -39,10 +39,10 @@ def _c(name="x", source="github", repo="a/b", steps=None, **kw):
 
 class TestInitialization:
     def test_first_open_creates_the_schema(self, tmp_path):
-        from flowmetrics.contracts_db import ContractsDB
+        from flowmetrics.workflows_db import WorkflowsDB
         path = tmp_path / "contracts.db"
         assert not path.exists()
-        ContractsDB(path)
+        WorkflowsDB(path)
         assert path.exists()
         con = sqlite3.connect(path)
         try:
@@ -115,7 +115,7 @@ class TestArchiveLifecycle:
 
     def test_hard_delete_refuses_on_live_contract(self, db):
         db.put(_c(name="x"))
-        with pytest.raises(ContractsDBError):
+        with pytest.raises(WorkflowsDBError):
             db.hard_delete("x")
         # Still there.
         assert db.get("x") is not None
@@ -135,7 +135,7 @@ class TestArchiveLifecycle:
         # silent resurrection.
         db.put(_c(name="x", label="first"))
         db.archive("x")
-        with pytest.raises(ContractsDBError):
+        with pytest.raises(WorkflowsDBError):
             db.put(_c(name="x", label="second"))
 
 

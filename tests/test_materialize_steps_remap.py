@@ -16,7 +16,7 @@ import duckdb
 from click.testing import CliRunner
 
 from flowmetrics.cli import cli
-from flowmetrics.contract import parse_contract_text
+from flowmetrics.workflow import parse_workflow_text
 
 FIXTURE_CACHE = Path(__file__).parent / "fixtures" / "cache"
 
@@ -91,7 +91,7 @@ def test_transitions_carry_step_names_not_adapter_stages(tmp_path):
 
 def test_wip_step_name_aligns_with_warehouse_stages(tmp_path):
     _, contracts = _materialize(tmp_path)
-    c = parse_contract_text((contracts / "uv-typed.yaml").read_text(), "uv-typed")
+    c = parse_workflow_text((contracts / "uv-typed.yaml").read_text(), "uv-typed")
     # The WIP filter keys off states.wip (step names); after remap the
     # warehouse stages ARE these names, so the filter resolves.
     assert c.states is not None

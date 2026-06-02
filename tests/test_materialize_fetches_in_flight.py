@@ -20,7 +20,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flowmetrics.compute import WorkItem
-from flowmetrics.contract import Contract
+from flowmetrics.workflow import Contract
 from flowmetrics.materialize import materialize
 
 

@@ -19,7 +19,7 @@ from dataclasses import replace
 
 from . import signals
 from .canonical import StageTransition
-from .contract import Matcher, Step
+from .workflow import Matcher, Step
 
 # Stage assigned to a transition that matches no step — surfaced as a
 # coverage-gap bucket rather than silently dropped.

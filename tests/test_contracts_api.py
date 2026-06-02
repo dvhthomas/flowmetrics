@@ -123,7 +123,7 @@ class TestGetContractDetail:
 
     def test_malformed_yaml_is_skipped_by_migration_and_returns_404(self, workspace):
         contracts, data = workspace
-        # Missing `source:` → ContractError on parse. The migration
+        # Missing `source:` → WorkflowError on parse. The migration
         # leaves the bad YAML in place (so the user can see + fix
         # it) and does NOT create a DB row. The detail endpoint
         # therefore returns 404 rather than 422.
@@ -162,7 +162,7 @@ class TestValidateEndpoint:
     def test_invalid_yaml_returns_structured_errors(self, workspace):
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
-        # Missing source: → ContractError.
+        # Missing source: → WorkflowError.
         with TestClient(app) as client:
             r = self._post(client, json={"yaml":
                 "contract:\n  name: alpha\n"

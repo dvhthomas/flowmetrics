@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from flowmetrics.canonical import StageTransition
-from flowmetrics.contract import Step
+from flowmetrics.workflow import Step
 from flowmetrics.matching import UNMATCHED_STAGE, remap_transitions
 
 

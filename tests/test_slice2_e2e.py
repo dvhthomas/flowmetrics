@@ -68,7 +68,7 @@ def _materialize_aging_demo(
     reference lines are drawn from.
     """
     from flowmetrics.compute import WorkItem
-    from flowmetrics.contract import Contract
+    from flowmetrics.workflow import Contract
     from flowmetrics.materialize import materialize
 
     name = "aging-demo"

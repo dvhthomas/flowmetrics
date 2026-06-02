@@ -19,7 +19,7 @@ from ...charts.cfd import (
     daily_flow_metrics,
     infer_stage_order,
 )
-from ...contract import WorkflowStates
+from ...workflow import WorkflowStates
 from ...warehouse.queries import (
     first_stage_entries,
     observed_stages,

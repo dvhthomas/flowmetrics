@@ -11,17 +11,17 @@ from __future__ import annotations
 
 import pytest
 
-from flowmetrics.contract import (
-    ContractError,
+from flowmetrics.workflow import (
+    WorkflowError,
     Matcher,
     emit_canonical_yaml,
-    parse_contract_text,
+    parse_workflow_text,
 )
 from flowmetrics.matching import matcher_matches
 
 
 def _parse(steps_yaml: str, source: str = "github", target: str = "  repo: o/r\n"):
-    return parse_contract_text(
+    return parse_workflow_text(
         f"contract:\n  name: c\n  source: {source}\n{target}{steps_yaml}", "c"
     )
 
@@ -43,7 +43,7 @@ class TestParseTypedMatchers:
         ]
 
     def test_bare_string_matcher_is_rejected(self):
-        with pytest.raises(ContractError):
+        with pytest.raises(WorkflowError):
             _parse(
                 "  steps:\n"
                 "    - name: X\n"
@@ -52,7 +52,7 @@ class TestParseTypedMatchers:
             )
 
     def test_unknown_event_code_is_rejected(self):
-        with pytest.raises(ContractError):
+        with pytest.raises(WorkflowError):
             _parse(
                 "  steps:\n"
                 "    - name: X\n"
@@ -61,7 +61,7 @@ class TestParseTypedMatchers:
             )
 
     def test_jira_event_code_rejected_on_github_source(self):
-        with pytest.raises(ContractError):
+        with pytest.raises(WorkflowError):
             _parse(
                 "  steps:\n"
                 "    - name: X\n"
@@ -98,7 +98,7 @@ class TestEmitRoundTrip:
             "      matches:\n"
             "        - event: pr-merged\n"
         )
-        again = parse_contract_text(emit_canonical_yaml(c), "c")
+        again = parse_workflow_text(emit_canonical_yaml(c), "c")
         m = again.steps[0].matches[0]
         assert (m.kind, m.value) == ("event", "pr-merged")
 

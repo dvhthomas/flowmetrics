@@ -1,6 +1,6 @@
 """User-facing DB file renamed from `contracts.db` → `workflows.db`.
 
-ContractStore auto-migrates on first construction:
+WorkflowStore auto-migrates on first construction:
 
   1. Empty workflows-dir: creates workflows.db directly. No rename
      ever needed.
@@ -10,7 +10,7 @@ ContractStore auto-migrates on first construction:
      in while contracts.db was already there): refuse to rename;
      surface the ambiguity. We never silently overwrite either.
 
-The Python type name (`ContractStore`) stays — it's implementation
+The Python type name (`WorkflowStore`) stays — it's implementation
 vocabulary. Only the filename users see on disk changes.
 """
 from __future__ import annotations
@@ -20,11 +20,11 @@ from pathlib import Path
 
 import pytest
 
-from flowmetrics.contracts_db import ContractStore
+from flowmetrics.workflows_db import WorkflowStore
 
 
 def _make_db(path: Path) -> None:
-    """Minimal contracts schema — enough that `ContractStore.list()`
+    """Minimal contracts schema — enough that `WorkflowStore.list()`
     can read it without crashing."""
     path.parent.mkdir(parents=True, exist_ok=True)
     yaml_text = (
@@ -62,7 +62,7 @@ def _make_db(path: Path) -> None:
 class TestEmptyWorkflowsDir:
     def test_creates_workflows_db_not_contracts_db(self, tmp_path):
         wf = tmp_path / "contracts"
-        ContractStore(wf)
+        WorkflowStore(wf)
         # The DB file should land at workflows.db, not contracts.db.
         assert (wf / "workflows.db").exists() or not (wf / "contracts.db").exists()
         # (Connection isn't opened until first use, so either the new
@@ -77,7 +77,7 @@ class TestLegacyMigration:
         legacy = wf / "contracts.db"
         _make_db(legacy)
 
-        ContractStore(wf)
+        WorkflowStore(wf)
 
         new = wf / "workflows.db"
         assert new.exists(), "expected workflows.db to be created"
@@ -88,7 +88,7 @@ class TestLegacyMigration:
         legacy = wf / "contracts.db"
         _make_db(legacy)
 
-        store = ContractStore(wf)
+        store = WorkflowStore(wf)
         rows = store.list()
         assert any(m.name == "astral-uv" for m in rows), (
             f"expected to find migrated row; got {rows}"
@@ -99,8 +99,8 @@ class TestLegacyMigration:
         legacy = wf / "contracts.db"
         _make_db(legacy)
 
-        ContractStore(wf)  # first call: migrates
-        ContractStore(wf)  # second call: nothing to do, must not raise
+        WorkflowStore(wf)  # first call: migrates
+        WorkflowStore(wf)  # second call: nothing to do, must not raise
 
         assert (wf / "workflows.db").exists()
         assert not (wf / "contracts.db").exists()
@@ -117,7 +117,7 @@ class TestAmbiguousState:
         _make_db(wf / "workflows.db")
 
         with pytest.raises(RuntimeError) as exc:
-            ContractStore(wf)
+            WorkflowStore(wf)
         msg = str(exc.value).lower()
         # Mention both filenames so the operator knows what's wrong.
         assert "contracts.db" in msg

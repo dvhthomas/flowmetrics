@@ -153,7 +153,7 @@ class TestDbWinsWhenBothPresent:
     def test_db_row_shadows_yaml_with_same_name(self, tmp_path):
         """If the same id has both a DB row and an un-migrated
         YAML, the DB row is authoritative — matches the resolution
-        order ContractStore.get() uses."""
+        order WorkflowStore.get() uses."""
         wf = tmp_path / "contracts"
         _make_yaml(wf, "same-name", repo="from-yaml/repo")
         _write_db_row(wf, name="same-name", repo="from-db/repo")

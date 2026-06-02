@@ -38,10 +38,10 @@ from .backfill import (
     status_path,
     write_status,
 )
-from .contract import (
-    ContractError,
+from .workflow import (
+    WorkflowError,
     load_contract,
-    parse_contract_text,
+    parse_workflow_text,
     validate_yaml_text_structured,
 )
 from .utc_dates import to_utc_display_date
@@ -180,8 +180,8 @@ class WorkflowView:
         if contracts_db is not None:
             meta = contracts_db.get_meta(workflow_id)
             if meta is None or meta.archived_at is not None:
-                from .contract import ContractError
-                raise ContractError(
+                from .workflow import WorkflowError
+                raise WorkflowError(
                     f"contract {workflow_id!r} not in the live "
                     f"store at {contracts_dir / 'contracts.db'}"
                 )
@@ -438,12 +438,12 @@ def create_app(
     binds where Tailscale or Caddy fronts the app.
     """
     # The contract store is the single YAML/DB persistence adapter
-    # (see flowmetrics.contracts_db.ContractStore). `ensure_initialized`
+    # (see flowmetrics.contracts_db.WorkflowStore). `ensure_initialized`
     # is the first-boot migration: import any legacy YAMLs in the
     # workflows dir into the SQLite store, then move them to `migrated/`.
     # Idempotent — subsequent calls with no YAMLs are no-ops.
-    from .contracts_db import ContractStore
-    contracts_db = ContractStore(contracts_dir)
+    from .workflows_db import WorkflowStore
+    contracts_db = WorkflowStore(contracts_dir)
     contracts_db.ensure_initialized()
 
     if cache_dir is None:
@@ -1192,15 +1192,15 @@ def create_app(
     )
     def put_contract(contract_id: str, payload: dict) -> dict:
         """Create or overwrite a contract. Body must carry a `yaml`
-        STRING that parses against `parse_contract_text` with
+        STRING that parses against `parse_workflow_text` with
         `name == contract_id`. The DB owns the storage — no
         filesystem write."""
-        from .contracts_db import ContractsDBError
+        from .workflows_db import WorkflowsDBError
 
         text = payload.get("yaml") or ""
         try:
-            contract = parse_contract_text(text, contract_id)
-        except ContractError as exc:
+            contract = parse_workflow_text(text, contract_id)
+        except WorkflowError as exc:
             errors = validate_yaml_text_structured(text, contract_id)
             raise HTTPException(
                 status_code=422,
@@ -1208,7 +1208,7 @@ def create_app(
             ) from exc
         try:
             contracts_db.put(contract)
-        except ContractsDBError as exc:
+        except WorkflowsDBError as exc:
             # e.g. id collides with an archived row.
             raise HTTPException(
                 status_code=409, detail=str(exc),
@@ -1223,7 +1223,7 @@ def create_app(
         """Soft-delete: sets `archived_at` (and an optional reason).
         Idempotent — re-archiving a row keeps the original timestamp;
         only the reason rolls forward."""
-        from .contracts_db import ContractsDBError
+        from .workflows_db import WorkflowsDBError
 
         meta = contracts_db.get_meta(contract_id)
         if meta is None:
@@ -1234,7 +1234,7 @@ def create_app(
         reason = (payload or {}).get("reason")
         try:
             contracts_db.archive(contract_id, reason=reason)
-        except ContractsDBError as exc:
+        except WorkflowsDBError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         return {"id": contract_id, "archived": True, "reason": reason}
 
@@ -1244,7 +1244,7 @@ def create_app(
     )
     def restore_contract(contract_id: str) -> dict:
         """Undo archive. No-op when the row is already live."""
-        from .contracts_db import ContractsDBError
+        from .workflows_db import WorkflowsDBError
 
         meta = contracts_db.get_meta(contract_id)
         if meta is None:
@@ -1254,7 +1254,7 @@ def create_app(
             )
         try:
             contracts_db.restore(contract_id)
-        except ContractsDBError as exc:
+        except WorkflowsDBError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         return {"id": contract_id, "archived": False}
 
@@ -1268,7 +1268,7 @@ def create_app(
         archived (the two-step delete invariant — POST to /archive
         first). Independent of `purge_data`, which controls whether
         the warehouse partitions get wiped alongside the row."""
-        from .contracts_db import ContractsDBError
+        from .workflows_db import WorkflowsDBError
 
         meta = contracts_db.get_meta(contract_id)
         if meta is None:
@@ -1301,7 +1301,7 @@ def create_app(
 
         try:
             contracts_db.hard_delete(contract_id)
-        except ContractsDBError as exc:
+        except WorkflowsDBError as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
 
         if purge:

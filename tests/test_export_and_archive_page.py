@@ -64,13 +64,13 @@ class TestExportYaml:
         """Exported YAML, written to a file, feeds
         `flow materialize --from-yaml PATH`. (Here we just confirm
         the exported text re-parses identically.)"""
-        from flowmetrics.contract import parse_contract_text
+        from flowmetrics.workflow import parse_workflow_text
         contracts, data = workspace
         app = create_app(data_dir=data, contracts_dir=contracts)
         with TestClient(app) as client:
             _seed(client, "alpha", label="Round Trip")
             text = client.get("/api/internal/workflows/alpha/yaml").text
-        c = parse_contract_text(text, "alpha")
+        c = parse_workflow_text(text, "alpha")
         assert c.name == "alpha"
         assert c.label == "Round Trip"
 

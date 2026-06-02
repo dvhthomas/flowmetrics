@@ -692,7 +692,7 @@ def materialize(
     """
 
     from .backfill import write_status
-    from .contracts_db import ContractStore
+    from .workflows_db import WorkflowStore
     from .materialize import materialize as run_materialize
 
     since_iso = since.date().isoformat() if since is not None else None
@@ -723,7 +723,7 @@ def materialize(
     # The store resolves DB-first then falls back to a YAML on disk
     # (cron / not-yet-migrated). Reads don't trigger the YAML→DB
     # migration — that's serve-time's job.
-    contract = ContractStore(contracts_dir).get(name)
+    contract = WorkflowStore(contracts_dir).get(name)
     if contract is None:
         msg = (
             f"contract {name!r} not found under {contracts_dir} "
@@ -835,13 +835,13 @@ def materialize_all(
     holds per-workflow detail for finer-grained alerting.
     """
 
-    from .contract import ContractError
-    from .contracts_db import ContractStore
+    from .workflow import WorkflowError
+    from .workflows_db import WorkflowStore
     from .materialize import materialize as run_materialize
 
     # Migrate any leftover YAMLs into the DB first so this single
     # command handles both first-boot and the steady-state cron path.
-    store = ContractStore(contracts_dir)
+    store = WorkflowStore(contracts_dir)
     store.ensure_initialized()
 
     started = _materialize_all_now()
@@ -864,8 +864,8 @@ def materialize_all(
             entry["status"] = "ok"
             entry["items"] = manifest.items_fetched
             entry["run_id"] = manifest.run_id
-        except ContractError as exc:
-            entry["error"] = f"ContractError: {exc}"
+        except WorkflowError as exc:
+            entry["error"] = f"WorkflowError: {exc}"
         except Exception as exc:
             entry["error"] = f"{type(exc).__name__}: {exc}"
         results.append(entry)
@@ -937,13 +937,13 @@ def contracts_list(contracts_dir: Path, include_archived: bool) -> None:
     Source markers: `db` for rows in workflows.db (wizard-managed);
     `yaml` for un-migrated YAML files in the workflows-dir. When
     both exist for the same name, the DB row wins — same precedence
-    as `ContractStore.get()`.
+    as `WorkflowStore.get()`.
     """
-    from .contracts_db import ContractStore
+    from .workflows_db import WorkflowStore
 
-    store = ContractStore(contracts_dir)
+    store = WorkflowStore(contracts_dir)
     # DB rows (active + archived as requested) come from the
-    # underlying SQLite via ContractStore.list().
+    # underlying SQLite via WorkflowStore.list().
     db_rows = store.list(include_archived=include_archived)
     db_names = {m.name for m in db_rows}
 

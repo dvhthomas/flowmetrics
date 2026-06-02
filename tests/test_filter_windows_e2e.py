@@ -51,7 +51,7 @@ def _materialize_wide(
     windows visibly diverge.
     """
     from flowmetrics.compute import WorkItem
-    from flowmetrics.contract import Contract
+    from flowmetrics.workflow import Contract
     from flowmetrics.materialize import materialize
 
     name = "wide-demo"

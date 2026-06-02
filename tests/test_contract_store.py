@@ -1,4 +1,4 @@
-"""`ContractStore` — the single contract-persistence adapter.
+"""`WorkflowStore` — the single contract-persistence adapter.
 
 Both the web app and the CLI go through this so the "YAML vs DB
 read/write" decision lives in one place:
@@ -13,8 +13,8 @@ from __future__ import annotations
 
 import pytest
 
-from flowmetrics.contract import parse_contract_text
-from flowmetrics.contracts_db import ContractStore
+from flowmetrics.workflow import parse_workflow_text
+from flowmetrics.workflows_db import WorkflowStore
 
 
 def _yaml(name: str, repo: str = "o/r") -> str:
@@ -22,12 +22,12 @@ def _yaml(name: str, repo: str = "o/r") -> str:
 
 
 def _c(name: str, repo: str = "o/r"):
-    return parse_contract_text(_yaml(name, repo), name)
+    return parse_workflow_text(_yaml(name, repo), name)
 
 
 @pytest.fixture
 def store(tmp_path):
-    return ContractStore(tmp_path / "wf")
+    return WorkflowStore(tmp_path / "wf")
 
 
 class TestReadsResolveDbFirstThenYaml:
@@ -40,7 +40,7 @@ class TestReadsResolveDbFirstThenYaml:
         wf = tmp_path / "wf"
         wf.mkdir()
         (wf / "beta.yaml").write_text(_yaml("beta"))
-        store = ContractStore(wf)
+        store = WorkflowStore(wf)
         # Not in the DB, but the YAML resolves it...
         assert store.get("beta").name == "beta"
         assert store.get_meta("beta").name == "beta"
@@ -52,7 +52,7 @@ class TestReadsResolveDbFirstThenYaml:
         wf = tmp_path / "wf"
         wf.mkdir()
         (wf / "gamma.yaml").write_text(_yaml("gamma", repo="yaml/repo"))
-        store = ContractStore(wf)
+        store = WorkflowStore(wf)
         store.put(_c("gamma", repo="db/repo"))
         assert store.get("gamma").repo == "db/repo"
 
@@ -66,7 +66,7 @@ class TestMigration:
         wf = tmp_path / "wf"
         wf.mkdir()
         (wf / "delta.yaml").write_text(_yaml("delta"))
-        store = ContractStore(wf)
+        store = WorkflowStore(wf)
         store.ensure_initialized()
         assert "delta" in [m.name for m in store.list()]
         # The migration moves the file aside (rollback copy).

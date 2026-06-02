@@ -25,20 +25,20 @@ import pytest
 
 class TestStepModel:
     def test_step_carries_name_and_wip_flag(self):
-        from flowmetrics.contract import Step
+        from flowmetrics.workflow import Step
         s = Step(name="In Progress", wip=True)
         assert s.name == "In Progress"
         assert s.wip is True
 
     def test_step_defaults_wip_to_false(self):
-        from flowmetrics.contract import Step
+        from flowmetrics.workflow import Step
         s = Step(name="Open")
         assert s.wip is False
 
     def test_step_rejects_empty_name(self):
         from pydantic import ValidationError
 
-        from flowmetrics.contract import Step
+        from flowmetrics.workflow import Step
         with pytest.raises(ValidationError):
             Step(name="", wip=True)
 
@@ -46,7 +46,7 @@ class TestStepModel:
         """A step is a logical bucket; `matches` lists the typed
         conditions (labels, statuses, lifecycle events) whose
         materialized data lands in this step."""
-        from flowmetrics.contract import Matcher, Step
+        from flowmetrics.workflow import Matcher, Step
         s = Step(
             name="Ready",
             wip=False,
@@ -62,7 +62,7 @@ class TestStepModel:
         `name` itself is treated as the identifier. Existing demo
         YAMLs whose `states:` block names are the source-native
         stage names keep working unchanged."""
-        from flowmetrics.contract import Step
+        from flowmetrics.workflow import Step
         s = Step(name="Draft")
         assert s.matches == []
 
@@ -70,7 +70,7 @@ class TestStepModel:
         """`Step.effective_matchers` is the lookup helper: empty
         list → a single `stage` matcher on the step's name. Use this
         wherever the query layer needs "what does this step capture"."""
-        from flowmetrics.contract import Matcher, Step
+        from flowmetrics.workflow import Matcher, Step
         bare = Step(name="Draft")
         with_matches = Step(name="Ready", matches=[{"status": "ready"}])
         assert bare.effective_matchers == (Matcher(kind="stage", value="Draft"),)
@@ -81,7 +81,7 @@ class TestStepModel:
 
 class TestContractModel:
     def test_minimal_github_contract(self):
-        from flowmetrics.contract import Contract
+        from flowmetrics.workflow import Contract
         c = Contract(name="foo", source="github", repo="owner/repo")
         assert c.name == "foo"
         assert c.source == "github"
@@ -90,7 +90,7 @@ class TestContractModel:
         assert c.label is None
 
     def test_minimal_jira_contract(self):
-        from flowmetrics.contract import Contract
+        from flowmetrics.workflow import Contract
         c = Contract(
             name="bar", source="jira",
             jira_url="https://j.example.com",
@@ -99,7 +99,7 @@ class TestContractModel:
         assert c.source == "jira"
 
     def test_steps_preserve_insertion_order(self):
-        from flowmetrics.contract import Contract, Step
+        from flowmetrics.workflow import Contract, Step
         c = Contract(
             name="x", source="github", repo="a/b",
             steps=[
@@ -124,7 +124,7 @@ class TestStatesCompatibilityShim:
     """
 
     def _c(self, *steps):
-        from flowmetrics.contract import Contract, Step
+        from flowmetrics.workflow import Contract, Step
         return Contract(
             name="x", source="github", repo="a/b",
             steps=[Step(name=n, wip=w) for n, w in steps],
@@ -176,11 +176,11 @@ class TestStatesCompatibilityShim:
 
 
 class TestParseNewShape:
-    """`parse_contract_text` reads the new `steps:` YAML shape."""
+    """`parse_workflow_text` reads the new `steps:` YAML shape."""
 
     def test_minimal_steps_yaml_roundtrips(self):
-        from flowmetrics.contract import parse_contract_text
-        c = parse_contract_text(
+        from flowmetrics.workflow import parse_workflow_text
+        c = parse_workflow_text(
             "contract:\n"
             "  name: x\n"
             "  source: github\n"
@@ -199,12 +199,12 @@ class TestParseNewShape:
 
     def test_steps_with_matches_round_trip(self):
         """The typed `matches:` per-step list survives parse + emit."""
-        from flowmetrics.contract import (
+        from flowmetrics.workflow import (
             Matcher,
             emit_canonical_yaml,
-            parse_contract_text,
+            parse_workflow_text,
         )
-        c = parse_contract_text(
+        c = parse_workflow_text(
             "contract:\n"
             "  name: x\n"
             "  source: github\n"
@@ -227,12 +227,12 @@ class TestParseNewShape:
         ]
         assert c.steps[1].matches == [Matcher(kind="event", value="pr-ready")]
         # And re-emitting + re-parsing is identity.
-        again = parse_contract_text(emit_canonical_yaml(c), "x")
+        again = parse_workflow_text(emit_canonical_yaml(c), "x")
         assert again == c
 
     def test_steps_wip_defaults_to_false(self):
-        from flowmetrics.contract import parse_contract_text
-        c = parse_contract_text(
+        from flowmetrics.workflow import parse_workflow_text
+        c = parse_workflow_text(
             "contract:\n"
             "  name: x\n"
             "  source: github\n"
@@ -250,8 +250,8 @@ class TestParseLegacyShape:
     (and the demo YAMLs in samples/) all use this shape today."""
 
     def test_old_shape_yaml_imports_as_ordered_steps(self):
-        from flowmetrics.contract import parse_contract_text
-        c = parse_contract_text(
+        from flowmetrics.workflow import parse_workflow_text
+        c = parse_workflow_text(
             "contract:\n"
             "  name: x\n"
             "  source: github\n"
@@ -277,11 +277,11 @@ class TestParseLegacyShape:
 
 class TestEmitCanonical:
     def test_emit_writes_steps_shape(self):
-        from flowmetrics.contract import (
+        from flowmetrics.workflow import (
             Contract,
             Step,
             emit_canonical_yaml,
-            parse_contract_text,
+            parse_workflow_text,
         )
         c = Contract(
             name="x", source="github", repo="a/b",
@@ -298,13 +298,13 @@ class TestEmitCanonical:
         assert "steps:" in text
         assert "states:" not in text
         # Round-trip.
-        parsed = parse_contract_text(text, "x")
+        parsed = parse_workflow_text(text, "x")
         assert parsed == c
 
     def test_parse_then_emit_then_parse_is_idempotent(self):
-        from flowmetrics.contract import (
+        from flowmetrics.workflow import (
             emit_canonical_yaml,
-            parse_contract_text,
+            parse_workflow_text,
         )
         original_yaml = (
             "contract:\n"
@@ -316,8 +316,8 @@ class TestEmitCanonical:
             "    wip: [In Progress]\n"
             "    done: [Closed]\n"
         )
-        once = parse_contract_text(original_yaml, "x")
-        twice = parse_contract_text(emit_canonical_yaml(once), "x")
+        once = parse_workflow_text(original_yaml, "x")
+        twice = parse_workflow_text(emit_canonical_yaml(once), "x")
         assert once == twice
 
 
@@ -326,7 +326,7 @@ class TestLegacyWorkflowStatesStillImportable:
     The name has to stay importable from flowmetrics.contract."""
 
     def test_workflowstates_name_is_importable(self):
-        from flowmetrics.contract import WorkflowStates
+        from flowmetrics.workflow import WorkflowStates
         s = WorkflowStates(wip=("Review",), done=("Merged",))
         assert s.wip == ("Review",)
         assert s.done == ("Merged",)

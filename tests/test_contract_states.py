@@ -26,7 +26,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from flowmetrics.contract import ContractError, load_contract
+from flowmetrics.workflow import WorkflowError, load_contract
 
 
 def _write(tmp: Path, name: str, body: dict) -> Path:
@@ -79,7 +79,7 @@ class TestLabelField:
             "start": "2026-05-04",
             "stop": "2026-05-10",
         })
-        with pytest.raises(ContractError, match=r"label.*string"):
+        with pytest.raises(WorkflowError, match=r"label.*string"):
             load_contract("demo", tmp_path)
 
 
@@ -166,7 +166,7 @@ class TestStatesBlockParsing:
                 "done": ["Approved"],  # duplicate
             },
         })
-        with pytest.raises(ContractError, match=r"appears in more than one"):
+        with pytest.raises(WorkflowError, match=r"appears in more than one"):
             load_contract("demo", tmp_path)
 
     def test_unknown_category_key_raises(self, tmp_path):
@@ -180,7 +180,7 @@ class TestStatesBlockParsing:
                 "in_review": ["Patch Available"],  # not a valid category
             },
         })
-        with pytest.raises(ContractError, match=r"unknown category"):
+        with pytest.raises(WorkflowError, match=r"unknown category"):
             load_contract("demo", tmp_path)
 
     def test_non_list_category_value_raises(self, tmp_path):
@@ -191,5 +191,5 @@ class TestStatesBlockParsing:
             "stop": "2026-05-10",
             "states": {"wip": "Approved"},  # must be a list
         })
-        with pytest.raises(ContractError, match=r"must be a list"):
+        with pytest.raises(WorkflowError, match=r"must be a list"):
             load_contract("demo", tmp_path)
