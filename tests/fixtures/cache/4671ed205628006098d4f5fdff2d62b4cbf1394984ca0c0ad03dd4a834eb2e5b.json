@@ -1,0 +1,1119 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "limit": 5000,
+      "remaining": 4993,
+      "resetAt": "2026-06-02T04:36:50Z"
+    },
+    "search": {
+      "issueCount": 389,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "User",
+            "login": "majiayu000"
+          },
+          "createdAt": "2026-03-22T05:27:46Z",
+          "isDraft": false,
+          "number": 18638,
+          "reviewDecision": null,
+          "title": "fix: route warnings through MultiProgress::suspend() to prevent truncation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "einkleindatagal"
+          },
+          "createdAt": "2026-03-21T16:58:10Z",
+          "isDraft": false,
+          "number": 18627,
+          "reviewDecision": null,
+          "title": "Add minimal clarifying install-python.md note"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-20T18:38:52Z",
+          "isDraft": true,
+          "number": 18596,
+          "reviewDecision": null,
+          "title": "Prefer hardlinks over reflinks for Mach-O executables to reduce security scanning overhead"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "t7r0n"
+          },
+          "createdAt": "2026-03-20T18:02:08Z",
+          "isDraft": false,
+          "number": 18593,
+          "reviewDecision": null,
+          "title": "Move UV_RUN_MAX_RECURSION_DEPTH parsing to EnvironmentOptions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-03-20T14:24:14Z",
+          "isDraft": true,
+          "number": 18587,
+          "reviewDecision": null,
+          "title": "Fork version selection based on wheel Python version tags"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mvanhorn"
+          },
+          "createdAt": "2026-03-20T05:17:53Z",
+          "isDraft": false,
+          "number": 18584,
+          "reviewDecision": null,
+          "title": "fix: handle BrokenPipe in shell completion generation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-19T13:53:31Z",
+          "isDraft": true,
+          "number": 18568,
+          "reviewDecision": null,
+          "title": "Expand publish network retries to include transient error status codes"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-19T13:18:44Z",
+          "isDraft": true,
+          "number": 18566,
+          "reviewDecision": null,
+          "title": "Validate locked versions satisfy requirement specifiers"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-17T23:15:31Z",
+          "isDraft": true,
+          "number": 18537,
+          "reviewDecision": null,
+          "title": "Invalidate interpreter cache when pyvenv.cfg changes"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "KryptosAI"
+          },
+          "createdAt": "2026-03-17T20:39:18Z",
+          "isDraft": false,
+          "number": 18531,
+          "reviewDecision": null,
+          "title": "Move parsing UV_RUN_RECURSION_DEPTH to EnvironmentOptions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-16T19:18:44Z",
+          "isDraft": false,
+          "number": 18519,
+          "reviewDecision": null,
+          "title": "Add JSON output format support to `uv python install`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-16T18:11:26Z",
+          "isDraft": true,
+          "number": 18518,
+          "reviewDecision": null,
+          "title": "Detect architecture at runtime using uname on Unix"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-16T18:00:02Z",
+          "isDraft": true,
+          "number": 18517,
+          "reviewDecision": null,
+          "title": "Add an integration test for aarch64 Linux"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "agosmou"
+          },
+          "createdAt": "2026-03-16T12:23:37Z",
+          "isDraft": false,
+          "number": 18505,
+          "reviewDecision": null,
+          "title": "feat: `uv add --constraints <file_or_url>` to save constraints to pyproject.toml"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T06:31:55Z",
+          "isDraft": false,
+          "number": 18476,
+          "reviewDecision": null,
+          "title": "docs: add workspace guidance for `--all-packages`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T06:28:37Z",
+          "isDraft": false,
+          "number": 18475,
+          "reviewDecision": null,
+          "title": "docs: mention `uv run python` for an interactive REPL"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T06:28:33Z",
+          "isDraft": false,
+          "number": 18474,
+          "reviewDecision": null,
+          "title": "docs: clarify uv export default dependency selection"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T02:15:49Z",
+          "isDraft": false,
+          "number": 18472,
+          "reviewDecision": null,
+          "title": "docs: clarify what `uv venv --seed` installs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T02:15:48Z",
+          "isDraft": false,
+          "number": 18471,
+          "reviewDecision": null,
+          "title": "docs: mention uvw in the GUI script guide"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "liruiluo"
+          },
+          "createdAt": "2026-03-14T01:19:20Z",
+          "isDraft": false,
+          "number": 18469,
+          "reviewDecision": null,
+          "title": "docs: clarify repeated --exclude usage"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-03-13T01:10:50Z",
+          "isDraft": false,
+          "number": 18437,
+          "reviewDecision": null,
+          "title": "Allow configuring preview features in `uv.toml` and `pyproject.toml`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-03-12T23:58:32Z",
+          "isDraft": false,
+          "number": 18434,
+          "reviewDecision": null,
+          "title": "Add an extension trait to provide a `Display` implementation which prints an error chain"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "henryiii"
+          },
+          "createdAt": "2026-03-12T13:25:59Z",
+          "isDraft": false,
+          "number": 18418,
+          "reviewDecision": null,
+          "title": "fix: update .gitignore to include additional patterns"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-03-11T18:11:42Z",
+          "isDraft": true,
+          "number": 18409,
+          "reviewDecision": null,
+          "title": "Airflow workspace benchmark"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-03-11T00:15:34Z",
+          "isDraft": false,
+          "number": 18402,
+          "reviewDecision": null,
+          "title": "Preserve absolute/relative paths passed to `uv add`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-03-10T21:06:33Z",
+          "isDraft": false,
+          "number": 18401,
+          "reviewDecision": null,
+          "title": "Allow `workspace` to take a path in `tool.uv.sources`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Bradley-McCallion"
+          },
+          "createdAt": "2026-03-08T13:32:48Z",
+          "isDraft": true,
+          "number": 18370,
+          "reviewDecision": null,
+          "title": "Add --emit-index-url and --emit-find-links to uv export"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "PrinceThummar011"
+          },
+          "createdAt": "2026-03-07T15:19:37Z",
+          "isDraft": false,
+          "number": 18363,
+          "reviewDecision": null,
+          "title": "docs: clarify that uv lock uses universal resolution (fixes #18029)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-06T20:45:11Z",
+          "isDraft": false,
+          "number": 18359,
+          "reviewDecision": null,
+          "title": "Switch to free runners when on a fork"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-06T15:02:42Z",
+          "isDraft": true,
+          "number": 18347,
+          "reviewDecision": null,
+          "title": "Move the registry tests out of the integration test job"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-03-05T11:25:39Z",
+          "isDraft": false,
+          "number": 18311,
+          "reviewDecision": null,
+          "title": "Speedup discovery of large workspaces"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-05T04:11:34Z",
+          "isDraft": true,
+          "number": 18302,
+          "reviewDecision": null,
+          "title": "Add an integration test for Android"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-03T22:23:19Z",
+          "isDraft": true,
+          "number": 18280,
+          "reviewDecision": null,
+          "title": "Add code signing of release binaries via `cargo-code-sign`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-03T19:07:45Z",
+          "isDraft": true,
+          "number": 18275,
+          "reviewDecision": null,
+          "title": "Add `uv clean --background` for async cache deletion"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-03-03T17:30:03Z",
+          "isDraft": true,
+          "number": 18272,
+          "reviewDecision": null,
+          "title": "Create complementary dependencies for extra-only sources"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-02-27T14:34:53Z",
+          "isDraft": true,
+          "number": 18214,
+          "reviewDecision": null,
+          "title": "Centralised environment storage"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-25T21:18:46Z",
+          "isDraft": true,
+          "number": 18195,
+          "reviewDecision": null,
+          "title": "Fix managed interpreter platform filtering when explicit requests are made"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-23T21:59:54Z",
+          "isDraft": true,
+          "number": 18171,
+          "reviewDecision": null,
+          "title": "Fix supervisor race condition when spawning child processes on Windows"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "alexreinking"
+          },
+          "createdAt": "2026-02-23T19:18:22Z",
+          "isDraft": false,
+          "number": 18166,
+          "reviewDecision": null,
+          "title": "Add uname -m to the interpreter cache key"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-23T15:13:51Z",
+          "isDraft": true,
+          "number": 18162,
+          "reviewDecision": null,
+          "title": "Drop the `ctrlc` dependency"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-20T17:06:58Z",
+          "isDraft": true,
+          "number": 18121,
+          "reviewDecision": null,
+          "title": "Add test for tool upgrade after Python version removal"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-20T14:45:28Z",
+          "isDraft": true,
+          "number": 18118,
+          "reviewDecision": null,
+          "title": "Attempt to use reflink on Windows"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-18T22:17:40Z",
+          "isDraft": true,
+          "number": 18095,
+          "reviewDecision": null,
+          "title": "Add test coverage for pip build environments in `find_uv_bin`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-18T16:47:16Z",
+          "isDraft": true,
+          "number": 18085,
+          "reviewDecision": null,
+          "title": "Respect `[tool.uv.sources]` for extra build dependencies in `uv build` and `uv run --with`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-18T16:40:40Z",
+          "isDraft": false,
+          "number": 18084,
+          "reviewDecision": null,
+          "title": "Vendor packse scenarios and serve them from an in-memory index"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ewdurbin"
+          },
+          "createdAt": "2026-02-17T18:04:49Z",
+          "isDraft": false,
+          "number": 18069,
+          "reviewDecision": null,
+          "title": "docs: add integration guide for building a minimal AWS Lambda docker image"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-02-16T00:56:53Z",
+          "isDraft": false,
+          "number": 18044,
+          "reviewDecision": null,
+          "title": "Update pre-commit dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "omair445"
+          },
+          "createdAt": "2026-02-15T16:42:51Z",
+          "isDraft": false,
+          "number": 18028,
+          "reviewDecision": null,
+          "title": "Clarify `uv python upgrade` message when no installations found"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "gizmoguy"
+          },
+          "createdAt": "2026-02-15T05:31:45Z",
+          "isDraft": false,
+          "number": 18023,
+          "reviewDecision": null,
+          "title": "Make access to system site packages directory configureable for tools"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "by22Jy"
+          },
+          "createdAt": "2026-02-13T13:37:10Z",
+          "isDraft": false,
+          "number": 18009,
+          "reviewDecision": null,
+          "title": "fix: improve clarity of uv python upgrade output message"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2026-02-12T20:44:35Z",
+          "isDraft": false,
+          "number": 17993,
+          "reviewDecision": null,
+          "title": "Improve unsat diagnostics by attributing transitive pins to constraints files"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-12T20:39:22Z",
+          "isDraft": true,
+          "number": 17992,
+          "reviewDecision": null,
+          "title": "Create non-virtual relocatable environments with managed interpreters"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-02-11T01:52:29Z",
+          "isDraft": true,
+          "number": 17961,
+          "reviewDecision": null,
+          "title": "Add preview option to respect umask when creating lock files"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Timi16"
+          },
+          "createdAt": "2026-02-09T00:53:58Z",
+          "isDraft": false,
+          "number": 17913,
+          "reviewDecision": null,
+          "title": "Fix tool upgrade error after Python version upgrade"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "veeceey"
+          },
+          "createdAt": "2026-02-08T05:47:59Z",
+          "isDraft": false,
+          "number": 17911,
+          "reviewDecision": null,
+          "title": "Fix benchmark image reflow on documentation index page"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T05:14:21Z",
+          "isDraft": false,
+          "number": 17894,
+          "reviewDecision": null,
+          "title": "fix(tool run): use --from context for requirement resolution failures"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T04:52:31Z",
+          "isDraft": false,
+          "number": 17893,
+          "reviewDecision": null,
+          "title": "fix(requirements): detect uv lockfiles passed to -r"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T04:46:05Z",
+          "isDraft": false,
+          "number": 17892,
+          "reviewDecision": null,
+          "title": "fix(lock): retry file lock acquisition on EINTR"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T04:41:40Z",
+          "isDraft": false,
+          "number": 17891,
+          "reviewDecision": null,
+          "title": "fix(frozen): clarify missing workspace member rename case"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T04:08:42Z",
+          "isDraft": false,
+          "number": 17889,
+          "reviewDecision": null,
+          "title": "fix(settings): handle `pyproject.toml` directories during discovery"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-06T03:24:00Z",
+          "isDraft": false,
+          "number": 17888,
+          "reviewDecision": null,
+          "title": "fix(python find): respect --project when selecting .venv"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-05T09:52:42Z",
+          "isDraft": false,
+          "number": 17874,
+          "reviewDecision": null,
+          "title": "feat(env): add UV_ACTIVE to default to --active"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-02-05T02:26:18Z",
+          "isDraft": false,
+          "number": 17868,
+          "reviewDecision": null,
+          "title": "Accept optional 's' suffix for UV_HTTP_TIMEOUT"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-04T20:46:46Z",
+          "isDraft": false,
+          "number": 17863,
+          "reviewDecision": null,
+          "title": "Move the extract test files into the repository"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-04T14:32:06Z",
+          "isDraft": true,
+          "number": 17854,
+          "reviewDecision": null,
+          "title": "Add support for locking build dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-02-03T19:28:54Z",
+          "isDraft": false,
+          "number": 17841,
+          "reviewDecision": null,
+          "title": "Package by default: Add in preview"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-02T15:31:48Z",
+          "isDraft": true,
+          "number": 17818,
+          "reviewDecision": null,
+          "title": "Add a script to cross-build macOS binaries on Linux"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "KrishanBhasin"
+          },
+          "createdAt": "2026-02-01T22:05:17Z",
+          "isDraft": true,
+          "number": 17800,
+          "reviewDecision": null,
+          "title": "Implement `uv pip index versions` command"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-01T16:17:52Z",
+          "isDraft": true,
+          "number": 17797,
+          "reviewDecision": null,
+          "title": "Add support for `--find-links-strategy` to enable non-merge semantics for find-links"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-02-01T00:00:00Z",
+          "isDraft": true,
+          "number": 17790,
+          "reviewDecision": null,
+          "title": "Show errors in `uv publish` with `-q` and require `-qq` to suppress them"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-31T21:37:53Z",
+          "isDraft": true,
+          "number": 17789,
+          "reviewDecision": null,
+          "title": "Allow concurrent uploads and wheel validations in `uv publish`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-31T19:50:51Z",
+          "isDraft": true,
+          "number": 17786,
+          "reviewDecision": null,
+          "title": "Add `--on-failure` to `uv publish` and continue on errors by default"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "tinovyatkin"
+          },
+          "createdAt": "2026-01-30T22:38:05Z",
+          "isDraft": false,
+          "number": 17779,
+          "reviewDecision": null,
+          "title": "Auto-run single executable in uvx/uv tool run when package name differs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-30T16:58:17Z",
+          "isDraft": true,
+          "number": 17775,
+          "reviewDecision": null,
+          "title": "Add riscv64 Docker images"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-30T03:16:50Z",
+          "isDraft": true,
+          "number": 17752,
+          "reviewDecision": null,
+          "title": "Fix canonicalization of incompatible marker pairs compound disjunctions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-30T02:02:14Z",
+          "isDraft": true,
+          "number": 17748,
+          "reviewDecision": null,
+          "title": "Allow installing when the base project and an extra are declared as conflicting"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-01-29T16:05:47Z",
+          "isDraft": false,
+          "number": 17736,
+          "reviewDecision": null,
+          "title": "Document interaction between index definitions and workspaces"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-26T23:56:00Z",
+          "isDraft": false,
+          "number": 17709,
+          "reviewDecision": null,
+          "title": "Fetch issues from prism on Claude Code for Web start"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "cscanlin"
+          },
+          "createdAt": "2026-01-26T21:22:07Z",
+          "isDraft": false,
+          "number": 17703,
+          "reviewDecision": null,
+          "title": "Add `--no-upgrade-package` to opt-out of upgrading a specific package (#7177)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LouisLau-art"
+          },
+          "createdAt": "2026-01-23T15:59:35Z",
+          "isDraft": false,
+          "number": 17668,
+          "reviewDecision": null,
+          "title": "docs(timeout): clarify timeout format in error messages"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "dcwatson"
+          },
+          "createdAt": "2026-01-21T20:09:30Z",
+          "isDraft": false,
+          "number": 17646,
+          "reviewDecision": null,
+          "title": "Create lock files 644, only check read bit for locks, respect umask"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "denyszhak"
+          },
+          "createdAt": "2026-01-20T22:54:03Z",
+          "isDraft": false,
+          "number": 17633,
+          "reviewDecision": null,
+          "title": "fix(install): limit preparer concurrency to prevent file handle exhaustion"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "danilohorta"
+          },
+          "createdAt": "2026-01-20T15:23:54Z",
+          "isDraft": false,
+          "number": 17628,
+          "reviewDecision": null,
+          "title": "Fix local wheel cache invalidation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "WeepingDogel"
+          },
+          "createdAt": "2026-01-19T14:44:46Z",
+          "isDraft": false,
+          "number": 17611,
+          "reviewDecision": null,
+          "title": "Add Nix installation instructions to documentation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-18T21:01:19Z",
+          "isDraft": true,
+          "number": 17553,
+          "reviewDecision": null,
+          "title": "Add an mdtest framework"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "akx"
+          },
+          "createdAt": "2026-01-14T11:53:03Z",
+          "isDraft": false,
+          "number": 17460,
+          "reviewDecision": null,
+          "title": "Improve create-python-mirror script"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-01-13T23:35:35Z",
+          "isDraft": false,
+          "number": 17455,
+          "reviewDecision": null,
+          "title": "Support using `--index` to refer to index names"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-13T16:15:59Z",
+          "isDraft": true,
+          "number": 17439,
+          "reviewDecision": null,
+          "title": "Fix Python downloads with explicit `+gil` requests"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-13T00:01:46Z",
+          "isDraft": true,
+          "number": 17431,
+          "reviewDecision": null,
+          "title": "Log if the `gh` CLI is available on session start"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ppalucha"
+          },
+          "createdAt": "2026-01-12T21:08:12Z",
+          "isDraft": true,
+          "number": 17426,
+          "reviewDecision": null,
+          "title": "Assume tar.gz for packages without extension"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-09T23:10:47Z",
+          "isDraft": true,
+          "number": 17398,
+          "reviewDecision": null,
+          "title": "Use a reactive benchmark image for the GitHub README"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-09T21:53:54Z",
+          "isDraft": true,
+          "number": 17394,
+          "reviewDecision": null,
+          "title": "Restore OpenSUSE system test in CI"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-01-08T14:38:30Z",
+          "isDraft": false,
+          "number": 17361,
+          "reviewDecision": null,
+          "title": "Allow `--bump post` with `--bump dev`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-01-06T15:14:48Z",
+          "isDraft": false,
+          "number": 17336,
+          "reviewDecision": null,
+          "title": "Add support for delocating macOS wheels"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-01-05T18:49:48Z",
+          "isDraft": true,
+          "number": 17326,
+          "reviewDecision": null,
+          "title": "Move remaining Boolean environment variables out of Clap"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-01-04T18:46:08Z",
+          "isDraft": false,
+          "number": 17316,
+          "reviewDecision": null,
+          "title": "Preserve absolute paths in `uv add` for local dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "jaltgen"
+          },
+          "createdAt": "2025-12-31T10:40:53Z",
+          "isDraft": true,
+          "number": 17278,
+          "reviewDecision": null,
+          "title": "Update docs on integrating to AWS CodeArtifact with currently working version"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mahiro72"
+          },
+          "createdAt": "2025-12-24T08:25:20Z",
+          "isDraft": true,
+          "number": 17233,
+          "reviewDecision": null,
+          "title": "WIP: Add hint for missing Python interpreter on spawn failure"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "TrevorBurnham"
+          },
+          "createdAt": "2025-12-21T22:31:10Z",
+          "isDraft": false,
+          "number": 17211,
+          "reviewDecision": null,
+          "title": "Add background autoprune to remove stale cache entries"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "fatelei"
+          },
+          "createdAt": "2025-12-21T13:39:46Z",
+          "isDraft": false,
+          "number": 17207,
+          "reviewDecision": null,
+          "title": "feat: add cache df sub command"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjIwMA==",
+        "hasNextPage": true
+      }
+    }
+  }
+}

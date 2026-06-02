@@ -1,0 +1,1119 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "limit": 5000,
+      "remaining": 4992,
+      "resetAt": "2026-06-02T04:36:50Z"
+    },
+    "search": {
+      "issueCount": 389,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "User",
+            "login": "j-helland"
+          },
+          "createdAt": "2025-12-21T02:02:38Z",
+          "isDraft": false,
+          "number": 17202,
+          "reviewDecision": null,
+          "title": "Added config file settings validation for preview features"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-12-18T14:24:51Z",
+          "isDraft": true,
+          "number": 17175,
+          "reviewDecision": null,
+          "title": "DEBUG: Improve Python install test performance"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "okhsunrog"
+          },
+          "createdAt": "2025-12-18T11:46:53Z",
+          "isDraft": false,
+          "number": 17172,
+          "reviewDecision": null,
+          "title": "Fix --color flag not working with --help"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-12-13T02:58:50Z",
+          "isDraft": true,
+          "number": 17118,
+          "reviewDecision": null,
+          "title": "Avoid allowing package-versions with no wheels in supported environments"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-12-12T19:09:31Z",
+          "isDraft": true,
+          "number": 17110,
+          "reviewDecision": null,
+          "title": "Remove miette"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "F4RAN"
+          },
+          "createdAt": "2025-12-11T19:32:06Z",
+          "isDraft": false,
+          "number": 17091,
+          "reviewDecision": null,
+          "title": "16782 python update shell force"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-12-10T16:40:29Z",
+          "isDraft": true,
+          "number": 17075,
+          "reviewDecision": null,
+          "title": "Cache Python downloads by default"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-12-10T15:36:12Z",
+          "isDraft": true,
+          "number": 17074,
+          "reviewDecision": null,
+          "title": "Store unpacked Python installations in the cache"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-12-10T14:43:42Z",
+          "isDraft": false,
+          "number": 17072,
+          "reviewDecision": null,
+          "title": "Allow missing executables in tool install target when `--with-executables-from` is used"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "kxzk"
+          },
+          "createdAt": "2025-12-08T04:11:59Z",
+          "isDraft": false,
+          "number": 17021,
+          "reviewDecision": null,
+          "title": "Add free-threaded selector hint for requires-python"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2025-12-05T22:36:26Z",
+          "isDraft": false,
+          "number": 17006,
+          "reviewDecision": null,
+          "title": "Add `--isolated-lock` flag to `uv sync`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2025-12-05T16:05:03Z",
+          "isDraft": false,
+          "number": 17001,
+          "reviewDecision": null,
+          "title": "Add helpful error message for 'uv activate'"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2025-12-04T21:00:05Z",
+          "isDraft": false,
+          "number": 16991,
+          "reviewDecision": null,
+          "title": "Honor `--refresh` when reusing cached tool environments for `uvx`/`uv` tool run"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-12-03T14:48:29Z",
+          "isDraft": false,
+          "number": 16967,
+          "reviewDecision": null,
+          "title": "Always treat paths after `-e` as directories"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "anoop-rehman"
+          },
+          "createdAt": "2025-12-03T03:53:49Z",
+          "isDraft": true,
+          "number": 16952,
+          "reviewDecision": null,
+          "title": "[Draft] Clarify duration environment variable format at parse time"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mawildoer"
+          },
+          "createdAt": "2025-11-25T23:14:58Z",
+          "isDraft": true,
+          "number": 16853,
+          "reviewDecision": null,
+          "title": "Issue 11632 - Add sources override"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-11-22T03:05:15Z",
+          "isDraft": false,
+          "number": 16816,
+          "reviewDecision": null,
+          "title": "Content-address distributions in the archive"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "sinsniwal"
+          },
+          "createdAt": "2025-11-21T22:25:36Z",
+          "isDraft": false,
+          "number": 16815,
+          "reviewDecision": null,
+          "title": "Clarify 'uv python upgrade' message when no versions exist"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2025-11-21T17:13:09Z",
+          "isDraft": false,
+          "number": 16808,
+          "reviewDecision": null,
+          "title": "Add `--exclude-packages` to pip compile/install/tool install"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "MeitarR"
+          },
+          "createdAt": "2025-11-15T21:11:34Z",
+          "isDraft": false,
+          "number": 16749,
+          "reviewDecision": null,
+          "title": "Follow-up from #16542"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "MarthinusBosman"
+          },
+          "createdAt": "2025-11-15T17:05:43Z",
+          "isDraft": false,
+          "number": 16748,
+          "reviewDecision": null,
+          "title": "fix: prefer env var credentials over index URL username; guard cache & git-store; add tests"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "LIghtJUNction"
+          },
+          "createdAt": "2025-11-15T14:03:50Z",
+          "isDraft": false,
+          "number": 16746,
+          "reviewDecision": null,
+          "title": "Migrate sys_info to sysinfo"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mikaylathompson"
+          },
+          "createdAt": "2025-11-14T20:11:43Z",
+          "isDraft": true,
+          "number": 16743,
+          "reviewDecision": null,
+          "title": "`uvx`/`uv tool run` install confirmation prompt"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2025-11-13T15:06:06Z",
+          "isDraft": false,
+          "number": 16723,
+          "reviewDecision": null,
+          "title": "tests: cache managed Python installs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-11-10T17:00:24Z",
+          "isDraft": true,
+          "number": 16670,
+          "reviewDecision": null,
+          "title": "Switch from Mkdocs to Zensical"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-11-09T04:13:39Z",
+          "isDraft": false,
+          "number": 16648,
+          "reviewDecision": null,
+          "title": "Use `git ls-remote` to resolve Git SHAs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "andrewjcg"
+          },
+          "createdAt": "2025-11-07T16:01:59Z",
+          "isDraft": false,
+          "number": 16635,
+          "reviewDecision": null,
+          "title": "Implement `pip install --report <file>`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "marcvernet31"
+          },
+          "createdAt": "2025-11-05T21:13:46Z",
+          "isDraft": false,
+          "number": 16606,
+          "reviewDecision": null,
+          "title": "Add debug logging for exclude-newer filtering"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "TaKO8Ki"
+          },
+          "createdAt": "2025-11-02T21:13:58Z",
+          "isDraft": false,
+          "number": 16553,
+          "reviewDecision": null,
+          "title": "Add `MACOSX_DEPLOYMENT_TARGET` hint for macos platform wheels"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-11-01T02:16:18Z",
+          "isDraft": false,
+          "number": 16544,
+          "reviewDecision": null,
+          "title": "Allow non-root packages in `uv sync`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "aznszn"
+          },
+          "createdAt": "2025-10-30T15:58:32Z",
+          "isDraft": false,
+          "number": 16515,
+          "reviewDecision": null,
+          "title": "add Renovate CustomManager to manage maturin version"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-10-29T00:04:33Z",
+          "isDraft": false,
+          "number": 16489,
+          "reviewDecision": null,
+          "title": "Ignore markers on requirements.txt options"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2025-10-28T11:42:39Z",
+          "isDraft": true,
+          "number": 16480,
+          "reviewDecision": null,
+          "title": "Don't allow local versions when a non-local version is pinned"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "plucia-mitre"
+          },
+          "createdAt": "2025-10-28T02:12:02Z",
+          "isDraft": false,
+          "number": 16475,
+          "reviewDecision": null,
+          "title": "Improve create-python-mirror - Save metadata & Update URLs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "hyqshr"
+          },
+          "createdAt": "2025-10-27T02:44:53Z",
+          "isDraft": false,
+          "number": 16462,
+          "reviewDecision": null,
+          "title": "allow toml pass preview features in list"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "j-helland"
+          },
+          "createdAt": "2025-10-26T07:41:57Z",
+          "isDraft": false,
+          "number": 16452,
+          "reviewDecision": null,
+          "title": "Added support for [tool.uv.preview-features] in TOML configs (#15767)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "KTibow"
+          },
+          "createdAt": "2025-10-25T01:23:04Z",
+          "isDraft": false,
+          "number": 16445,
+          "reviewDecision": null,
+          "title": "tweak build dependency hint wording"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "jkrauth"
+          },
+          "createdAt": "2025-10-24T07:51:50Z",
+          "isDraft": false,
+          "number": 16432,
+          "reviewDecision": null,
+          "title": "Add example to docs for a release job within GitLab CI"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ahundt"
+          },
+          "createdAt": "2025-10-22T01:46:11Z",
+          "isDraft": false,
+          "number": 16403,
+          "reviewDecision": null,
+          "title": "Ignore PermissionDenied during config discovery"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "belmarca-bia"
+          },
+          "createdAt": "2025-10-21T20:17:59Z",
+          "isDraft": false,
+          "number": 16398,
+          "reviewDecision": null,
+          "title": "Add JSON output for the `tree` command"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "andrey-berenda"
+          },
+          "createdAt": "2025-10-21T14:56:53Z",
+          "isDraft": false,
+          "number": 16388,
+          "reviewDecision": null,
+          "title": "Move parsing `UV_COMPILE_BYTECODE_TIMEOUT` to EnvironmentOptions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "krishmas"
+          },
+          "createdAt": "2025-10-17T05:10:51Z",
+          "isDraft": false,
+          "number": 16335,
+          "reviewDecision": null,
+          "title": "Fix: uv tool install installs workspace members non\u2011editable by default; --editable to opt\u2011in"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2025-10-15T18:44:36Z",
+          "isDraft": true,
+          "number": 16323,
+          "reviewDecision": null,
+          "title": "Error when there is an authentication failure in check URL"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mlanett"
+          },
+          "createdAt": "2025-10-13T19:53:53Z",
+          "isDraft": false,
+          "number": 16287,
+          "reviewDecision": null,
+          "title": "Fix: uv fails if requirements.txt files contain remote constraints"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "jackrosenthal"
+          },
+          "createdAt": "2025-10-13T03:09:36Z",
+          "isDraft": false,
+          "number": 16277,
+          "reviewDecision": null,
+          "title": "Add `@generated` marker to `uv.lock` files"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "kopp"
+          },
+          "createdAt": "2025-10-12T05:48:08Z",
+          "isDraft": false,
+          "number": 16255,
+          "reviewDecision": null,
+          "title": "document how to specify where to install tools"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "CrendKing"
+          },
+          "createdAt": "2025-10-11T05:19:06Z",
+          "isDraft": false,
+          "number": 16249,
+          "reviewDecision": null,
+          "title": "Add `--no-wait` argument for the `run` command to not wait for spawned process to finish"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "assadyousuf"
+          },
+          "createdAt": "2025-10-11T00:18:06Z",
+          "isDraft": false,
+          "number": 16245,
+          "reviewDecision": null,
+          "title": "Dont retry connection on SSL certificate error"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "morags"
+          },
+          "createdAt": "2025-10-10T14:46:35Z",
+          "isDraft": false,
+          "number": 16230,
+          "reviewDecision": null,
+          "title": "Add technique for offline generation of autocompletion files to docs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "j178"
+          },
+          "createdAt": "2025-10-10T08:03:19Z",
+          "isDraft": true,
+          "number": 16222,
+          "reviewDecision": null,
+          "title": "Add `UV_PYTHON_EXTRA_INSTALL_DIRS`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2025-10-02T15:50:07Z",
+          "isDraft": false,
+          "number": 16103,
+          "reviewDecision": null,
+          "title": "Add `--find-links` support for `uv pip list`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "terror"
+          },
+          "createdAt": "2025-10-01T17:36:17Z",
+          "isDraft": false,
+          "number": 16089,
+          "reviewDecision": null,
+          "title": "Error on dependency groups with incompatible requires-python in `pip compile`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "moi90"
+          },
+          "createdAt": "2025-09-30T08:29:02Z",
+          "isDraft": false,
+          "number": 16069,
+          "reviewDecision": null,
+          "title": "Short overview of project creation options"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "eifinger"
+          },
+          "createdAt": "2025-09-26T08:48:21Z",
+          "isDraft": false,
+          "number": 16036,
+          "reviewDecision": null,
+          "title": "Remove docs for custom GitHub caching"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "yumeminami"
+          },
+          "createdAt": "2025-09-24T18:21:19Z",
+          "isDraft": false,
+          "number": 16018,
+          "reviewDecision": null,
+          "title": "Add `--outdated` to `uv python uninstall`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "browniebroke"
+          },
+          "createdAt": "2025-09-23T19:04:29Z",
+          "isDraft": false,
+          "number": 16006,
+          "reviewDecision": null,
+          "title": "Switch default indentation to 2 spaces in `pyproject.toml`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "shaanmajid"
+          },
+          "createdAt": "2025-09-23T14:46:02Z",
+          "isDraft": false,
+          "number": 16002,
+          "reviewDecision": null,
+          "title": "Add support for explicit variants and `--all-variants` flag with `uv python list`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ndouglas-cloudsmith"
+          },
+          "createdAt": "2025-09-19T13:47:45Z",
+          "isDraft": false,
+          "number": 15949,
+          "reviewDecision": "CHANGES_REQUESTED",
+          "title": "Add instructions for publishing to Cloudsmith"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "blueraft"
+          },
+          "createdAt": "2025-09-18T21:32:20Z",
+          "isDraft": false,
+          "number": 15939,
+          "reviewDecision": null,
+          "title": "Support `uv version --all-packages`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-09-18T14:04:11Z",
+          "isDraft": true,
+          "number": 15932,
+          "reviewDecision": null,
+          "title": "Always ensure wheels are compatible with the required Python versions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mohammedgqudah"
+          },
+          "createdAt": "2025-09-18T02:14:58Z",
+          "isDraft": false,
+          "number": 15924,
+          "reviewDecision": null,
+          "title": "support isolated PEP 723 scripts"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "hoodmane"
+          },
+          "createdAt": "2025-09-16T13:58:03Z",
+          "isDraft": true,
+          "number": 15893,
+          "reviewDecision": null,
+          "title": "Allow uv to install from Pyodide's index"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-09-16T02:30:10Z",
+          "isDraft": true,
+          "number": 15884,
+          "reviewDecision": null,
+          "title": "Ignore inferred conflict marker when determining if lockfile is up-to-date"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "harshithvh"
+          },
+          "createdAt": "2025-09-14T15:51:51Z",
+          "isDraft": false,
+          "number": 15841,
+          "reviewDecision": null,
+          "title": "Add GHE support for gist resolution with GH_HOST"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "steve4650"
+          },
+          "createdAt": "2025-09-07T14:57:58Z",
+          "isDraft": true,
+          "number": 15711,
+          "reviewDecision": null,
+          "title": "Implement UV_PYTHON_PLATFORM env var"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-09-03T12:44:08Z",
+          "isDraft": true,
+          "number": 15658,
+          "reviewDecision": null,
+          "title": "Restrict the URLs considered compatible with pyx requests"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "adamnemecek"
+          },
+          "createdAt": "2025-09-01T15:26:51Z",
+          "isDraft": false,
+          "number": 15621,
+          "reviewDecision": null,
+          "title": "merged match arms where possible"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2025-08-28T10:19:24Z",
+          "isDraft": true,
+          "number": 15568,
+          "reviewDecision": null,
+          "title": "Allow declaring match-runtime for project's own build dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "sunfkny"
+          },
+          "createdAt": "2025-08-24T11:59:16Z",
+          "isDraft": false,
+          "number": 15479,
+          "reviewDecision": null,
+          "title": "Filter Python executables on Windows by Python version metadata"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "harsh-ps-2003"
+          },
+          "createdAt": "2025-08-23T09:38:01Z",
+          "isDraft": false,
+          "number": 15467,
+          "reviewDecision": null,
+          "title": "Warn when uv venv is used and VIRTUAL_ENV is set"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "jtfmumm"
+          },
+          "createdAt": "2025-08-22T15:33:20Z",
+          "isDraft": true,
+          "number": 15456,
+          "reviewDecision": null,
+          "title": "Add keyring integration for git credentials"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "yumeminami"
+          },
+          "createdAt": "2025-08-18T08:01:35Z",
+          "isDraft": false,
+          "number": 15343,
+          "reviewDecision": null,
+          "title": "Add comma-separated support for --extra and --group flags"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "RafalSkolasinski"
+          },
+          "createdAt": "2025-08-15T22:59:32Z",
+          "isDraft": false,
+          "number": 15321,
+          "reviewDecision": null,
+          "title": "Update build-backend.md"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "acehinnnqru"
+          },
+          "createdAt": "2025-08-15T13:26:12Z",
+          "isDraft": false,
+          "number": 15308,
+          "reviewDecision": null,
+          "title": "Support UV_PYTHON_PLATFORM when executing `uv sync`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "adamnemecek"
+          },
+          "createdAt": "2025-08-15T02:38:37Z",
+          "isDraft": false,
+          "number": 15295,
+          "reviewDecision": null,
+          "title": "Improved `match` statements"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-08-14T16:05:29Z",
+          "isDraft": true,
+          "number": 15284,
+          "reviewDecision": null,
+          "title": "Set `VIRTUAL_ENV` in `uv tool run`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-08-14T13:31:38Z",
+          "isDraft": true,
+          "number": 15279,
+          "reviewDecision": null,
+          "title": "Add a CI job to test memory"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nils-werner"
+          },
+          "createdAt": "2025-08-13T09:24:05Z",
+          "isDraft": false,
+          "number": 15250,
+          "reviewDecision": null,
+          "title": "Implement -C as short hand for --project"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-08-12T17:04:43Z",
+          "isDraft": false,
+          "number": 15244,
+          "reviewDecision": null,
+          "title": "Merge the top-level members of the Jupyter share and etc directories"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "lavisha25"
+          },
+          "createdAt": "2025-08-12T12:30:50Z",
+          "isDraft": false,
+          "number": 15236,
+          "reviewDecision": null,
+          "title": "change in build-backend.md file and settings.md"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Olexandr88"
+          },
+          "createdAt": "2025-08-12T10:59:40Z",
+          "isDraft": false,
+          "number": 15235,
+          "reviewDecision": null,
+          "title": "chore: replaced the license link"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "geofft"
+          },
+          "createdAt": "2025-08-08T20:11:23Z",
+          "isDraft": false,
+          "number": 15175,
+          "reviewDecision": null,
+          "title": "workflows: Add annotating permission to 'annotate uv' action"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2025-08-08T14:36:01Z",
+          "isDraft": false,
+          "number": 15167,
+          "reviewDecision": null,
+          "title": "chore(ci): address lint findings in release workflow"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "adamnemecek"
+          },
+          "createdAt": "2025-08-05T21:05:29Z",
+          "isDraft": false,
+          "number": 15094,
+          "reviewDecision": null,
+          "title": "Code style improvements"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Onyx-Nostalgia"
+          },
+          "createdAt": "2025-08-05T05:39:33Z",
+          "isDraft": false,
+          "number": 15075,
+          "reviewDecision": null,
+          "title": "Update badge logo SVG"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "lucasew"
+          },
+          "createdAt": "2025-07-31T18:01:36Z",
+          "isDraft": false,
+          "number": 15004,
+          "reviewDecision": null,
+          "title": "docs/guides/integration/jupyter: section about ephemeral environments"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Zaloog"
+          },
+          "createdAt": "2025-07-31T17:27:35Z",
+          "isDraft": true,
+          "number": 15001,
+          "reviewDecision": null,
+          "title": "Move environment variable parsing to EnvironmentOptions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-07-28T12:56:04Z",
+          "isDraft": false,
+          "number": 14937,
+          "reviewDecision": null,
+          "title": "Allow templating the `UV_PROJECT_ENVIRONMENT` path"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "AlpinDale"
+          },
+          "createdAt": "2025-07-26T03:44:29Z",
+          "isDraft": true,
+          "number": 14911,
+          "reviewDecision": null,
+          "title": "[WIP] feat: add CUDA management support to uv"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-07-25T21:07:59Z",
+          "isDraft": true,
+          "number": 14909,
+          "reviewDecision": "APPROVED",
+          "title": "Automatically include extra variant index in variant prototype"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-07-24T20:17:55Z",
+          "isDraft": true,
+          "number": 14877,
+          "reviewDecision": null,
+          "title": "Symlink (or copy) binary entry points into ephemeral environments"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-07-24T11:44:38Z",
+          "isDraft": false,
+          "number": 14869,
+          "reviewDecision": null,
+          "title": "Do not replace the Python dylib on macOS if `install_name_tool` fails"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-07-21T14:32:35Z",
+          "isDraft": false,
+          "number": 14789,
+          "reviewDecision": null,
+          "title": "Add `--all-groups` to `uv pip install` and `uv pip sync`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "pimdh"
+          },
+          "createdAt": "2025-07-21T09:14:19Z",
+          "isDraft": false,
+          "number": 14783,
+          "reviewDecision": null,
+          "title": "In pylock.toml export, include dependencies (name, marker and version)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "geofft"
+          },
+          "createdAt": "2025-07-19T06:50:04Z",
+          "isDraft": true,
+          "number": 14743,
+          "reviewDecision": null,
+          "title": "Directly ask the NVIDIA kernel driver what version it is"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "geofft"
+          },
+          "createdAt": "2025-07-17T18:54:32Z",
+          "isDraft": false,
+          "number": 14687,
+          "reviewDecision": null,
+          "title": "Support http/https URLs in `uv python --python-downloads-json-url`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2025-07-16T18:06:42Z",
+          "isDraft": true,
+          "number": 14669,
+          "reviewDecision": null,
+          "title": "Add a GitHub Actions warning to the `uv venv` behavior change"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "rsyring"
+          },
+          "createdAt": "2025-07-15T14:55:53Z",
+          "isDraft": false,
+          "number": 14628,
+          "reviewDecision": null,
+          "title": "Initial design doc for centralized venvs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2025-07-12T18:58:22Z",
+          "isDraft": true,
+          "number": 14579,
+          "reviewDecision": null,
+          "title": "Implement an auto-import proof-of-concept"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "DragonflyRobotics"
+          },
+          "createdAt": "2025-07-07T22:06:51Z",
+          "isDraft": false,
+          "number": 14499,
+          "reviewDecision": null,
+          "title": "Added an automatic sourcing utility called \"Envy\" to CLI "
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjMwMA==",
+        "hasNextPage": true
+      }
+    }
+  }
+}

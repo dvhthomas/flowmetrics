@@ -1,0 +1,449 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "limit": 5000,
+      "remaining": 4995,
+      "resetAt": "2026-06-02T04:36:50Z"
+    },
+    "search": {
+      "issueCount": 43,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-10T23:19:39Z",
+          "mergedAt": "2026-05-10T23:58:26Z",
+          "number": 19342,
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-10T22:23:54Z",
+          "mergedAt": "2026-05-10T22:54:30Z",
+          "number": 19341,
+          "title": "Remove stale `uv-bench` platform tags input"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-09T19:46:29Z",
+          "mergedAt": "2026-05-09T20:03:28Z",
+          "number": 19334,
+          "title": "Respect `--require-hashes` when installing from `pylock.toml` files"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-08T21:35:27Z",
+          "mergedAt": "2026-05-08T22:06:22Z",
+          "number": 19331,
+          "title": "Bump version to 0.11.12"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-08T19:20:54Z",
+          "mergedAt": "2026-05-09T05:13:55Z",
+          "number": 19330,
+          "title": "Upload JUnit summaries for our tests"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-08T00:51:48Z",
+          "mergedAt": "2026-05-08T21:28:10Z",
+          "number": 19322,
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-07T21:32:38Z",
+          "mergedAt": "2026-05-07T23:58:14Z",
+          "number": 19320,
+          "title": "Require git refs in URLs to be percent-encoded"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Gankra"
+          },
+          "createdAt": "2026-05-07T15:08:48Z",
+          "mergedAt": "2026-05-07T16:24:55Z",
+          "number": 19318,
+          "title": "Fix test filter to work with dot-dirs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-07T05:31:54Z",
+          "mergedAt": "2026-05-07T15:53:28Z",
+          "number": 19313,
+          "title": "Respect `--no-dev` over `UV_DEV=1`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-07T05:23:48Z",
+          "mergedAt": "2026-05-10T18:31:20Z",
+          "number": 19312,
+          "title": "Include data files in editable builds"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "brews"
+          },
+          "createdAt": "2026-05-07T00:46:31Z",
+          "mergedAt": "2026-05-07T17:33:31Z",
+          "number": 19309,
+          "title": "Fix bug from inconsistent workflow name in GHA-PyPI guide example"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-05-06T22:49:49Z",
+          "mergedAt": "2026-05-07T13:54:38Z",
+          "number": 19306,
+          "title": "Add `--no-editable` support to `uv pip install`"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-06T18:49:52Z",
+          "mergedAt": "2026-05-06T19:34:21Z",
+          "number": 19303,
+          "title": "Bump version to 0.11.11"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-06T16:43:17Z",
+          "mergedAt": "2026-05-06T16:57:47Z",
+          "number": 19302,
+          "title": "Continue docs/versions/mirror publish on crates.io failure"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ChrisJr404"
+          },
+          "createdAt": "2026-05-06T12:54:20Z",
+          "mergedAt": "2026-05-06T16:16:44Z",
+          "number": 19301,
+          "title": "fix(cache): accept legacy ID format from pre-0.11.9 cache entries (#19298)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ChrisJr404"
+          },
+          "createdAt": "2026-05-05T19:28:09Z",
+          "mergedAt": "2026-05-07T05:01:31Z",
+          "number": 19294,
+          "title": "fix(lock): warning suggests non-existent --no-frozen flag (#19290)"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-05T18:49:13Z",
+          "mergedAt": "2026-05-05T19:39:52Z",
+          "number": 19293,
+          "title": "Bump version to 0.11.10"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T18:22:03Z",
+          "mergedAt": "2026-05-05T18:43:51Z",
+          "number": 19292,
+          "title": "Add job to prepare a release branch"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T16:30:06Z",
+          "mergedAt": "2026-05-05T16:52:29Z",
+          "number": 19291,
+          "title": "Allow releases to continue on failure to publish to crates.io"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T14:43:40Z",
+          "mergedAt": "2026-05-06T20:46:22Z",
+          "number": 19288,
+          "title": "Ensure that all Python downloads do not panic on `VersionRequest::from(PythonVersion)`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T14:37:58Z",
+          "mergedAt": "2026-05-05T17:09:47Z",
+          "number": 19287,
+          "title": "Increase the timeout for crates.io publishes"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T14:12:43Z",
+          "mergedAt": "2026-05-05T14:37:26Z",
+          "number": 19286,
+          "title": "Allow pre-release Python requests with non-zero patch versions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T07:02:32Z",
+          "mergedAt": "2026-05-05T07:06:48Z",
+          "number": 19276,
+          "title": "Fix pre-release handling in the manual release script"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-05T04:51:55Z",
+          "mergedAt": "2026-05-05T05:06:20Z",
+          "number": 19273,
+          "title": "Bump version to 0.11.9"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "copilot-swe-agent"
+          },
+          "createdAt": "2026-05-05T01:32:15Z",
+          "mergedAt": "2026-05-05T02:24:53Z",
+          "number": 19272,
+          "title": "Fix CI: update `python_upgrade` snapshot for `3.14.5rc1` pre-release, keep `LATEST_PYTHON_3_14` at stable `3.14.4`"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "copilot-swe-agent"
+          },
+          "createdAt": "2026-05-05T01:10:56Z",
+          "mergedAt": "2026-05-05T01:11:28Z",
+          "number": 19271,
+          "title": "Bump `LATEST_PYTHON_3_14` to `3.14.5rc1`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-05T00:35:51Z",
+          "mergedAt": "2026-05-05T00:47:10Z",
+          "number": 19269,
+          "title": "Fix transitive Git path dependencies in lockfiles"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-05T00:35:11Z",
+          "mergedAt": "2026-05-05T02:33:33Z",
+          "number": 19268,
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-05T00:02:03Z",
+          "mergedAt": "2026-05-05T00:11:22Z",
+          "number": 19267,
+          "title": "Omit compatible release desugaring for pre-release hints"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-04T17:38:17Z",
+          "mergedAt": "2026-05-04T18:04:42Z",
+          "number": 19264,
+          "title": "Bump rand to 0.9.4"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:36:34Z",
+          "mergedAt": "2026-05-04T21:36:12Z",
+          "number": 19257,
+          "title": "Update uraimo/run-on-arch-action action to v3.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:36:06Z",
+          "mergedAt": "2026-05-04T21:30:45Z",
+          "number": 19255,
+          "title": "Update Rust crate data-encoding to v2.11.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:35:54Z",
+          "mergedAt": "2026-05-04T21:30:17Z",
+          "number": 19254,
+          "title": "Update CodSpeedHQ/action action to v4.14.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:35:46Z",
+          "mergedAt": "2026-05-04T18:25:53Z",
+          "number": 19253,
+          "title": "Update Rust crate webpki to v0.103.13"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:35:34Z",
+          "mergedAt": "2026-05-04T21:32:04Z",
+          "number": 19252,
+          "title": "Update Rust crate tracing-durations-export to v0.3.3"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:34:56Z",
+          "mergedAt": "2026-05-04T21:31:51Z",
+          "number": 19249,
+          "title": "Update Rust crate rkyv to v0.8.16"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:34:44Z",
+          "mergedAt": "2026-05-04T21:29:17Z",
+          "number": 19248,
+          "title": "Update Rust crate jiff to v0.2.24"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-04T01:33:38Z",
+          "mergedAt": "2026-05-04T21:29:00Z",
+          "number": 19247,
+          "title": "Update dependency astral-sh/uv to v0.11.8"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-01T03:21:02Z",
+          "mergedAt": "2026-05-04T21:34:14Z",
+          "number": 19232,
+          "title": "Update debian Docker tag to trixie-20260421"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-30T18:29:47Z",
+          "mergedAt": "2026-05-08T06:32:56Z",
+          "number": 19227,
+          "title": "Detect TOML 1.1 and automatically enable the toml backwards compatibility preview feature"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-27T00:46:43Z",
+          "mergedAt": "2026-05-04T21:33:35Z",
+          "number": 19169,
+          "title": "Update Rust crate test-log to v0.2.20"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-25T22:04:12Z",
+          "mergedAt": "2026-05-04T21:54:52Z",
+          "number": 19154,
+          "title": "Fix URL prefix matching to require path boundaries"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-22T11:28:04Z",
+          "mergedAt": "2026-05-04T21:59:15Z",
+          "number": 19114,
+          "title": "Prevent uninstalling site-packages for empty `top_level.txt` in `.egg-info`"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjQz",
+        "hasNextPage": false
+      }
+    }
+  }
+}

@@ -1,0 +1,1119 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "limit": 5000,
+      "remaining": 4994,
+      "resetAt": "2026-06-02T04:36:50Z"
+    },
+    "search": {
+      "issueCount": 389,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nhukc"
+          },
+          "createdAt": "2026-06-01T22:07:44Z",
+          "isDraft": false,
+          "number": 19642,
+          "reviewDecision": null,
+          "title": "[RFC] Improve cache-keys interactions with deployments"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "godfengliang"
+          },
+          "createdAt": "2026-06-01T12:17:55Z",
+          "isDraft": false,
+          "number": 19632,
+          "reviewDecision": null,
+          "title": "fix: prevent activate.fish from changing cwd on relocatable venvs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-29T21:30:32Z",
+          "isDraft": true,
+          "number": 19615,
+          "reviewDecision": null,
+          "title": "Use ICF in release builds"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-29T20:34:47Z",
+          "isDraft": true,
+          "number": 19613,
+          "reviewDecision": null,
+          "title": "Actually use mold for linking in CI"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-29T20:29:08Z",
+          "isDraft": true,
+          "number": 19611,
+          "reviewDecision": null,
+          "title": "Add Google Artifact Registry credential retrieval"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-29T15:57:27Z",
+          "isDraft": true,
+          "number": 19604,
+          "reviewDecision": null,
+          "title": "Use runners from namespace"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-29T14:08:39Z",
+          "isDraft": false,
+          "number": 19603,
+          "reviewDecision": null,
+          "title": "Split uv integration tests into smaller test harnesses"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ImFeH2"
+          },
+          "createdAt": "2026-05-28T10:13:25Z",
+          "isDraft": false,
+          "number": 19591,
+          "reviewDecision": null,
+          "title": "Rebuild explicit local directory tool installs"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "sharifhsn"
+          },
+          "createdAt": "2026-05-28T03:43:38Z",
+          "isDraft": false,
+          "number": 19585,
+          "reviewDecision": null,
+          "title": "Document `--find-links` caching behavior"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-27T19:53:30Z",
+          "isDraft": true,
+          "number": 19583,
+          "reviewDecision": null,
+          "title": "Infer `uv tool` Python requests from remote distributions with static metadata"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Dev-X25874"
+          },
+          "createdAt": "2026-05-27T01:10:50Z",
+          "isDraft": false,
+          "number": 19573,
+          "reviewDecision": null,
+          "title": "Add tests for Azure signing: x-ms-version preservation and blob storage URL matching"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-26T20:52:22Z",
+          "isDraft": true,
+          "number": 19571,
+          "reviewDecision": null,
+          "title": "Allow future `exclude-newer` values during `uv lock --check`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-26T19:10:04Z",
+          "isDraft": true,
+          "number": 19570,
+          "reviewDecision": null,
+          "title": "Avoid preserving Windows virtualenv launcher timestamps"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-26T13:49:57Z",
+          "isDraft": true,
+          "number": 19565,
+          "reviewDecision": null,
+          "title": "Run CI for removed workspace code"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "faroukBakari"
+          },
+          "createdAt": "2026-05-25T21:49:18Z",
+          "isDraft": false,
+          "number": 19561,
+          "reviewDecision": null,
+          "title": "feat: add `--env-file-override` flag to `uv run` and `uv tool run`"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-25T00:30:14Z",
+          "isDraft": false,
+          "number": 19552,
+          "reviewDecision": null,
+          "title": "Update Rust crate nix to v0.31.3"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-25T00:29:08Z",
+          "isDraft": false,
+          "number": 19549,
+          "reviewDecision": null,
+          "title": "Update maturin to v1.13.3"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "fallintoplace"
+          },
+          "createdAt": "2026-05-24T11:21:58Z",
+          "isDraft": false,
+          "number": 19543,
+          "reviewDecision": null,
+          "title": "Avoid following symlinks during cache prune"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-05-22T11:06:55Z",
+          "isDraft": true,
+          "number": 19532,
+          "reviewDecision": null,
+          "title": "Replace dashmap with papaya"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-05-22T00:58:04Z",
+          "isDraft": true,
+          "number": 19531,
+          "reviewDecision": null,
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Kuhai9801"
+          },
+          "createdAt": "2026-05-21T19:06:24Z",
+          "isDraft": false,
+          "number": 19520,
+          "reviewDecision": null,
+          "title": "Hide ignored auth keyring provider option"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "sandyharvie"
+          },
+          "createdAt": "2026-05-21T18:10:16Z",
+          "isDraft": false,
+          "number": 19518,
+          "reviewDecision": null,
+          "title": "Handle missing archives for URL- and path-specified wheels"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Richardmsbr"
+          },
+          "createdAt": "2026-05-20T17:42:21Z",
+          "isDraft": false,
+          "number": 19501,
+          "reviewDecision": null,
+          "title": "docs: Clarify that `uv run python` opens an interactive REPL"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "adv0r"
+          },
+          "createdAt": "2026-05-20T15:54:36Z",
+          "isDraft": true,
+          "number": 19498,
+          "reviewDecision": null,
+          "title": "docs(settings): disambiguate the duplicate `index` heading"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "crispyricepc"
+          },
+          "createdAt": "2026-05-20T15:24:48Z",
+          "isDraft": true,
+          "number": 19497,
+          "reviewDecision": null,
+          "title": "Add support for `uv audit --fix`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-19T22:33:22Z",
+          "isDraft": true,
+          "number": 19489,
+          "reviewDecision": null,
+          "title": "Generate PEP 740 attestations"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-19T15:35:55Z",
+          "isDraft": true,
+          "number": 19486,
+          "reviewDecision": null,
+          "title": "Add a benchmark interface to the `uv` crate"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-19T01:31:06Z",
+          "isDraft": false,
+          "number": 19477,
+          "reviewDecision": null,
+          "title": "Infer the version on release workflow instead of requiring user input"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-18T17:37:52Z",
+          "isDraft": true,
+          "number": 19467,
+          "reviewDecision": null,
+          "title": "Use the `fast-build` profile as the default build"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "timfel"
+          },
+          "createdAt": "2026-05-18T13:26:02Z",
+          "isDraft": true,
+          "number": 19458,
+          "reviewDecision": null,
+          "title": "Support newer GraalPy release assets that include the Python version."
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "rroohhh"
+          },
+          "createdAt": "2026-05-15T22:43:06Z",
+          "isDraft": false,
+          "number": 19424,
+          "reviewDecision": null,
+          "title": "Only perform unix specific steps when installing python for a unix ta\u2026"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-05-15T13:13:57Z",
+          "isDraft": false,
+          "number": 19415,
+          "reviewDecision": null,
+          "title": "Add `replace_symlink_lenient`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "RyanJamesStewart"
+          },
+          "createdAt": "2026-05-13T00:29:54Z",
+          "isDraft": false,
+          "number": 19388,
+          "reviewDecision": null,
+          "title": "Retry file lock acquisition on EINTR"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "athaapa"
+          },
+          "createdAt": "2026-05-12T04:04:48Z",
+          "isDraft": false,
+          "number": 19373,
+          "reviewDecision": "CHANGES_REQUESTED",
+          "title": "Add support for setting `no-editable` in `pyproject.toml`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-05-11T14:07:17Z",
+          "isDraft": true,
+          "number": 19359,
+          "reviewDecision": null,
+          "title": "Add some generated internals documentation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mosquito"
+          },
+          "createdAt": "2026-05-11T08:35:15Z",
+          "isDraft": false,
+          "number": 19357,
+          "reviewDecision": null,
+          "title": "Fixes for #16455"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-05-10T01:54:03Z",
+          "isDraft": false,
+          "number": 19336,
+          "reviewDecision": null,
+          "title": "Support `--require-hashes` in `requirements.txt files`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Criseda"
+          },
+          "createdAt": "2026-05-09T22:33:48Z",
+          "isDraft": false,
+          "number": 19335,
+          "reviewDecision": null,
+          "title": "Clarify rollback after tool install executable conflicts"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-05-09T18:55:13Z",
+          "isDraft": false,
+          "number": 19333,
+          "reviewDecision": "CHANGES_REQUESTED",
+          "title": "Preserve `--locked` error message when `--quiet` is set"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ChrisJr404"
+          },
+          "createdAt": "2026-05-08T01:04:25Z",
+          "isDraft": false,
+          "number": 19323,
+          "reviewDecision": null,
+          "title": "Recognize `UV_NO_INSTALL_PROJECT`, `UV_NO_INSTALL_WORKSPACE`, `UV_NO_INSTALL_LOCAL`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "aconal-com"
+          },
+          "createdAt": "2026-05-07T15:46:07Z",
+          "isDraft": false,
+          "number": 19319,
+          "reviewDecision": null,
+          "title": "Continue uninstalling tools after encountering a tool environment with a missing receipt"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "makhlwf"
+          },
+          "createdAt": "2026-05-07T11:40:56Z",
+          "isDraft": false,
+          "number": 19316,
+          "reviewDecision": null,
+          "title": "added more detailed alternative description of the bar chart in the readme"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-05-06T19:13:48Z",
+          "isDraft": true,
+          "number": 19304,
+          "reviewDecision": null,
+          "title": "Bump rand/digest/hashing crates"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "internet-dot"
+          },
+          "createdAt": "2026-05-06T10:13:00Z",
+          "isDraft": false,
+          "number": 19299,
+          "reviewDecision": "CHANGES_REQUESTED",
+          "title": "docs: clarify that `uv run python` starts a REPL (fixes #6548)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "hunterhogan"
+          },
+          "createdAt": "2026-05-06T02:36:32Z",
+          "isDraft": false,
+          "number": 19295,
+          "reviewDecision": null,
+          "title": "Minimal edit of documentation in settings.rs for `index`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "ChrisJr404"
+          },
+          "createdAt": "2026-05-05T14:49:00Z",
+          "isDraft": false,
+          "number": 19289,
+          "reviewDecision": null,
+          "title": "docs(init): show .git/ and .gitignore in concepts/projects/init.md (#19281)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "sashetov"
+          },
+          "createdAt": "2026-05-03T01:32:06Z",
+          "isDraft": false,
+          "number": 19244,
+          "reviewDecision": null,
+          "title": "Resolve project environment in `uv python find --project` (#11990)"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "mxxun"
+          },
+          "createdAt": "2026-05-02T14:10:01Z",
+          "isDraft": false,
+          "number": 19240,
+          "reviewDecision": null,
+          "title": "Move parsing of `UV_RUN_MAX_RECURSION_DEPTH` to EnvironmentOptions; update `str_to_bool` comment about nonstandard values"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-05-01T07:31:46Z",
+          "isDraft": false,
+          "number": 19235,
+          "reviewDecision": null,
+          "title": "Fix pythonw launcher mode for managed Windows venv links"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-05-01T03:20:55Z",
+          "isDraft": false,
+          "number": 19231,
+          "reviewDecision": null,
+          "title": "Update fedora:45 Docker digest to 0c1f63e"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "KlotzAndrew"
+          },
+          "createdAt": "2026-04-29T23:31:35Z",
+          "isDraft": false,
+          "number": 19220,
+          "reviewDecision": null,
+          "title": "Handle broken managed Python installation directory"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Aditya-PS-05"
+          },
+          "createdAt": "2026-04-27T22:45:58Z",
+          "isDraft": false,
+          "number": 19198,
+          "reviewDecision": null,
+          "title": "filter `[exclude-newer-package]` lockfile entries to resolved packages"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-27T20:25:40Z",
+          "isDraft": true,
+          "number": 19197,
+          "reviewDecision": null,
+          "title": "Package by default: Stabilize preview feature"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Aditya-PS-05"
+          },
+          "createdAt": "2026-04-27T08:15:05Z",
+          "isDraft": false,
+          "number": 19182,
+          "reviewDecision": null,
+          "title": "warn csh users when creating a relocatable virtual environment"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-26T13:57:58Z",
+          "isDraft": false,
+          "number": 19159,
+          "reviewDecision": null,
+          "title": "Fix PowerShell activator UNC path handling"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Aditya-PS-05"
+          },
+          "createdAt": "2026-04-25T18:14:10Z",
+          "isDraft": false,
+          "number": 19151,
+          "reviewDecision": null,
+          "title": "Preserve relative structure of transitive editables in `uv pip compile`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-04-24T20:33:52Z",
+          "isDraft": true,
+          "number": 19148,
+          "reviewDecision": null,
+          "title": "fetch available CPython releases from the network"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-04-24T20:04:51Z",
+          "isDraft": true,
+          "number": 19147,
+          "reviewDecision": null,
+          "title": "Redact sensitive parts of URLs in reqwest errors"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-23T15:31:19Z",
+          "isDraft": false,
+          "number": 19127,
+          "reviewDecision": null,
+          "title": "Support `pylock.toml` in `--with-requirements` in `uv run` and `uvx`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-22T08:05:45Z",
+          "isDraft": false,
+          "number": 19111,
+          "reviewDecision": null,
+          "title": "Stop stacking progress bars when a wheel download is retried"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-22T03:11:32Z",
+          "isDraft": true,
+          "number": 19109,
+          "reviewDecision": null,
+          "title": "Fix inclusion of extra specified in dependency group when listed in a conflict"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-20T19:51:27Z",
+          "isDraft": true,
+          "number": 19085,
+          "reviewDecision": null,
+          "title": "Workspace caching 2 bench"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-20T19:49:53Z",
+          "isDraft": true,
+          "number": 19084,
+          "reviewDecision": null,
+          "title": "Workspace caching 1 bench"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "apaz-cli"
+          },
+          "createdAt": "2026-04-20T05:07:53Z",
+          "isDraft": false,
+          "number": 19075,
+          "reviewDecision": null,
+          "title": "Retry failed partial downloads with HTTP Range header when supported"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-19T09:15:29Z",
+          "isDraft": false,
+          "number": 19046,
+          "reviewDecision": null,
+          "title": "docs: disambiguate duplicate top-level setting anchors"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-19T08:47:52Z",
+          "isDraft": false,
+          "number": 19045,
+          "reviewDecision": null,
+          "title": "docs: deduplicate editable install instructions"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "purepani"
+          },
+          "createdAt": "2026-04-18T02:03:36Z",
+          "isDraft": false,
+          "number": 19041,
+          "reviewDecision": null,
+          "title": "Adds --interactive` flag to pass `-i` to python"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-16T19:27:42Z",
+          "isDraft": true,
+          "number": 19026,
+          "reviewDecision": null,
+          "title": "Package by default: Update documentation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T15:11:15Z",
+          "isDraft": true,
+          "number": 19011,
+          "reviewDecision": null,
+          "title": "Allow snapshotting a toml subsection"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-15T11:43:05Z",
+          "isDraft": true,
+          "number": 19007,
+          "reviewDecision": null,
+          "title": "Cache `pyproject.toml` parsing in workspace discovery"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:07:01Z",
+          "isDraft": false,
+          "number": 18980,
+          "reviewDecision": null,
+          "title": "Update dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T12:37:15Z",
+          "isDraft": false,
+          "number": 18975,
+          "reviewDecision": null,
+          "title": "Log out without `--username` if username is unambiguous"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T10:51:27Z",
+          "isDraft": false,
+          "number": 18974,
+          "reviewDecision": null,
+          "title": "Add support for `'3.7.*' == python_full_version`-style markers"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-09T21:20:32Z",
+          "isDraft": false,
+          "number": 18957,
+          "reviewDecision": null,
+          "title": "Validate `--upgrade-group` targets"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-09T17:21:37Z",
+          "isDraft": true,
+          "number": 18954,
+          "reviewDecision": null,
+          "title": "Allow workspace root to override member non-workspace sources"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-09T17:08:22Z",
+          "isDraft": true,
+          "number": 18953,
+          "reviewDecision": null,
+          "title": "Only use reproducible exclude newer errors in the test suite"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-09T02:22:27Z",
+          "isDraft": false,
+          "number": 18937,
+          "reviewDecision": null,
+          "title": "Add a full \"lockfile\" to tool receipts"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-08T19:02:46Z",
+          "isDraft": false,
+          "number": 18929,
+          "reviewDecision": null,
+          "title": "Add additional retries on WinGet dowloads in CI"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-08T17:33:56Z",
+          "isDraft": false,
+          "number": 18927,
+          "reviewDecision": null,
+          "title": "Remove bz/lzma/xz support from ZIP handling"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-08T16:19:57Z",
+          "isDraft": true,
+          "number": 18923,
+          "reviewDecision": null,
+          "title": "Fail on `exclude-newer` parse errors"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-08T14:45:49Z",
+          "isDraft": true,
+          "number": 18921,
+          "reviewDecision": null,
+          "title": "Add `allow-bypass` option to `exclude-newer` for allowing direct pinned dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-08T13:06:54Z",
+          "isDraft": false,
+          "number": 18918,
+          "reviewDecision": null,
+          "title": "Show larger files first in progress reporters"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "raffaelemancuso"
+          },
+          "createdAt": "2026-04-08T01:10:36Z",
+          "isDraft": false,
+          "number": 18910,
+          "reviewDecision": null,
+          "title": "Added instructions for using JupyterLab in a separate environment"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-07T22:56:17Z",
+          "isDraft": true,
+          "number": 18907,
+          "reviewDecision": null,
+          "title": "Rewrite the native authentication storage scheme"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "monsonego"
+          },
+          "createdAt": "2026-04-06T17:41:10Z",
+          "isDraft": false,
+          "number": 18884,
+          "reviewDecision": null,
+          "title": "docs: link the run page to locking and syncing"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "renezander030"
+          },
+          "createdAt": "2026-04-06T14:50:42Z",
+          "isDraft": false,
+          "number": 18881,
+          "reviewDecision": null,
+          "title": "feat(python): add --all-variants flag to python list"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-05T18:08:30Z",
+          "isDraft": false,
+          "number": 18859,
+          "reviewDecision": null,
+          "title": "Omit workspace members for `--no-sources` commands"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Vastargazing"
+          },
+          "createdAt": "2026-04-04T09:52:33Z",
+          "isDraft": false,
+          "number": 18846,
+          "reviewDecision": null,
+          "title": "Move `UV_CUDA_DRIVER_VERSION` and `UV_AMD_GPU_ARCHITECTURE` parsing to `EnvironmentOptions`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "qqgjyx"
+          },
+          "createdAt": "2026-04-03T00:53:29Z",
+          "isDraft": false,
+          "number": 18835,
+          "reviewDecision": null,
+          "title": "Skip macOS AppleDouble sidecar files during .data directory installation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-01T21:06:44Z",
+          "isDraft": true,
+          "number": 18810,
+          "reviewDecision": null,
+          "title": "Fix Docker layer caching during trampoline reproducibility check"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "pietrodn"
+          },
+          "createdAt": "2026-03-31T12:48:41Z",
+          "isDraft": false,
+          "number": 18776,
+          "reviewDecision": null,
+          "title": "fix: support native macOS keyring credential lookup"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-03-30T20:39:30Z",
+          "isDraft": true,
+          "number": 18772,
+          "reviewDecision": null,
+          "title": "Don't silently ignore directories in source-include"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "MoonMao42"
+          },
+          "createdAt": "2026-03-30T16:09:28Z",
+          "isDraft": false,
+          "number": 18770,
+          "reviewDecision": null,
+          "title": "Add `--outdated` to `uv python uninstall` and `--uninstall` to `uv python upgrade`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-03-25T23:29:18Z",
+          "isDraft": true,
+          "number": 18718,
+          "reviewDecision": null,
+          "title": "Store flat indexes as relative paths when originally specified as relative"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-25T14:38:43Z",
+          "isDraft": true,
+          "number": 18713,
+          "reviewDecision": null,
+          "title": "Use `editpe` for trampoline resource edits"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-25T12:47:03Z",
+          "isDraft": false,
+          "number": 18712,
+          "reviewDecision": null,
+          "title": "Add docker integration test for Windows NanoServer entrypoint installation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-25T12:31:37Z",
+          "isDraft": false,
+          "number": 18711,
+          "reviewDecision": null,
+          "title": "Use a GitHub App for authentication during release creation"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-24T18:50:22Z",
+          "isDraft": true,
+          "number": 18702,
+          "reviewDecision": null,
+          "title": "Add a `system-certs-default` preview feature"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-24T13:32:46Z",
+          "isDraft": true,
+          "number": 18693,
+          "reviewDecision": null,
+          "title": "Infer Python version requests from source trees in `uv tool` invocations"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-23T20:23:39Z",
+          "isDraft": true,
+          "number": 18684,
+          "reviewDecision": null,
+          "title": "Add parallel discovery of Python versions for `uv python list`"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjEwMA==",
+        "hasNextPage": true
+      }
+    }
+  }
+}

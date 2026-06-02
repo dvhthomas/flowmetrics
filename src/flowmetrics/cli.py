@@ -251,119 +251,6 @@ def cli() -> None:
     """
 
 
-@cli.command(short_help="Flow efficiency (active vs. wait time)")
-@_apply_source_options
-@click.option(
-    "--start",
-    type=str,
-    default=None,
-    help="Window start (YYYY-MM-DD). Default: Monday of current week.",
-)
-@click.option(
-    "--stop",
-    type=str,
-    default=None,
-    help="Window stop (YYYY-MM-DD). Default: Sunday of current week.",
-)
-@click.option(
-    "--cache-dir", type=click.Path(path_type=Path), default=DEFAULT_CACHE_DIR, show_default=True
-)
-@click.option(
-    "--offline/--online",
-    default=False,
-    help="Offline reads cache only; online hits the source API on cache miss.",
-)
-@click.option(
-    "--gap-hours", type=float, default=DEFAULT_GAP.total_seconds() / 3600, show_default=True
-)
-@click.option(
-    "--min-cluster-minutes",
-    type=float,
-    default=DEFAULT_MIN_CLUSTER.total_seconds() / 60,
-    show_default=True,
-)
-@click.option(
-    "--active-statuses",
-    type=str,
-    default=",".join(sorted(DEFAULT_ACTIVE_STATUSES)),
-    show_default=True,
-    help="Jira only: comma-separated workflow statuses counted as active. "
-    "Ignored for GitHub (which infers activity from event timestamps).",
-)
-@click.option(
-    "--include-issues/--no-include-issues",
-    default=False,
-    help="GitHub-only. Also include Issues closed in the window. For "
-    "Issues closed by a PR-merge, cycle time uses the PR's mergedAt.",
-)
-@_FORMAT_OPTION
-@_OUTPUT_OPTION
-@_VERBOSE_OPTION
-def efficiency(
-    repo: str | None,
-    jira_url: str | None,
-    jira_project: str | None,
-    start: str | None,
-    stop: str | None,
-    cache_dir: Path,
-    offline: bool,
-    gap_hours: float,
-    min_cluster_minutes: float,
-    active_statuses: str,
-    include_issues: bool,
-    fmt: str,
-    output: Path | None,
-    verbose: bool,
-) -> None:
-    """Flow efficiency for a date window (defaults to this week).
-
-    For agent use, pass --format json (schema: flowmetrics.efficiency.v1).
-    """
-    if start is None and stop is None:
-        start_d, stop_d = this_week_window()
-    elif start is not None and stop is not None:
-        start_d, stop_d = _parse_date(start), _parse_date(stop)
-    else:
-        raise click.UsageError("Provide both --start and --stop, or neither.")
-
-    src = _build_source(
-        repo=repo,
-        jira_url=jira_url, jira_project=jira_project,
-        cache_dir=cache_dir, offline=offline,
-        include_issues=include_issues,
-    )
-
-    active_set = frozenset(
-        s.strip() for s in active_statuses.split(",") if s.strip()
-    )
-
-    def build() -> EfficiencyReport:
-        result: WindowResult = flowmetrics_for_window(
-            src, start_d, stop_d,
-            gap=timedelta(hours=gap_hours),
-            min_cluster=timedelta(minutes=min_cluster_minutes),
-            active_statuses=active_set,
-        )
-        input_ = EfficiencyInput(
-            repo=src.label,
-            start=start_d,
-            stop=stop_d,
-            active_statuses=tuple(sorted(active_set)),
-            gap_hours=gap_hours,
-            min_cluster_minutes=min_cluster_minutes,
-            offline=offline,
-            jira_url=jira_url,
-        )
-        return EfficiencyReport(
-            input=input_,
-            result=result,
-            interpretation=interpret_efficiency(input_, result),
-        )
-
-    _dispatch(fmt, output, build, verbose=verbose)
-
-
-
 @cli.group(short_help="Monte Carlo forecasting (when-done / how-many)")
 def forecast() -> None:
     """Monte Carlo forecasting — when-done / how-many."""
@@ -589,6 +476,401 @@ def forecast_how_many(
         )
 
     _dispatch(fmt, output, build, verbose=verbose)
+
+
+# ---------------------------------------------------------------------------
+# `flow metric ...` — text + JSON metric extraction for agents.
+#
+# These commands expose the underlying lib metric computations (aging,
+# CFD, throughput, cycle-time) in graphics-free shape. They were
+# top-level commands (`flow aging` / `flow cfd` / `flow scatterplot`)
+# until the CLI shrink — turns out agents still need the numbers; the
+# right home is a metric group, not chart-primary top-level commands.
+# ---------------------------------------------------------------------------
+
+
+@cli.group(short_help="Extract metrics for agents / headless humans")
+def metric() -> None:
+    """Pull numeric metric data without rendering anything.
+
+    Each subcommand takes a source (`--repo` OR `--jira-url` +
+    `--jira-project`) and writes either a one-line text headline
+    (default) or a versioned JSON envelope (`--format json`). No
+    HTML, no charts — the web UI (`flow serve`) is the home for
+    every chart.
+    """
+
+
+_METRIC_FORMAT_OPTION = click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    show_default=True,
+    help="text=one-line headline (default); json=structured envelope.",
+)
+
+
+def _emit_metric(fmt: str, headline: str, payload: dict) -> None:
+    """Emit a metric subcommand's result in the chosen format. Text
+    mode prints the one-line headline; JSON mode emits the structured
+    envelope (with a trailing newline so pipeable to `jq`)."""
+    if fmt == "json":
+        click.echo(json.dumps(payload, indent=2))
+        return
+    click.echo(headline)
+
+
+@metric.command("throughput", short_help="Daily completion counts in a window")
+@_apply_source_options
+@click.option("--start", type=str, required=True, help="Window start (YYYY-MM-DD).")
+@click.option("--stop", type=str, required=True, help="Window stop (YYYY-MM-DD).")
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR, show_default=True,
+)
+@click.option("--offline/--online", default=False)
+@click.option(
+    "--include-issues/--no-include-issues", default=False,
+    help="GitHub-only: also include Issues closed in the window.",
+)
+@_METRIC_FORMAT_OPTION
+def metric_throughput(
+    repo, jira_url, jira_project, start, stop,
+    cache_dir, offline, include_issues, fmt,
+) -> None:
+    """Daily completion counts — items completed each day in the
+    window. Schema: `flowmetrics.metric.throughput.v1`."""
+    from datetime import date, timedelta
+
+    from .throughput import daily_counts
+
+    start_d = _parse_date(start)
+    stop_d = _parse_date(stop)
+    src = _build_source(
+        repo=repo, jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline, include_issues=include_issues,
+    )
+    items = list(src.fetch_completed_in_window(start_d, stop_d))
+    completion_dates: list[date] = [
+        it.completed_at.date() for it in items if it.completed_at is not None
+    ]
+    samples = daily_counts(completion_dates, start_d, stop_d)
+    total = sum(samples)
+    days = (stop_d - start_d).days + 1
+    avg = total / days if days else 0.0
+
+    headline = (
+        f"{src.label} {start_d} → {stop_d}: "
+        f"{total} items completed across {days} days "
+        f"({avg:.2f}/day)."
+    )
+    payload = {
+        "schema": "flowmetrics.metric.throughput.v1",
+        "input": {
+            "repo": src.label,
+            "start": start_d.isoformat(),
+            "stop": stop_d.isoformat(),
+            "offline": offline,
+            "jira_url": jira_url,
+        },
+        "summary": {
+            "total_items": total,
+            "days": days,
+            "avg_per_day": round(avg, 4),
+        },
+        "daily_samples": samples,
+        "headline": headline,
+    }
+    _emit_metric(fmt, headline, payload)
+
+
+@metric.command("cumulative", short_help="Cumulative Flow Diagram — state counts over time")
+@_apply_source_options
+@click.option("--start", type=str, required=True, help="Window start (YYYY-MM-DD).")
+@click.option("--stop", type=str, required=True, help="Window stop (YYYY-MM-DD).")
+@click.option(
+    "--workflow", type=str, required=True,
+    help="Comma-separated workflow states, earliest → latest.",
+)
+@click.option(
+    "--interval-days", type=int, default=1, show_default=True,
+    help="Sample interval in days.",
+)
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR, show_default=True,
+)
+@click.option("--offline/--online", default=False)
+@click.option(
+    "--include-issues/--no-include-issues", default=False,
+    help="GitHub-only: also include Issues alongside PRs.",
+)
+@_METRIC_FORMAT_OPTION
+def metric_cumulative(
+    repo, jira_url, jira_project, start, stop, workflow, interval_days,
+    cache_dir, offline, include_issues, fmt,
+) -> None:
+    """Cumulative Flow Diagram data — cumulative state counts at
+    each sample. Schema: `flowmetrics.metric.cumulative.v1`."""
+    from datetime import timedelta
+
+    from .cfd import build_cfd
+    from .service import fetch_items_active_in_window
+
+    start_d = _parse_date(start)
+    stop_d = _parse_date(stop)
+    workflow_tuple = tuple(
+        s.strip() for s in workflow.split(",") if s.strip()
+    )
+    if not workflow_tuple:
+        raise click.UsageError("--workflow needs at least one state")
+
+    src = _build_source(
+        repo=repo, jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline, include_issues=include_issues,
+    )
+    items = fetch_items_active_in_window(src, start_d, stop_d)
+    points = build_cfd(
+        items, workflow=workflow_tuple,
+        start=start_d, stop=stop_d,
+        interval=timedelta(days=interval_days),
+    )
+
+    end = points[-1] if points else None
+    arrivals = end.counts_by_state.get(workflow_tuple[0], 0) if end else 0
+    departures = end.counts_by_state.get(workflow_tuple[-1], 0) if end else 0
+    end_wip = arrivals - departures
+    headline = (
+        f"{src.label} {start_d} → {stop_d}: "
+        f"{arrivals} arrivals, {departures} departures, "
+        f"end-of-window WIP {end_wip}."
+    )
+    payload = {
+        "schema": "flowmetrics.metric.cumulative.v1",
+        "input": {
+            "repo": src.label,
+            "start": start_d.isoformat(),
+            "stop": stop_d.isoformat(),
+            "workflow": list(workflow_tuple),
+            "interval_days": interval_days,
+            "offline": offline,
+            "jira_url": jira_url,
+        },
+        "summary": {
+            "arrivals_at_end": arrivals,
+            "departures_at_end": departures,
+            "end_of_window_wip": end_wip,
+            "samples": len(points),
+        },
+        "points": [
+            {
+                "sampled_on": p.sampled_on.isoformat(),
+                "counts_by_state": dict(p.counts_by_state),
+            }
+            for p in points
+        ],
+        "headline": headline,
+    }
+    _emit_metric(fmt, headline, payload)
+
+
+@metric.command("aging", short_help="In-flight items × state × age")
+@_apply_source_options
+@click.option(
+    "--asof", type=str, default=None,
+    help="As-of date (YYYY-MM-DD). Defaults to today (UTC).",
+)
+@click.option(
+    "--workflow", type=str, default=None,
+    help=(
+        "Comma-separated workflow states, earliest → latest. "
+        "Required unless --wip-labels is supplied."
+    ),
+)
+@click.option(
+    "--wip-labels", "wip_labels_raw", type=str, default=None,
+    help="GitHub-only: PR-label-driven WIP, ordered (rightmost = most progress).",
+)
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR, show_default=True,
+)
+@click.option("--offline/--online", default=False)
+@click.option(
+    "--include-issues/--no-include-issues", default=False,
+    help="GitHub-only: also include open Issues alongside open PRs.",
+)
+@_METRIC_FORMAT_OPTION
+def metric_aging(
+    repo, jira_url, jira_project, asof, workflow, wip_labels_raw,
+    cache_dir, offline, include_issues, fmt,
+) -> None:
+    """In-flight items by current state × age, plus completed-item
+    cycle-time percentiles as reference thresholds.
+
+    Schema: `flowmetrics.metric.aging.v1`."""
+    from datetime import date
+
+    from .aging import compute_aging, cycle_time_percentiles
+    from .compute import compute_pr_flow
+    from .sources.github_labels import WipLabels
+
+    asof_d = _parse_date(asof) if asof else date.today()
+    try:
+        wip = WipLabels.parse(wip_labels_raw) if wip_labels_raw else None
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+
+    if workflow:
+        workflow_tuple = tuple(s.strip() for s in workflow.split(",") if s.strip())
+    elif wip is not None:
+        workflow_tuple = wip.ordered
+    else:
+        raise click.UsageError(
+            "Pass --workflow (review-cycle / Jira) or --wip-labels "
+            "(GitHub label mode)."
+        )
+
+    src = _build_source(
+        repo=repo, jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline,
+        wip_labels=wip, include_issues=include_issues,
+    )
+
+    in_flight = list(src.fetch_in_flight(asof_d))
+    aging_items = compute_aging(in_flight, asof=asof_d)
+
+    # Cycle-time percentiles from the prior 30-day window — the same
+    # reference window the Aging chart uses on the web UI.
+    from datetime import timedelta as _td
+    hist_end = asof_d - _td(days=1)
+    hist_start = hist_end - _td(days=DEFAULT_TRAINING_DAYS - 1)
+    completed = list(src.fetch_for_percentile_training(hist_start, hist_end))
+    flows = [
+        compute_pr_flow(it, gap=DEFAULT_GAP, min_cluster=DEFAULT_MIN_CLUSTER)
+        for it in completed
+        if it.completed_at is not None
+    ]
+    pct = cycle_time_percentiles(flows)
+
+    count = len(aging_items)
+    oldest = max((it.age_days for it in aging_items), default=0)
+    headline = (
+        f"{src.label} as of {asof_d}: {count} in-flight "
+        f"items; oldest {oldest}d "
+        f"(P85={pct.get(85, 0):.1f}d from {len(flows)} completed)."
+    )
+    payload = {
+        "schema": "flowmetrics.metric.aging.v1",
+        "input": {
+            "repo": src.label,
+            "asof": asof_d.isoformat(),
+            "workflow": list(workflow_tuple),
+            "from_wip_labels": wip is not None,
+            "offline": offline,
+            "jira_url": jira_url,
+        },
+        "summary": {
+            "in_flight_count": count,
+            "oldest_age_days": oldest,
+            "completed_count_for_percentiles": len(flows),
+        },
+        "cycle_time_percentiles_days": {str(p): v for p, v in pct.items()},
+        "items": [
+            {
+                "item_id": it.item_id,
+                "title": it.title,
+                "current_state": it.current_state,
+                "age_days": it.age_days,
+                "url": it.url,
+            }
+            for it in aging_items
+        ],
+        "headline": headline,
+    }
+    _emit_metric(fmt, headline, payload)
+
+
+@metric.command("cycle-time", short_help="Per-item cycle times + P50/P85/P95")
+@_apply_source_options
+@click.option("--start", type=str, default=None, help="Window start (YYYY-MM-DD).")
+@click.option("--stop", type=str, default=None, help="Window stop (YYYY-MM-DD).")
+@click.option(
+    "--cache-dir", type=click.Path(path_type=Path),
+    default=DEFAULT_CACHE_DIR, show_default=True,
+)
+@click.option("--offline/--online", default=False)
+@click.option(
+    "--include-issues/--no-include-issues", default=False,
+    help="GitHub-only: also include Issues closed in the window.",
+)
+@_METRIC_FORMAT_OPTION
+def metric_cycle_time(
+    repo, jira_url, jira_project, start, stop,
+    cache_dir, offline, include_issues, fmt,
+) -> None:
+    """Per-item cycle times + percentile thresholds. Replaces the
+    old `flow scatterplot` command — same numbers, no chart.
+
+    Schema: `flowmetrics.metric.cycle_time.v1`."""
+    from .charts.primitives import chart_percentiles
+    from .service import default_history_end, default_history_start
+
+    stop_d = _parse_date(stop) if stop else default_history_end()
+    start_d = _parse_date(start) if start else default_history_start(stop_d)
+    if start_d > stop_d:
+        raise click.UsageError(
+            f"--start ({start_d}) must be on or before --stop ({stop_d})"
+        )
+
+    src = _build_source(
+        repo=repo, jira_url=jira_url, jira_project=jira_project,
+        cache_dir=cache_dir, offline=offline, include_issues=include_issues,
+    )
+    items = list(src.fetch_for_percentile_training(start_d, stop_d))
+
+    rows: list[dict] = []
+    cycle_days: list[float] = []
+    for it in items:
+        if it.completed_at is None:
+            continue
+        cycle = (it.completed_at - it.created_at).total_seconds() / 86400
+        cycle_days.append(cycle)
+        rows.append({
+            "item_id": it.item_id,
+            "title": it.title,
+            "completed_at": it.completed_at.date().isoformat(),
+            "cycle_time_days": round(cycle, 4),
+            "url": it.url,
+        })
+
+    pct = (
+        chart_percentiles(cycle_days)
+        if cycle_days else {50: 0.0, 70: 0.0, 85: 0.0, 95: 0.0}
+    )
+    headline = (
+        f"{src.label} {start_d} → {stop_d}: "
+        f"{len(rows)} completed items; "
+        f"P50={pct.get(50, 0):.1f}d, "
+        f"P85={pct.get(85, 0):.1f}d, "
+        f"P95={pct.get(95, 0):.1f}d."
+    )
+    payload = {
+        "schema": "flowmetrics.metric.cycle_time.v1",
+        "input": {
+            "repo": src.label,
+            "start": start_d.isoformat(),
+            "stop": stop_d.isoformat(),
+            "offline": offline,
+            "jira_url": jira_url,
+        },
+        "summary": {"completed_count": len(rows)},
+        "percentiles_days": {str(p): round(v, 4) for p, v in pct.items()},
+        "items": rows,
+        "headline": headline,
+    }
+    _emit_metric(fmt, headline, payload)
 
 
 # ---------------------------------------------------------------------------

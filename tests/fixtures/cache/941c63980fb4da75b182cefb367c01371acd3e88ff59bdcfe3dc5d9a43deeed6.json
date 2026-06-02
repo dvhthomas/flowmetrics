@@ -1,0 +1,819 @@
+{
+  "data": {
+    "rateLimit": {
+      "cost": 1,
+      "limit": 5000,
+      "remaining": 4989,
+      "resetAt": "2026-06-02T04:36:50Z"
+    },
+    "search": {
+      "issueCount": 180,
+      "nodes": [
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-21T14:17:00Z",
+          "mergedAt": "2026-04-21T14:47:44Z",
+          "number": 19094,
+          "title": "Add test for `exclude-newer-package` with missing `timestamp` in the lockfile"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-21T13:43:04Z",
+          "mergedAt": "2026-04-21T14:29:47Z",
+          "number": 19093,
+          "title": "Fix `UV_NO_PROJECT` added-in metadata"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-04-21T13:03:58Z",
+          "mergedAt": "2026-04-21T18:03:06Z",
+          "number": 19092,
+          "title": "Add `--python-downloads-json-url` to `python pin`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-20T21:12:56Z",
+          "mergedAt": "2026-04-21T17:43:23Z",
+          "number": 19088,
+          "title": "Ensure uv invocations of git do not inherit repository location environment variables"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "Gankra"
+          },
+          "createdAt": "2026-04-20T20:31:54Z",
+          "mergedAt": "2026-04-21T17:12:36Z",
+          "number": 19087,
+          "title": "Support `uv lock` on a `pyproject.toml` that only contains dependency-groups"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-20T20:06:32Z",
+          "mergedAt": "2026-04-20T20:17:10Z",
+          "number": 19086,
+          "title": "Respect discovered hashes from lookahead build dependencies"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-20T18:54:21Z",
+          "mergedAt": "2026-04-20T18:58:36Z",
+          "number": 19083,
+          "title": "Remove duplicate hashbrown lockfile entry"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-20T16:30:23Z",
+          "mergedAt": "2026-04-20T16:39:45Z",
+          "number": 19082,
+          "title": "Support `pip uninstall -y`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "nooscraft"
+          },
+          "createdAt": "2026-04-20T08:26:11Z",
+          "mergedAt": "2026-04-20T19:50:34Z",
+          "number": 19076,
+          "title": "Run `LookaheadResolver` when resolving PEP 517 build requirements"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-20T01:47:34Z",
+          "mergedAt": "2026-04-20T10:30:20Z",
+          "number": 19073,
+          "title": "Move retry logic into its own file"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:57Z",
+          "mergedAt": "2026-04-29T14:23:24Z",
+          "number": 19072,
+          "title": "Update Vampire/setup-wsl action to v7"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:50Z",
+          "mergedAt": "2026-04-20T20:37:00Z",
+          "number": 19071,
+          "title": "Update taiki-e/install-action action to v2.75.10"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:36Z",
+          "mergedAt": "2026-04-20T18:31:08Z",
+          "number": 19070,
+          "title": "Update Rust crate indexmap to v2.14.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:25Z",
+          "mergedAt": "2026-04-20T18:30:56Z",
+          "number": 19069,
+          "title": "Update Rust crate hashbrown to 0.17.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:15Z",
+          "mergedAt": "2026-04-22T03:24:33Z",
+          "number": 19068,
+          "title": "Update Rust crate fastrand to v2.4.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:22:02Z",
+          "mergedAt": "2026-04-21T17:44:00Z",
+          "number": 19067,
+          "title": "Update pypa/gh-action-pypi-publish action to v1.14.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:55Z",
+          "mergedAt": "2026-04-20T18:29:55Z",
+          "number": 19066,
+          "title": "Update PyO3/maturin-action action to v1.51.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:32Z",
+          "mergedAt": "2026-04-21T14:05:58Z",
+          "number": 19065,
+          "title": "Update MSRV to v1.93.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:25Z",
+          "mergedAt": "2026-04-20T18:29:26Z",
+          "number": 19064,
+          "title": "Update maturin to v1.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:21:05Z",
+          "mergedAt": "2026-04-20T18:29:47Z",
+          "number": 19062,
+          "title": "Update aws-actions/configure-aws-credentials action to v6.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:59Z",
+          "mergedAt": "2026-04-20T18:30:22Z",
+          "number": 19061,
+          "title": "Update astral-sh/setup-uv action to v8.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:51Z",
+          "mergedAt": "2026-04-20T18:30:35Z",
+          "number": 19060,
+          "title": "Update Rust crate tokio to v1.51.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:20:40Z",
+          "mergedAt": "2026-04-21T19:28:27Z",
+          "number": 19059,
+          "title": "Update Rust crate rustls to v0.23.38"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:44Z",
+          "mergedAt": "2026-04-20T18:35:32Z",
+          "number": 19058,
+          "title": "Update peter-evans/create-pull-request action to v8.1.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:38Z",
+          "mergedAt": "2026-04-20T18:32:28Z",
+          "number": 19057,
+          "title": "Update EmbarkStudios/cargo-deny-action action to v2.0.16"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:32Z",
+          "mergedAt": "2026-04-20T18:32:05Z",
+          "number": 19056,
+          "title": "Update dependency astral-sh/uv to v0.11.7"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:24Z",
+          "mergedAt": "2026-04-20T18:32:39Z",
+          "number": 19055,
+          "title": "Update CodSpeedHQ/action action to v4.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:19:18Z",
+          "mergedAt": "2026-04-20T18:32:33Z",
+          "number": 19054,
+          "title": "Update actions/upload-artifact action to v7.0.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-20T01:18:25Z",
+          "mergedAt": "2026-04-21T14:05:43Z",
+          "number": 19053,
+          "title": "Update acj/freebsd-firecracker-action action to v0.9.1"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-19T19:52:36Z",
+          "mergedAt": "2026-04-19T23:19:53Z",
+          "number": 19052,
+          "title": "Add an environment variable for `UV_NO_PROJECT`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T21:02:11Z",
+          "mergedAt": "2026-04-17T21:25:53Z",
+          "number": 19040,
+          "title": "Only update `test-system.yml` dependencies monthly"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T20:46:28Z",
+          "mergedAt": "2026-04-17T21:01:30Z",
+          "number": 19039,
+          "title": "Refactor `update_availability_range` to use iterator and collect"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-17T19:33:19Z",
+          "mergedAt": "2026-04-20T18:48:22Z",
+          "number": 19038,
+          "title": "Cache positive OSV hits"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T18:24:39Z",
+          "mergedAt": "2026-04-20T18:50:13Z",
+          "number": 19035,
+          "title": "Add `UV_PYTHON_NO_REGISTRY`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T17:22:40Z",
+          "mergedAt": "2026-04-20T19:13:41Z",
+          "number": 19034,
+          "title": "Expose `UV_PYTHON_SEARCH_PATH` for Python discovery `PATH` overrides"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T14:05:12Z",
+          "mergedAt": "2026-04-20T19:03:38Z",
+          "number": 19032,
+          "title": "Use an Ubuntu snapshot for apt installs in CI for reproducibility"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-17T13:00:19Z",
+          "mergedAt": "2026-04-17T13:10:43Z",
+          "number": 19031,
+          "title": "Add a lock equality assertion for `uv lock --check` with a relative exclude newer"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "eifinger"
+          },
+          "createdAt": "2026-04-17T06:58:39Z",
+          "mergedAt": "2026-04-17T13:55:46Z",
+          "number": 19030,
+          "title": "Bump astral-sh/setup-uv version in docs"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-17T03:44:14Z",
+          "mergedAt": "2026-04-20T16:36:19Z",
+          "number": 19029,
+          "title": "Update Rust crate webpki to v0.103.12"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T14:56:10Z",
+          "mergedAt": "2026-04-21T14:49:25Z",
+          "number": 19024,
+          "title": "Allow `exclude-newer` to be missing from the lockfile when `exclude-newer-span` is present"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T14:20:15Z",
+          "mergedAt": "2026-04-20T14:36:40Z",
+          "number": 19022,
+          "title": "Use a no-op timestamp for `exclude-newer` in lockfiles when a relative value is configured"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-16T13:24:00Z",
+          "mergedAt": "2026-04-16T14:05:06Z",
+          "number": 19021,
+          "title": "Add test case for lock when `exclude-newer` is missing but `exclude-newer-span` is present"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T21:49:21Z",
+          "mergedAt": "2026-04-17T16:42:01Z",
+          "number": 19019,
+          "title": "Only show the version number in `uv self version --short`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T21:23:28Z",
+          "mergedAt": "2026-04-15T21:47:00Z",
+          "number": 19018,
+          "title": "Silence warnings on empty `SSL_CERT_DIR` directory"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T20:53:17Z",
+          "mergedAt": "2026-04-15T21:03:37Z",
+          "number": 19017,
+          "title": "Bump version to 0.11.7"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T20:23:31Z",
+          "mergedAt": "2026-04-15T20:52:54Z",
+          "number": 19016,
+          "title": "Pin prettier in `scripts/generate-crate-readmes.py` to avoid prompts"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-15T16:27:43Z",
+          "mergedAt": "2026-04-17T15:24:49Z",
+          "number": 19012,
+          "title": "Fix Python variant tagging in the Windows registry"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-15T14:16:31Z",
+          "mergedAt": "2026-04-15T21:47:25Z",
+          "number": 19010,
+          "title": "Skip Pyodide pre-release builds during version sync"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-14T17:53:00Z",
+          "mergedAt": "2026-04-14T18:20:28Z",
+          "number": 19004,
+          "title": "Upgrade CPython build to 20260414"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "oconnor663"
+          },
+          "createdAt": "2026-04-13T22:23:54Z",
+          "mergedAt": "2026-04-14T00:24:29Z",
+          "number": 18997,
+          "title": "replace the RAYON_INITIALIZE `LazyLock` with a local `Once`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "EliteTK"
+          },
+          "createdAt": "2026-04-13T18:21:26Z",
+          "mergedAt": "2026-04-14T13:29:24Z",
+          "number": 18994,
+          "title": "Allow some modification of global preview state"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:09:16Z",
+          "mergedAt": "2026-04-18T22:21:24Z",
+          "number": 18991,
+          "title": "Update Rust crate similar to v3"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:09:07Z",
+          "mergedAt": "2026-04-13T13:09:48Z",
+          "number": 18990,
+          "title": "Update taiki-e/install-action action to v2.73.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:52Z",
+          "mergedAt": "2026-04-13T13:09:27Z",
+          "number": 18989,
+          "title": "Update Rust crate tokio to v1.51.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:43Z",
+          "mergedAt": "2026-04-13T07:26:04Z",
+          "number": 18988,
+          "title": "Update Rust crate hyper to v1.9.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:32Z",
+          "mergedAt": "2026-04-13T13:17:02Z",
+          "number": 18987,
+          "title": "Update docker/login-action action to v4.1.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:25Z",
+          "mergedAt": "2026-04-13T13:09:11Z",
+          "number": 18986,
+          "title": "Update crate-ci/typos action to v1.45.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:19Z",
+          "mergedAt": "2026-04-13T13:08:58Z",
+          "number": 18985,
+          "title": "Update CodSpeedHQ/action action to v4.13.0"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:13Z",
+          "mergedAt": "2026-04-13T13:08:48Z",
+          "number": 18984,
+          "title": "Update Rust crate insta to v1.47.2"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:08:04Z",
+          "mergedAt": "2026-04-13T13:08:40Z",
+          "number": 18983,
+          "title": "Update Rust crate indexmap to v2.13.1"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:07:13Z",
+          "mergedAt": "2026-04-13T07:27:14Z",
+          "number": 18982,
+          "title": "Update dependency astral-sh/uv to v0.11.6"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "renovate"
+          },
+          "createdAt": "2026-04-13T01:07:06Z",
+          "mergedAt": "2026-04-17T20:19:16Z",
+          "number": 18981,
+          "title": "Update cgr.dev/chainguard/python:latest-dev Docker digest to c2ac411"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T15:19:12Z",
+          "mergedAt": "2026-04-13T13:27:41Z",
+          "number": 18977,
+          "title": "Elevate configuration errors to `required-version` mismatches"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-12T13:02:02Z",
+          "mergedAt": "2026-04-12T13:18:52Z",
+          "number": 18976,
+          "title": "Emit JSON report for `uv sync --check` failures"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "woodruffw"
+          },
+          "createdAt": "2026-04-10T21:08:56Z",
+          "mergedAt": "2026-04-12T10:58:31Z",
+          "number": 18970,
+          "title": "Fix two bugs in `uv audit`"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-10T12:05:15Z",
+          "mergedAt": "2026-04-10T13:43:56Z",
+          "number": 18966,
+          "title": "De-quote `workspace metadata` linehaul data"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-10T01:53:02Z",
+          "mergedAt": "2026-04-10T02:03:48Z",
+          "number": 18961,
+          "title": "Fix stale Python upgrade preview feature check in project environment construction"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-10T01:48:18Z",
+          "mergedAt": "2026-04-13T12:16:55Z",
+          "number": 18960,
+          "title": "Fix equality comparisons for version specifiers with `~=` operators"
+        },
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "createdAt": "2026-04-10T00:41:42Z",
+          "mergedAt": "2026-04-16T04:28:48Z",
+          "number": 18958,
+          "title": "Sync latest Python releases"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-09T20:47:27Z",
+          "mergedAt": "2026-04-17T18:41:53Z",
+          "number": 18956,
+          "title": "Review for `--index <name>` support"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-09T16:45:03Z",
+          "mergedAt": "2026-04-15T16:39:32Z",
+          "number": 18952,
+          "title": "Improve `--exclude-newer` hints "
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-09T09:20:57Z",
+          "mergedAt": "2026-04-13T09:12:07Z",
+          "number": 18945,
+          "title": "Stronger Windows path normalization"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-04-07T02:28:51Z",
+          "mergedAt": "2026-04-14T14:01:32Z",
+          "number": 18891,
+          "title": "Avoid installing tool workspace member dependencies as editable"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-04-02T14:03:57Z",
+          "mergedAt": "2026-04-27T23:11:11Z",
+          "number": 18821,
+          "title": "Catch missing uv build backend compatible version bumps"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-04-01T21:09:32Z",
+          "mergedAt": "2026-04-23T10:48:55Z",
+          "number": 18811,
+          "title": "Pin the platform during reproducible trampoline builds"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "charliermarsh"
+          },
+          "createdAt": "2026-03-24T23:30:17Z",
+          "mergedAt": "2026-04-29T15:43:50Z",
+          "number": 18705,
+          "title": "Mark `--native-tls` and `UV_NATIVE_TLS` as deprecated"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-24T17:42:40Z",
+          "mergedAt": "2026-04-29T16:05:04Z",
+          "number": 18700,
+          "title": "Discover versioned Python executables when `requires-python` pins a version"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zsol"
+          },
+          "createdAt": "2026-03-23T19:29:03Z",
+          "mergedAt": "2026-04-17T17:40:30Z",
+          "number": 18682,
+          "title": "Fetch uv from Astral mirror during self-update"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "zanieb"
+          },
+          "createdAt": "2026-03-05T19:05:59Z",
+          "mergedAt": "2026-04-30T14:06:38Z",
+          "number": 18323,
+          "title": "Fix file locks on Android"
+        },
+        {
+          "author": {
+            "__typename": "User",
+            "login": "konstin"
+          },
+          "createdAt": "2026-02-24T13:39:43Z",
+          "mergedAt": "2026-04-27T20:42:06Z",
+          "number": 18182,
+          "title": "Trim trailing whitespace in help output"
+        }
+      ],
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjE4MA==",
+        "hasNextPage": false
+      }
+    }
+  }
+}
