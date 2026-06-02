@@ -19,13 +19,13 @@ from ...charts.cfd import (
     daily_flow_metrics,
     infer_stage_order,
 )
-from ...workflow import WorkflowStates
 from ...warehouse.queries import (
     first_stage_entries,
     observed_stages,
     pairwise_stage_precedence,
 )
 from ...windows import Window
+from ...workflow import WorkflowStates
 from ._vega import to_vega
 
 # Categorical palette derived from the brand hue: nine pastels evenly
@@ -44,7 +44,7 @@ def _palette_for_stages(stage_count: int) -> list[str]:
         return []
     if stage_count == 1:
         return ["__theme:cfd-terminal__"]
-    return _CFD_BAND_TOKENS[: stage_count - 1] + ["__theme:cfd-terminal__"]
+    return [*_CFD_BAND_TOKENS[: stage_count - 1], "__theme:cfd-terminal__"]
 
 
 def render(

@@ -68,8 +68,8 @@ def _materialize_aging_demo(
     reference lines are drawn from.
     """
     from flowmetrics.compute import WorkItem
-    from flowmetrics.workflow import Workflow
     from flowmetrics.materialize import materialize
+    from flowmetrics.workflow import Workflow
 
     name = "aging-demo"
     (contracts_dir / f"{name}.yaml").write_text(

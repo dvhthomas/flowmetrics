@@ -17,6 +17,7 @@ are never clobbered by a re-imported YAML (the API row wins).
 
 from __future__ import annotations
 
+import contextlib
 import shutil
 import sqlite3
 from dataclasses import dataclass
@@ -74,13 +75,11 @@ def _migrate_legacy_table(con: sqlite3.Connection) -> None:
         # Rename the index to follow the table; older DBs might not
         # have one (IF NOT EXISTS in the schema) — the subsequent
         # CREATE INDEX in _SCHEMA will create one with the new name.
-        try:
+        with contextlib.suppress(sqlite3.OperationalError):
             con.execute(
                 "ALTER INDEX contracts_archived_at_idx "
                 "RENAME TO workflows_archived_at_idx"
             )
-        except sqlite3.OperationalError:
-            pass
 
 
 class WorkflowsDBError(Exception):

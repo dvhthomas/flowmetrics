@@ -31,13 +31,13 @@ from pathlib import Path
 
 import duckdb
 
-from .workflow import Workflow
 from .matching import remap_transitions
 from .service import make_github_source, make_jira_source
 from .sources.intervals import (
     github_workitem_to_transitions,
     jira_workitem_to_transitions,
 )
+from .workflow import Workflow
 
 # A `.tmp` file from a Parquet/status write is short-lived — it
 # exists only for the few seconds of the `COPY`, then is renamed

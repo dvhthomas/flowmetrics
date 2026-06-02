@@ -11,8 +11,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-from flowmetrics.workflow import Workflow
 from flowmetrics.materialize import DEFAULT_FETCH_WINDOW_DAYS, _resolve_window
+from flowmetrics.workflow import Workflow
 
 
 def _c(**kw) -> Workflow:

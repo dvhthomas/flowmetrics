@@ -12,8 +12,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from flowmetrics.canonical import StageTransition
-from flowmetrics.workflow import Step
 from flowmetrics.matching import UNMATCHED_STAGE, remap_transitions
+from flowmetrics.workflow import Step
 
 
 def _t(stage: str, signal: str, item: str = "github:o/r:pr:1") -> StageTransition:

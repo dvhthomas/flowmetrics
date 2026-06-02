@@ -19,9 +19,9 @@ from datetime import date, datetime
 import duckdb
 
 from flowmetrics.charts.aging import build_aging_model
-from flowmetrics.workflow import WorkflowStates
 from flowmetrics.warehouse.queries import CompletedItem, InFlightItem
 from flowmetrics.web.components.aging import render, to_vega
+from flowmetrics.workflow import WorkflowStates
 
 ASOF = date(2026, 6, 1)
 

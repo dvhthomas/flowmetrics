@@ -51,8 +51,8 @@ def _materialize_wide(
     windows visibly diverge.
     """
     from flowmetrics.compute import WorkItem
-    from flowmetrics.workflow import Workflow
     from flowmetrics.materialize import materialize
+    from flowmetrics.workflow import Workflow
 
     name = "wide-demo"
     (contracts_dir / f"{name}.yaml").write_text(

@@ -20,8 +20,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flowmetrics.compute import WorkItem
-from flowmetrics.workflow import Workflow
 from flowmetrics.materialize import materialize
+from flowmetrics.workflow import Workflow
 
 
 def _make_item(item_id, *, created_at, completed_at):

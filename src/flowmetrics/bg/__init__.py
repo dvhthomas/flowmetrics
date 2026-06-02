@@ -167,7 +167,7 @@ def stop_materialize_schedule() -> None:
 __all__ = [
     "BgError",
     "install_and_start",
-    "stop_and_uninstall",
     "install_materialize_schedule",
+    "stop_and_uninstall",
     "stop_materialize_schedule",
 ]
