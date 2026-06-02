@@ -184,7 +184,7 @@ def _resolve_workflow(
     if not path.exists():
         raise click.UsageError(f"YAML file {path} does not exist.")
     try:
-        return parse_workflow_text(path.read_text(), path.stem)
+        return parse_workflow_text(path.read_text(encoding="utf-8"), path.stem)
     except WorkflowError as exc:
         raise click.UsageError(f"failed to parse {path}: {exc}") from exc
 

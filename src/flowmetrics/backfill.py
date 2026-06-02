@@ -42,7 +42,7 @@ def read_status(path: Path) -> dict | None:
     """Read the JSON status file, or None when it is absent or
     unreadable (a torn read is treated as "no status yet")."""
     try:
-        return json.loads(Path(path).read_text())
+        return json.loads(Path(path).read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return None
 

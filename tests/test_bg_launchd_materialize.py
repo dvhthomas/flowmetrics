@@ -18,7 +18,19 @@ from __future__ import annotations
 
 import plistlib
 import subprocess
+import sys
 from pathlib import Path
+
+import pytest
+
+# launchd is macOS-only. See `test_bg_launchd.py` for the same
+# rationale: the render path stringifies Path objects, which use
+# backslashes on Windows, breaking the cross-platform string-equality
+# assertions here. Skip the whole module on Windows.
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="launchd is macOS-only; render path is unreachable on Windows.",
+)
 
 
 def _capture_subprocess(monkeypatch):

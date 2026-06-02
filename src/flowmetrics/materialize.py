@@ -132,6 +132,10 @@ def _compact_one(
     )
     con = duckdb.connect()
     try:
+        # Pin TZ=UTC so reads of tz-aware values from older snapshots
+        # (or future TIMESTAMPTZ columns) don't shift by the host's
+        # offset on the way through compaction. [[feedback_flowmetrics_anchor_is_authoritative]]
+        con.execute("SET TimeZone='UTC'")
         # No hive_partitioning: read the pure data columns so the
         # compacted file's schema matches a normal snapshot —
         # year/month/day stay path-only, never baked in as columns.
@@ -457,6 +461,12 @@ def _write_work_items_parquet(
     tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
     con = duckdb.connect()
     try:
+        # Pin TZ=UTC so tz-aware datetimes flowing into the TIMESTAMP
+        # columns are normalised to UTC wall-time before the offset is
+        # dropped — without this, the same source data writes
+        # different bytes on a Mac (host TZ) than on a UTC CI runner.
+        # [[feedback_flowmetrics_anchor_is_authoritative]]
+        con.execute("SET TimeZone='UTC'")
         con.execute(_WORK_ITEMS_DDL)
         if rows:
             con.executemany(
@@ -506,6 +516,8 @@ def _write_transitions_parquet(
     tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
     con = duckdb.connect()
     try:
+        # See `_write_work_items_parquet` for why we pin TZ=UTC.
+        con.execute("SET TimeZone='UTC'")
         con.execute(_TRANSITIONS_DDL)
         if rows:
             con.executemany(

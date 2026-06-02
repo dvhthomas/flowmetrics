@@ -203,8 +203,12 @@ def write_backup(
     """
     payload = _enumerate_payload(data_dir, include_cache)
     config_bytes = _collect_config_payload(contracts_dir)
+    # tar standard mandates `/` separators; Path's `str()` returns
+    # `\` on Windows, which produced a header/arcname mismatch where
+    # `tar.getmember()` couldn't locate files the header claimed
+    # existed. `as_posix()` pins the on-tape layout cross-platform.
     files: dict[str, str] = {
-        str(p.relative_to(data_dir)): _sha256(p) for p in payload
+        p.relative_to(data_dir).as_posix(): _sha256(p) for p in payload
     }
     for relpath, raw in config_bytes.items():
         files[relpath] = hashlib.sha256(raw).hexdigest()
@@ -225,7 +229,7 @@ def write_backup(
         info.size = len(header_bytes)
         tar.addfile(info, io.BytesIO(header_bytes))
         for p in payload:
-            tar.add(p, arcname=str(p.relative_to(data_dir)))
+            tar.add(p, arcname=p.relative_to(data_dir).as_posix())
         for relpath, raw in config_bytes.items():
             info = tarfile.TarInfo(name=relpath)
             info.size = len(raw)

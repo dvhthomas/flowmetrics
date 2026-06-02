@@ -276,7 +276,9 @@ class TestNoBrowserLocalTimeFormatters:
         )
         offenders: list[tuple[str, int, str]] = []
         for path in templates_dir.glob("*_chart*.jinja"):
-            for lineno, line in enumerate(path.read_text().splitlines(), 1):
+            for lineno, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1,
+            ):
                 # Skip Jinja comments and `//`-style JS comments —
                 # documentary references like `// --p-500` are fine.
                 code, _, _ = line.partition("//")

@@ -14,8 +14,11 @@
 # ---- Stage 1: builder. Install uv + sync deps into /opt/venv. ----
 FROM python:3.13-slim AS builder
 
-# Pinned uv version keeps the build deterministic.
-ENV UV_VERSION=0.5.11
+# Pinned uv version keeps the build deterministic. Must match (or
+# exceed) the version that wrote `uv.lock` — older uv chokes on
+# newer lockfile schema (e.g. editable packages without a version
+# field). Bump in lockstep when the local toolchain advances.
+ENV UV_VERSION=0.8.22
 RUN pip install --no-cache-dir "uv==${UV_VERSION}"
 
 WORKDIR /build

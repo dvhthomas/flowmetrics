@@ -142,7 +142,7 @@ def load_stream_from_json(path: Path) -> Stream:
     (`workflows` key) — those need an explicit per-item workflow
     map and a richer loader.
     """
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     if "workflows" in data:
         raise ValueError(
             "fixture has multiple workflows; the single-workflow loader cannot "

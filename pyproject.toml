@@ -73,6 +73,10 @@ build-backend = "hatchling.build"
 # so `uv tool list` and `flow --version` show the exact build a user
 # is running.
 source = "vcs"
+# Builds without `.git` (the Docker image stage, or any
+# sdist-from-tarball context) get a deterministic dev marker
+# instead of crashing the build with a setuptools-scm lookup error.
+raw-options = { fallback_version = "0.0.0.dev0+unknown" }
 
 [tool.hatch.build.hooks.vcs]
 # Drop the resolved version into a generated _version.py so the

@@ -132,14 +132,16 @@ class TestWorkItemsTableShape:
     def test_completed_on_filter_narrows_to_one_calendar_date(self, warehouse):
         """The throughput chart's click-handler will pass a single
         UTC date here to filter the table to items that completed on
-        that exact date. The fixture's May 04 has 19 completions —
-        passing completed_on='2026-05-04' must return exactly those."""
+        that exact date. The fixture's May 04 has 13 UTC completions
+        — passing completed_on='2026-05-04' must return exactly
+        those. (The number is the UTC-anchored count, not the
+        host-local one; see [[feedback_flowmetrics_anchor_is_authoritative]].)"""
         data = render(
             warehouse, "astral-uv-week", completed_on="2026-05-04"
         )
-        assert data.count == 19, (
-            f"completed_on='2026-05-04' should return the 19 items "
-            f"completed on May 4; got {data.count}"
+        assert data.count == 13, (
+            f"completed_on='2026-05-04' should return the 13 items "
+            f"completed on May 4 (UTC); got {data.count}"
         )
         for r in data.rows:
             assert r.completed_at == "2026-05-04", (
@@ -167,14 +169,14 @@ class TestWorkItemsTableShape:
         from datetime import date
 
         from flowmetrics.windows import Window
-        # Fixture completions span May 4-10, 2026. A window of
-        # just May 4 should match the 19 May-4 completions.
+        # Fixture completions span May 4-10, 2026 (UTC). A window of
+        # just May 4 (UTC) should match the 13 UTC-May-4 completions.
         data = render(
             warehouse, "astral-uv-week",
             view=Window(from_=date(2026, 5, 4), to=date(2026, 5, 4)),
         )
-        assert data.count == 19, (
-            f"view window May 4-4 should match the 19 May-4 "
+        assert data.count == 13, (
+            f"view window May 4-4 should match the 13 UTC-May-4 "
             f"completions; got {data.count}"
         )
         # A window entirely outside the data → empty table.
