@@ -27,9 +27,9 @@ Every contract takes these keys:
 
 ## See also
 
-- [Tutorial](../docs/TUTORIAL.md) — install → materialize → serve in
+- [Tutorial](../docs/tutorial.md) — install → materialize → serve in
   one linear walkthrough.
-- [How-to guides](../docs/HOWTO.md) — scheduling, backup, persistent
+- [How-to guides](../docs/howto/) — scheduling, backup, persistent
   server, Docker.
-- [Reference](../docs/REFERENCE.md) — every CLI flag and the full
+- [Reference](../docs/reference.md) — every CLI flag and the full
   workflow YAML schema.

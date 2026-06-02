@@ -1,9 +1,17 @@
+---
+title: Monte Carlo forecasting
+---
+
 # Monte Carlo forecasting
 
-This document explains both forecast scenarios this tool implements, exactly
-how each one is computed from GitHub data, the assumptions baked in, and
-how to read the output. The framing follows *When Will It Be Done?*
-(Vacanti) for both scenarios.
+> **Diátaxis: Explanation.** What the forecast numbers mean, exactly
+> how each is computed, the assumptions baked in, and how to read
+> the output. Not a how-to — for the commands themselves, see
+> [Extract metrics for agents](../howto/extract-metrics-for-agents.md)
+> or [Reference § flow forecast](../reference.md#flow-forecast).
+
+The framing follows *When Will It Be Done?* (Vacanti) for both
+scenarios.
 
 ## 1. The two questions
 
@@ -11,22 +19,22 @@ There are two questions a delivery team typically asks. They use the same
 historical data and the same simulator; they differ in what is held fixed
 and what is forecast, and in how percentiles are read.
 
-| Scenario          | You hold fixed... | You forecast... | Axis units    | Percentiles read |
-| ----------------- | ----------------- | --------------- | ------------- | ---------------- |
-| **When-done**     | N items | a completion date | dates       | forward          |
-| **How-many**      | a target date     | items completed | items         | backward         |
+| Scenario                  | CLI                          | You hold fixed... | You forecast... | Axis units | Percentiles read |
+| ------------------------- | ---------------------------- | ----------------- | --------------- | ---------- | ---------------- |
+| **When will N be done?**  | `flow forecast date`         | N items           | a completion date | dates    | forward          |
+| **How many by date D?**   | `flow forecast throughput`   | a target date     | items completed  | items    | backward         |
 
 If you remember nothing else: **dates use forward percentiles, items use
 backward percentiles**. The next two sections explain why.
 
 ## 2. The simulator
 
-Both scenarios use the same engine. The empirical training data is a list
-of historical daily throughput samples — one count per day in the training
-window, including zero-merge days. The simulator draws from this list with
-replacement.
+Both subcommands use the same engine. The empirical training data is
+a list of historical daily throughput samples — one count per day in
+the training window, including zero-completion days. The simulator
+draws from this list with replacement.
 
-### 2.1 When-done
+### 2.1 `flow forecast date`
 
 > "We have 50 items to deliver. When will it be done?"
 
@@ -49,7 +57,7 @@ a Results Histogram with **dates on the x-axis and frequency on the y-axis**.
 Convergence rule of thumb: 1,000 runs gives the shape, 10,000 runs
 stabilises it. The default is 10,000.
 
-### 2.2 How-many
+### 2.2 `flow forecast throughput`
 
 > "We need delivery by 2026-05-25. How many items can we promise?"
 
@@ -82,7 +90,7 @@ throughput; the tail represents draws of consecutive bad days.
 The whole reason both scenarios coexist is that the practical meaning of
 "confidence" runs in opposite directions on the two axes.
 
-### 4.1 When-done: forward
+### 4.1 `flow forecast date`: forward percentiles
 
 "85% confidence we will be done by date X" means: 85% of simulations
 finished on or before X. As confidence rises, X moves **later**.
@@ -94,7 +102,7 @@ finished on or before X. As confidence rises, X moves **later**.
 Why this direction: pushing the date later is more conservative because
 more simulation runs have completed by a later date.
 
-### 4.2 How-many: backward
+### 4.2 `flow forecast throughput`: backward percentiles
 
 "85% confidence we will deliver at least N items" means: 85% of simulations
 delivered N or more items. As confidence rises, N moves **lower**.
@@ -110,20 +118,23 @@ This is the trickiest part of the framework and the single most
 common mistake when reading the output. The CLI prints both directions
 clearly so there is no ambiguity:
 
-- when-done output says **"by what date will all items be done?"**
-- how-many output says **"minimum items we can commit to"**.
+- `flow forecast date` output says **"by what date will all items be done?"**
+- `flow forecast throughput` output says **"minimum items we can commit to"**.
 
-## 5. Where the GitHub data feeds in
+## 5. Where the source data feeds in
 
-The training samples are real PR-merge counts from GitHub. Specifically:
+The training samples are real completion counts from the source. For
+GitHub, that's merged PRs per day; for Jira, resolved issues per day.
+Specifically:
 
 1. Pick a training window. By default this is the **30 calendar days
-   ending today** — the standard rolling-window recommendation.
-2. Search GitHub for PRs in that repo merged in the window
-   (`repo:X is:pr is:merged merged:START..END`).
-3. Group by merge date in UTC.
-4. Produce one integer per day in the window: the count of merges that
-   day. **Zero-merge days are included.**
+   ending yesterday-UTC** — the standard rolling-window recommendation.
+2. Query the source for items completed in that window
+   (GitHub: `repo:X is:pr is:merged merged:START..END`; Jira: the
+   project's resolved-in-window issues).
+3. Group by completion date in UTC.
+4. Produce one integer per day in the window: the count of completions
+   that day. **Zero-completion days are included.**
 
 The samples list is what the simulator draws from. A 30-day training
 window produces a 30-element list of integers (one per day). The
@@ -131,18 +142,18 @@ distribution of those integers — including all the zero days — is treated
 as the empirical distribution of "what one day looks like" for this team
 in this regime.
 
-### 5.1 Why zero-merge days are included
+### 5.1 Why zero-completion days are included
 
 They are real observations. Excluding them would systematically overstate
 throughput (you would only ever draw "good days"). If 3 of 30 days had no
-merges, that 10% chance of a zero-merge day appears in the simulator and
-shows up correctly in the tail of the forecast distribution.
+completions, that 10% chance of a zero-completion day appears in the
+simulator and shows up correctly in the tail of the forecast distribution.
 
-### 5.2 What we are using as a proxy for "throughput"
+### 5.2 What we use as a proxy for "throughput"
 
-We are using **merged PRs per day** as the throughput unit. The implicit
-assumption is that one merged PR = one delivered "item of work". For most
-teams that is good enough for forecasting. Cases where it breaks down:
+For GitHub: **merged PRs per day**. The implicit assumption is that one
+merged PR = one delivered "item of work". For most teams that is good
+enough for forecasting. Cases where it breaks down:
 
 - You batch many tiny changes into single merge commits (overstates work
   per item).
@@ -151,7 +162,10 @@ teams that is good enough for forecasting. Cases where it breaks down:
 - Your team's PR granularity has changed during the training window (the
   past does not represent the present).
 
-The metric is most useful when PR size is roughly stable across the
+For Jira: **resolved issues per day** — same shape, same caveats with
+"issue" substituted for "PR".
+
+The metric is most useful when item size is roughly stable across the
 training window and the forecast window.
 
 ## 6. Assumptions, in plain language
@@ -189,12 +203,15 @@ equal probability. That ignores:
   throughput to a Tuesday, which is wrong in detail. For 1-4 week
   forecasts the effect is usually small.
 
-### 6.3 PR merges are a complete record of completed work
+### 6.3 Source completions are a complete record of completed work
 
-Closed-without-merge PRs are not counted as completed. Direct pushes to
-the main branch (rare in most teams, common in some) are invisible.
-Squashed-merge PRs count as one item regardless of how many commits they
-contain.
+For GitHub: closed-without-merge PRs are not counted as completed. Direct
+pushes to the main branch (rare in most teams, common in some) are
+invisible. Squashed-merge PRs count as one item regardless of how many
+commits they contain.
+
+For Jira: only resolved issues count; reopens, abandoned issues, and
+issues moved between projects are not.
 
 ### 6.4 30 days is "enough but not too much"
 
@@ -217,26 +234,26 @@ The window is 30 calendar days. Weekends and holidays are real low-
 throughput days; including them is more honest than pretending only
 weekdays exist.
 
-### 6.6 GitHub timestamps are accurate to the day
+### 6.6 Source timestamps are accurate to the day
 
-We bucket by the date portion of `mergedAt`. We do not adjust for time
-zones. A PR merged at 23:55 UTC and one merged at 00:05 UTC are placed in
-different days. For most teams this is acceptable noise; if your team is
-entirely in one time zone, the bucketing should ideally be that zone, not
-UTC. This tool currently does not support time-zone offsets — open an
-issue if you need it.
+We bucket by the date portion of the completion timestamp. We do not
+adjust for time zones. A PR merged at 23:55 UTC and one merged at 00:05
+UTC are placed in different days. For most teams this is acceptable
+noise; if your team is entirely in one time zone, the bucketing should
+ideally be that zone, not UTC. This tool currently does not support time-
+zone offsets — open an issue if you need it.
 
-### 6.7 Search returns at most ~1000 results
+### 6.7 GitHub search returns at most ~1000 results
 
 The GitHub search API caps results at 1,000. A 30-day window with >1,000
 merges (very busy repos) will silently truncate, **under-counting
-throughput and inflating zero-merge days**. If you suspect this matters,
-narrow the window or paginate explicitly. For most teams this never
-binds.
+throughput and inflating zero-completion days**. See
+[Decisions § 4](decisions.md#4-github-search-caps-results-at-1000) for
+the workaround. For most teams this never binds.
 
 ## 7. How to read the output
 
-### 7.1 When-done
+### 7.1 `flow forecast date`
 
 ```
 Confidence — by what date will all items be done?
@@ -256,7 +273,7 @@ How to use it:
 - **95%** is for high-stakes commitments. The remaining 5% is the tail
   risk; it is not zero.
 
-### 7.2 How-many
+### 7.2 `flow forecast throughput`
 
 ```
 Confidence — minimum items we can commit to by the target date:
@@ -287,11 +304,11 @@ committing to the median; you will miss it about half the time.
 | --------------------- | ------- | ------------------------------------------------------ |
 | `--history-start`     | 29 days before `--history-end` | First day of training window         |
 | `--history-end`       | yesterday-UTC | End of training window (today's data is partial) |
-| `--start-date`        | today   | First day of forecast work                             |
+| `--start-date`        | today   | First day of forecast work (`flow forecast date` only) |
 | `--runs`              | 10000   | Monte Carlo runs (1k for shape, 10k stabilises)        |
 | `--seed`              | random  | Optional RNG seed for reproducibility                  |
-| `--cache-dir`         | .cache/github | Where GraphQL responses are cached            |
-| `--offline / --online`| online  | Offline reads cache only; online hits GitHub on miss   |
+| `--cache-dir`         | .cache/github | Where source API responses are cached         |
+| `--offline / --online`| online  | Offline reads cache only; online hits source on miss   |
 
 ### 8.1 Reproducibility
 
@@ -302,10 +319,11 @@ but non-zero.
 
 ### 8.2 The cache makes reruns free
 
-The training-window GraphQL response is cached by query+variables hash.
-Rerunning the same `--history-start --history-end` against the same repo
-makes zero requests — the data is already on disk. You can iterate on
-`--items`, `--target-date`, `--runs`, and `--seed` essentially for free.
+The training-window source response is cached by query+variables hash.
+Rerunning the same `--history-start --history-end` against the same
+workflow makes zero requests — the data is already on disk. You can
+iterate on `--items`, `--target-date`, `--runs`, and `--seed`
+essentially for free. See [Decisions § 5](decisions.md#5-the-cache-is-unconditional-and-never-expires).
 
 ## 9. What this is not
 
@@ -317,20 +335,21 @@ makes zero requests — the data is already on disk. You can iterate on
   starting point for the conversation.
 - **Not an estimate of effort.** Throughput-based forecasting deliberately
   ignores "how hard each item is". It assumes the next 50 items will, on
-  average, look like the last few weeks of merged work. If item size is
-  changing dramatically (e.g. you are about to start a large architectural
-  rewrite), the forecast will be too optimistic.
-- **Not for per-engineer use.** Same warning as the flowmetrics
-  metric: a system-level forecast does not say anything about any single
-  contributor's velocity. Using it that way is harmful.
+  average, look like the last few weeks of completed work. If item size
+  is changing dramatically (e.g. you are about to start a large
+  architectural rewrite), the forecast will be too optimistic.
+- **Not for per-engineer use.** A system-level forecast does not say
+  anything about any single contributor's velocity. Using it that way is
+  harmful.
 
-## 10. Example workflows
+## 10. Example invocations
 
 ### 10.1 "When can I commit to this 50-item commitment?"
 
-```
-uv run flow forecast date \
-    --repo astral-sh/uv --items 50
+```bash
+flow forecast date \
+    --workflow-name astral-uv \
+    --items 50
 ```
 
 Reads the last 30 calendar days of merges, runs 10,000 Monte Carlo
@@ -339,20 +358,23 @@ ASCII histogram.
 
 ### 10.2 "How many can we commit to by quarter-end?"
 
-```
-uv run flow forecast throughput \
-    --repo astral-sh/uv --target-date 2026-06-30
+```bash
+flow forecast throughput \
+    --workflow-name astral-uv \
+    --target-date 2026-06-30
 ```
 
-Same training window, same simulator, but the histogram is items-on-x and
-percentiles read backward. Print the 50/70/85/95 minimum-items
+Same training window, same simulator, but the histogram is items-on-x
+and percentiles read backward. Prints the 50/70/85/95 minimum-items
 commitments.
 
 ### 10.3 "What about a shorter history because we just reorganised?"
 
-```
-uv run flow forecast date \
-    --repo astral-sh/uv --items 50 --history-start 2026-04-28
+```bash
+flow forecast date \
+    --workflow-name astral-uv \
+    --items 50 \
+    --history-start 2026-04-28
     # ↑ a closer start date narrows the training window
 ```
 
@@ -361,12 +383,18 @@ regime.
 
 ### 10.4 "Compare two scenarios reproducibly"
 
-```
-uv run flow forecast date \
-    --repo astral-sh/uv --items 50 --seed 42
-uv run flow forecast date \
-    --repo astral-sh/uv --items 75 --seed 42
+```bash
+flow forecast date --workflow-name astral-uv --items 50 --seed 42
+flow forecast date --workflow-name astral-uv --items 75 --seed 42
 ```
 
 Same seed; the only difference in the output is the effect of changing
 the item count. The simulator is deterministic given a seed.
+
+### 10.5 Ad-hoc against an un-stored YAML
+
+```bash
+flow forecast date \
+    --workflow-yaml ./my-demo-workflow.yaml \
+    --items 50
+```

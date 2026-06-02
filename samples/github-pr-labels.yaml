@@ -7,7 +7,7 @@
 # board). State is materialized from LabeledEvent / UnlabeledEvent
 # timestamps in the PR's timeline.
 #
-# See docs/SPEC-github-labels.md for the full resolution rules.
+# See docs/explain/github-labels.md for the full resolution rules.
 
 workflow:
   name: backend-team-week

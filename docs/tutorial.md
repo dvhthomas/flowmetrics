@@ -1,11 +1,15 @@
+---
+title: Tutorial
+---
+
 # Tutorial — your first dashboard in 5 minutes
 
-This walks you from a clean machine to a working dashboard, all
-through the browser. One linear path, copy-paste-able.
+> **Diátaxis: Tutorial.** Learning-oriented. One linear, hands-on path
+> from a clean machine to a working dashboard. Copy-paste each step.
 
 For task-specific recipes (scheduling, backup, persistent server,
-Docker, scripting YAML by hand) see [HOWTO.md](HOWTO.md). For full
-CLI + file-layout detail see [REFERENCE.md](REFERENCE.md).
+Docker, scripting YAML by hand) see [How-to guides](howto/). For
+full CLI + file-layout detail see [Reference](reference.md).
 
 ## 1. Install `uv`
 
@@ -58,13 +62,13 @@ flow serve
 ```
 
 That's it — `flow` creates the `contracts/` and `data/` directories
-on demand. On macOS, swap `flow serve` for `flow serve --bg` to
-install it as a persistent LaunchAgent that survives logout and
-reboot ([details](HOWTO.md#run-as-a-persistent-web-server)).
+on demand. On macOS or Linux, swap `flow serve` for `flow serve --bg`
+to install it as a persistent native service that survives logout
+and reboot ([details](howto/run-as-persistent-server.md)).
 
 ## 5. Add a workflow in the browser
 
-Open http://127.0.0.1:8000. The home page shows **No workflows yet**
+Open <http://127.0.0.1:8000>. The home page shows **No workflows yet**
 and a **+ New workflow** button. Click it.
 
 The wizard walks you through:
@@ -112,13 +116,15 @@ page.
 ## Next steps
 
 - **Schedule periodic fetches** so the warehouse stays fresh →
-  [HOWTO § Schedule data fetches](HOWTO.md#schedule-data-fetches).
+  [Schedule data fetches](howto/schedule-fetches.md).
 - **Run the dashboard as a persistent service** (login-independent
   on macOS, systemd on Linux) →
-  [HOWTO § Run as a persistent web server](HOWTO.md#run-as-a-persistent-web-server).
+  [Run as a persistent web server](howto/run-as-persistent-server.md).
 - **Back up + restore** your warehouse and config →
-  [HOWTO § Back up](HOWTO.md#back-up--restore).
+  [Back up and restore](howto/backup-and-restore.md).
 - **Metric extraction for agents** (`flow metric throughput / cumulative
-  / aging / cycle-time`, `flow forecast`) → [HOWTO § Extract metrics for agents](HOWTO.md#extract-metrics-for-agents).
+  / aging / cycle-time`, `flow forecast`) →
+  [Extract metrics for agents](howto/extract-metrics-for-agents.md).
 - **Define workflows from YAML** (scripted / committable, instead of
-  the wizard) → [HOWTO § Write a workflow YAML by hand](HOWTO.md#write-a-workflow-yaml-by-hand).
+  the wizard) →
+  [Write a workflow YAML by hand](howto/write-workflow-yaml.md).

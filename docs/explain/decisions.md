@@ -1,15 +1,28 @@
+---
+title: Architectural decisions and known constraints
+---
+
 # Architectural decisions and known constraints
 
-This document records the deliberate trade-offs in how `flowmetrics`
-talks to GitHub. Each section names the constraint, the decision we
-made, the cost we accepted, and when the decision should be revisited.
+> **Diátaxis: Explanation.** Each section names a deliberate
+> trade-off in how `flowmetrics` talks to GitHub: the constraint,
+> the decision we made, the cost we accepted, and when the decision
+> should be revisited.
 
-## 1. One shared GraphQL query for both efficiency and forecast
+> **Note.** Some entries below refer to a `flow efficiency` command
+> that has since been removed (the active/wait heuristic wasn't a
+> strong-enough signal). The rationale is kept here because the same
+> query, cache, and pagination machinery now serves `flow metric *`
+> and `flow forecast` — the trade-offs are unchanged; only the
+> command name moved.
+
+## 1. One shared GraphQL query for metric extraction and forecast
 
 **What we do.** A single query (`PR_SEARCH_QUERY` in
-`src/flowmetrics/github.py`) drives both `flow efficiency` and
-`flow forecast`. The query fetches PR metadata *and* the first 100
-timeline events per PR inline, in a single round trip per page.
+`src/flowmetrics/github.py`) drives both the metric-extraction path
+(`flow metric *`) and `flow forecast`. The query fetches PR metadata
+*and* the first 100 timeline events per PR inline, in a single round
+trip per page.
 
 **What it costs.** The forecast path only reads `mergedAt`. The 100
 timeline events per PR are fetched and discarded — about a 99%
@@ -37,13 +50,13 @@ following becomes true:
   GraphQL points limit.
 - You start running uncached against many repos in a short window
   (e.g. a fleet dashboard).
-- Forecast becomes the dominant use case and efficiency is rarely
-  invoked.
+- Forecast becomes the dominant use case and metric extraction is
+  rarely invoked.
 
 The change would be ~50 lines: a second query constant + a second
 fetcher that returns only `(number, mergedAt)`. The forecast service
-function would call the slim fetcher; efficiency would keep the full
-one.
+function would call the slim fetcher; metric extraction would keep
+the full one.
 
 ## 2. Page size is 100 — GitHub's max
 
@@ -73,20 +86,17 @@ for cache-sharing tools. Neither is currently relevant.
 inner pagination.
 
 **What it costs.** PRs with more than 100 activity events have their
-tail dropped. Effect: active time is slightly under-counted, flow
-efficiency is slightly under-stated.
+tail dropped. For the label-driven CFD / Aging path, this can drop
+late label changes; the chart caption surfaces the per-PR truncation
+count so the reader can see when it happens.
 
 **Why we accepted it.** The vast majority of merged PRs in a typical
-weekly window have fewer than 100 events. The PRs that exceed it are
-usually long-running with massive review threads — their cycle time
-is already enormous and the flow efficiency is already near zero;
-truncating the tail moves it from "near zero" to "still near zero"
-without changing the conclusion. Forecast doesn't read timelines at
-all, so this is invisible to that path.
+weekly window have fewer than 100 events. Forecast doesn't read
+timelines at all, so this is invisible to that path.
 
 **When to revisit.** If you find specific PRs whose under-counted
-active time materially changes the system-level number, add an inner
-pagination loop in `fetch_prs_merged_in_window` keyed off
+label history materially changes the chart, add an inner pagination
+loop in `fetch_prs_merged_in_window` keyed off
 `timelineItems.pageInfo.hasNextPage`. Expect a meaningful complexity
 bump.
 
@@ -97,7 +107,7 @@ ourselves.
 
 **What it costs.** A window with more than 1,000 merged PRs has its
 tail silently dropped. Throughput averages will be under-counted,
-flow-efficiency numbers will exclude the dropped PRs entirely.
+metric-extraction numbers will exclude the dropped PRs entirely.
 
 **Why we accepted it.** For 30-day windows on most repos, including
 `astral-sh/uv` at ~6 merges/day, this is far from binding. The cap is
@@ -227,37 +237,27 @@ interchangeable; either covers some teams' reality and not others'.
   in the review queue; not useful for tracking development phases that
   happen *before* a PR is opened.
 
-- **GitHub PRs (CFD)**: also two-state degenerate (arrivals/departures
-  only) when we lack synthetic per-phase transitions. We don't backfill
-  the four-state lifecycle into CFD because we'd be inventing
-  transition timestamps we don't have — `reviewDecision` is a snapshot,
-  not a history. Aging only needs the *current* snapshot, which is why
-  it works here.
+- **GitHub PRs (label-driven CFD + Aging)**: opt-in via the YAML's
+  `wip_labels` field. The caller names which labels constitute WIP;
+  the materializer in `src/flowmetrics/github_labels.py` walks
+  `LabeledEvent` / `UnlabeledEvent` timeline events into
+  `status_intervals` consumed by the same CFD/Aging code as Jira.
+  Design notes: [GitHub label-driven CFD and Aging](github-labels.md).
 
 - **GitHub issues + labels**: not supported. That's [gh-velocity]'s
   domain — they handle the per-repo label-to-state configuration
   honestly (it must be configured, because conventions vary). We point
-  users there from the in-line `flow metric aging` help.
-
-  **Update 2026-05-14:** PR-label-driven Aging *is* now supported via
-  `flow metric aging --wip-labels "a,b,c"` (GitHub only). The caller names
-  which labels constitute WIP per invocation; the materializer in
-  `src/flowmetrics/github_labels.py` walks `LabeledEvent` /
-  `UnlabeledEvent` timeline events into `status_intervals`. CFD on
-  GitHub PRs is still degenerate — that's the next milestone. Issues
-  remain out of scope (see §10 below). Design notes:
-  [docs/SPEC-github-labels.md](SPEC-github-labels.md).
+  users there from the `flow metric aging --help`.
 
 **What we accept.**
 
-1. GitHub Aging surfaces review-cycle phase only. Teams that track
-   real development phases via labels need a tool that knows their
-   label conventions (gh-velocity, or a future `GitHubIssuesSource`
-   here).
-2. GitHub CFD remains degenerate for now. The fix is to materialize
-   `isDraft` / `reviewDecision` transitions from PR timeline events
-   (`ReadyForReviewEvent`, `ConvertToDraftEvent`, `PullRequestReview`)
-   — doable but not done.
+1. GitHub Aging surfaces review-cycle phase only, unless `wip_labels`
+   is configured. Teams that track real development phases via labels
+   should set `wip_labels`; teams without label conventions get the
+   review-cycle view.
+2. CFD on GitHub PRs is degenerate (arrivals + departures only) absent
+   `wip_labels`. With `wip_labels` it gains one band per named label.
+3. GitHub issues remain out of scope (see §10 below).
 
 **When to revisit.**
 
@@ -266,8 +266,6 @@ interchangeable; either covers some teams' reality and not others'.
   mapping per repo (config file or repeated `--label-state` flags).
   It should sit alongside the Jira source as a peer, not replace
   anything.
-- If GitHub PR CFD becomes important, materialize review-phase
-  transitions from timeline events.
 
 [gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
 
@@ -279,7 +277,7 @@ interchangeable; either covers some teams' reality and not others'.
 *pull request* as the unit of work. Issues are never queried. If a team
 tracks WIP on issues (with or without labels), opens issues that don't
 result in a PR, or closes issues by hand, none of that flows into any
-report — efficiency, forecast, CFD, or Aging.
+report — forecast, CFD, or Aging.
 
 **What it means in practice.**
 
@@ -287,9 +285,9 @@ report — efficiency, forecast, CFD, or Aging.
 - A team that fixes bugs via direct pushes or settings changes has its
   output silently dropped.
 - The Aging chart, on GitHub, surfaces PR review state (Draft →
-  Awaiting Review → Changes Requested → Approved). It is *not* a view
-  of issue progress. A PR sitting at Approved is one stalled review;
-  the underlying issue may or may not be moving.
+  Awaiting Review → Changes Requested → Approved) or — with
+  `wip_labels` — PR label progression. It is *not* a view of issue
+  progress.
 - "Items" in the forecast vocabulary means "PRs" for GitHub sources
   and "issues" for Jira sources. The unit is consistent within a
   report but the noun changes by backend.
@@ -297,12 +295,12 @@ report — efficiency, forecast, CFD, or Aging.
 **Why we accept it.**
 
 PRs have unambiguous start (`createdAt`) and end (`mergedAt`)
-timestamps via the GraphQL API, plus a rich timeline of events for
-active/wait clustering. Issues, by contrast, have no native concept of
-"started" — that signal lives in per-team conventions (labels, project
-boards, milestones, custom fields). Trying to be right across teams
-means making per-team decisions configurable, which is exactly what
-[gh-velocity] is for. We deliberately do not duplicate that.
+timestamps via the GraphQL API, plus a rich timeline of events. Issues,
+by contrast, have no native concept of "started" — that signal lives
+in per-team conventions (labels, project boards, milestones, custom
+fields). Trying to be right across teams means making per-team
+decisions configurable, which is exactly what [gh-velocity] is for. We
+deliberately do not duplicate that.
 
 **When to revisit.**
 
@@ -311,12 +309,6 @@ remediation is a new `GitHubIssuesSource` with explicit per-repo
 label-to-state mapping passed in config. It would sit alongside the
 existing PR source as a separate source, not replace it. The two
 answer different questions; both should be available.
-
-**Update 2026-05-14:** The label-mode work landed for PRs only —
-`flow metric aging --wip-labels` against `--repo OWNER/NAME`. Issues are
-still untouched; a future `GitHubIssuesSource` would re-use the same
-materializer in `src/flowmetrics/github_labels.py`. Design notes:
-[docs/SPEC-github-labels.md](SPEC-github-labels.md).
 
 [gh-velocity]: https://gh-velocity.org/guides/cycle-time-setup/
 

@@ -58,7 +58,7 @@ with sync_playwright() as p:
         pg.screenshot(path=f"{out}/{prefix}-{metric}-detail.png", full_page=False,
                       clip={"x":0,"y":0,"width":1400,"height":900})
 
-    pg.goto(f"{base}/admin/contracts/new", timeout=15000)
+    pg.goto(f"{base}/admin/workflows/new", timeout=15000)
     pg.wait_for_selector("input[name='name']", timeout=5000); pg.wait_for_timeout(1000)
     pg.screenshot(path=f"{out}/contract-wizard.png", full_page=True)
 

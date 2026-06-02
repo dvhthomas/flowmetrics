@@ -1,4 +1,11 @@
+---
+title: Glossary
+---
+
 # Glossary
+
+> **Diátaxis: Reference.** Definitions of every domain term, plus
+> the terms we deliberately avoid and why.
 
 flowmetrics uses the kanban-flow vocabulary popularised by *Actionable
 Agile Metrics for Predictability* and *When Will It Be Done?* (Daniel
@@ -10,7 +17,7 @@ drift between the code, the docs, and the user.
 ### Items
 
 The unit of work the simulator counts. In this tool an item is one
-merged pull request (GitHub) or one resolved issue (Jira, future).
+merged pull request (GitHub) or one resolved issue (Jira).
 
 We use **items**, not **backlog**. "Backlog" is Scrum-loaded — it
 overloads the word for "the prioritized list of work-yet-to-be-done".
@@ -22,45 +29,29 @@ The string "backlog" appears nowhere in user-facing narrative copy
 ### Cycle time
 
 Wall-clock time from when work was committed to until it was done.
-For a PR: `merged_at - created_at`. See
-[`docs/METRICS.md`](METRICS.md.archive) for the GitHub-specific proxy and
-its limitations.
-
-### Active time
-
-The subset of cycle time during which someone was actually working
-on the item. Derived from event clustering on the activity timeline.
-
-### Wait time
-
-`cycle_time - active_time`. Never measured directly — it's whatever
-isn't active. Wait time is the actionable signal: large wait means a
-queue, which is where flow efficiency points you.
-
-### Flow efficiency
-
-`active_time / cycle_time`. Always reported in two flavours:
-
-- **Portfolio flow efficiency** = `Σ active / Σ cycle` across all
-  items in the window. The right number for system-level conversations.
-- **Per-item flow efficiency** = the ratio for one item. Directional;
-  not a precise measurement.
-
-We also report mean and median per-item ratios; both are inferior to
-portfolio efficiency and we say so in the output. Mean of ratios is
-particularly misleading when a long tail of fast PRs distorts it.
-
-**Concrete example.** Fifty trivial 5-minute version-bump PRs at 100%
-FE, plus one big 30-day refactor PR at 5% FE. Mean per-PR FE ≈ 98%.
-Portfolio FE ≈ 5%. The portfolio number reflects the system you're
-trying to improve — the one big PR is where the wait time actually
-lives. Optimizing for the 98% number rewards the people churning out
-small PRs and punishes the engineer working through the queue.
+For a PR: `merged_at - created_at`. Reported as a per-item series and
+summarised with empirical P50/P85/P95 percentiles by
+`flow metric cycle-time`.
 
 ### Throughput
 
 Count of items completed per unit time (we use days). The empirical
-input to Monte Carlo Simulation.
+input to Monte Carlo Simulation. Reported by `flow metric throughput`.
+
+### Aging
+
+For an in-flight item: `today − started_at`. Plotted by current
+workflow state against age. Percentile reference lines on the Aging
+chart are **empirical** percentiles drawn from completed-item cycle
+times, used as risk thresholds — they are not derived from Monte
+Carlo simulation. Reported by `flow metric aging`.
+
+### Cumulative Flow Diagram (CFD)
+
+Stacked-band chart of state counts over time. Band height = items in
+that state on that date; total stack height = items in the system;
+slope of the top = arrival rate; slope of the bottom = throughput
+(departures). Reported by `flow metric cumulative`.
 
 ### Training window
 
@@ -71,8 +62,8 @@ and `--history-end`.
 
 ### Forecast window
 
-The future window we're forecasting *into*. Used by `forecast
-how-many`. `--start-date` (default: today) → `--target-date`
+The future window we're forecasting *into*. Used by `flow forecast
+throughput`. `--start-date` (default: today) → `--target-date`
 (required).
 
 ### Monte Carlo Simulation (MCS)
@@ -84,22 +75,24 @@ of outcomes is the forecast. CLI: `--runs N`, default 10,000.
 ### Results Histogram
 
 The empirical distribution produced by Monte Carlo. X-axis = outcome
-(date for when-done, item count for how-many); Y-axis = simulation-run
-frequency.
+(date for `flow forecast date`, item count for `flow forecast
+throughput`); Y-axis = simulation-run frequency.
 
 ### Forward percentile
 
-For `when-done` (date-axis): "smallest date X such that P(complete by
-X) >= p%". Higher confidence ⇒ later date.
+For `flow forecast date` (date-axis): "smallest date X such that
+P(complete by X) >= p%". Higher confidence ⇒ later date.
 
 ### Backward percentile
 
-For `how-many` (items-axis): "largest item count N such that P(deliver
->= N) >= p%". Higher confidence ⇒ FEWER items.
+For `flow forecast throughput` (items-axis): "largest item count N
+such that P(deliver >= N) >= p%". Higher confidence ⇒ FEWER items.
 
 This is the trickiest part of the framework — *more confidence
-means commit to fewer items, not more*. The HTML and text renderers
-spell this out next to every how-many forecast.
+means commit to fewer items, not more*. The renderers spell this
+out next to every `flow forecast throughput` output. See
+[Monte Carlo forecasting](explain/forecasting.md) for the worked
+math.
 
 ## Terms we deliberately avoid
 
@@ -129,8 +122,7 @@ A scheduling unit, not a flow concept. We use absolute dates.
 
 ### PR (pull request)
 
-GitHub-specific. The unit our `efficiency` command measures and
-the unit `forecast` counts.
+GitHub-specific. The unit our GitHub source measures.
 
 ### Issue
 
@@ -141,25 +133,45 @@ math as a PR for GitHub).
 report.** For GitHub sources, the unit of work is the pull request,
 period. A team that tracks WIP on GitHub issues without opening
 corresponding PRs will have that work silently dropped. See
-`docs/DECISIONS.md` #10 for the full reasoning, and `gh-velocity.org`
-for a tool that does read GitHub issues with label-based workflows.
+[Decisions § 10](explain/decisions.md#10-for-github-only-pull-requests-count-as-work--issues-are-invisible)
+for the full reasoning.
 
 When a renderer string says "items" it means "PRs OR Jira issues" —
 the math is identical, but the noun differs by source.
+
+## Deprecated terms
+
+The following terms were associated with the now-removed
+`flow efficiency` command. They are kept here only to explain the
+content of archived design docs.
+
+### Active time
+
+The subset of cycle time during which someone was actually working
+on the item. Derived from event clustering on the activity timeline.
+
+### Wait time
+
+`cycle_time - active_time`. Never measured directly — whatever isn't
+active.
+
+### Flow efficiency
+
+`active_time / cycle_time`. The heuristic split between active and
+wait wasn't a strong enough signal to be useful; the `flow
+efficiency` command was removed.
 
 ## Configurable defaults
 
 | Term | Default | Source |
 |------|---------|--------|
-| Activity-cluster gap | 4 hours | `--gap-hours` |
-| Minimum credit per cluster | 30 minutes | `--min-cluster-minutes` |
 | Training window length | 30 calendar days | derived from `--history-start` / `--history-end` |
 | Training window end | Yesterday-UTC | `--history-end` |
 | Forecast runs | 10,000 | `--runs` |
+| Cycle-time window | last 30 days | `--start` / `--stop` on `flow metric cycle-time` |
 
 ## How this glossary stays accurate
 
 `tests/test_interpretation.py` asserts that "backlog" never appears in
-any user-facing narrative output. `tests/test_samples_helpers.py`
-asserts the CLI surface (the configured repos, the --items flag).
-Changing one of the avoided terms requires changing a test.
+any user-facing narrative output. Changing one of the avoided terms
+requires changing a test.

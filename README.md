@@ -18,13 +18,13 @@ for every workflow:
 
 **GitHub — `astral-sh/uv`** (PR review cycle)
 
-[![flowmetrics dashboard against the astral-sh/uv repo](docs/screenshots/github-dashboard.png)](docs/SCREENSHOTS.md)
+[![flowmetrics dashboard against the astral-sh/uv repo](docs/screenshots/github-dashboard.png)](docs/explain/screenshots.md)
 
 **Jira — Apache CASSANDRA** (richer multi-stage workflow)
 
-[![flowmetrics dashboard against Apache CASSANDRA](docs/screenshots/jira-dashboard.png)](docs/SCREENSHOTS.md)
+[![flowmetrics dashboard against Apache CASSANDRA](docs/screenshots/jira-dashboard.png)](docs/explain/screenshots.md)
 
-[**More screenshots →**](docs/SCREENSHOTS.md) — per-metric detail
+[**More screenshots →**](docs/explain/screenshots.md) — per-metric detail
 pages, the contract builder, and the data-source page.
 
 [**Example workflow YAMLs →**](samples/) — copy-paste starters for
@@ -46,7 +46,7 @@ uv tool install git+https://github.com/dvhthomas/flowmetrics
 flow --help
 ```
 
-Full walkthrough: **[Tutorial](docs/TUTORIAL.md)** — zero to dashboard
+Full walkthrough: **[Tutorial](docs/tutorial.md)** — zero to dashboard
 in five minutes.
 
 ## Two ways to use it
@@ -109,33 +109,35 @@ be misread. It's a learning artifact, not a product.
 
 Organised by [Diátaxis](https://diataxis.fr/): a tutorial to learn
 from, how-to guides for specific tasks, reference for canonical
-facts, plus background explainers.
+facts, plus background explainers. **[Doc index →](docs/)**
 
-**Get started**
+**Tutorial** — learn
 
-- **[Tutorial](docs/TUTORIAL.md)** — zero to dashboard in five
+- **[Tutorial](docs/tutorial.md)** — zero to dashboard in five
   minutes. Install, write a YAML, materialize, serve.
 
-**Task-specific guides**
+**How-to guides** — solve a specific task
 
-- **[How-to guides](docs/HOWTO.md)** — install on each OS, schedule
-  fetches, run as a persistent web server, back up + restore (data /
-  config / both), Docker, ad-hoc reports, JSON for agents,
-  troubleshooting.
+- **[How-to index](docs/howto/)** — install on each OS, schedule
+  fetches, run as a persistent web server, back up + restore, Docker,
+  metric extraction for agents, troubleshooting.
 
-**Reference**
+**Reference** — canonical facts
 
-- **[CLI + YAML + file layout](docs/REFERENCE.md)** — every command,
-  every flag, every file. Output envelope schemas.
-- **[Forecasting](docs/FORECAST.md)** — Monte Carlo `forecast date`
-  and `forecast throughput`, with worked examples.
-- **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms
+- **[CLI + YAML + file layout + output envelopes](docs/reference.md)**
+  — every command, every flag, every file, every schema.
+- **[Glossary](docs/glossary.md)** — terms and definitions; the terms
   we deliberately avoid (Scrum-contaminated "backlog" and "velocity").
 
-**Explanation**
+**Explanation** — understand the design
 
-- **[Decisions](docs/DECISIONS.md)** — architectural trade-offs and
-  known constraints (GitHub API caps, cache strategy, WIP-tracking
-  source scope).
-- **[Screenshots](docs/SCREENSHOTS.md)** — every page, both source
-  types (GitHub PRs + Atlassian Jira), captured against live data.
+- **[Monte Carlo forecasting](docs/explain/forecasting.md)** — the
+  math behind `flow forecast date` and `flow forecast throughput`.
+- **[Decisions](docs/explain/decisions.md)** — architectural
+  trade-offs and known constraints (GitHub API caps, cache strategy,
+  WIP-tracking source scope).
+- **[GitHub label-driven CFD and Aging](docs/explain/github-labels.md)**
+  — design rationale for the `wip_labels` mode.
+- **[Screenshots](docs/explain/screenshots.md)** — every page, both
+  source types (GitHub PRs + Atlassian Jira), captured against live
+  data.

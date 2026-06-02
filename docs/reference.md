@@ -1,9 +1,14 @@
+---
+title: Reference
+---
+
 # Reference
 
-Canonical facts: every CLI command, every flag, every file the
-warehouse touches, every output schema. No tutorial framing, no
-opinions — for those see [TUTORIAL.md](TUTORIAL.md) /
-[HOWTO.md](HOWTO.md).
+> **Diátaxis: Reference.** Fact-oriented. Every CLI command, every
+> flag, every file the warehouse touches, every output schema. No
+> tutorial framing, no opinions — for those see
+> [Tutorial](tutorial.md) / [How-to guides](howto/) /
+> [Explanation](explain/).
 
 - [CLI](#cli)
 - [Workflow YAML](#workflow-yaml)
@@ -81,6 +86,26 @@ per-workflow detail lives in the manifest.
 | `--offline / --online` | online |
 | `--manifest PATH` | `<data-dir>/_status/daily-<UTC-date>.json` |
 
+### `flow materialize --bg`
+
+Install / uninstall a scheduled materialize job. macOS only (Linux
+support uses the templated systemd timer for now).
+
+| Flag | Default | Notes |
+|----|----|----|
+| `--bg / --no-bg` | off | Install + activate a scheduled job. Requires `--at HH:MM`. |
+| `--at HH:MM` | — | Local time the job fires daily (24-hour). |
+| `--stop / --no-stop` | off | With `--bg`: uninstall the schedule. Without `--bg`: error. |
+
+The scheduled command captures whatever `NAME | --all`,
+`--workflows-dir`, and `--data-dir` you passed at install time;
+re-run `flow materialize --bg --at HH:MM …` to reschedule with
+different args (idempotent — reloads the plist). Writes a
+LaunchAgent at `~/Library/LaunchAgents/com.flowmetrics.materialize.plist`
+with `StartCalendarInterval` set to the chosen hour/minute; missed
+firings (Mac asleep) run on next wake. Logs at
+`<data-dir>/_status/materialize.{out,err}.log`.
+
 ### `flow backup`
 
 Snapshot the warehouse (and optionally the config DB) into a single
@@ -118,6 +143,7 @@ Read-only enumeration of configured workflows.
 | Flag | Default | Notes |
 |----|----|----|
 | `--workflows-dir PATH` | `contracts` | DB + YAML lookup root. |
+| `--data-dir PATH` | — | When given, adds a DATA column showing whether materialize has produced Parquet for each workflow. |
 | `--all / --no-all` | off | Include archived rows. |
 
 Output columns: `NAME`, `SOURCE` (`db` = wizard-managed in
@@ -160,7 +186,7 @@ Common flags (apply to `metric` + `forecast`):
 |----|----|
 | `--workflow-name NAME` | Stored workflow lookup. |
 | `--workflow-yaml PATH` | YAML file path (for ad-hoc queries). |
-| `--workflows-dir PATH` | Default `contracts`. Where --workflow-name looks. |
+| `--workflows-dir PATH` | Default `contracts`. Where `--workflow-name` looks. |
 | `--cache-dir PATH` | Default `.cache/github`. |
 | `--offline / --online` | Cache-only vs. hit-API-on-miss. |
 | `--format text\|json` | text=humans (default), json=agents. |
@@ -172,7 +198,9 @@ Forecast-only:
 | `--history-start / --history-end` | Training window (UTC). Defaults to a 30-day window ending yesterday. |
 | `--runs N` | Monte Carlo iterations. Default 10 000. |
 | `--seed N` | Reproducible RNG. |
-| `--start-date YYYY-MM-DD` | Forecast horizon start (when-done). |
+| `--start-date YYYY-MM-DD` | Forecast horizon start (`forecast date` only). |
+
+The math: [Monte Carlo forecasting](explain/forecasting.md).
 
 ## Workflow YAML
 
@@ -197,7 +225,10 @@ workflow:
   jira_project: KEY          # required when source: jira
 ```
 
-WIP rules:
+> **Legacy.** The top-level key was `contract:` in older versions and
+> still parses for back-compat. New YAMLs should use `workflow:`.
+
+### WIP rules
 
 - Default (GitHub PR review cycle): `Draft → Awaiting Review →
   Changes Requested → Approved`, derived from `isDraft` +
@@ -205,7 +236,8 @@ WIP rules:
 - `wip_labels`: anything carrying one of these labels is in flight.
   Order matters — leftmost = earliest stage, rightmost = most
   progress. First-match wins. See
-  [SPEC-github-labels.md](SPEC-github-labels.md) for resolution rules.
+  [GitHub label-driven CFD and Aging](explain/github-labels.md) for
+  the resolution rules.
 
 Worked starters: [`samples/`](../samples/).
 
@@ -244,6 +276,9 @@ WORKFLOWS_DIR/
 `workflows.db` is created/managed by `flow serve` (the in-browser
 contract editor); the YAMLs are the canonical text source. Both are
 included in a `flow backup --workflows-dir …` snapshot.
+
+> **Legacy filename.** Older installs may carry `contracts.db`. It is
+> auto-renamed to `workflows.db` on first open.
 
 ## Output envelopes
 
@@ -311,7 +346,8 @@ wrapper scripts:
 | `flow materialize --all` | ≥1 workflow succeeded | every workflow failed |
 | `flow backup` / `flow restore` | success | malformed archive, checksum mismatch, dirty target without `--force` |
 | `flow serve` | clean shutdown (SIGTERM/SIGINT) | bind failure, missing config |
-| Ad-hoc reports | success | source-API failure, invalid input |
+| `flow metric *` / `flow forecast *` | success | source-API failure, invalid input |
+| `flow workflows list` | success | bad `--workflows-dir` |
 
 For schedulers wired to alert on non-zero: `materialize --all` is
 intentionally lenient — read `_status/daily-<UTC-date>.json` for
@@ -319,9 +355,9 @@ per-workflow detail.
 
 ## See also
 
-- [TUTORIAL.md](TUTORIAL.md) — linear walkthrough from zero to dashboard.
-- [HOWTO.md](HOWTO.md) — task-specific recipes.
-- [METRICS.md (archived)](METRICS.md.archive) — what each chart computes.
-- [FORECAST.md](FORECAST.md) — Monte Carlo when-done and how-many.
-- [GLOSSARY.md](GLOSSARY.md) — terms; the terms we avoid.
-- [DECISIONS.md](DECISIONS.md) — architectural trade-offs.
+- [Tutorial](tutorial.md) — linear walkthrough from zero to dashboard.
+- [How-to guides](howto/) — task-specific recipes.
+- [Monte Carlo forecasting](explain/forecasting.md) — what the
+  forecast numbers mean.
+- [Glossary](glossary.md) — terms; the terms we avoid.
+- [Architectural decisions](explain/decisions.md) — trade-offs.

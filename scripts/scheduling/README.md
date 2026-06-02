@@ -45,8 +45,12 @@ contracts directory is the source of truth.
 
 ## See also
 
-- [docs/HOWTO.md](../../docs/HOWTO.md) — scheduling, backup, restore,
-  persistent server, Docker, troubleshooting.
-- [docs/REFERENCE.md](../../docs/REFERENCE.md) — every `flow` flag
+- [docs/howto/schedule-fetches.md](../../docs/howto/schedule-fetches.md)
+  — scheduler templates per OS.
+- [docs/howto/backup-and-restore.md](../../docs/howto/backup-and-restore.md)
+  — back up / restore + rotation.
+- [docs/howto/run-as-persistent-server.md](../../docs/howto/run-as-persistent-server.md)
+  — persistent dashboard.
+- [docs/reference.md](../../docs/reference.md) — every `flow` flag
   with defaults.
 - `flow materialize --all --help` — current flag list.

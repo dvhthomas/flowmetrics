@@ -5,21 +5,22 @@
 # samples/* (static HTML/JSON/text) is served as-is at /samples/.
 #
 # Internal markdown links to other .md files (e.g.
-# `[METRICS](METRICS.md)` inside `docs/GLOSSARY.md`) are rewritten by
-# `jekyll-relative-links` to their generated HTML URLs at build time —
-# so the same link works both on github.com and on the published site.
+# `[Forecasting](explain/forecasting.md)` inside `docs/reference.md`) are
+# rewritten by `jekyll-relative-links` to their generated HTML URLs at
+# build time — so the same link works both on github.com and on the
+# published site.
 
 title: flowmetrics
 description: >-
-  Kanban-flow metrics (cycle/active/wait time, flow efficiency) and
-  Monte Carlo forecasting from GitHub (PRs and Issues) and Atlassian Jira issue
+  Kanban-flow metrics (cycle time, throughput, CFD, Aging WIP) and
+  Monte Carlo forecasting from GitHub PRs and Atlassian Jira issue
   data. Demo-quality learning tool.
 
 # Project sites at user.github.io/<repo>/ need baseurl set so internal
 # absolute paths and theme assets resolve correctly.
 baseurl: "/flowmetrics"
 
-theme: jekyll-theme-cayman
+theme: jekyll-theme-primer
 
 plugins:
   - jekyll-readme-index        # README.md → site home (`/`)
