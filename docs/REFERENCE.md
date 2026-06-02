@@ -147,11 +147,12 @@ AND the stage order — the CLI doesn't accept those inline.
 ### `flow forecast`
 
 Monte Carlo forecasts. Same workflow-pointing pattern as `metric`.
+Subcommands name what the answer is.
 
-| Subcommand | Purpose | Required |
+| Subcommand | Answer | Required |
 |----|----|----|
-| `flow forecast when-done` | When will N items be done? | `--items` |
-| `flow forecast how-many` | How many items by a target date? | `--target-date` |
+| `flow forecast date` | A date — when will N items be done? | `--items` |
+| `flow forecast throughput` | An item count — how many items by a target date? | `--target-date` |
 
 Common flags (apply to `metric` + `forecast`):
 
@@ -255,8 +256,8 @@ versioned `schema` field. Schemas in current use:
 | `flowmetrics.metric.cumulative.v1` | `flow metric cumulative` |
 | `flowmetrics.metric.aging.v1` | `flow metric aging` |
 | `flowmetrics.metric.cycle_time.v1` | `flow metric cycle-time` |
-| `flowmetrics.forecast.when_done.v1` | `flow forecast when-done` |
-| `flowmetrics.forecast.how_many.v1` | `flow forecast how-many` |
+| `flowmetrics.forecast.when_done.v1` | `flow forecast date` |
+| `flowmetrics.forecast.how_many.v1` | `flow forecast throughput` |
 | `flowmetrics.materialize_all.v1` | `flow materialize --all` daily manifest |
 | `flowmetrics.backup.v1` | header inside a `flow backup` tarball |
 | `flowmetrics.error.v1` | any command on failure |

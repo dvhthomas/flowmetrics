@@ -119,6 +119,108 @@ def _apply_source_options(f):
     return f
 
 
+_WORKFLOW_OPTIONS = [
+    click.option(
+        "--workflow-name", "workflow_name", type=str, default=None,
+        help=(
+            "Look up the workflow in `<workflows-dir>/workflows.db` "
+            "(DB-first, YAML fallback in the same dir). The workflow's "
+            "source + stages drive the query."
+        ),
+    ),
+    click.option(
+        "--workflow-yaml", "workflow_yaml", type=click.Path(path_type=Path),
+        default=None,
+        help=(
+            "Path to a workflow YAML file. Use this for ad-hoc "
+            "queries against a workflow that isn't in the store."
+        ),
+    ),
+    click.option(
+        "--workflows-dir", "workflows_dir",
+        type=click.Path(path_type=Path),
+        default=Path("./contracts"), show_default=True,
+        help="Where --workflow-name looks up the store (DB + un-migrated YAMLs).",
+    ),
+]
+
+
+def _apply_workflow_options(f):
+    """Decorator: add --workflow-name / --workflow-yaml / --workflows-dir
+    to a subcommand. Used by every `flow metric ...` and
+    `flow forecast ...` — they all share the same 'point at a
+    workflow definition' shape."""
+    for decorator in reversed(_WORKFLOW_OPTIONS):
+        f = decorator(f)
+    return f
+
+
+def _resolve_workflow(
+    *,
+    workflow_name: str | None,
+    workflow_yaml: Path | None,
+    workflows_dir: Path,
+):
+    """Resolve the workflow definition via either
+    `--workflow-name NAME` (store) or `--workflow-yaml PATH` (file).
+    Exactly one MUST be set. Returns a `Workflow` Pydantic model.
+    """
+    if workflow_name and workflow_yaml:
+        raise click.UsageError(
+            "--workflow-name and --workflow-yaml are mutually exclusive."
+        )
+    if not workflow_name and not workflow_yaml:
+        raise click.UsageError(
+            "Pass --workflow-name NAME (stored workflow) or "
+            "--workflow-yaml PATH (YAML file). Run `flow workflows "
+            "list` to see what's in the store."
+        )
+
+    if workflow_name:
+        from .workflows_db import WorkflowStore
+        wf = WorkflowStore(workflows_dir).get(workflow_name)
+        if wf is None:
+            raise click.UsageError(
+                f"workflow {workflow_name!r} not found under "
+                f"{workflows_dir} (no DB row and no matching YAML). "
+                "Run `flow workflows list` to see what's configured."
+            )
+        return wf
+
+    from .workflow import WorkflowError, parse_workflow_text
+    path = Path(workflow_yaml)
+    if not path.exists():
+        raise click.UsageError(f"YAML file {path} does not exist.")
+    try:
+        return parse_workflow_text(path.read_text(), path.stem)
+    except WorkflowError as exc:
+        raise click.UsageError(f"failed to parse {path}: {exc}") from exc
+
+
+def _build_source_from_workflow(
+    wf, *, cache_dir: Path, offline: bool,
+    include_issues: bool = False, wip_labels=None,
+):
+    """Build a Source from a `Workflow` model. Centralised so each
+    subcommand body stays small."""
+    return _build_source(
+        repo=wf.repo if wf.source == "github" else None,
+        jira_url=wf.jira_url if wf.source == "jira" else None,
+        jira_project=wf.jira_project if wf.source == "jira" else None,
+        cache_dir=cache_dir, offline=offline,
+        include_issues=include_issues,
+        wip_labels=wip_labels,
+    )
+
+
+def _stages_from_workflow(wf) -> tuple[str, ...]:
+    """The ordered stage tuple — WIP-marked steps if any exist,
+    else every step in order. Used by aging + cumulative as the
+    band / column order."""
+    wip = tuple(s.name for s in wf.steps if s.wip)
+    return wip or tuple(s.name for s in wf.steps)
+
+
 def _build_source(
     *,
     repo: str | None,
@@ -252,9 +354,18 @@ def cli() -> None:
     """
 
 
-@cli.group(short_help="Monte Carlo forecasting (when-done / how-many)")
+@cli.group(short_help="Monte Carlo forecasting (date / throughput)")
 def forecast() -> None:
-    """Monte Carlo forecasting — when-done / how-many."""
+    """Monte Carlo forecasting.
+
+    `flow forecast date NAME --items N` — when will N items be done?
+    `flow forecast throughput NAME --target-date YYYY-MM-DD` — how many
+    items by a given date?
+
+    Both subcommands take the workflow's source from
+    `--workflow-name` (store lookup) or `--workflow-yaml` (direct
+    file path) — same shape as `flow metric ...`.
+    """
 
 
 _HISTORY_OPTIONS = [
@@ -311,34 +422,27 @@ def _resolve_history(
     )
 
 
-@forecast.command("when-done")
-@_apply_source_options
+@forecast.command("date", short_help="When will N items be done? (date forecast)")
+@_apply_workflow_options
 @click.option(
-    "--items",
-    "items",
-    type=int,
-    required=True,
+    "--items", "items", type=int, required=True,
     help=(
-        "Number of items to complete. We use 'items' rather than 'backlog' "
-        "because the latter is Scrum-loaded (used for the prioritized list)."
+        "Number of items to complete. We use 'items' rather than "
+        "'backlog' because the latter is Scrum-loaded."
     ),
 )
-@click.option("--start-date", type=str, default=None)
-@_apply_history_options
 @click.option(
-    "--include-issues/--no-include-issues",
-    default=False,
-    help="GitHub-only. Include Issues closed in the training window "
-    "(with stitched PR-merge cycle times where applicable).",
+    "--start-date", type=str, default=None,
+    help="Forecast horizon start (YYYY-MM-DD). Defaults to today.",
 )
+@_apply_history_options
 @_FORMAT_OPTION
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
-def forecast_when_done(
-
-    repo: str | None,
-    jira_url: str | None,
-    jira_project: str | None,
+def forecast_date(
+    workflow_name: str | None,
+    workflow_yaml: Path | None,
+    workflows_dir: Path,
     items: int,
     start_date: str | None,
     history_start: str | None,
@@ -347,29 +451,34 @@ def forecast_when_done(
     offline: bool,
     runs: int,
     seed: int | None,
-    include_issues: bool,
     fmt: str,
     output: Path | None,
     verbose: bool,
 ) -> None:
     """When will N items be done?
 
-    Date-axis forecast with forward percentiles. For agent use, pass
-    --format json (schema: flowmetrics.forecast.when_done.v1).
-    """
+    Date-axis forecast with forward percentiles. The workflow
+    (`--workflow-name` or `--workflow-yaml`) supplies the source.
 
-    src = _build_source(
-        repo=repo,
-        jira_url=jira_url, jira_project=jira_project,
-        cache_dir=cache_dir, offline=offline,
-        include_issues=include_issues,
+    For agent use, pass --format json (schema:
+    flowmetrics.forecast.when_done.v1).
+    """
+    wf = _resolve_workflow(
+        workflow_name=workflow_name, workflow_yaml=workflow_yaml,
+        workflows_dir=workflows_dir,
+    )
+    src = _build_source_from_workflow(
+        wf, cache_dir=cache_dir, offline=offline,
     )
 
     def build() -> WhenDoneReport:
-        samples, train_start, train_end = _resolve_history(src, history_start, history_end)
+        samples, train_start, train_end = _resolve_history(
+            src, history_start, history_end,
+        )
         if sum(samples) == 0:
             raise RuntimeError(
-                f"No completed items in training window {train_start}→{train_end}; cannot forecast."
+                f"No completed items in training window "
+                f"{train_start}→{train_end}; cannot forecast."
             )
         start = _parse_date(start_date) if start_date else date.today()
         rng = Random(seed) if seed is not None else Random()
@@ -384,7 +493,7 @@ def forecast_when_done(
             history_start=train_start,
             history_end=train_end,
             offline=offline,
-            jira_url=jira_url,
+            jira_url=wf.jira_url,
         )
         training = build_training_summary(samples, train_start, train_end)
         return WhenDoneReport(
@@ -399,25 +508,24 @@ def forecast_when_done(
     _dispatch(fmt, output, build, verbose=verbose)
 
 
-@forecast.command("how-many")
-@_apply_source_options
-@click.option("--target-date", type=str, required=True)
-@click.option("--start-date", type=str, default=None)
-@_apply_history_options
+@forecast.command("throughput", short_help="How many items by a target date? (throughput forecast)")
+@_apply_workflow_options
 @click.option(
-    "--include-issues/--no-include-issues",
-    default=False,
-    help="GitHub-only. Include Issues closed in the training window "
-    "(with stitched PR-merge cycle times where applicable).",
+    "--target-date", type=str, required=True,
+    help="Target date the forecast aims at (YYYY-MM-DD).",
 )
+@click.option(
+    "--start-date", type=str, default=None,
+    help="Forecast horizon start (YYYY-MM-DD). Defaults to today.",
+)
+@_apply_history_options
 @_FORMAT_OPTION
 @_OUTPUT_OPTION
 @_VERBOSE_OPTION
-def forecast_how_many(
-
-    repo: str | None,
-    jira_url: str | None,
-    jira_project: str | None,
+def forecast_throughput(
+    workflow_name: str | None,
+    workflow_yaml: Path | None,
+    workflows_dir: Path,
     target_date: str,
     start_date: str | None,
     history_start: str | None,
@@ -426,34 +534,41 @@ def forecast_how_many(
     offline: bool,
     runs: int,
     seed: int | None,
-    include_issues: bool,
     fmt: str,
     output: Path | None,
     verbose: bool,
 ) -> None:
     """How many items by a given date?
 
-    Items-axis forecast with backward percentiles. For agent use, pass
-    --format json (schema: flowmetrics.forecast.how_many.v1).
-    """
+    Items-axis forecast with backward percentiles. The workflow
+    (`--workflow-name` or `--workflow-yaml`) supplies the source.
 
-    src = _build_source(
-        repo=repo,
-        jira_url=jira_url, jira_project=jira_project,
-        cache_dir=cache_dir, offline=offline,
-        include_issues=include_issues,
+    For agent use, pass --format json (schema:
+    flowmetrics.forecast.how_many.v1).
+    """
+    wf = _resolve_workflow(
+        workflow_name=workflow_name, workflow_yaml=workflow_yaml,
+        workflows_dir=workflows_dir,
+    )
+    src = _build_source_from_workflow(
+        wf, cache_dir=cache_dir, offline=offline,
     )
 
     def build() -> HowManyReport:
-        samples, train_start, train_end = _resolve_history(src, history_start, history_end)
+        samples, train_start, train_end = _resolve_history(
+            src, history_start, history_end,
+        )
         if sum(samples) == 0:
             raise RuntimeError(
-                f"No completed items in training window {train_start}→{train_end}; cannot forecast."
+                f"No completed items in training window "
+                f"{train_start}→{train_end}; cannot forecast."
             )
         start = _parse_date(start_date) if start_date else date.today()
         end = _parse_date(target_date)
         rng = Random(seed) if seed is not None else Random()
-        results = monte_carlo_how_many(samples, start_date=start, end_date=end, runs=runs, rng=rng)
+        results = monte_carlo_how_many(
+            samples, start_date=start, end_date=end, runs=runs, rng=rng,
+        )
         hist: ResultsHistogram[int] = build_histogram(results)
         percentiles = {p: backward_percentile(hist, p) for p in (50, 70, 85, 95)}
 
@@ -464,7 +579,7 @@ def forecast_how_many(
             history_start=train_start,
             history_end=train_end,
             offline=offline,
-            jira_url=jira_url,
+            jira_url=wf.jira_url,
         )
         training = build_training_summary(samples, train_start, train_end)
         return HowManyReport(
@@ -520,121 +635,6 @@ def _emit_metric(fmt: str, headline: str, payload: dict) -> None:
         click.echo(json.dumps(payload, indent=2))
         return
     click.echo(headline)
-
-
-_WORKFLOW_OPTIONS = [
-    click.option(
-        "--workflow-name", "workflow_name", type=str, default=None,
-        help=(
-            "Look up the workflow in `<workflows-dir>/workflows.db` "
-            "(DB-first, YAML fallback in the same dir). The workflow's "
-            "source + stages drive the query."
-        ),
-    ),
-    click.option(
-        "--workflow-yaml", "workflow_yaml", type=click.Path(path_type=Path),
-        default=None,
-        help=(
-            "Path to a workflow YAML file. Use this for ad-hoc "
-            "queries against a workflow that isn't in the store."
-        ),
-    ),
-    click.option(
-        "--workflows-dir", "workflows_dir",
-        type=click.Path(path_type=Path),
-        default=Path("./contracts"), show_default=True,
-        help="Where --workflow-name looks up the store (DB + un-migrated YAMLs).",
-    ),
-]
-
-
-def _apply_workflow_options(f):
-    """Decorator: add the --workflow-name / --workflow-yaml / --workflows-dir trio to
-    a subcommand. Used by every `flow metric ...` and `flow forecast
-    ...` command — they all share the same 'point at a workflow
-    definition' shape."""
-    for decorator in reversed(_WORKFLOW_OPTIONS):
-        f = decorator(f)
-    return f
-
-
-def _resolve_workflow(
-    *,
-    workflow_name: str | None,
-    workflow_yaml: Path | None,
-    workflows_dir: Path,
-):
-    """Resolve the workflow definition the user pointed at, via
-    either `--workflow-name NAME` (store lookup) or `--workflow-yaml PATH` (direct
-    file). Exactly one MUST be set. Returns a `Workflow` Pydantic
-    model — the caller reads `.source`, `.repo`, `.jira_url`,
-    `.jira_project`, and `.steps` from it.
-
-    Refuses ambiguous combinations (`--workflow-name` + `--workflow-yaml` together,
-    or neither) so the user can't silently end up running the wrong
-    workflow.
-    """
-    if workflow_name and workflow_yaml:
-        raise click.UsageError(
-            "--workflow-name and --workflow-yaml are mutually exclusive."
-        )
-    if not workflow_name and not workflow_yaml:
-        raise click.UsageError(
-            "Pass --workflow-name NAME (stored workflow) or --workflow-yaml PATH "
-            "(YAML file). Run `flow workflows list` to see what's "
-            "in the store."
-        )
-
-    if workflow_name:
-        from .workflows_db import WorkflowStore
-        wf = WorkflowStore(workflows_dir).get(workflow_name)
-        if wf is None:
-            raise click.UsageError(
-                f"workflow {workflow_name!r} not found under "
-                f"{workflows_dir} (no DB row and no matching YAML). "
-                "Run `flow workflows list` to see what's configured."
-            )
-        return wf
-
-    from .workflow import WorkflowError, parse_workflow_text
-    path = Path(workflow_yaml)
-    if not path.exists():
-        raise click.UsageError(f"YAML file {path} does not exist.")
-    try:
-        return parse_workflow_text(path.read_text(), path.stem)
-    except WorkflowError as exc:
-        raise click.UsageError(
-            f"failed to parse {path}: {exc}"
-        ) from exc
-
-
-def _build_source_from_workflow(
-    wf,
-    *,
-    cache_dir: Path,
-    offline: bool,
-    include_issues: bool = False,
-    wip_labels=None,
-):
-    """Build a Source from a `Workflow` model. Centralised so the
-    per-subcommand code stays small (and so any future Source
-    construction tweaks happen in one place)."""
-    return _build_source(
-        repo=wf.repo if wf.source == "github" else None,
-        jira_url=wf.jira_url if wf.source == "jira" else None,
-        jira_project=wf.jira_project if wf.source == "jira" else None,
-        cache_dir=cache_dir, offline=offline,
-        include_issues=include_issues,
-        wip_labels=wip_labels,
-    )
-
-
-def _stages_from_workflow(wf) -> tuple[str, ...]:
-    """The ordered stage tuple — WIP steps if any are marked, else
-    every step in order. Used by aging + cumulative as the band /
-    column order."""
-    wip = tuple(s.name for s in wf.steps if s.wip)
-    return wip or tuple(s.name for s in wf.steps)
 
 
 @metric.command("throughput", short_help="Daily completion counts in a window")

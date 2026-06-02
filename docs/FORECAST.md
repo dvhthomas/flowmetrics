@@ -329,7 +329,7 @@ makes zero requests — the data is already on disk. You can iterate on
 ### 10.1 "When can I commit to this 50-item commitment?"
 
 ```
-uv run flow forecast when-done \
+uv run flow forecast date \
     --repo astral-sh/uv --items 50
 ```
 
@@ -340,7 +340,7 @@ ASCII histogram.
 ### 10.2 "How many can we commit to by quarter-end?"
 
 ```
-uv run flow forecast how-many \
+uv run flow forecast throughput \
     --repo astral-sh/uv --target-date 2026-06-30
 ```
 
@@ -351,7 +351,7 @@ commitments.
 ### 10.3 "What about a shorter history because we just reorganised?"
 
 ```
-uv run flow forecast when-done \
+uv run flow forecast date \
     --repo astral-sh/uv --items 50 --history-start 2026-04-28
     # ↑ a closer start date narrows the training window
 ```
@@ -362,9 +362,9 @@ regime.
 ### 10.4 "Compare two scenarios reproducibly"
 
 ```
-uv run flow forecast when-done \
+uv run flow forecast date \
     --repo astral-sh/uv --items 50 --seed 42
-uv run flow forecast when-done \
+uv run flow forecast date \
     --repo astral-sh/uv --items 75 --seed 42
 ```
 

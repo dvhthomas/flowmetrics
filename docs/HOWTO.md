@@ -453,12 +453,15 @@ Monte Carlo forecasts (same `--workflow-name` / `--workflow-yaml`
 pattern):
 
 ```bash
-# When will 50 items be done? (percentile dates).
-flow forecast when-done --workflow-name astral-uv --items 50
+# Date forecast: when will 50 items be done?
+flow forecast date --workflow-name astral-uv --items 50
 
-# How many items by 2026-06-30? (percentile counts).
-flow forecast how-many --workflow-name astral-uv --target-date 2026-06-30
+# Throughput forecast: how many items by 2026-06-30?
+flow forecast throughput --workflow-name astral-uv --target-date 2026-06-30
 ```
+
+(`flow forecast date` names what the answer is — a date.
+`flow forecast throughput` likewise — an item-count rate.)
 
 Every command takes `--format text|json` (default `text`). See
 [REFERENCE § CLI](REFERENCE.md#cli).

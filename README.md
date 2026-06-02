@@ -64,14 +64,17 @@ flow serve              # → http://127.0.0.1:8000 → "+ New workflow"
 ```
 
 **Metric extraction for agents** — graphics-free text + JSON output
-for pipelines and headless analysis.
+for pipelines and headless analysis. Each command points at a
+configured workflow (`--workflow-name`) or a YAML file
+(`--workflow-yaml`).
 
 ```
-$ flow metric cycle-time --repo astral-sh/uv --start 2026-05-04 --stop 2026-05-10
-astral-sh/uv 2026-05-04 → 2026-05-10: 46 completed items;
+$ flow metric cycle-time --workflow-name astral-uv \
+    --start 2026-05-04 --stop 2026-05-10
+astral-uv (astral-sh/uv) 2026-05-04 → 2026-05-10: 46 completed items;
 P50=1.2d, P85=3.4d, P95=7.1d.
 
-$ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
+$ flow forecast date --workflow-name astral-uv --items 50 --format json \
     | jq '.summary.percentiles'
 {"50": "2026-05-19", "70": "2026-05-21", "85": "2026-05-23", "95": "2026-05-26"}
 ```
@@ -87,8 +90,9 @@ $ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
 - **Aging WIP** — every in-flight item plotted by current workflow state
   × age (CD − SD + 1), with completed-item percentile lines as risk
   thresholds.
-- **Forecasts** — Monte Carlo *when-done* (date for N items) and
-  *how-many* (items by target date) at 50/70/85/95% confidence.
+- **Forecasts** — Monte Carlo `flow forecast date` (date for N items)
+  and `flow forecast throughput` (items by target date) at
+  50/70/85/95% confidence.
 
 ## Why this exists
 
@@ -123,8 +127,8 @@ facts, plus background explainers.
 
 - **[CLI + YAML + file layout](docs/REFERENCE.md)** — every command,
   every flag, every file. Output envelope schemas.
-- **[Forecasting](docs/FORECAST.md)** — Monte Carlo when-done and
-  how-many, with worked examples.
+- **[Forecasting](docs/FORECAST.md)** — Monte Carlo `forecast date`
+  and `forecast throughput`, with worked examples.
 - **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms
   we deliberately avoid (Scrum-contaminated "backlog" and "velocity").
 
