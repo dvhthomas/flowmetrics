@@ -164,7 +164,7 @@ Materialize every configured workflow at once — what the schedulers
 below run:
 
 ```bash
-flow materialize-all \
+flow materialize --all \
     --workflows-dir CONTRACTS_DIR \
     --data-dir       DATA_DIR
 ```
@@ -402,7 +402,7 @@ deletes round-trip to the host. Both services use the same image
 built from `Dockerfile`.
 
 For CI-hosted ingest (no host to operate), see
-`.github/workflows/materialize.yml` — runs `flow materialize-all` on
+`.github/workflows/materialize.yml` — runs `flow materialize --all` on
 a cron schedule and uploads `data/` as a build artifact.
 
 ## Ad-hoc CLI reports
@@ -468,7 +468,7 @@ the upgraded binary.
 
 After upgrade, if Parquet read errors crop up (a major DuckDB bump
 can change on-disk shape), restore from the most recent good backup
-into a fresh `--data-dir` or re-run `flow materialize-all` — the
+into a fresh `--data-dir` or re-run `flow materialize --all` — the
 warehouse is downstream of the source API, never the source of truth.
 
 ## Develop against a source checkout
@@ -535,7 +535,7 @@ flow materialize your-workflow --workflows-dir contracts --data-dir data
 
 DuckDB writes Parquet at its current version. A major bump can change
 the on-disk shape. Restore from the most recent good backup into a
-fresh `--data-dir`, or re-run `flow materialize-all` against your
+fresh `--data-dir`, or re-run `flow materialize --all` against your
 contracts.
 
 ### `flow` not on PATH after install

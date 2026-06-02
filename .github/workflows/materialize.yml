@@ -2,7 +2,7 @@
 # cron / systemd when you'd rather your warehouse live in CI.
 #
 # Pattern: the workflow YAMLs are committed in `contracts/` (the
-# repo is the source of truth). The job runs `flow materialize-all`
+# repo is the source of truth). The job runs `flow materialize --all`
 # against them and uploads the resulting `data/` as a build artifact
 # (retained 14 days). Use `actions/download-artifact` (or copy to
 # a release / external bucket) if you want the warehouse off CI.
@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   materialize:
-    name: materialize-all
+    name: materialize --all
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -65,7 +65,7 @@ jobs:
           # in this org without setup.
           GITHUB_TOKEN: ${{ secrets.FLOW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          uv run flow materialize-all \
+          uv run flow materialize --all \
             --workflows-dir contracts \
             --data-dir data
 

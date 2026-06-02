@@ -1,7 +1,7 @@
 # Windows Task Scheduler
 
 Daily ingest under the Windows Task Scheduler. The XML template runs
-`flow materialize-all` once a day; one-line installer with `schtasks`.
+`flow materialize --all` once a day; one-line installer with `schtasks`.
 
 ## Install
 

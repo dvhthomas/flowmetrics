@@ -63,7 +63,7 @@
     <Exec>
       <!-- Replace with the actual paths on your machine. -->
       <Command>C:\flowmetrics\.venv\Scripts\flow.exe</Command>
-      <Arguments>materialize-all --workflows-dir C:\flowmetrics\contracts --data-dir C:\flowmetrics\data</Arguments>
+      <Arguments>materialize --all --workflows-dir C:\flowmetrics\contracts --data-dir C:\flowmetrics\data</Arguments>
       <WorkingDirectory>C:\flowmetrics</WorkingDirectory>
     </Exec>
   </Actions>

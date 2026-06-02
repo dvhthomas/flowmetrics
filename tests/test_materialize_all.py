@@ -52,7 +52,7 @@ class TestEmpty:
     def test_no_contracts_writes_an_empty_manifest_and_exits_clean(self, workspace):
         contracts, data = workspace
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),
@@ -74,7 +74,7 @@ class TestHappyPath:
         contracts, data = workspace
         _write_contract(contracts, "astral-uv-week", "astral-sh/uv")
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),
@@ -104,7 +104,7 @@ class TestMixedOutcomes:
         # Intentionally broken — no `source:`.
         (contracts / "broken.yaml").write_text("workflow: {name: broken}\n")
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),
@@ -135,7 +135,7 @@ class TestMixedOutcomes:
         _write_contract(contracts, "alpha-only", "no-such/repo-alpha")
         _write_contract(contracts, "beta-only", "no-such/repo-beta")
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),
@@ -154,7 +154,7 @@ class TestManifestPathOverride:
         _write_contract(contracts, "astral-uv-week", "astral-sh/uv")
         out = tmp_path / "custom-manifest.json"
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),
@@ -182,7 +182,7 @@ class TestDateStamping:
             cli_mod, "_materialize_all_now", lambda: pinned, raising=False,
         )
         res = CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(FIXTURE_CACHE),

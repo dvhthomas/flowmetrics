@@ -9,7 +9,7 @@ your scheduler.
 ## What "good enough" looks like
 
 ```
-02:30  flow materialize-all   (data is fresh)
+02:30  flow materialize --all   (data is fresh)
 02:45  flow backup            (snapshot the fresh data)
 02:50  retain last 14 days, delete older
 03:00  optionally: rsync to off-host

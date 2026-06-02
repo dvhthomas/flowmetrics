@@ -597,7 +597,18 @@ def forecast_how_many(
 
 
 @cli.command(short_help="Materialize a workflow — fetch + write Parquet")
-@click.argument("name", type=str)
+@click.argument("name", type=str, required=False, default=None)
+@click.option(
+    "--all/--no-all",
+    "all_workflows",
+    default=False,
+    help=(
+        "Materialize every configured workflow (the daily-cron path). "
+        "Mutually exclusive with a NAME positional. A single failing "
+        "workflow doesn't block the rest; per-workflow detail lives in "
+        "the manifest."
+    ),
+)
 @click.option(
     "--data-dir",
     type=click.Path(path_type=Path),
@@ -656,11 +667,22 @@ def forecast_how_many(
     help=(
         "Write a JSON status file (running → done/failed) at this "
         "path. The Data Source page polls it during a "
-        "browser-triggered backfill."
+        "browser-triggered backfill. Single-workflow mode only."
+    ),
+)
+@click.option(
+    "--manifest",
+    "manifest_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help=(
+        "With --all: where to write the daily JSON manifest. "
+        "Defaults to <data-dir>/_status/daily-<UTC-date>.json."
     ),
 )
 def materialize(
-    name: str,
+    name: str | None,
+    all_workflows: bool,
     data_dir: Path,
     contracts_dir: Path,
     cache_dir: Path,
@@ -668,32 +690,92 @@ def materialize(
     since,  # click.DateTime → datetime | None
     until,
     status_file: Path | None,
+    manifest_path: Path | None,
 ) -> None:
-    """Fetch + canonicalise + write Parquet for one workflow.
+    """Fetch + canonicalise + write Parquet for one workflow, or for
+    every configured workflow with `--all`.
 
-    NAME is looked up DB-first in `<workflows-dir>/workflows.db`
-    (where the wizard writes), then falls back to a `NAME.yaml` file
-    in the same directory. `flow workflows list` shows what's
-    resolvable. Use `flow materialize-all` for the whole set.
+    Two modes:
 
-    Invoked by external cron / systemd-timer / k8s CronJob. Exits 0
-    on success, non-zero on any failure. Operators see the error in
-    cron mail or systemd journal.
+      \b
+      flow materialize NAME    # single workflow
+      flow materialize --all   # every workflow in --workflows-dir
 
-    `--since` and `--until` override the workflow's stored
-    start/stop for this invocation only — they don't mutate the
-    DB row or YAML. Useful for targeted backfills when the
-    warehouse needs to be brought forward without changing the
-    workflow's canonical window.
+    NAME is looked up DB-first in `<workflows-dir>/workflows.db`,
+    then falls back to a `NAME.yaml` file in the same directory.
+    `flow workflows list` shows what's resolvable.
 
-    `--status-file` (opt-in) writes a JSON running → done/failed
-    record so the web Data Source page can poll a browser-triggered
-    backfill. Without it, behaviour is unchanged (cron path).
+    `--all` is the daily-cron / scheduled-ingest path: iterate every
+    non-archived workflow, write a per-day JSON manifest at
+    `<data-dir>/_status/daily-<UTC-date>.json`, and exit non-zero
+    only when EVERY workflow failed. A single bad workflow doesn't
+    block the others.
+
+    `--since` and `--until` override the workflow's stored start/stop
+    for this invocation only — single-workflow mode.
+
+    `--status-file` (opt-in, single-workflow mode) writes a JSON
+    running → done/failed record so the web Data Source page can
+    poll a browser-triggered backfill.
     """
+    if name is None and not all_workflows:
+        raise click.UsageError(
+            "pass a workflow NAME or `--all` (use `flow workflows list` "
+            "to see what's configured)."
+        )
+    if name is not None and all_workflows:
+        raise click.UsageError(
+            "NAME and `--all` are mutually exclusive."
+        )
+    if all_workflows and (since is not None or until is not None):
+        raise click.UsageError(
+            "--since / --until apply to a single workflow only; "
+            "drop --all, or run materialize per workflow."
+        )
+    if all_workflows and status_file is not None:
+        raise click.UsageError(
+            "--status-file applies to a single workflow only; "
+            "with --all, use --manifest instead."
+        )
 
+    if all_workflows:
+        _materialize_all(
+            data_dir=data_dir,
+            contracts_dir=contracts_dir,
+            cache_dir=cache_dir,
+            offline=offline,
+            manifest_path=manifest_path,
+        )
+    else:
+        _materialize_one(
+            name=name,
+            data_dir=data_dir,
+            contracts_dir=contracts_dir,
+            cache_dir=cache_dir,
+            offline=offline,
+            since=since,
+            until=until,
+            status_file=status_file,
+        )
+
+
+def _materialize_one(
+    *,
+    name: str,
+    data_dir: Path,
+    contracts_dir: Path,
+    cache_dir: Path,
+    offline: bool,
+    since,
+    until,
+    status_file: Path | None,
+) -> None:
+    """Single-workflow path. Invoked by external cron / systemd-timer
+    / k8s CronJob (or by the wizard's browser-triggered backfill).
+    Exits 0 on success, non-zero on any failure."""
     from .backfill import write_status
-    from .workflows_db import WorkflowStore
     from .materialize import materialize as run_materialize
+    from .workflows_db import WorkflowStore
 
     since_iso = since.date().isoformat() if since is not None else None
     until_iso = until.date().isoformat() if until is not None else None
@@ -733,15 +815,12 @@ def materialize(
         click.echo(f"error: {msg}", err=True)
         sys.exit(2)
 
-    # Click's DateTime returns datetime; we want date.
     overrides: dict = {}
     if since is not None:
         overrides["start"] = since.date()
     if until is not None:
         overrides["stop"] = until.date()
     if overrides:
-        # Pydantic's `model_copy` is the equivalent of
-        # `dataclasses.replace` for the new Workflow model.
         workflow = workflow.model_copy(update=overrides)
 
     try:
@@ -753,7 +832,6 @@ def materialize(
         )
     except Exception as exc:
         _status("failed", f"{type(exc).__name__}: {exc}")
-        # No status file → preserve the cron path: let it raise.
         if status_file is None:
             raise
         click.echo(f"error: {exc}", err=True)
@@ -768,14 +846,6 @@ def materialize(
     click.echo(msg)
 
 
-# ---------------------------------------------------------------------------
-# `flow materialize-all` — daily-ingest wrapper for cron / launchd / Task
-# Scheduler. Iterates every YAML in --workflows-dir; one bad workflow
-# doesn't block the others. Writes a JSON manifest the user's monitoring
-# tool can grep for failures.
-# ---------------------------------------------------------------------------
-
-
 def _materialize_all_now() -> datetime:
     """Indirection so tests can pin the timestamp without touching
     the global `datetime.now`. Plain function, not a constant — the
@@ -783,61 +853,18 @@ def _materialize_all_now() -> datetime:
     return datetime.now(UTC)
 
 
-@cli.command(
-    name="materialize-all",
-    short_help="Run materialize for every configured workflow",
-)
-@click.option(
-    "--data-dir",
-    type=click.Path(path_type=Path),
-    default=Path("./data"),
-    show_default=True,
-)
-@click.option(
-    "--workflows-dir", "contracts_dir",
-    type=click.Path(path_type=Path),
-    default=Path("./contracts"),
-    show_default=True,
-)
-@click.option(
-    "--cache-dir",
-    type=click.Path(path_type=Path),
-    default=DEFAULT_CACHE_DIR,
-    show_default=True,
-)
-@click.option("--offline/--online", default=False)
-@click.option(
-    "--manifest",
-    "manifest_path",
-    type=click.Path(path_type=Path),
-    default=None,
-    help=(
-        "Where to write the daily JSON manifest. Defaults to "
-        "<data-dir>/_status/daily-<UTC-date>.json."
-    ),
-)
-def materialize_all(
+def _materialize_all(
+    *,
     data_dir: Path,
     contracts_dir: Path,
     cache_dir: Path,
     offline: bool,
     manifest_path: Path | None,
 ) -> None:
-    """Iterate every configured workflow and materialize each one.
-
-    Workflows come from workflows.db (the wizard's store) plus any
-    un-migrated YAML files in --workflows-dir. `flow workflows list`
-    shows what would run.
-
-    Scheduler-friendly: a single failing workflow doesn't block the
-    rest. Exit code is 0 when at least one workflow succeeded (so
-    monitoring only pages when EVERYTHING is broken); the manifest
-    holds per-workflow detail for finer-grained alerting.
-    """
-
+    """All-workflows path. The daily-cron / scheduled-ingest target."""
+    from .materialize import materialize as run_materialize
     from .workflow import WorkflowError
     from .workflows_db import WorkflowStore
-    from .materialize import materialize as run_materialize
 
     # Migrate any leftover YAMLs into the DB first so this single
     # command handles both first-boot and the steady-state cron path.
@@ -889,7 +916,8 @@ def materialize_all(
     ok = sum(1 for r in results if r["status"] == "ok")
     failed = sum(1 for r in results if r["status"] == "failed")
     click.echo(
-        f"materialize-all: {ok} ok, {failed} failed, manifest at {manifest_path}"
+        f"materialize --all: {ok} ok, {failed} failed, "
+        f"manifest at {manifest_path}"
     )
 
     # Exit non-zero only when everything failed (or the dir was empty

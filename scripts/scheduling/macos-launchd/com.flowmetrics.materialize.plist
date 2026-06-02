@@ -27,7 +27,8 @@
   <key>ProgramArguments</key>
   <array>
     <string>REPLACE_VENV/bin/flow</string>
-    <string>materialize-all</string>
+    <string>materialize</string>
+    <string>--all</string>
     <string>--workflows-dir</string>
     <string>REPLACE_HOME/contracts</string>
     <string>--data-dir</string>

@@ -1,6 +1,6 @@
 # Scheduled ingest
 
-Templates for running `flow materialize-all` once a day under your
+Templates for running `flow materialize --all` once a day under your
 OS's native scheduler. Pick the directory for your platform and follow
 the README inside.
 
@@ -14,7 +14,7 @@ the README inside.
 Each template fires one command:
 
 ```
-flow materialize-all --workflows-dir $FLOWMETRICS_HOME/contracts \
+flow materialize --all --workflows-dir $FLOWMETRICS_HOME/contracts \
     --data-dir $FLOWMETRICS_HOME/data
 ```
 
@@ -49,4 +49,4 @@ contracts directory is the source of truth.
   persistent server, Docker, troubleshooting.
 - [docs/REFERENCE.md](../../docs/REFERENCE.md) — every `flow` flag
   with defaults.
-- `flow materialize-all --help` — current flag list.
+- `flow materialize --all --help` — current flag list.

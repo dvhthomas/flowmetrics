@@ -16,7 +16,7 @@ FLOWMETRICS_VENV=/srv/flowmetrics/.venv
 # Daily at 02:30 local. Output goes to syslog (`logger -t flowmetrics`).
 # Replace with `>> $FLOWMETRICS_HOME/data/_status/cron.log 2>&1`
 # if you prefer file-based logs.
-30 2 * * *  cd $FLOWMETRICS_HOME && $FLOWMETRICS_VENV/bin/flow materialise-all \
+30 2 * * *  cd $FLOWMETRICS_HOME && $FLOWMETRICS_VENV/bin/flow materialize --all \
             --workflows-dir $FLOWMETRICS_HOME/contracts \
             --data-dir $FLOWMETRICS_HOME/data \
             2>&1 | logger -t flowmetrics

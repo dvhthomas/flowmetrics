@@ -214,7 +214,7 @@ class TestArchivedExclusionFromMaterialize:
             Path(__file__).parent / "fixtures" / "cache"
         )
         CliRunner().invoke(cli, [
-            "materialize-all",
+            "materialize", "--all",
             "--workflows-dir", str(contracts),
             "--data-dir", str(data),
             "--cache-dir", str(cache_dir),

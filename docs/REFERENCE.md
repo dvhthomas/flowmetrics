@@ -66,7 +66,7 @@ Fetch + canonicalise one workflow into Parquet. Exits 0 on success.
 | `--until YYYY-MM-DD` | YAML `stop` | Override window stop for this run. |
 | `--status-file PATH` | — | Opt-in JSON `running → done/failed` record for the Data Source page. |
 
-### `flow materialize-all`
+### `flow materialize --all`
 
 Iterate every YAML under `--workflows-dir` and materialize each. A
 single failing contract doesn't block the rest. Exit code is 0
@@ -205,7 +205,7 @@ DATA_DIR/
 ├── runs/
 │   └── <contract>/run_id=<…>/manifest.json   # per-run audit trail
 ├── _status/
-│   ├── daily-<UTC-date>.json                 # materialize-all manifest
+│   ├── daily-<UTC-date>.json                 # materialize --all manifest
 │   ├── <workflow>.json                       # browser-backfill status
 │   ├── launchd.out.log / launchd.err.log     # launchd templates
 │   └── serve.out.log  / serve.err.log        # serve unit logs
@@ -290,12 +290,12 @@ wrapper scripts:
 | Command | 0 | non-zero |
 |----|----|----|
 | `flow materialize NAME` | success | any failure |
-| `flow materialize-all` | ≥1 workflow succeeded | every workflow failed |
+| `flow materialize --all` | ≥1 workflow succeeded | every workflow failed |
 | `flow backup` / `flow restore` | success | malformed archive, checksum mismatch, dirty target without `--force` |
 | `flow serve` | clean shutdown (SIGTERM/SIGINT) | bind failure, missing config |
 | Ad-hoc reports | success | source-API failure, invalid input |
 
-For schedulers wired to alert on non-zero: `materialize-all` is
+For schedulers wired to alert on non-zero: `materialize --all` is
 intentionally lenient — read `_status/daily-<UTC-date>.json` for
 per-workflow detail.
 
