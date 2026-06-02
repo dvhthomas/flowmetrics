@@ -101,4 +101,73 @@ def stop_and_uninstall() -> None:
     )
 
 
-__all__ = ["BgError", "install_and_start", "stop_and_uninstall"]
+def install_materialize_schedule(
+    *,
+    flow_bin: Path,
+    materialize_args: list[str],
+    hour: int,
+    minute: int,
+    log_dir: Path,
+) -> Path:
+    """Install + activate a scheduled `flow materialize` job for the
+    current user. Idempotent — re-running reloads with the latest
+    flags / schedule.
+
+    `materialize_args` is everything that should follow `flow
+    materialize` on the command line (typically `["--all",
+    "--workflows-dir", PATH, "--data-dir", PATH]`).
+
+    Returns the path to the on-disk plist/unit file.
+    """
+    if sys.platform == "darwin":
+        from . import launchd
+        return launchd.install_materialize_schedule(
+            launchagents_dir=launchd.default_launchagents_dir(),
+            uid=launchd.current_uid(),
+            flow_bin=flow_bin,
+            materialize_args=materialize_args,
+            hour=hour, minute=minute,
+            log_dir=log_dir,
+        )
+    if sys.platform.startswith("linux"):
+        raise BgError(
+            "`flow materialize --bg` ships with macOS launchd "
+            "support today. Linux systemd-timer support is on "
+            "the roadmap — meanwhile, the templated unit + timer "
+            "under scripts/scheduling/linux-systemd/ handle "
+            "scheduling on Linux."
+        )
+    raise BgError(
+        "`flow materialize --bg` supports macOS (launchd) in this "
+        "release. Other platforms: use the templated scheduler "
+        "files under scripts/scheduling/."
+    )
+
+
+def stop_materialize_schedule() -> None:
+    """Tear down the scheduled materialize job. Idempotent."""
+    if sys.platform == "darwin":
+        from . import launchd
+        launchd.stop_materialize_schedule(
+            launchagents_dir=launchd.default_launchagents_dir(),
+            uid=launchd.current_uid(),
+        )
+        return
+    if sys.platform.startswith("linux"):
+        raise BgError(
+            "`flow materialize --bg --stop` ships with macOS "
+            "support today. Linux: remove the templated unit + "
+            "timer files yourself."
+        )
+    raise BgError(
+        "`flow materialize --bg --stop` supports macOS only."
+    )
+
+
+__all__ = [
+    "BgError",
+    "install_and_start",
+    "stop_and_uninstall",
+    "install_materialize_schedule",
+    "stop_materialize_schedule",
+]

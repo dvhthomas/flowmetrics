@@ -1069,6 +1069,30 @@ def metric_cycle_time(
         "Defaults to <data-dir>/_status/daily-<UTC-date>.json."
     ),
 )
+@click.option(
+    "--bg/--no-bg",
+    default=False,
+    help=(
+        "Install + activate a scheduled materialize job (macOS "
+        "launchd). Requires --at HH:MM. Use `--bg --stop` to "
+        "uninstall."
+    ),
+)
+@click.option(
+    "--at", "at_time", type=str, default=None,
+    help=(
+        "With --bg: local time of day to fire the scheduled "
+        "materialize, in HH:MM format (e.g. 06:00 for 6 AM)."
+    ),
+)
+@click.option(
+    "--stop/--no-stop",
+    default=False,
+    help=(
+        "With --bg: stop the scheduled job and remove its plist. "
+        "Without --bg: error."
+    ),
+)
 def materialize(
     name: str | None,
     all_workflows: bool,
@@ -1080,6 +1104,9 @@ def materialize(
     until,
     status_file: Path | None,
     manifest_path: Path | None,
+    bg: bool,
+    at_time: str | None,
+    stop: bool,
 ) -> None:
     """Fetch + canonicalise + write Parquet for one workflow, or for
     every configured workflow with `--all`.
@@ -1107,6 +1134,24 @@ def materialize(
     running → done/failed record so the web Data Source page can
     poll a browser-triggered backfill.
     """
+    # --stop only makes sense paired with --bg.
+    if stop and not bg:
+        raise click.ClickException(
+            "--stop requires --bg (it's the inverse of --bg). "
+            "Did you mean `flow materialize --bg --stop`?"
+        )
+
+    if bg:
+        _materialize_bg(
+            name=name,
+            all_workflows=all_workflows,
+            data_dir=data_dir,
+            contracts_dir=contracts_dir,
+            at_time=at_time,
+            stop=stop,
+        )
+        return
+
     if name is None and not all_workflows:
         raise click.UsageError(
             "pass a workflow NAME or `--all` (use `flow workflows list` "
@@ -1146,6 +1191,113 @@ def materialize(
             until=until,
             status_file=status_file,
         )
+
+
+def _parse_at(at_time: str) -> tuple[int, int]:
+    """Parse `--at HH:MM` (24-hour, local time) into (hour, minute).
+    Raises UsageError with a clear message on malformed input."""
+    import re as _re
+    m = _re.fullmatch(r"\s*(\d{1,2}):(\d{2})\s*", at_time)
+    if not m:
+        raise click.UsageError(
+            f"--at {at_time!r}: expected HH:MM format (e.g. 06:00, 14:30)."
+        )
+    hour = int(m.group(1))
+    minute = int(m.group(2))
+    if not (0 <= hour <= 23 and 0 <= minute <= 59):
+        raise click.UsageError(
+            f"--at {at_time!r}: hour must be 0–23 and minute 0–59."
+        )
+    return hour, minute
+
+
+def _materialize_bg(
+    *,
+    name: str | None,
+    all_workflows: bool,
+    data_dir: Path,
+    contracts_dir: Path,
+    at_time: str | None,
+    stop: bool,
+) -> None:
+    """Install / uninstall a scheduled materialize job. Mirrors the
+    `flow serve --bg` flag combinatorics: --stop tears it down,
+    otherwise --at HH:MM installs."""
+    from . import bg as bg_mod
+
+    if stop:
+        try:
+            bg_mod.stop_materialize_schedule()
+        except bg_mod.BgError as exc:
+            raise click.ClickException(str(exc)) from exc
+        click.echo("scheduled materialize stopped + uninstalled.")
+        return
+
+    if at_time is None:
+        raise click.UsageError(
+            "`--bg` requires `--at HH:MM` to schedule the run "
+            "(or `--bg --stop` to uninstall a previous schedule)."
+        )
+    if name is None and not all_workflows:
+        raise click.UsageError(
+            "with `--bg --at HH:MM`, pass a workflow NAME or `--all` "
+            "(use `flow workflows list` to see what's configured)."
+        )
+    if name is not None and all_workflows:
+        raise click.UsageError(
+            "NAME and `--all` are mutually exclusive."
+        )
+
+    hour, minute = _parse_at(at_time)
+
+    # Resolve absolute paths — launchd doesn't inherit a CWD, and
+    # encoding relative paths into a plist would break the moment
+    # the scheduled job fires from a different directory.
+    flow_bin_str = shutil.which("flow")
+    if flow_bin_str is None:
+        raise click.ClickException(
+            "could not locate the `flow` executable on PATH. "
+            "Re-run after `uv tool install` or with the absolute "
+            "path on PATH."
+        )
+    flow_bin = Path(flow_bin_str).resolve()
+    data_dir_abs = data_dir.resolve()
+    contracts_dir_abs = contracts_dir.resolve()
+    log_dir = data_dir_abs / "_status"
+
+    # The args carried INTO the scheduled command — everything that
+    # follows `flow materialize`. Position the workflow selector
+    # (NAME or --all) first, then the paths.
+    materialize_args: list[str] = []
+    if all_workflows:
+        materialize_args.append("--all")
+    else:
+        # Single-workflow mode.
+        materialize_args.append(name)  # type: ignore[arg-type]
+    materialize_args.extend([
+        "--workflows-dir", str(contracts_dir_abs),
+        "--data-dir", str(data_dir_abs),
+    ])
+
+    try:
+        unit_path = bg_mod.install_materialize_schedule(
+            flow_bin=flow_bin,
+            materialize_args=materialize_args,
+            hour=hour, minute=minute,
+            log_dir=log_dir,
+        )
+    except bg_mod.BgError as exc:
+        raise click.ClickException(str(exc)) from exc
+
+    selector = "--all" if all_workflows else name
+    click.echo(
+        f"scheduled materialize installed at {unit_path}\n"
+        f"  fires:   daily at {hour:02d}:{minute:02d} local time\n"
+        f"  command: flow materialize {selector} "
+        f"--workflows-dir {contracts_dir_abs} --data-dir {data_dir_abs}\n"
+        f"  logs:    {log_dir}/materialize.{{out,err}}.log\n"
+        f"  stop:    flow materialize --bg --stop"
+    )
 
 
 def _materialize_one(

@@ -27,10 +27,11 @@ from pathlib import Path
 
 from . import BgError
 
-# Canonical agent label. Mirrors the templated plist so a user
+# Canonical agent labels. Mirror the templated plists so a user
 # switching between `--bg` and the manual install path doesn't end
 # up with two competing agents under different labels.
 SERVE_LABEL = "com.flowmetrics.serve"
+MATERIALIZE_LABEL = "com.flowmetrics.materialize"
 
 # launchctl exit code when bootout is called on an agent that isn't
 # loaded. Not an error — just nothing to undo.
@@ -174,6 +175,114 @@ def stop_and_uninstall(*, launchagents_dir: Path, uid: int) -> None:
     )
 
     plist_path = launchagents_dir / f"{SERVE_LABEL}.plist"
+    try:
+        plist_path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def render_materialize_plist(
+    *,
+    label: str,
+    flow_bin: Path,
+    materialize_args: list[str],
+    hour: int,
+    minute: int,
+    log_dir: Path,
+) -> bytes:
+    """Build the launchd plist XML for a scheduled `flow materialize`.
+
+    Unlike `render_serve_plist` (RunAtLoad + KeepAlive — a
+    long-running daemon), this is a one-shot scheduled job: launchd
+    fires it once per matching calendar interval, lets it exit, and
+    waits for the next match.
+
+    `materialize_args` is everything that should follow `flow
+    materialize` on the command line — typically `["--all",
+    "--workflows-dir", PATH, "--data-dir", PATH]` for a daily-cron
+    install, or `[NAME, "--workflows-dir", PATH, "--data-dir",
+    PATH]` for a single-workflow schedule.
+
+    The hour/minute are LOCAL time. The Mac's timezone decides what
+    that maps to in UTC.
+    """
+    args: list[str] = [str(flow_bin), "materialize", *materialize_args]
+    spec: dict[str, object] = {
+        "Label": label,
+        "ProgramArguments": args,
+        "StartCalendarInterval": {"Hour": int(hour), "Minute": int(minute)},
+        # Run on next wake if the Mac was asleep when the calendar
+        # interval fired — without this, sleeping through 6 AM means
+        # skipping the day entirely.
+        "StartCalendarIntervalDoesNotFireWhenSleeping": False,
+        "StandardOutPath": str(log_dir / "materialize.out.log"),
+        "StandardErrorPath": str(log_dir / "materialize.err.log"),
+        # Inherit a workable PATH so /opt/homebrew/bin etc. resolve.
+        "EnvironmentVariables": {
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin",
+        },
+    }
+    return plistlib.dumps(spec)
+
+
+def install_materialize_schedule(
+    *,
+    launchagents_dir: Path,
+    flow_bin: Path,
+    materialize_args: list[str],
+    hour: int,
+    minute: int,
+    log_dir: Path,
+    uid: int,
+) -> Path:
+    """Write the materialize plist + (re-)bootstrap. Idempotent —
+    safe to re-run; reloads the schedule with the latest flags."""
+    launchagents_dir.mkdir(parents=True, exist_ok=True)
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    plist_path = launchagents_dir / f"{MATERIALIZE_LABEL}.plist"
+    plist_path.write_bytes(
+        render_materialize_plist(
+            label=MATERIALIZE_LABEL,
+            flow_bin=flow_bin,
+            materialize_args=materialize_args,
+            hour=hour, minute=minute,
+            log_dir=log_dir,
+        )
+    )
+
+    domain = f"gui/{uid}"
+    target = f"{domain}/{MATERIALIZE_LABEL}"
+    subprocess.run(
+        ["launchctl", "bootout", target],
+        check=False, capture_output=True,
+    )
+    result = subprocess.run(
+        ["launchctl", "bootstrap", domain, str(plist_path)],
+        check=False, capture_output=True,
+    )
+    if result.returncode != 0:
+        stderr = (
+            result.stderr.decode("utf-8", errors="replace")
+            if isinstance(result.stderr, bytes) else (result.stderr or "")
+        )
+        raise BgError(
+            f"launchctl bootstrap exited {result.returncode}: "
+            f"{stderr.strip() or '(no stderr)'}"
+        )
+    return plist_path
+
+
+def stop_materialize_schedule(
+    *, launchagents_dir: Path, uid: int,
+) -> None:
+    """Bootout the schedule + remove the plist. Idempotent."""
+    target = f"gui/{uid}/{MATERIALIZE_LABEL}"
+    subprocess.run(
+        ["launchctl", "bootout", target],
+        check=False, capture_output=True,
+    )
+    plist_path = launchagents_dir / f"{MATERIALIZE_LABEL}.plist"
     try:
         plist_path.unlink()
     except FileNotFoundError:
