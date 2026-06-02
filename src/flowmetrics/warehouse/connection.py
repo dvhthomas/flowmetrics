@@ -47,18 +47,42 @@ def open_warehouse(data_dir: Path) -> duckdb.DuckDBPyConnection:
     # materialized_at. Stable tie-break by run_id keeps the
     # answer deterministic when two snapshots share the exact
     # same materialized_at (rare; same-second re-runs).
-    # No parquet yet → propagate the IOException; work_items is
-    # required by every component.
-    con.execute(
-        f"CREATE VIEW work_items AS "
-        f"SELECT * EXCLUDE (_dedup_rn) FROM ( "
-        f"  SELECT *, ROW_NUMBER() OVER ("
-        f"    PARTITION BY contract_id, source, item_id "
-        f"    ORDER BY materialized_at DESC, run_id DESC"
-        f"  ) AS _dedup_rn "
-        f"  FROM read_parquet('{work_items_glob}', hive_partitioning = true)"
-        f") WHERE _dedup_rn = 1"
-    )
+    try:
+        con.execute(
+            f"CREATE VIEW work_items AS "
+            f"SELECT * EXCLUDE (_dedup_rn) FROM ( "
+            f"  SELECT *, ROW_NUMBER() OVER ("
+            f"    PARTITION BY contract_id, source, item_id "
+            f"    ORDER BY materialized_at DESC, run_id DESC"
+            f"  ) AS _dedup_rn "
+            f"  FROM read_parquet('{work_items_glob}', hive_partitioning = true)"
+            f") WHERE _dedup_rn = 1"
+        )
+    except duckdb.IOException:
+        # No parquet yet (fresh install before `flow materialize` has
+        # ever run). Stub the view with the canonical schema so
+        # downstream queries that name specific columns still PREPARE
+        # cleanly. Empty result set → consumers' empty-state UI
+        # ("no data yet, backfill from the Data Source page") takes
+        # over. Without this stub, the Data Source page itself
+        # 500s — the very page the user is supposed to go to.
+        con.execute(
+            "CREATE VIEW work_items AS "
+            "SELECT NULL::VARCHAR  AS source, "
+            "NULL::VARCHAR  AS repo, "
+            "NULL::VARCHAR  AS item_id, "
+            "NULL::VARCHAR  AS title, "
+            "NULL::VARCHAR  AS url, "
+            "NULL::VARCHAR  AS author, "
+            "NULL::BOOLEAN  AS is_bot, "
+            "NULL::TIMESTAMP AS created_at, "
+            "NULL::TIMESTAMP AS completed_at, "
+            "NULL::DOUBLE   AS cycle_time_days, "
+            "NULL::VARCHAR  AS contract_id, "
+            "NULL::TIMESTAMP AS materialized_at, "
+            "NULL::VARCHAR  AS run_id "
+            "WHERE FALSE"
+        )
 
     transitions_glob = (
         data_dir / "transitions" / "**" / "*.parquet"

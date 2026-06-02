@@ -1343,11 +1343,25 @@ def workflows() -> None:
     ),
 )
 @click.option(
+    "--data-dir",
+    type=click.Path(path_type=Path),
+    default=None,
+    help=(
+        "Optional: also show a DATA column reporting whether "
+        "`flow materialize NAME` has ever produced Parquet for "
+        "each workflow under <data-dir>/work_items/."
+    ),
+)
+@click.option(
     "--all/--no-all", "include_archived",
     default=False,
     help="Include archived workflows.",
 )
-def contracts_list(contracts_dir: Path, include_archived: bool) -> None:
+def contracts_list(
+    contracts_dir: Path,
+    data_dir: Path | None,
+    include_archived: bool,
+) -> None:
     """Enumerate every workflow `flow materialize` / `flow serve`
     would resolve.
 
@@ -1355,6 +1369,11 @@ def contracts_list(contracts_dir: Path, include_archived: bool) -> None:
     `yaml` for un-migrated YAML files in the workflows-dir. When
     both exist for the same name, the DB row wins — same precedence
     as `WorkflowStore.get()`.
+
+    Pass `--data-dir PATH` to also surface a DATA column: `ready`
+    when materialize has produced Parquet for that workflow, `—`
+    otherwise (with a footer hint pointing at the recovery
+    command).
     """
     from .workflows_db import WorkflowStore
 
@@ -1395,8 +1414,6 @@ def contracts_list(contracts_dir: Path, include_archived: bool) -> None:
         )
         return
 
-    # One row per workflow, three columns: name, source, target.
-    # `archived` rows carry a suffix so a glance is unambiguous.
     rows: list[tuple[str, str, str, bool]] = []
     for meta in db_rows:
         rows.append((
@@ -1408,14 +1425,55 @@ def contracts_list(contracts_dir: Path, include_archived: bool) -> None:
     for name, target in yaml_rows:
         rows.append((name, "yaml", target, False))
 
+    # Optional DATA column: probe the warehouse for any Parquet under
+    # the workflow's contract_id= partition. A single matching file
+    # is enough — we're answering "has materialize EVER run?", not
+    # "is this fresh?".
+    data_cells: dict[str, str] = {}
+    empty_names: list[str] = []
+    if data_dir is not None:
+        for name, _src, _target, _arch in rows:
+            partition = data_dir / "work_items" / f"contract_id={name}"
+            has_parquet = (
+                partition.is_dir()
+                and any(partition.rglob("*.parquet"))
+            )
+            data_cells[name] = "ready" if has_parquet else "—"
+            if not has_parquet:
+                empty_names.append(name)
+
     # Column widths sized from data, capped so a very long repo
     # name doesn't blow up the format.
     name_w = max(len("NAME"), *(len(r[0]) for r in rows))
     src_w = max(len("SOURCE"), *(len(r[1]) for r in rows))
-    click.echo(f"{'NAME':<{name_w}}  {'SOURCE':<{src_w}}  TARGET")
+    if data_dir is not None:
+        data_w = max(len("DATA"), *(len(v) for v in data_cells.values()))
+        click.echo(
+            f"{'NAME':<{name_w}}  {'SOURCE':<{src_w}}  "
+            f"{'DATA':<{data_w}}  TARGET"
+        )
+    else:
+        click.echo(f"{'NAME':<{name_w}}  {'SOURCE':<{src_w}}  TARGET")
     for name, src, target, archived in sorted(rows):
         suffix = "  [archived]" if archived else ""
-        click.echo(f"{name:<{name_w}}  {src:<{src_w}}  {target}{suffix}")
+        if data_dir is not None:
+            data_cell = data_cells[name]
+            click.echo(
+                f"{name:<{name_w}}  {src:<{src_w}}  "
+                f"{data_cell:<{data_w}}  {target}{suffix}"
+            )
+        else:
+            click.echo(f"{name:<{name_w}}  {src:<{src_w}}  {target}{suffix}")
+
+    if empty_names:
+        click.echo(
+            "\nWorkflows without warehouse data: "
+            f"{', '.join(empty_names)}\n"
+            "Recover with one of:\n"
+            "  - `flow serve` → open the Data Source page → Backfill\n"
+            f"  - `flow materialize {empty_names[0]} "
+            f"--workflows-dir {contracts_dir} --data-dir {data_dir}`"
+        )
 
 
 def _contract_target(workflow) -> str:
