@@ -237,10 +237,10 @@ interchangeable; either covers some teams' reality and not others'.
 - **GitHub issues + labels**: not supported. That's [gh-velocity]'s
   domain — they handle the per-repo label-to-state configuration
   honestly (it must be configured, because conventions vary). We point
-  users there from the in-line `flow aging` help.
+  users there from the in-line `flow metric aging` help.
 
   **Update 2026-05-14:** PR-label-driven Aging *is* now supported via
-  `flow aging --wip-labels "a,b,c"` (GitHub only). The caller names
+  `flow metric aging --wip-labels "a,b,c"` (GitHub only). The caller names
   which labels constitute WIP per invocation; the materializer in
   `src/flowmetrics/github_labels.py` walks `LabeledEvent` /
   `UnlabeledEvent` timeline events into `status_intervals`. CFD on
@@ -313,7 +313,7 @@ existing PR source as a separate source, not replace it. The two
 answer different questions; both should be available.
 
 **Update 2026-05-14:** The label-mode work landed for PRs only —
-`flow aging --wip-labels` against `--repo OWNER/NAME`. Issues are
+`flow metric aging --wip-labels` against `--repo OWNER/NAME`. Issues are
 still untouched; a future `GitHubIssuesSource` would re-use the same
 materializer in `src/flowmetrics/github_labels.py`. Design notes:
 [docs/SPEC-github-labels.md](SPEC-github-labels.md).

@@ -175,7 +175,7 @@ The order is forced by **back-compat**, not preference:
     old one.
 
 - **Risk:** the `--include-issues` opt-out default flips
-  behaviour for existing users running `flow aging
+  behaviour for existing users running `flow metric aging
   --wip-labels '...'`. They suddenly see Issues in their
   charts.
   - **Mitigation:** *intended* behaviour — the user explicitly
@@ -228,7 +228,7 @@ Plus the phase-specific check:
 |-------|----------------------------------------------------------------------------------------------------------------------|
 | 0     | `grep -rn 'merged_at\|pr_url' src/ tests/` returns zero matches outside source adapters that legitimately handle PR data internally. |
 | 1     | New test: bridge flattens canonical rows into intervals byte-identical to today's source output, for every existing source-test fixture. |
-| 2     | New tests: `test_github_issues.py` and `test_github_stitch.py` green. Manual: `flow aging --repo dvhthomas/kno --wip-labels '...'` runs without error. |
+| 2     | New tests: `test_github_issues.py` and `test_github_stitch.py` green. Manual: `flow metric aging --repo dvhthomas/kno --wip-labels '...'` runs without error. |
 | 3     | New test: end-to-end aging fixture with one stitched Issue+PR produces an `AgingItem` whose age, current_state, and url match the rule in the spec. Manual: regen Cassandra aging — same numbers as before, since Jira path is untouched. Regen one GitHub repo aging with `--include-issues` and spot-check the chart. |
 | 4     | (per report) regenerate all samples. Confirm no visual regression on the report being migrated. |
 

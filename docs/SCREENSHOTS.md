@@ -58,7 +58,7 @@ of the top = arrival rate; slope of the bottom = throughput.
 
 ## Contract builder
 
-`/admin/contracts/new` builds a workflow YAML through a structured
+`/admin/workflows/new` builds a workflow YAML through a structured
 form. Source picker (GitHub or Jira), repo / project validator that
 pings the source API to confirm the target exists, and a stage builder
 that discovers known stages from the warehouse and lets the user move

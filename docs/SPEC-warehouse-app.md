@@ -912,7 +912,7 @@ the application source (the operator's choice of remote).
 
 ## 14. Migration from current CLI
 
-The existing CLI commands (`flow efficiency`, `flow aging`, etc.)
+The existing CLI commands (`flow efficiency`, `flow metric aging`, etc.)
 keep working in v1 unchanged. The new commands (`flow materialize`,
 `flow serve`, `flow mcp`) are additive. After Slice 4 the existing
 commands gain a `--from-warehouse` flag that reads Parquet instead

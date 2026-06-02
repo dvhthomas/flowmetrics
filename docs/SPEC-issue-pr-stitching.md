@@ -300,7 +300,7 @@ tests/test_github_stitch.py
 
 ```
 src/flowmetrics/cli.py
-    `flow aging --include-issues` flag — opt-in for now.
+    `flow metric aging --include-issues` flag — opt-in for now.
     Reads StageTransition rows directly (bridge stops applying
     for Aging's path).
 

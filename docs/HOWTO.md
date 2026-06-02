@@ -16,8 +16,8 @@ For canonical detail on every flag, file, and schema, see
 - [Run as a persistent web server](#run-as-a-persistent-web-server)
 - [Back up & restore](#back-up--restore)
 - [Deploy with Docker](#deploy-with-docker)
-- [Run ad-hoc CLI reports](#ad-hoc-cli-reports)
-- [Output for agents (JSON)](#output-for-agents-json)
+- [Extract metrics for agents](#extract-metrics-for-agents)
+- [JSON envelopes](#json-envelopes)
 - [Upgrade](#upgrade)
 - [Develop against a source checkout](#develop-against-a-source-checkout)
 - [Troubleshooting](#troubleshooting)
@@ -90,7 +90,7 @@ workflows-dir are imported into `workflows.db` and moved to
 
 ```yaml
 # Minimal GitHub PR-review workflow.
-contract:
+workflow:
   name: astral-uv-week
   source: github
   repo: astral-sh/uv
@@ -101,7 +101,7 @@ contract:
 ```yaml
 # Label-driven GitHub workflow — WIP is "anything carrying one of
 # these labels". Order = most progress wins (first match).
-contract:
+workflow:
   name: kno-shaping
   source: github
   repo: dvhthomas/kno
@@ -115,7 +115,7 @@ contract:
 
 ```yaml
 # Atlassian Jira (anonymous public read).
-contract:
+workflow:
   name: cassandra-month
   source: jira
   jira_url:     https://issues.apache.org/jira
@@ -139,7 +139,7 @@ flow workflows list --workflows-dir CONTRACTS_DIR
 # kno-shaping    db      dvhthomas/kno
 ```
 
-`SOURCE` shows where each contract came from: `db` for wizard-managed
+`SOURCE` shows where each workflow came from: `db` for wizard-managed
 rows in `workflows.db`, `yaml` for un-migrated YAML files in the
 workflows-dir. When both exist for the same name, the DB row wins —
 same precedence the materialize commands use.
@@ -169,13 +169,11 @@ flow materialize --all \
     --data-dir       DATA_DIR
 ```
 
-A single failing contract doesn't block the others; the per-day
+A single failing workflow doesn't block the others; the per-day
 manifest at `DATA_DIR/_status/daily-<UTC-date>.json` records what
-ran, what passed, and what failed.
-
-Writes a per-day manifest at
-`DATA_DIR/_status/daily-<UTC-date>.json` with per-workflow results.
-A single failing YAML doesn't block the rest.
+ran, what passed, and what failed. The exit code only signals total
+failure (no workflow succeeded) so cron-style monitoring doesn't
+page on a single bad workflow.
 
 ## Schedule data fetches
 
@@ -405,38 +403,61 @@ For CI-hosted ingest (no host to operate), see
 `.github/workflows/materialize.yml` — runs `flow materialize --all` on
 a cron schedule and uploads `data/` as a build artifact.
 
-## Ad-hoc CLI reports
+## Extract metrics for agents
 
-Numeric metrics for terminals, pipelines, and agents. No warehouse
+Numeric metric data for terminals, pipelines, and agents. No warehouse
 required; these hit the source API directly. **For charts, use the
-web UI (`flow serve`)** — the CLI deliberately produces only text /
-JSON, never graphics.
+web UI (`flow serve`)** — the CLI is intentionally graphics-free.
+
+`flow metric` group — text headline by default, `--format json`
+for a versioned envelope:
 
 ```bash
-# Flow efficiency for this week (single number).
-flow efficiency --repo astral-sh/uv
+# Daily completion counts in a window.
+flow metric throughput --repo astral-sh/uv \
+    --start 2026-05-04 --stop 2026-05-10
 
-# Forecast when 50 items will be done (percentile dates).
+# Cumulative Flow Diagram data (state counts over time).
+flow metric cumulative --repo astral-sh/uv \
+    --start 2026-05-04 --stop 2026-05-10 \
+    --workflow "Open,Merged"
+
+# In-flight items × current state × age + percentile thresholds.
+flow metric aging --repo astral-sh/uv \
+    --workflow "Draft,Awaiting Review,Changes Requested,Approved"
+
+# Per-item cycle times + P50/P70/P85/P95.
+flow metric cycle-time --repo astral-sh/uv \
+    --start 2026-05-04 --stop 2026-05-10
+```
+
+Monte Carlo forecasts:
+
+```bash
+# When will 50 items be done? (percentile dates).
 flow forecast when-done --repo astral-sh/uv --items 50
 
-# How many items will be done by 2026-06-30 (percentile counts).
+# How many items by 2026-06-30? (percentile counts).
 flow forecast how-many --repo astral-sh/uv --target-date 2026-06-30
 ```
 
 Every command takes `--format text|json` (default `text`). See
 [REFERENCE § CLI](REFERENCE.md#cli).
 
-## Output for agents (JSON)
+## JSON envelopes
 
 ```bash
-flow forecast when-done --repo astral-sh/uv --items 50 --format json \
-    | jq '.summary.percentiles'
+flow metric cycle-time --repo astral-sh/uv \
+    --start 2026-05-04 --stop 2026-05-10 --format json \
+    | jq '.percentiles_days'
 ```
 
-JSON includes a schema URI (`flowmetrics.forecast.when_done.v1` etc.),
-raw input, raw result, training window, simulation parameters, chart
-data, captured stderr, and a one-line reproducer. Errors emit a
-`flowmetrics.error.v1` envelope with `hint` and `command_to_fix`.
+Every JSON envelope carries a versioned `schema` field:
+`flowmetrics.metric.throughput.v1`, `flowmetrics.metric.cumulative.v1`,
+`flowmetrics.metric.aging.v1`, `flowmetrics.metric.cycle_time.v1`,
+`flowmetrics.forecast.when_done.v1`,
+`flowmetrics.forecast.how_many.v1`. Plus `input` (every flag),
+`summary` (key numbers), the raw data, and a one-line `headline`.
 
 Field-by-field detail: [REFERENCE § Output envelopes](REFERENCE.md#output-envelopes).
 
@@ -549,7 +570,7 @@ to have `uv` do it for you.
 
 - [TUTORIAL.md](TUTORIAL.md) — linear walkthrough from zero to dashboard.
 - [REFERENCE.md](REFERENCE.md) — every command, flag, file, schema.
-- [METRICS.md](METRICS.md) — how each chart is computed.
+- [METRICS.md (archived)](METRICS.md.archive) — how each chart is computed.
 - [DECISIONS.md](DECISIONS.md) — why we built it this way.
 - [`scripts/scheduling/`](../scripts/scheduling/) — paste-ready
   scheduler templates per OS.

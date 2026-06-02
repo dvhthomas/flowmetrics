@@ -23,7 +23,7 @@ The string "backlog" appears nowhere in user-facing narrative copy
 
 Wall-clock time from when work was committed to until it was done.
 For a PR: `merged_at - created_at`. See
-[`docs/METRICS.md`](METRICS.md) for the GitHub-specific proxy and
+[`docs/METRICS.md`](METRICS.md.archive) for the GitHub-specific proxy and
 its limitations.
 
 ### Active time

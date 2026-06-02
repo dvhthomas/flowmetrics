@@ -347,7 +347,7 @@ suite until green.
 
 ### Task 3.1: `--include-issues` / `--no-include-issues` CLI flags
 
-- **Subject**: add the boolean flag to `flow aging`. Default
+- **Subject**: add the boolean flag to `flow metric aging`. Default
   `True` per spec; user can pass `--no-include-issues` to
   suppress.
 - **TDD evidence**: CLI integration test using `click`'s
@@ -381,7 +381,7 @@ suite until green.
 ### Task 3.3: end-to-end aging test with stitched Issue+PR fixture
 
 - **Subject**: fixture-driven test that runs the full CLI
-  `flow aging --repo X --wip-labels Y --include-issues
+  `flow metric aging --repo X --wip-labels Y --include-issues
   --offline` against an in-memory cache containing one Issue
   + one closing PR.
 - **TDD evidence**: test asserts the final HTML / JSON

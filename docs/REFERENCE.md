@@ -68,10 +68,10 @@ Fetch + canonicalise one workflow into Parquet. Exits 0 on success.
 
 ### `flow materialize --all`
 
-Iterate every YAML under `--workflows-dir` and materialize each. A
-single failing contract doesn't block the rest. Exit code is 0
-when at least one workflow succeeded; per-workflow detail lives in
-the manifest.
+Iterate every configured workflow (DB rows + un-migrated YAMLs)
+and materialize each. A single failing workflow doesn't block the
+rest. Exit code is 0 when at least one workflow succeeded;
+per-workflow detail lives in the manifest.
 
 | Flag | Default |
 |----|----|
@@ -125,20 +125,31 @@ Output columns: `NAME`, `SOURCE` (`db` = wizard-managed in
 `owner/repo` or `JIRA_PROJECT @ jira_url`). Archived rows carry a
 `[archived]` suffix.
 
-### Ad-hoc reports
+### `flow metric ...`
 
-All take `--repo OWNER/NAME` **or** `--jira-url URL --jira-project
-KEY` (mutually exclusive). All write to stdout unless `--output PATH`
-is given. All accept `--format text|json` (default `text`). Charts
-live in the web UI — the CLI is intentionally graphics-free.
+Text + JSON metric extraction for agents / headless humans. Each
+subcommand takes `--repo OWNER/NAME` **or** `--jira-url URL
+--jira-project KEY` (mutually exclusive) plus subcommand-specific
+flags. All write to stdout. `--format text` (default) → one-line
+headline; `--format json` → versioned envelope.
 
-| Command | Purpose | Required |
+| Subcommand | Purpose | Required |
 |----|----|----|
-| `flow efficiency` | Portfolio flow efficiency for a window | — (defaults to this week) |
+| `flow metric throughput` | Daily completion counts in a window | `--start --stop` |
+| `flow metric cumulative` | CFD points — state counts over time | `--start --stop --workflow` |
+| `flow metric aging` | In-flight × state × age + percentiles | `--workflow` *or* `--wip-labels` |
+| `flow metric cycle-time` | Per-item cycle times + P50/P70/P85/P95 | — (defaults to last 30 days) |
+
+### `flow forecast`
+
+Monte Carlo forecasts over the empirical throughput distribution.
+
+| Subcommand | Purpose | Required |
+|----|----|----|
 | `flow forecast when-done` | When will N items be done? | `--items` |
 | `flow forecast how-many` | How many items by a target date? | `--target-date` |
 
-Common ad-hoc flags:
+Common source-fetching flags (apply to `metric` + `forecast`):
 
 | Flag | Notes |
 |----|----|
@@ -147,8 +158,8 @@ Common ad-hoc flags:
 | `--offline / --online` | Cache-only vs. hit-API-on-miss. |
 | `--include-issues / --no-include-issues` | GitHub-only: also include Issues. |
 | `--format text\|json` | text=humans (default), json=agents. |
-| `--output PATH` | Stdout by default. |
-| `-v, --verbose` | Full text report (tables + interpretation). Default text is a one-line headline. |
+| `--workflow "A,B,C"` | Comma-separated states, earliest → latest. |
+| `--wip-labels "x,y,z"` | GitHub-only: PR-label-driven WIP, ordered. |
 
 Forecast-only:
 
@@ -162,11 +173,13 @@ Forecast-only:
 ## Workflow YAML
 
 One file per workflow, in `--workflows-dir`. The file name is
-arbitrary; the `contract.name` field is the identifier.
+arbitrary; the `workflow.name` field is the identifier. The first-boot
+migration imports YAMLs into `workflows.db` and moves the file to
+`migrated/`, so a YAML edit + restart round-trips through the wizard.
 
 ```yaml
-contract:
-  name: <unique-slug>        # required — used as the contract id
+workflow:
+  name: <unique-slug>        # required — used as the workflow id
   source: github | jira      # required
   start: YYYY-MM-DD          # required — window start (UTC)
   stop:  YYYY-MM-DD          # required — window stop (UTC)
@@ -235,14 +248,15 @@ versioned `schema` field. Schemas in current use:
 
 | Schema | Source command |
 |----|----|
-| `flowmetrics.efficiency.v1` | `flow efficiency` |
+| `flowmetrics.metric.throughput.v1` | `flow metric throughput` |
+| `flowmetrics.metric.cumulative.v1` | `flow metric cumulative` |
+| `flowmetrics.metric.aging.v1` | `flow metric aging` |
+| `flowmetrics.metric.cycle_time.v1` | `flow metric cycle-time` |
 | `flowmetrics.forecast.when_done.v1` | `flow forecast when-done` |
 | `flowmetrics.forecast.how_many.v1` | `flow forecast how-many` |
-| `flowmetrics.aging.v1` | `flow aging` |
-| `flowmetrics.cfd.v1` | `flow cfd` |
-| `flowmetrics.scatterplot.v1` | `flow scatterplot` |
-| `flowmetrics.error.v1` | any command on failure |
+| `flowmetrics.materialize_all.v1` | `flow materialize --all` daily manifest |
 | `flowmetrics.backup.v1` | header inside a `flow backup` tarball |
+| `flowmetrics.error.v1` | any command on failure |
 
 Common fields across success envelopes:
 
@@ -303,7 +317,7 @@ per-workflow detail.
 
 - [TUTORIAL.md](TUTORIAL.md) — linear walkthrough from zero to dashboard.
 - [HOWTO.md](HOWTO.md) — task-specific recipes.
-- [METRICS.md](METRICS.md) — what each chart computes.
+- [METRICS.md (archived)](METRICS.md.archive) — what each chart computes.
 - [FORECAST.md](FORECAST.md) — Monte Carlo when-done and how-many.
 - [GLOSSARY.md](GLOSSARY.md) — terms; the terms we avoid.
 - [DECISIONS.md](DECISIONS.md) — architectural trade-offs.

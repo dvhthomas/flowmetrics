@@ -53,23 +53,23 @@ in five minutes.
 
 **Interactive dashboard** — start the server, configure workflows in
 the browser, browse charts. The wizard probes your GitHub repo or
-Jira project, suggests stages, and writes a `contracts.db` — no
+Jira project, suggests stages, and writes a `workflows.db` — no
 hand-edited YAML needed.
 
 ```
 flow serve              # → http://127.0.0.1:8000 → "+ New workflow"
-# macOS: `flow serve --bg` installs a persistent LaunchAgent so the
-# dashboard survives logout / reboot.
+# macOS + Linux: `flow serve --bg` installs a persistent native
+# service (launchd / systemd-user) so the dashboard survives
+# logout and reboot.
 ```
 
-**Ad-hoc reports** — one-shot CLI for terminal pipelines and agent
-consumption (`--format json`). Text or JSON only; charts live in the
-web UI.
+**Metric extraction for agents** — graphics-free text + JSON output
+for pipelines and headless analysis.
 
 ```
-$ flow efficiency --repo astral-sh/uv
-Portfolio flow efficiency for astral-sh/uv May 5 → May 11:
-8.4% across 46 completed items.
+$ flow metric cycle-time --repo astral-sh/uv --start 2026-05-04 --stop 2026-05-10
+astral-sh/uv 2026-05-04 → 2026-05-10: 46 completed items;
+P50=1.2d, P85=3.4d, P95=7.1d.
 
 $ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
     | jq '.summary.percentiles'
@@ -78,9 +78,9 @@ $ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
 
 ## What you get
 
-- **Cycle Time** — scatterplot of completed items with empirical P50/P85/P95.
+- **Cycle Time** — per-item cycle times with empirical P50/P85/P95.
 - **Throughput** — daily completion counts with an empirical P50/P85
-  reference band (toggle: include weekends / weekdays only).
+  reference band.
 - **Cumulative Flow Diagram** — the six standard CFD properties laid out
   honestly: arrivals on top, departures on bottom, vertical distance =
   WIP, slope = arrival rate.
@@ -89,16 +89,14 @@ $ flow forecast when-done --repo astral-sh/uv --items 50 --format json \
   thresholds.
 - **Forecasts** — Monte Carlo *when-done* (date for N items) and
   *how-many* (items by target date) at 50/70/85/95% confidence.
-- **Flow efficiency** — Portfolio FE (`Σ active / Σ cycle`) across
-  merged items in a window. System-level, never per-engineer.
 
 ## Why this exists
 
 Most flow-metrics products implement the kanban-flow toolkit partially
-or with subtle distortions — a "flow efficiency" that's actually mean
-per-PR, a CFD that smooths over the vertical-distance-equals-WIP
-property, an Aging chart with percentile lines drawn from arbitrary
-windows. This project implements the math honestly, surfaces the
+or with subtle distortions — a CFD that smooths over the
+vertical-distance-equals-WIP property, an Aging chart with percentile
+lines drawn from arbitrary windows. This project implements the math
+honestly, surfaces the
 assumptions on the rendered page itself rather than hiding them in
 docs, and links out to the canonical references where a number could
 be misread. It's a learning artifact, not a product.
@@ -125,8 +123,6 @@ facts, plus background explainers.
 
 - **[CLI + YAML + file layout](docs/REFERENCE.md)** — every command,
   every flag, every file. Output envelope schemas.
-- **[Metrics](docs/METRICS.md)** — how cycle / active / wait time and
-  flow efficiency are computed; the clustering algorithm; assumptions.
 - **[Forecasting](docs/FORECAST.md)** — Monte Carlo when-done and
   how-many, with worked examples.
 - **[Glossary](docs/GLOSSARY.md)** — terms and definitions; the terms

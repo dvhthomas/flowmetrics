@@ -3,11 +3,11 @@
 Status: Draft v3 — needs human review before any code changes.
 Owner: dvhthomas
 Date: 2026-05-14
-Related: [DECISIONS.md #9 and #10](DECISIONS.md), [METRICS.md](METRICS.md)
+Related: [DECISIONS.md #9 and #10](DECISIONS.md), [METRICS.md (archived)](METRICS.md.archive)
 
 ## 1. Objective
 
-Make GitHub a first-class source for `flow cfd` and `flow aging` by
+Make GitHub a first-class source for `flow metric cumulative` and `flow metric aging` by
 **letting the caller name the labels that constitute WIP**. Everything
 else is "not WIP" by exclusion. The user supplies the WIP-label set
 per invocation; flowmetrics applies it.
@@ -69,12 +69,12 @@ WIP for the chart they want right now.
 
 ## 2. Success criteria
 
-1. `flow aging --repo OWNER/NAME --wip-labels "a,b,c"` renders an
+1. `flow metric aging --repo OWNER/NAME --wip-labels "a,b,c"` renders an
    Aging chart with one column per named label, in the order given,
    plotting only PRs whose **current** label set intersects
    `{a, b, c}`. PRs with no WIP labels currently applied are excluded
    from Aging.
-2. `flow cfd --repo OWNER/NAME --wip-labels "a,b,c"` renders a CFD
+2. `flow metric cumulative --repo OWNER/NAME --wip-labels "a,b,c"` renders a CFD
    with one band per named label, ordered as given, between an
    implicit pre-WIP arrivals band and a departures band. Vertical
    distance across the named bands at any date equals WIP count at
@@ -94,7 +94,7 @@ WIP for the chart they want right now.
    in that column until the label is removed (or never leaves it).
    This is intentional: it surfaces merged-but-not-shipped work as
    aging WIP, which is the symptom worth seeing.
-7. `flow aging --repo astral-sh/uv` (no `--wip-labels`) continues to
+7. `flow metric aging --repo astral-sh/uv` (no `--wip-labels`) continues to
    produce the same review-cycle output as today. No regression to
    the zero-config path.
 
@@ -124,10 +124,10 @@ Run:    uv run flow <subcommand> ...
 New CLI surface — additive:
 
 ```
-uv run flow aging --repo dvhthomas/kno \
+uv run flow metric aging --repo dvhthomas/kno \
     --wip-labels "shaping,in-progress,in-review"
 
-uv run flow cfd --repo dvhthomas/kno \
+uv run flow metric cumulative --repo dvhthomas/kno \
     --wip-labels "shaping,in-progress,in-review" \
     --window 30d
 ```
@@ -264,7 +264,7 @@ _NON_WIP = {PRE_WIP_STATUS, DEPARTED_STATUS, ABANDONED_STATUS}
 
 def is_aging_wip(item: WorkItem) -> bool:
     """True iff the item's current status is one of the user's WIP
-    labels — i.e. NOT in `_NON_WIP`. Used by `flow aging` in label
+    labels — i.e. NOT in `_NON_WIP`. Used by `flow metric aging` in label
     mode to drop rows that aren't currently WIP."""
 ```
 
@@ -664,7 +664,7 @@ sit at typical project coverage.
 | Timeline truncation at 100 events drops late label changes    | Low        | Counted into `timeline_truncated`; caption surfaces. Pagination is a follow-up.                  |
 | Caller supplies labels the repo has never used                | Medium     | `missing_wip_labels` count + `gh`-style "did you mean …" at startup.                             |
 | Concurrent labels produce surprising column choice            | Medium     | Caption: "most progress wins — rightmost in --wip-labels."                                       |
-| Two GitHub Aging modes (review-cycle vs label) confuse users  | Medium     | `flow aging --help` and the chart caption name the mode in use.                                  |
+| Two GitHub Aging modes (review-cycle vs label) confuse users  | Medium     | `flow metric aging --help` and the chart caption name the mode in use.                                  |
 | Merged-but-not-shipped PRs show as stuck WIP                  | Wanted     | Captioned: `merged_not_shipped: N`. This is the point.                                           |
 | Closed-not-merged PR with stale WIP label leaks into WIP      | Was high   | **Fixed in §8b:** `ABANDONED_STATUS` at `closedAt` regardless of labels. Counted.                |
 | Reopened PR loses its history                                 | Was high   | **Fixed in §8b:** lifecycle state machine consumes `ReopenedEvent`. Counted.                     |
@@ -691,7 +691,7 @@ Leans are defaults, not commitments.
    **Lean: yes.**
 5. **Discoverability** (per `feedback-issue-scope-dont-invent-flags`
    memory). This is genuine new capability — no existing flag does
-   this. `flow aging --help` must clearly note that two modes exist
+   this. `flow metric aging --help` must clearly note that two modes exist
    (review-cycle by default, label mode when `--wip-labels` is
    supplied).
 

@@ -118,7 +118,7 @@ page.
   [HOWTO § Run as a persistent web server](HOWTO.md#run-as-a-persistent-web-server).
 - **Back up + restore** your warehouse and config →
   [HOWTO § Back up](HOWTO.md#back-up--restore).
-- **Ad-hoc reports** for terminals / agents (`flow forecast`,
-  `flow efficiency`, …) → [HOWTO § Ad-hoc CLI reports](HOWTO.md#ad-hoc-cli-reports).
+- **Metric extraction for agents** (`flow metric throughput / cumulative
+  / aging / cycle-time`, `flow forecast`) → [HOWTO § Extract metrics for agents](HOWTO.md#extract-metrics-for-agents).
 - **Define workflows from YAML** (scripted / committable, instead of
   the wizard) → [HOWTO § Write a workflow YAML by hand](HOWTO.md#write-a-workflow-yaml-by-hand).
