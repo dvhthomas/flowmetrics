@@ -1009,9 +1009,13 @@ def metric_cycle_time(
 @click.option(
     "--cache-dir",
     type=click.Path(path_type=Path),
-    default=DEFAULT_CACHE_DIR,
-    show_default=True,
-    help="Source-API response cache (read by GitHub/Jira adapters).",
+    default=None,
+    help=(
+        "Source-API response cache (read by GitHub/Jira adapters). "
+        "Defaults to `<data-dir>/.cache/github` — one tree per "
+        "`flow` install means launchd / cron / systemd never "
+        "inherit a CWD-relative path."
+    ),
 )
 @click.option(
     "--offline/--online",
@@ -1089,7 +1093,7 @@ def materialize(
     all_workflows: bool,
     data_dir: Path,
     contracts_dir: Path,
-    cache_dir: Path,
+    cache_dir: Path | None,
     offline: bool,
     since,  # click.DateTime → datetime | None
     until,
@@ -1132,12 +1136,18 @@ def materialize(
             "Did you mean `flow materialize --bg --stop`?"
         )
 
+    # Co-locate cache with the warehouse it feeds. The launchd /
+    # cron / systemd path cannot rely on CWD-relative defaults — see
+    # `_default_cache_dir`'s docstring.
+    resolved_cache_dir = _default_cache_dir(cache_dir, data_dir)
+
     if bg:
         _materialize_bg(
             name=name,
             all_workflows=all_workflows,
             data_dir=data_dir,
             contracts_dir=contracts_dir,
+            cache_dir=resolved_cache_dir,
             at_time=at_time,
             stop=stop,
         )
@@ -1167,7 +1177,7 @@ def materialize(
         _materialize_all(
             data_dir=data_dir,
             contracts_dir=contracts_dir,
-            cache_dir=cache_dir,
+            cache_dir=resolved_cache_dir,
             offline=offline,
             manifest_path=manifest_path,
         )
@@ -1176,7 +1186,7 @@ def materialize(
             name=name,
             data_dir=data_dir,
             contracts_dir=contracts_dir,
-            cache_dir=cache_dir,
+            cache_dir=resolved_cache_dir,
             offline=offline,
             since=since,
             until=until,
@@ -1202,12 +1212,27 @@ def _parse_at(at_time: str) -> tuple[int, int]:
     return hour, minute
 
 
+def _default_cache_dir(cache_dir: Path | None, data_dir: Path) -> Path:
+    """Resolve `--cache-dir` for the materialize command.
+
+    Returns the explicit value when set; otherwise derives
+    `<data-dir>/.cache/github`. Co-locating with the warehouse means
+    `flow materialize` works the same under launchd (CWD=`/`,
+    sealed-system-volume read-only), under cron, and from any
+    interactive shell — never inheriting whatever CWD the launcher
+    happened to choose."""
+    if cache_dir is not None:
+        return cache_dir
+    return data_dir / ".cache" / "github"
+
+
 def _materialize_bg(
     *,
     name: str | None,
     all_workflows: bool,
     data_dir: Path,
     contracts_dir: Path,
+    cache_dir: Path,
     at_time: str | None,
     stop: bool,
 ) -> None:
@@ -1254,6 +1279,7 @@ def _materialize_bg(
     flow_bin = Path(flow_bin_str).resolve()
     data_dir_abs = data_dir.resolve()
     contracts_dir_abs = contracts_dir.resolve()
+    cache_dir_abs = cache_dir.resolve()
     log_dir = data_dir_abs / "_status"
 
     # The args carried INTO the scheduled command — everything that
@@ -1268,6 +1294,10 @@ def _materialize_bg(
     materialize_args.extend([
         "--workflows-dir", str(contracts_dir_abs),
         "--data-dir", str(data_dir_abs),
+        # Pin the cache dir explicitly so launchd never inherits a
+        # CWD-relative default (which on macOS resolves under `/`,
+        # the read-only sealed system volume → OSError [Errno 30]).
+        "--cache-dir", str(cache_dir_abs),
     ])
 
     try:
@@ -1285,7 +1315,9 @@ def _materialize_bg(
         f"scheduled materialize installed at {unit_path}\n"
         f"  fires:   daily at {hour:02d}:{minute:02d} local time\n"
         f"  command: flow materialize {selector} "
-        f"--workflows-dir {contracts_dir_abs} --data-dir {data_dir_abs}\n"
+        f"--workflows-dir {contracts_dir_abs} "
+        f"--data-dir {data_dir_abs} "
+        f"--cache-dir {cache_dir_abs}\n"
         f"  logs:    {log_dir}/materialize.{{out,err}}.log\n"
         f"  stop:    flow materialize --bg --stop"
     )
