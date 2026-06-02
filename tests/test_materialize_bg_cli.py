@@ -111,6 +111,78 @@ class TestInstallSchedule:
         data_idx = args.index("--data-dir")
         assert Path(args[data_idx + 1]).is_absolute()
 
+    def test_bg_at_bakes_absolute_cache_dir_into_args(
+        self, tmp_path, monkeypatch,
+    ):
+        """launchd fires the scheduled job from CWD=`/` (sealed,
+        read-only). A relative cache_dir default resolves to `/.cache/`
+        and the job dies with `OSError [Errno 30]`. The install path
+        must therefore bake an absolute --cache-dir into the plist
+        args — never trust the CLI default to do the right thing once
+        launchd is the caller."""
+        install_calls, _ = _patch_bg(monkeypatch)
+        data = tmp_path / "data"
+
+        res = CliRunner().invoke(cli, [
+            "materialize", "--all", "--bg", "--at", "06:00",
+            "--workflows-dir", str(tmp_path / "contracts"),
+            "--data-dir", str(data),
+        ])
+        assert res.exit_code == 0, res.output
+        args = install_calls[0]["materialize_args"]
+        assert "--cache-dir" in args, (
+            f"--cache-dir missing from scheduled args: {args}"
+        )
+        cache_idx = args.index("--cache-dir")
+        cache_val = Path(args[cache_idx + 1])
+        assert cache_val.is_absolute(), (
+            f"scheduled --cache-dir must be absolute, got {cache_val}"
+        )
+
+    def test_bg_at_default_cache_dir_lives_under_data_dir(
+        self, tmp_path, monkeypatch,
+    ):
+        """When the operator doesn't pass --cache-dir, the scheduled
+        job inherits a cache path under --data-dir. Co-locating means
+        backup, cleanup, and 'what is flowmetrics keeping on disk'
+        all live in one tree, and the launchd CWD problem can never
+        bite again."""
+        install_calls, _ = _patch_bg(monkeypatch)
+        data = tmp_path / "data"
+
+        res = CliRunner().invoke(cli, [
+            "materialize", "--all", "--bg", "--at", "06:00",
+            "--workflows-dir", str(tmp_path / "contracts"),
+            "--data-dir", str(data),
+        ])
+        assert res.exit_code == 0, res.output
+        args = install_calls[0]["materialize_args"]
+        cache_idx = args.index("--cache-dir")
+        cache_val = Path(args[cache_idx + 1])
+        # Default derivation: <data-dir>/.cache/github (absolute).
+        assert cache_val == (data.resolve() / ".cache" / "github"), (
+            f"expected derived <data-dir>/.cache/github, got {cache_val}"
+        )
+
+    def test_bg_at_explicit_cache_dir_is_honored(
+        self, tmp_path, monkeypatch,
+    ):
+        """Power-user override path: an explicit --cache-dir wins
+        over the data-dir-derived default."""
+        install_calls, _ = _patch_bg(monkeypatch)
+        custom_cache = tmp_path / "elsewhere" / "cache"
+
+        res = CliRunner().invoke(cli, [
+            "materialize", "--all", "--bg", "--at", "06:00",
+            "--workflows-dir", str(tmp_path / "contracts"),
+            "--data-dir", str(tmp_path / "data"),
+            "--cache-dir", str(custom_cache),
+        ])
+        assert res.exit_code == 0, res.output
+        args = install_calls[0]["materialize_args"]
+        cache_idx = args.index("--cache-dir")
+        assert Path(args[cache_idx + 1]) == custom_cache.resolve()
+
     def test_bg_at_with_single_workflow_name(
         self, tmp_path, monkeypatch,
     ):
