@@ -26,7 +26,21 @@ from __future__ import annotations
 
 import plistlib
 import subprocess
+import sys
 from pathlib import Path
+
+import pytest
+
+# Plist render takes Path objects and stringifies them into the
+# `ProgramArguments` array. On Windows, `str(Path('/Users/.../flow'))`
+# uses backslashes — which is nonsense for launchd (macOS-only) and
+# makes the cross-platform string-equality assertions in this file
+# trip over the host's path style. Skip the whole module on Windows;
+# the production code-path is never reached there anyway.
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="launchd is macOS-only; render path is unreachable on Windows.",
+)
 
 
 class TestRenderServePlist:

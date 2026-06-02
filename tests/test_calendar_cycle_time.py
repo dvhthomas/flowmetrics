@@ -132,7 +132,9 @@ class TestCycleTimeDays:
         for path in src_root.rglob("*.py"):
             if "__pycache__" in path.parts:
                 continue
-            for lineno, line in enumerate(path.read_text().splitlines(), 1):
+            for lineno, line in enumerate(
+                path.read_text(encoding="utf-8").splitlines(), 1,
+            ):
                 if "def cycle_time_days(" in line:
                     rel = str(path.relative_to(src_root))
                     if rel != "materialize.py":

@@ -32,8 +32,11 @@ class FileCache:
         path = self._path(key)
         if not path.exists():
             return None
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
 
     def put(self, key: str, value: dict[str, Any]) -> None:
         self.directory.mkdir(parents=True, exist_ok=True)
-        self._path(key).write_text(json.dumps(value, sort_keys=True, indent=2))
+        self._path(key).write_text(
+            json.dumps(value, sort_keys=True, indent=2),
+            encoding="utf-8",
+        )

@@ -423,7 +423,7 @@ def load_contract(name: str, contracts_dir: Path) -> Workflow:
                 f"workflow {name!r} not found under {contracts_dir}/ "
                 f"(looked for {name}.yaml and {name}.yml)"
             )
-    return parse_workflow_text(path.read_text(), name)
+    return parse_workflow_text(path.read_text(encoding="utf-8"), name)
 
 
 def emit_canonical_yaml(workflow: Workflow) -> str:

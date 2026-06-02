@@ -17,7 +17,18 @@ Pins three things, same shape as the launchd tests:
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
+
+import pytest
+
+# systemd is Linux-only. The render path stringifies Path objects;
+# on Windows those use backslashes, which is meaningless for a
+# `.service` file we'd never install there anyway.
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="systemd is Linux-only; render path is unreachable on Windows.",
+)
 
 
 class TestRenderServeUnit:

@@ -362,7 +362,7 @@ def ensure_initialized(workflows_dir: Path) -> None:
             continue
         name = path.stem
         try:
-            workflow = parse_workflow_text(path.read_text(), name)
+            workflow = parse_workflow_text(path.read_text(encoding="utf-8"), name)
         except WorkflowError:
             # Leave the bad YAML where it is so the user sees it.
             continue
@@ -447,7 +447,7 @@ class WorkflowStore:
             path = self.workflows_dir / f"{contract_id}{ext}"
             if not path.exists():
                 continue
-            text = path.read_text()
+            text = path.read_text(encoding="utf-8")
             try:
                 workflow = parse_workflow_text(text, contract_id)
             except WorkflowError:
